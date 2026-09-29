@@ -1,6 +1,8 @@
 # Nekkora Commercial Experience V1 — Arquitetura da página
 
-Página única (landing comercial) com navegação por âncoras. Tema: **Nekkora Dark**.
+Página única (landing comercial) com navegação por âncoras. Temas: **Midnight Blue** (escuro, padrão) e
+**Sage Light** (claro), alternados pelo `ThemeToggle` da nekkora-lib na barra de navegação. A escolha fica no
+`localStorage` (`nekkora-commercial-theme`) e é aplicada antes da primeira pintura por um script no `index.html`.
 Todos os componentes de interface vêm da **nekkora-lib**; o que é específico da página
 (ilustrações, composição das seções) fica em `src/`.
 
@@ -62,8 +64,9 @@ O botão flutuante some enquanto a seção de contato está na tela, para não c
 
 ## Ilustrações
 
-Todas em SVG, desenhadas em código (`src/illustrations/`), com a paleta da marca e o mesmo gato de óculos
-Cat-Eye do logo:
+Todas em SVG, desenhadas em código (`src/illustrations/`), com o mesmo gato de óculos Cat-Eye do logo. As cores
+vêm de variáveis `--ill-*` (`src/styles.css`) derivadas dos tokens do tema ativo, então as cenas acompanham o
+tema escolhido — nos temas claros o corpo do gato usa a cor secundária para os óculos continuarem visíveis:
 
 | Componente | Tema | Cena |
 |---|---|---|

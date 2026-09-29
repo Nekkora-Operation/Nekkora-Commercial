@@ -22,3 +22,6 @@ export const NAV_LINKS = [
   { label: 'Suporte', href: '#suporte' },
   { label: 'Contato', href: '#contato' },
 ];
+
+/** Chave do localStorage com o tema escolhido (Midnight Blue escuro · Sage Light claro). Lida também no index.html. */
+export const THEME_STORAGE_KEY = 'nekkora-commercial-theme';

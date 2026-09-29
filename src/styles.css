@@ -3,6 +3,36 @@
    Cores, tipografia e componentes vêm da nekkora-lib (tokens --nk-*).
    ========================================================================== */
 
+/* Paleta das ilustrações (src/illustrations) — derivada dos tokens do tema ativo */
+:root {
+  --ill-bg: var(--nk-color-bg);
+  --ill-panel: var(--nk-color-surface);
+  --ill-panel2: var(--nk-color-card);
+  --ill-line: color-mix(in srgb, var(--nk-color-text) 18%, var(--nk-color-surface));
+  --ill-plum: color-mix(in srgb, var(--nk-color-primary) 55%, var(--nk-color-bg));
+  --ill-plum2: var(--nk-color-primary);
+  --ill-mauve: var(--nk-color-secondary);
+  --ill-pink: var(--nk-color-accent);
+  --ill-pink-deep: var(--nk-solid-accent);
+  --ill-blush: var(--nk-color-highlight);
+  --ill-cream: color-mix(in srgb, var(--nk-color-highlight) 30%, #ffffff);
+  --ill-ink: color-mix(in srgb, var(--nk-color-primary) 25%, #0b0d12);
+  --ill-green: var(--nk-color-success);
+  --ill-red: var(--nk-color-danger);
+  --ill-violet: var(--nk-color-info);
+  --ill-amber: var(--nk-color-warning);
+}
+/* Temas claros: acento e primária coincidem (ex.: Sage Light) — o mascote usa a secundária no corpo para os
+   óculos (acento) continuarem visíveis; lentes brancas e linhas um pouco mais marcadas. */
+[data-nk-theme='light'],
+[data-nk-theme='porcelain-light'],
+[data-nk-theme='sage-light'] {
+  --ill-plum: color-mix(in srgb, var(--nk-color-secondary) 55%, var(--nk-color-bg));
+  --ill-plum2: var(--nk-color-secondary);
+  --ill-cream: #ffffff;
+  --ill-line: color-mix(in srgb, var(--nk-color-text) 22%, var(--nk-color-surface));
+}
+
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body { margin: 0; background: var(--nk-color-bg); }

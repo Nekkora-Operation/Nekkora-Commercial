@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, FloatingButton, Logo, Navbar } from 'nekkora-lib';
+import { Button, FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
 import { NAV_LINKS, whatsappUrl } from './config';
 import { Contact } from './sections/Contact';
 import { Differentials } from './sections/Differentials';
@@ -32,6 +32,14 @@ function useActiveSection(hrefs: string[]) {
 
 const HREFS = NAV_LINKS.map((l) => l.href);
 
+/** Mantém a cor da barra do navegador (meta theme-color) igual ao fundo do tema ativo. */
+function useThemeColorMeta() {
+  const { resolvedTheme } = useTheme();
+  useEffect(() => {
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themes[resolvedTheme].palette.bg);
+  }, [resolvedTheme]);
+}
+
 /** true enquanto a seção de contato está visível (ela já tem o próprio botão de WhatsApp). */
 function useContactVisible() {
   const [visible, setVisible] = useState(false);
@@ -58,6 +66,7 @@ function useMediaQuery(query: string) {
 
 export function App() {
   const active = useActiveSection(HREFS);
+  useThemeColorMeta();
   // No celular, o botão flutuante sai de cena enquanto o contato está visível.
   const contactVisible = useContactVisible();
   const isMobile = useMediaQuery('(max-width: 900px)');
@@ -73,6 +82,7 @@ export function App() {
         brandHref="#inicio"
         links={NAV_LINKS}
         activeHref={active}
+        tools={<ThemeToggle />}
         actions={
           <Button size="sm" leftIcon="whatsapp" href={whatsappUrl()}>
             Falar no WhatsApp
