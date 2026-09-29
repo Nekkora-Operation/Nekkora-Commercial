@@ -19,4 +19,8 @@ export const P = {
   red: 'var(--ill-red)',
   violet: 'var(--ill-violet)',
   amber: 'var(--ill-amber)',
+  /** Mascote: cabeça, corpo e aro dos óculos (nos temas claros o aro fica escuro sobre o gato claro). */
+  catHead: 'var(--ill-cat-head)',
+  catBody: 'var(--ill-cat-body)',
+  catFrame: 'var(--ill-cat-frame)',
 } as const;

@@ -21,9 +21,12 @@
   --ill-red: var(--nk-color-danger);
   --ill-violet: var(--nk-color-info);
   --ill-amber: var(--nk-color-warning);
+  --ill-cat-head: var(--ill-plum2);
+  --ill-cat-body: var(--ill-plum);
+  --ill-cat-frame: var(--ill-pink);
 }
-/* Temas claros: acento e primária coincidem (ex.: Sage Light) — o mascote usa a secundária no corpo para os
-   óculos (acento) continuarem visíveis; lentes brancas e linhas um pouco mais marcadas. */
+/* Temas claros: acento e primária coincidem (ex.: Sage Light). O mascote fica claro, com o aro dos óculos no tom
+   mais escuro do acento e lentes brancas — o mesmo contraste do logo sobre fundo claro. */
 [data-nk-theme='light'],
 [data-nk-theme='porcelain-light'],
 [data-nk-theme='sage-light'] {
@@ -31,6 +34,9 @@
   --ill-plum2: var(--nk-color-secondary);
   --ill-cream: #ffffff;
   --ill-line: color-mix(in srgb, var(--nk-color-text) 22%, var(--nk-color-surface));
+  --ill-cat-head: color-mix(in srgb, var(--nk-color-secondary) 62%, #ffffff);
+  --ill-cat-body: color-mix(in srgb, var(--nk-color-secondary) 85%, #ffffff);
+  --ill-cat-frame: var(--nk-color-accent-active);
 }
 
 html { scroll-behavior: smooth; }

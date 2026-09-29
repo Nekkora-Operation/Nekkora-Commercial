@@ -27,16 +27,16 @@ export function Neko({ x = 0, y = 0, scale = 1, look = 0, lookUp = false, headse
       {/* corpo */}
       {!peek && (
         <>
-          <path d="M12 152C12 120 34 104 64 104C94 104 116 120 116 152Z" fill={P.plum} />
-          <path d="M46 152C48 128 56 116 64 116C72 116 80 128 82 152Z" fill={P.plum2} opacity="0.55" />
+          <path d="M12 152C12 120 34 104 64 104C94 104 116 120 116 152Z" fill={P.catBody} />
+          <path d="M46 152C48 128 56 116 64 116C72 116 80 128 82 152Z" fill={P.catHead} opacity="0.55" />
         </>
       )}
 
       {/* cabeça */}
       <path
         d="M14 62L30 16L52 38Q64 34 76 38L98 16L114 62C118 92 94 112 64 112C34 112 10 92 14 62Z"
-        fill={P.plum2}
-        stroke={P.plum2}
+        fill={P.catHead}
+        stroke={P.catHead}
         strokeWidth="8"
         strokeLinejoin="round"
       />
@@ -47,13 +47,13 @@ export function Neko({ x = 0, y = 0, scale = 1, look = 0, lookUp = false, headse
       <path d="M36 90L14 86M36 96L15 98M92 90L114 86M92 96L113 98" stroke={P.blush} strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" />
 
       {/* óculos Cat-Eye */}
-      <g stroke={P.pink} strokeWidth="5" strokeLinejoin="round">
-        <path d="M29.9 64.9L26 50.5L38.9 55.9Z" fill={P.pink} />
-        <path d="M98.1 64.9L102 50.5L89.1 55.9Z" fill={P.pink} />
+      <g stroke={P.catFrame} strokeWidth="5" strokeLinejoin="round">
+        <path d="M29.9 64.9L26 50.5L38.9 55.9Z" fill={P.catFrame} />
+        <path d="M98.1 64.9L102 50.5L89.1 55.9Z" fill={P.catFrame} />
         <circle cx="44" cy="70" r="15" fill={P.cream} />
         <circle cx="84" cy="70" r="15" fill={P.cream} />
       </g>
-      <path d="M59 68Q64 63 69 68" fill="none" stroke={P.pink} strokeWidth="5" strokeLinecap="round" />
+      <path d="M59 68Q64 63 69 68" fill="none" stroke={P.catFrame} strokeWidth="5" strokeLinecap="round" />
       <ellipse cx={44 + dx} cy={71 + dy} rx="3.4" ry="7.2" fill={P.ink} />
       <ellipse cx={84 + dx} cy={71 + dy} rx="3.4" ry="7.2" fill={P.ink} />
       <circle cx={46 + dx} cy={66.5 + dy} r="1.6" fill="#FFFFFF" />
@@ -76,7 +76,7 @@ export function Neko({ x = 0, y = 0, scale = 1, look = 0, lookUp = false, headse
 
       {/* patinhas (modo espiando) */}
       {peek && (
-        <g fill={P.plum2}>
+        <g fill={P.catHead}>
           <rect x="24" y="104" width="26" height="16" rx="8" />
           <rect x="78" y="104" width="26" height="16" rx="8" />
           <path d="M32 113V118M38 113V118M86 113V118M92 113V118" stroke={P.bg} strokeOpacity="0.45" strokeWidth="1.6" strokeLinecap="round" />
