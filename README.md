@@ -1,9 +1,16 @@
 # nekkora-commercial
 
-Página comercial da Nekkora (**Commercial Experience V1**): apresenta o Studio, a hospedagem de automações, o
-monitoramento e o suporte operacional, com contato direto por WhatsApp.
+Página comercial da Nekkora (**COM-001 — posicionamento comercial**). Apresenta duas ofertas complementares:
+
+- **Nekkora Delivery** — desenvolvimento de automações por demanda, com escopo, preço e aceite definidos em proposta.
+- **Nekkora Hosting** — infraestrutura e serviços para executar automações, em avaliação de viabilidade.
 
 Feita com **Vite + React + TypeScript** e a **[nekkora-lib](../Nekkora-lib)** (design system da Nekkora).
+Tema padrão **Sakura Dark**, com alternância para **Sage Light**.
+
+> **Versão para homologação.** Os canais de contato ainda não foram confirmados: a página não mostra WhatsApp,
+> e-mail nem redes sociais, e o formulário funciona em modo de demonstração (valida, mas não envia nada).
+> Veja [docs/com-001/08-pendencias-publicacao.md](docs/com-001/08-pendencias-publicacao.md).
 
 ## Rodando localmente
 
@@ -12,7 +19,7 @@ As duas pastas precisam ficar lado a lado, porque a lib é instalada direto da p
 ```
 projetos/
 ├── Nekkora-lib/
-└── nekkora-commercial/
+└── Nekkora-Commercial/
 ```
 
 ```bash
@@ -20,7 +27,7 @@ projetos/
 cd Nekkora-lib && npm install && npm run build
 
 # 2. rodar a página
-cd ../nekkora-commercial && npm install
+cd ../Nekkora-Commercial && npm install
 npm run dev        # http://localhost:5173
 ```
 
@@ -30,24 +37,34 @@ npm run dev        # http://localhost:5173
 | `npm run build` | Build estático em `dist/` |
 | `npm run preview` | Serve o build para conferir |
 | `npm run check` | Tipos + build (rodar antes de juntar uma branch) |
+| `npm run homologacao -- <url> <pasta>` | Verificação em navegador real: capturas, axe-core, teclado, formulário, links e alegações proibidas. Precisa de Playwright e axe-core (`NEKKORA_PW_MODULES=<node_modules que os contenha>`) |
+| `npm run texto` | Gera `docs/com-001/05-texto-comercial.md` a partir de `src/content.ts` |
 
-> Mudou algo na lib? Rode `npm run build` na `Nekkora-lib`. A página usa um link para a pasta, então basta recarregar.
+## Onde mudar o quê
 
-## Antes de divulgar
+| Quero mudar… | Arquivo |
+|---|---|
+| Qualquer texto da página | `src/content.ts` (os comentários `[A-01]`… apontam a [matriz de alegações](docs/com-001/03-matriz-alegacoes.md)) |
+| Canais de contato, menu, aviso de homologação | `src/config.ts` |
+| Layout de uma seção | `src/sections/*.tsx` |
+| Espaçamentos e composição | `src/styles.css` (somente tokens `--nk-*`) |
 
-Preencha os dados reais em **`src/config.ts`**: número do WhatsApp, e-mail, Instagram e LinkedIn.
-Hoje estão com valores provisórios.
+Antes de mudar uma promessa comercial, atualize o [contrato](docs/com-001/02-contrato-comercial.md) e a matriz.
 
 ## Estrutura
 
 ```
 src/
-├── config.ts            contatos, links do menu e mensagem padrão do WhatsApp
-├── App.tsx              Navbar, seções, footer e WhatsApp flutuante
+├── content.ts           texto comercial (fonte única)
+├── config.ts            canais de contato validados, menu, aviso de homologação, chave do tema
+├── App.tsx              Navbar, seções, footer e WhatsApp flutuante (só com número confirmado)
 ├── styles.css           layout e composição (cores e componentes vêm da lib)
-├── sections/            Hero, Services, HowItWorks, Studio, Hosting, Monitoring, Support,
-│                        Differentials, Contact, Footer
+├── sections/            Hero, Solutions, Delivery, HowItWorks, Hosting, Combined, Differentials,
+│                        Transparency, Contact, Footer
 └── illustrations/       mascote (Neko) e cenas em SVG
-docs/ARQUITETURA.md      seções, wireframe, ilustrações e decisões
-public/                  favicons da marca
+scripts/                 homologacao.mjs, homologacao-canais.mjs, exportar-texto.mjs
+docs/ARQUITETURA.md      visão geral da página
+docs/com-001/            auditoria, contrato, matriz, arquitetura, texto, roteiro, checklist, pendências,
+                         relatório e evidências
+public/                  favicons da marca (idênticos aos da nekkora-lib)
 ```

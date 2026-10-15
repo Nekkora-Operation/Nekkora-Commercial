@@ -122,9 +122,9 @@ export function HostingScene({ className }: { className?: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Studio: gato analisando o fluxo (blueprint) e a documentação       */
+/* Delivery: gato analisando o fluxo (blueprint) e a documentação       */
 /* ------------------------------------------------------------------ */
-export function StudioScene({ className }: { className?: string }) {
+export function DeliveryScene({ className }: { className?: string }) {
   return (
     <Scene className={className} label="Gato de óculos analisando o fluxo de uma automação num quadro e um documento gerado ao lado">
       <Glow id="g-studio" cx={300} cy={140} r={200} />

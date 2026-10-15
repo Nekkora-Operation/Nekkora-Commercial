@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Button, FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
 import { NAV_LINKS, whatsappUrl } from './config';
+import { Combined } from './sections/Combined';
 import { Contact } from './sections/Contact';
+import { Delivery } from './sections/Delivery';
 import { Differentials } from './sections/Differentials';
 import { Footer } from './sections/Footer';
 import { Hero } from './sections/Hero';
 import { Hosting } from './sections/Hosting';
 import { HowItWorks } from './sections/HowItWorks';
-import { Monitoring } from './sections/Monitoring';
-import { Services } from './sections/Services';
-import { Studio } from './sections/Studio';
-import { Support } from './sections/Support';
+import { Solutions } from './sections/Solutions';
+import { Transparency } from './sections/Transparency';
 
 /** Retorna o href (#id) da seção do menu que está visível. */
 function useActiveSection(hrefs: string[]) {
@@ -64,6 +64,9 @@ function useMediaQuery(query: string) {
   return matches;
 }
 
+/** WhatsApp só com número confirmado em config.ts (sem destino provisório). */
+const WHATSAPP = whatsappUrl();
+
 export function App() {
   const active = useActiveSection(HREFS);
   useThemeColorMeta();
@@ -73,8 +76,8 @@ export function App() {
   const tucked = contactVisible && isMobile;
 
   return (
-    <div className="page">
-      <a className="nk-visually-hidden" href="#conteudo">
+    <div className={WHATSAPP ? 'page page--fab' : 'page'}>
+      <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
       <Navbar
@@ -84,33 +87,35 @@ export function App() {
         activeHref={active}
         tools={<ThemeToggle />}
         actions={
-          <Button size="sm" leftIcon="whatsapp" href={whatsappUrl()}>
-            Falar no WhatsApp
+          <Button size="sm" rightIcon="arrow-right" href="#contato">
+            Solicitar avaliação
           </Button>
         }
       />
-      <main id="conteudo">
+      <main id="conteudo" tabIndex={-1}>
         <Hero />
-        <Services />
+        <Solutions />
+        <Delivery />
         <HowItWorks />
-        <Studio />
         <Hosting />
-        <Monitoring />
-        <Support />
+        <Combined />
         <Differentials />
+        <Transparency />
         <Contact />
       </main>
       <Footer />
-      <FloatingButton
-        href={whatsappUrl()}
-        icon="whatsapp"
-        label="Fale conosco"
-        tone="whatsapp"
-        pulse
-        className={tucked ? 'fab--tucked' : undefined}
-        aria-hidden={tucked || undefined}
-        tabIndex={tucked ? -1 : undefined}
-      />
+      {WHATSAPP && (
+        <FloatingButton
+          href={WHATSAPP}
+          icon="whatsapp"
+          label="Fale conosco"
+          tone="whatsapp"
+          pulse
+          className={tucked ? 'fab--tucked' : undefined}
+          aria-hidden={tucked || undefined}
+          tabIndex={tucked ? -1 : undefined}
+        />
+      )}
     </div>
   );
 }

@@ -1,45 +1,28 @@
-import { SectionHeader, Steps } from 'nekkora-lib';
+import { Icon, SectionHeader, Steps, Text } from 'nekkora-lib';
+import { HOW_IT_WORKS } from '../content';
 
 export function HowItWorks() {
+  const { timing } = HOW_IT_WORKS;
   return (
     <section id="como-funciona" className="section section--band" aria-labelledby="como-title">
       <div className="wrap stack">
-        <SectionHeader
-          titleId="como-title"
-          eyebrow="Como funciona"
-          title="Uma jornada clara, do primeiro contato à operação contínua"
-          description="Cada etapa tem dono, entregável e acompanhamento. Você sabe onde está e o que vem depois."
-        />
+        <SectionHeader titleId="como-title" eyebrow={HOW_IT_WORKS.eyebrow} title={HOW_IT_WORKS.title} description={HOW_IT_WORKS.description} />
         <div className="journey">
-          <Steps
-            items={[
-              {
-                icon: 'message',
-                title: 'Entendemos sua necessidade',
-                description: 'Conversamos sobre o processo, as regras e o resultado esperado.',
-              },
-              {
-                icon: 'studio',
-                title: 'Estruturamos no Studio',
-                description: 'O processo vira desenho e documentação, prontos para desenvolver.',
-              },
-              {
-                icon: 'server',
-                title: 'Executamos a automação',
-                description: 'A automação roda em ambiente preparado e operado pela Nekkora.',
-              },
-              {
-                icon: 'pulse',
-                title: 'Monitoramos a operação',
-                description: 'Acompanhamos execuções, falhas e eventos no dia a dia.',
-              },
-              {
-                icon: 'headset',
-                title: 'Apoiamos a sustentação',
-                description: 'Tratamos incidentes e evoluímos a automação com você.',
-              },
-            ]}
-          />
+          <Steps items={HOW_IT_WORKS.steps} />
+        </div>
+        <div className="timing">
+          <div className="timing__head">
+            <Icon name="clock" size="md" />
+            <Text id="prazo-title" variant="h4" as="h3">
+              {timing.title}
+            </Text>
+          </div>
+          <p>{timing.text}</p>
+          <ul>
+            {timing.items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

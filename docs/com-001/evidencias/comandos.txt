@@ -1,0 +1,129 @@
+# Bateria final COM-001 — 2026-10-15T06:57:57-03:00
+node v24.19.0 · npm 11.17.0 · branch feat/com-001-commercial-positioning · Playwright 1.63.0 · axe-core 4.13.0
+
+$ npm run typecheck
+> nekkora-commercial@0.1.0 typecheck
+> tsc --noEmit
+exit=0
+
+$ npm run build
+> nekkora-commercial@0.1.0 build
+> vite build
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 61 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.34 kB │ gzip:   0.74 kB
+dist/assets/index-qDM1MbN1.css   82.82 kB │ gzip:  13.76 kB
+dist/assets/index-cG-7lLtU.js   337.29 kB │ gzip: 103.63 kB
+✓ built in 165ms
+exit=0
+
+$ npm run check
+> nekkora-commercial@0.1.0 check
+> npm run typecheck && npm run build
+> nekkora-commercial@0.1.0 typecheck
+> tsc --noEmit
+> nekkora-commercial@0.1.0 build
+> vite build
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 61 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.34 kB │ gzip:   0.74 kB
+dist/assets/index-qDM1MbN1.css   82.82 kB │ gzip:  13.76 kB
+dist/assets/index-cG-7lLtU.js   337.29 kB │ gzip: 103.63 kB
+✓ built in 157ms
+exit=0
+
+$ npm run texto
+> nekkora-commercial@0.1.0 texto
+> node scripts/exportar-texto.mjs
+Gerado: docs\com-001\05-texto-comercial.md
+exit=0
+
+$ git -C ../Nekkora-lib status --porcelain | wc -l   (lib não alterada)
+0
+HEAD c4c479f Merge pull request #5 from Nekkora-Operation/fix/contraste-perigo
+
+$ npx vite preview --host 127.0.0.1 --port 4174   (servidor já em execução, servindo o dist/ acima)
+$ npm run homologacao -- http://127.0.0.1:4174/ docs/com-001/evidencias/depois
+OK   tema-aplicado:sakura-dark:mobile — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:mobile — excesso=0px
+OK   tema-aplicado:sakura-dark:tablet — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:tablet — excesso=0px
+OK   tema-aplicado:sakura-dark:desktop — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:desktop — excesso=0px
+OK   tema-aplicado:sakura-dark:wide — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:wide — excesso=0px
+OK   tema-aplicado:sage-light:mobile — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:mobile — excesso=0px
+OK   tema-aplicado:sage-light:tablet — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:tablet — excesso=0px
+OK   tema-aplicado:sage-light:desktop — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:desktop — excesso=0px
+OK   tema-aplicado:sage-light:wide — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:wide — excesso=0px
+OK   axe:sakura-dark:mobile — 28 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sakura-dark:mobile — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sakura-dark:mobile — 55 nós; pior folga: .nk-alert--warning > .nk-alert__content > .nk-alert__body 4.73:1 (mín. 4.5)
+OK   axe:sakura-dark:desktop — 28 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sakura-dark:desktop — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sakura-dark:desktop — 54 nós; pior folga: li:nth-child(6) > .journey-panel__num[aria-hidden="true"] 5.01:1 (mín. 4.5)
+OK   axe:sage-light:mobile — 28 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sage-light:mobile — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sage-light:mobile — 55 nós; pior folga: .nk-alert--warning > .nk-alert__content > .nk-alert__body 4.59:1 (mín. 4.5)
+OK   axe:sage-light:desktop — 28 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sage-light:desktop — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sage-light:desktop — 54 nós; pior folga: .nk-badge--md 4.67:1 (mín. 4.5)
+OK   tema-padrao-sakura-dark — data-nk-theme=sakura-dark
+OK   ordem-das-secoes — inicio > solucoes > delivery > como-funciona > hosting > combinado > diferenciais > transparencia > contato
+OK   um-unico-h1 — 1 h1
+OK   ancoras-validas — 30 âncoras, quebradas: nenhuma
+OK   sem-destinos-provisorios — links externos: nenhum; status contato=pendente
+OK   sem-whatsapp-flutuante-provisorio — ausente
+OK   sem-alegacoes-proibidas — 3 ocorrência(s), todas em listas de exclusão
+OK   produtos-internos-so-em-bloco-informativo — 1 menção(ões)
+OK   demonstrativos-identificados — [{"label":"jornada","visible":true}]
+OK   primeiro-tab-pular-conteudo — {"text":"Pular para o conteúdo","href":"#conteudo"}
+OK   pular-conteudo-visivel-no-foco
+OK   foco-visivel-nos-40-primeiros-tabs — 0 sem indicador de foco
+OK   alternancia-de-tema-persiste — sage-light → recarregado: sage-light
+OK   formulario-erros-obrigatorios — 7 campos inválidos; foco no primeiro inválido=true
+OK   formulario-foco-no-primeiro-erro
+OK   formulario-radio-por-teclado
+OK   formulario-modo-demonstracao — Solicitação validada — envio desativado nesta versão Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação. Nome Pessoa de Teste E-mail test
+OK   formulario-sem-envio-real — popup=false; url inalterada=true
+OK   formulario-resultado-visivel-e-focado — {"doneTop":87.71875,"navBottom":69,"focused":true}
+OK   menu-mobile-abre-e-fecha-com-esc — aberto=true depois do Esc=false
+OK   sem-requisicoes-externas — nenhuma
+OK   console-sem-erros — limpo
+
+50 verificações, 0 falha(s). Resultados em docs/com-001/evidencias/depois
+exit=0
+
+$ build temporário com canais de teste (src/config.ts alterado e restaurado) → C:/Users/nicol/AppData/Local/Temp/claude/C--Users-nicol-nekkora/15cf64e0-97c2-4505-9dad-943064f62fb4/scratchpad/dist-canal
+✓ built in 168ms
+config.ts restaurado: 1 ocorrência de 'whatsappNumber: null'
+$ node scripts/homologacao-canais.mjs http://127.0.0.1:4175/ docs/com-001/evidencias/canais
+OK   status-configurado
+OK   whatsapp-exibido — 3 link(s) wa.me
+OK   email-exibido
+OK   linkedin-perfil-exibido
+OK   instagram-pagina-inicial-rejeitado — URL sem caminho de perfil não vira link
+OK   botao-flutuante-presente
+OK   aviso-canais-pendentes-ausente
+OK   botao-envio-whatsapp
+OK   formulario-abre-whatsapp-com-mensagem — https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.
+
+Quero avaliar: Delivery e Hosting.
+
+Teste de homologação com canal configurado.
+
+Contato: teste@exem
+OK   resultado-sucesso
+
+10 verificações, 0 falha(s).
+exit=0

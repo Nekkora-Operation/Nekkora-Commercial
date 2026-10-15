@@ -1,87 +1,39 @@
-import { Badge, Button, Card, Icon, Text, type IconName } from 'nekkora-lib';
-import { whatsappUrl } from '../config';
+import { Badge, Button, Card, Icon, Text } from 'nekkora-lib';
+import { HERO } from '../content';
 import { NekoPeek } from '../illustrations/Scenes';
 
-const PILLARS: [IconName, string][] = [
-  ['studio', 'Studio'],
-  ['server', 'Hospedagem'],
-  ['pulse', 'Monitoramento'],
-  ['headset', 'Suporte'],
-];
-
-/** Painel ilustrativo de operação (mock), montado com componentes da nekkora-lib. */
-function OpsPanel() {
+/**
+ * Jornada de uma automação — ilustração sem dados (substitui o painel com números fictícios da V1).
+ * Marcada com data-demo e com o selo "Ilustração" visível (X-11, X-12).
+ */
+function JourneyPanel() {
+  const { journey } = HERO;
   return (
-    <div className="ops-panel">
-      <NekoPeek className="ops-panel__peek" />
-      <Card className="ops-panel__card" variant="surface" padding="md" aria-label="Exemplo de painel de operação da Nekkora">
-        <div className="ops-panel__bar">
-          <span className="ops-panel__dots" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
-          <Text variant="body-sm" weight="semibold" style={{ flex: 1 }}>
-            Operação · hoje
+    <div className="journey-panel" data-demo="jornada">
+      <NekoPeek className="journey-panel__peek" />
+      <Card className="journey-panel__card" variant="surface" padding="md" aria-labelledby="journey-title">
+        <div className="journey-panel__bar">
+          <Text id="journey-title" variant="body-sm" weight="semibold" as="h2" style={{ flex: 1, margin: 0 }}>
+            {journey.title}
           </Text>
-          <Badge tone="success" variant="solid" size="sm" dot>
-            Tudo operacional
+          <Badge tone="neutral" variant="outline" size="sm" icon="eye">
+            {journey.label}
           </Badge>
         </div>
-
-        <div className="ops-panel__stats">
-          <div className="ops-stat">
-            <strong>156</strong>
-            <span>Execuções</span>
-          </div>
-          <div className="ops-stat">
-            <strong>98,1%</strong>
-            <span>Sucesso</span>
-          </div>
-          <div className="ops-stat">
-            <strong>3/3</strong>
-            <span>Agentes</span>
-          </div>
-        </div>
-
-        <svg className="ops-panel__chart" viewBox="0 0 320 72" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 58L32 50L64 54L96 36L128 42L160 26L192 32L224 18L256 24L288 12L320 16V72H0Z" fill="var(--nk-color-accent)" opacity="0.14" />
-          <path
-            d="M0 58L32 50L64 54L96 36L128 42L160 26L192 32L224 18L256 24L288 12L320 16"
-            fill="none"
-            stroke="var(--nk-color-accent)"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-
-        <ul className="ops-list">
-          <li>
-            <Icon name="download" size="sm" color="var(--nk-color-text-secondary)" />
-            <span>Download de Faturas</span>
-            <time>10:24</time>
-            <Badge tone="success" variant="solid" size="sm">
-              Concluído
-            </Badge>
-          </li>
-          <li>
-            <Icon name="mail" size="sm" color="var(--nk-color-text-secondary)" />
-            <span>Leitura de E-mails</span>
-            <time>10:31</time>
-            <Badge tone="info" variant="solid" size="sm">
-              Em execução
-            </Badge>
-          </li>
-          <li>
-            <Icon name="alert" size="sm" color="var(--nk-color-warning)" />
-            <span>Falha detectada e reprocessada</span>
-            <time>09:58</time>
-            <Badge tone="warning" variant="solid" size="sm">
-              Tratada
-            </Badge>
-          </li>
-        </ul>
+        <ol className="journey-panel__steps">
+          {journey.steps.map((step, i) => (
+            <li key={step}>
+              <span className="journey-panel__num" aria-hidden="true">
+                {i + 1}
+              </span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+        <p className="journey-panel__exec">
+          <Icon name="server" size="sm" />
+          <span>{journey.execution}</span>
+        </p>
       </Card>
     </div>
   );
@@ -93,33 +45,30 @@ export function Hero() {
       <div className="wrap hero__grid">
         <div className="hero__copy">
           <Badge tone="accent" size="md" icon="sakura" style={{ alignSelf: 'flex-start' }}>
-            Automação · Hospedagem · Monitoramento · Suporte
+            {HERO.badge}
           </Badge>
           <h1 id="hero-title" className="hero__title">
-            Automação com clareza, <em>operação com confiança.</em>
+            {HERO.titleLead} <em>{HERO.titleAccent}</em>
           </h1>
-          <p className="hero__lead">
-            Da estruturação da automação à hospedagem, monitoramento e suporte operacional. Tudo num só ecossistema, com
-            quem acompanha a sua operação de perto.
-          </p>
+          <p className="hero__lead">{HERO.lead}</p>
           <div className="hero__ctas">
-            <Button size="lg" leftIcon="whatsapp" href={whatsappUrl()}>
-              Falar no WhatsApp
+            <Button size="lg" rightIcon="arrow-right" href="#contato">
+              {HERO.primaryCta}
             </Button>
-            <Button size="lg" variant="secondary" rightIcon="arrow-right" href="#studio">
-              Conhecer o Studio
+            <Button size="lg" variant="secondary" href="#como-funciona">
+              {HERO.secondaryCta}
             </Button>
           </div>
-          <ul className="hero__pillars" aria-label="Pilares da Nekkora">
-            {PILLARS.map(([icon, label]) => (
-              <li key={label}>
-                <Icon name={icon} size="sm" />
-                {label}
+          <ul className="hero__pillars" aria-label="Princípios da contratação">
+            {HERO.points.map((p) => (
+              <li key={p.label}>
+                <Icon name={p.icon} size="sm" />
+                {p.label}
               </li>
             ))}
           </ul>
         </div>
-        <OpsPanel />
+        <JourneyPanel />
       </div>
     </section>
   );
