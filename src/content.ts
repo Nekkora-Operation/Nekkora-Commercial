@@ -168,6 +168,7 @@ export const HOSTING = {
     { icon: 'workflow', title: 'Sustentação e evolução das automações', text: 'Ajustes por mudanças no processo ou nos sistemas e novas funcionalidades.', terms: 'Não incluída no desenvolvimento; contratada à parte.' },
   ] as (Feature & { terms: string })[],
   termsLabel: 'Como é contratado',
+  accordionHint: 'Toque em um serviço para ver o que ele significa. A forma de contratação aparece em todos.',
   cta: 'Solicitar avaliação de viabilidade',
 };
 
@@ -300,6 +301,16 @@ export const CONTACT_COPY = {
   demoSubmit: 'Revisar solicitação',
   whatsappSubmit: 'Enviar pelo WhatsApp',
   whatsappNote: 'Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página.',
+  // Nunca afirmar envio: a página só sabe se a aba foi aberta, não se a mensagem foi enviada.
+  whatsappOpened: {
+    title: 'WhatsApp aberto em uma nova aba',
+    text: 'A mensagem só é enviada quando você a confirmar no WhatsApp. Se a aba não apareceu, use o botão abaixo.',
+  },
+  whatsappBlocked: {
+    title: 'Não foi possível abrir o WhatsApp automaticamente',
+    text: 'O navegador bloqueou a nova aba. Use o botão abaixo para abrir a conversa com a mensagem pronta.',
+  },
+  whatsappManual: 'Abrir conversa no WhatsApp',
   demoResult: {
     title: 'Solicitação validada — envio desativado nesta versão',
     text: 'Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.',

@@ -24,6 +24,8 @@ function ContactForm() {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [reviewed, setReviewed] = useState(false);
+  /** Resultado da tentativa de abrir o WhatsApp: só "aberto" se o navegador devolveu a nova aba. */
+  const [whatsapp, setWhatsapp] = useState<{ url: string; opened: boolean } | null>(null);
   const canSend = whatsappUrl() != null;
   const interestLabel = CONTACT_COPY.interests.find((i) => i.value === interest)?.label;
 
@@ -52,7 +54,12 @@ function ContactForm() {
         message.trim(),
         `Contato: ${email.trim()}${phone ? ` · ${phone}` : ''}`,
       ].join('\n\n');
-      window.open(whatsappUrl(text)!, '_blank', 'noopener,noreferrer');
+      const url = whatsappUrl(text)!;
+      // Sem "noopener" na lista de features: com ele, window.open devolve sempre null e não dá para saber se o
+      // navegador bloqueou a aba. O vínculo com esta página é cortado logo em seguida (mesmo efeito do noopener).
+      const win = window.open(url, '_blank');
+      if (win) win.opener = null;
+      setWhatsapp({ url, opened: win != null });
     }
     setReviewed(true);
   };
@@ -65,10 +72,19 @@ function ContactForm() {
   if (reviewed) {
     return (
       <div ref={doneRef} tabIndex={-1} className="contact__form contact__done">
-        {canSend ? (
-          <Alert tone="success" title="Abrimos o WhatsApp com a sua mensagem." live="polite">
-            É só confirmar o envio por lá.
-          </Alert>
+        {whatsapp ? (
+          <>
+            <Alert
+              tone={whatsapp.opened ? 'info' : 'warning'}
+              title={whatsapp.opened ? CONTACT_COPY.whatsappOpened.title : CONTACT_COPY.whatsappBlocked.title}
+              live="polite"
+            >
+              {whatsapp.opened ? CONTACT_COPY.whatsappOpened.text : CONTACT_COPY.whatsappBlocked.text}
+            </Alert>
+            <Button leftIcon="whatsapp" href={whatsapp.url} target="_blank" rel="noopener noreferrer" style={{ alignSelf: 'flex-start' }}>
+              {CONTACT_COPY.whatsappManual}
+            </Button>
+          </>
         ) : (
           <Alert tone="info" title={CONTACT_COPY.demoResult.title} live="polite">
             {CONTACT_COPY.demoResult.text}
@@ -84,7 +100,14 @@ function ContactForm() {
             { term: 'Processo', description: message.trim() },
           ]}
         />
-        <Button variant="secondary" leftIcon="edit" onClick={() => setReviewed(false)}>
+        <Button
+          variant="secondary"
+          leftIcon="edit"
+          onClick={() => {
+            setReviewed(false);
+            setWhatsapp(null);
+          }}
+        >
           Editar solicitação
         </Button>
       </div>

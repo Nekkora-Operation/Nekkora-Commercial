@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button, FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
 import { NAV_LINKS, whatsappUrl } from './config';
+import { useMediaQuery } from './hooks';
 import { Combined } from './sections/Combined';
 import { Contact } from './sections/Contact';
 import { Delivery } from './sections/Delivery';
@@ -51,17 +52,6 @@ function useContactVisible() {
     return () => observer.disconnect();
   }, []);
   return visible;
-}
-
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    const update = () => setMatches(mql.matches);
-    mql.addEventListener('change', update);
-    return () => mql.removeEventListener('change', update);
-  }, [query]);
-  return matches;
 }
 
 /** WhatsApp só com número confirmado em config.ts (sem destino provisório). */

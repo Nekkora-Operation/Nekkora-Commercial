@@ -1,6 +1,6 @@
 {
   "baseUrl": "http://127.0.0.1:4175/",
-  "at": "2026-10-15T09:58:40.504Z",
+  "at": "2026-10-15T10:32:01.428Z",
   "checks": [
     {
       "id": "status-configurado",
@@ -42,8 +42,28 @@
       "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero avaliar: Delivery e Hosting.\n\nTeste de homologação com canal configurado.\n\nContato: teste@exem"
     },
     {
-      "id": "resultado-sucesso",
+      "id": "aba-aberta-sem-afirmar-envio",
+      "ok": true,
+      "detail": "WhatsApp aberto em uma nova aba"
+    },
+    {
+      "id": "aba-aberta-sem-opener",
+      "ok": true,
+      "detail": "window.opener = null na aba do WhatsApp"
+    },
+    {
+      "id": "link-manual-quando-aberta",
       "ok": true
+    },
+    {
+      "id": "aba-bloqueada-avisa",
+      "ok": true,
+      "detail": "Não foi possível abrir o WhatsApp automaticamente"
+    },
+    {
+      "id": "aba-bloqueada-link-manual-com-mensagem",
+      "ok": true,
+      "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero avaliar: Delivery.\n\nTeste de homologação com pop-up bl"
     }
   ],
   "abortedExternal": [

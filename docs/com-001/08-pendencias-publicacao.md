@@ -14,7 +14,7 @@ Nenhum item abaixo foi presumido. Enquanto estiver pendente, a página **não fa
 | PUB-06 | Uso de cases, clientes ou depoimentos reais (X-10) | Nenhum | Seção nova, só com autorização e material real |
 | PUB-07 | Referências visuais aprovadas (logo/mascote) fora dos repositórios | Conferido contra a nekkora-lib | Conferência visual pela responsável |
 | PUB-08 | Destino do formulário em produção (backend/CRM/e-mail) | Sem envio (fora de escopo) | Missão própria: armazenamento, LGPD, consentimento e aviso de privacidade |
-| PUB-09 | Aviso de privacidade / LGPD para coleta de dados no formulário | Não necessário hoje (nada é enviado nem armazenado) | Obrigatório antes de o formulário enviar dados |
+| PUB-09 | Aviso de privacidade / LGPD para coleta de dados no formulário — **inclusive no envio pelo WhatsApp**, que encaminha dados pessoais para uma conversa externa | Não necessário hoje (nada é enviado nem armazenado) | Obrigatório antes de ativar formulário ou WhatsApp (COM-002) |
 | PUB-10 | Desligar `PREVIEW_NOTICE` (aviso "Versão para homologação") | Aviso visível no rodapé | Somente com autorização de publicação |
 | PUB-11 | Domínio, hospedagem e deploy da própria página | Não realizado (proibido nesta missão) | Missão de publicação |
 | PUB-12 | Segurança, estabilidade ou desempenho do ambiente de Hosting (H-06) | Nenhuma afirmação | Só com definição técnica |
@@ -34,5 +34,5 @@ Nenhum item abaixo foi presumido. Enquanto estiver pendente, a página **não fa
 
 | ID | Situação | Recomendação |
 |---|---|---|
-| REP-01 | Alteração **não versionada** em `.gitignore` (adiciona `.env` e `.env.*`) já existia antes da missão | Revisar e versionar em commit próprio. Foi deixada fora deste PR por não ser desta missão |
-| REP-02 | Arquivo `.env` não rastreado com credenciais de outro contexto (Postgres, Azure) dentro da pasta da página | Mover para o projeto correto e rotacionar as credenciais, se tiverem sido expostas. Não foi lido além dos nomes das chaves nem incluído no PR |
+| REP-01 | Alteração **não versionada** em `.gitignore` (adiciona `.env` e `.env.*`) já existia antes da missão | **R1:** versionada isoladamente na branch `chore/gitignore-env`, PR #2 (aguarda merge) |
+| REP-02 | Arquivo `.env` não rastreado com credenciais de outro contexto (Postgres, Azure) dentro da pasta da página | **R1:** `git log --all -- .env .env.*` = 0 commits (nunca versionado em nenhuma ref). Remover da pasta e avaliar rotação é ação da responsável: o arquivo não foi lido, movido nem apagado |

@@ -386,6 +386,40 @@ await block('menu-mobile', async () => {
   await context.close();
 });
 
+// 5. Catálogo do Hosting: acordeão no celular, expandido no desktop
+await block('hosting-acordeao', async () => {
+  const mobile = await newPage({ width: 375, height: 812 }, null);
+  const mp = mobile.page;
+  results.mobilePageHeight = await mp.evaluate(() => document.documentElement.scrollHeight);
+  const mode = await mp.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
+  const items = mp.locator('[data-hosting-catalog] details');
+  const count = await items.count();
+  const summaries = await mp.locator('[data-hosting-catalog] summary').allInnerTexts();
+  const termsVisible = summaries.every((t) => t.includes('Como é contratado:'));
+  const closed = await items.evaluateAll((els) => els.every((d) => !d.open));
+  check('hosting-acordeao-no-celular', mode === 'acordeao' && count === 8 && closed, `modo=${mode}; itens=${count}; todos recolhidos=${closed}; altura da página=${results.mobilePageHeight}px`);
+  check('hosting-condicoes-visiveis-recolhido', termsVisible, `${summaries.filter((t) => t.includes('Como é contratado:')).length}/8 resumos mostram "Como é contratado"`);
+  const first = mp.locator('[data-hosting-catalog] summary').first();
+  await first.focus();
+  const ring = await first.evaluate((el) => getComputedStyle(el).boxShadow !== 'none');
+  await mp.keyboard.press('Enter');
+  const openedEnter = await items.first().evaluate((d) => d.open);
+  const defVisible = await mp.locator('[data-hosting-catalog] .service-item__definition').first().isVisible();
+  await mp.keyboard.press('Space');
+  const closedSpace = await items.first().evaluate((d) => !d.open);
+  check('hosting-acordeao-teclado', ring && openedEnter && defVisible && closedSpace, `foco visível=${ring}; Enter abre=${openedEnter}; definição visível=${defVisible}; Espaço fecha=${closedSpace}`);
+  await items.first().evaluate((d) => (d.open = true));
+  await mp.locator('[data-hosting-catalog]').screenshot({ path: path.join(outDir, 'hosting-acordeao-mobile.png') });
+  results.screenshots.push('hosting-acordeao-mobile.png');
+  await mobile.context.close();
+
+  const desktop = await newPage({ width: 1280, height: 800 }, null);
+  const dmode = await desktop.page.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
+  const defs = await desktop.page.locator('[data-hosting-catalog] > li > p:first-of-type').evaluateAll((els) => els.filter((e) => e.offsetParent !== null).length);
+  check('hosting-expandido-no-desktop', dmode === 'expandido' && defs === 8, `modo=${dmode}; definições visíveis=${defs}/8`);
+  await desktop.context.close();
+});
+
 check('sem-requisicoes-externas', results.blocked.length === 0, results.blocked.join(' | ') || 'nenhuma');
 const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c));
 check('console-sem-erros', realErrors.length === 0, realErrors.join(' | ') || 'limpo');

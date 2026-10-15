@@ -57,8 +57,43 @@ const popupUrl = popup ? popup.url() : '';
 await page.waitForTimeout(300);
 const decoded = decodeURIComponent(aborted.find((u) => u.includes('wa.me')) ?? popupUrl);
 check('formulario-abre-whatsapp-com-mensagem', decoded.includes('wa.me/5511912345678') && decoded.includes('Quero avaliar: Delivery e Hosting.'), decoded.slice(0, 160));
-check('resultado-sucesso', /Abrimos o WhatsApp/.test(await page.locator('#contato .contact__done').innerText()));
+const openedText = await page.locator('#contato .contact__done').innerText();
+check('aba-aberta-sem-afirmar-envio', /WhatsApp aberto em uma nova aba/.test(openedText) && /só é enviada quando você a confirmar/.test(openedText) && !/enviad[ao] com sucesso/i.test(openedText), openedText.split('\n')[0]);
+check('aba-aberta-sem-opener', popup ? await popup.evaluate(() => window.opener === null).catch(() => true) : false, popup ? 'window.opener = null na aba do WhatsApp' : 'sem popup');
+const manualOpen = await page.locator('#contato .contact__done a[href^="https://wa.me/5511912345678?"]').count();
+check('link-manual-quando-aberta', manualOpen === 1);
 await page.locator('#contato').screenshot({ path: path.join(outDir, 'contato-com-canais.png') });
+
+// Navegador que bloqueia a nova aba: window.open devolve null (comportamento de bloqueador de pop-up).
+{
+  const blockedCtx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  await blockedCtx.route('**/*', (route) => {
+    const url = route.request().url();
+    if (url.startsWith(new URL(baseUrl).origin) || /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(url)) return route.continue();
+    aborted.push(url);
+    return route.abort();
+  });
+  await blockedCtx.addInitScript(() => {
+    window.open = () => null;
+  });
+  const bp = await blockedCtx.newPage();
+  await bp.goto(baseUrl, { waitUntil: 'networkidle' });
+  const bf = bp.locator('#contato form');
+  await bf.getByLabel(/^Nome/).fill('Pessoa de Teste');
+  await bf.getByLabel(/^E-mail/).fill('teste@exemplo.invalid');
+  await bf.getByRole('radio').first().check();
+  await bf.getByLabel(/Descreva o processo/).fill('Teste de homologação com pop-up bloqueado.');
+  await bf.locator('button[type="submit"]').click();
+  await bp.waitForTimeout(300);
+  const done = bp.locator('#contato .contact__done');
+  const text = await done.innerText();
+  const manual = done.locator('a[href^="https://wa.me/5511912345678?"]');
+  const href = decodeURIComponent((await manual.getAttribute('href')) ?? '');
+  check('aba-bloqueada-avisa', /Não foi possível abrir o WhatsApp automaticamente/.test(text) && !/WhatsApp aberto/.test(text), text.split('\n')[0]);
+  check('aba-bloqueada-link-manual-com-mensagem', (await manual.count()) === 1 && href.includes('Quero avaliar: Delivery.') && (await manual.getAttribute('target')) === '_blank', href.slice(0, 120));
+  await done.screenshot({ path: path.join(outDir, 'whatsapp-bloqueado.png') });
+  await blockedCtx.close();
+}
 
 await browser.close();
 const failed = checks.filter((c) => !c.ok).length;

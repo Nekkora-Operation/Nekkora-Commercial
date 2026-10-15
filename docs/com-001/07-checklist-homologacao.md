@@ -36,7 +36,7 @@ NEKKORA_PW_MODULES=../Nekkora-Platform-Web/node_modules npm run homologacao -- h
 - [ ] **[auto]** Nenhum link para WhatsApp, e-mail ou rede social sem valor confirmado; sem botão flutuante.
 - [ ] **[auto]** Formulário: erros em nome, e-mail, interesse e descrição; foco vai ao primeiro erro.
 - [ ] **[auto]** Formulário válido mostra "envio desativado" e o resumo, sem abrir janela e sem requisição externa.
-- [ ] **[auto, build de teste]** Com canais preenchidos, os links aparecem, URLs inválidas são rejeitadas e o WhatsApp abre com a mensagem montada ([evidencias/canais](evidencias/canais/resultados.json)).
+- [ ] **[auto, build de teste]** Com canais preenchidos, os links aparecem, URLs inválidas são rejeitadas e o WhatsApp abre com a mensagem montada, sem afirmar envio; se o navegador bloquear a aba, aparecem o aviso e o link manual ([evidencias/canais](evidencias/canais/resultados.json)).
 - [ ] **[manual]** Antes de publicar: preencher os canais reais em `src/config.ts` e conferir cada link manualmente.
 
 ## Visual e acessibilidade
@@ -46,6 +46,8 @@ NEKKORA_PW_MODULES=../Nekkora-Platform-Web/node_modules npm run homologacao -- h
 - [ ] **[auto]** axe-core WCAG 2.1 AA sem violações (mobile e desktop, nos dois temas).
 - [ ] **[auto]** Primeiro Tab = "Pular para o conteúdo", visível; foco visível nos 40 primeiros Tabs.
 - [ ] **[auto]** Menu mobile abre com Enter e fecha com Esc.
+- [ ] **[auto]** Hosting no celular: 8 itens em acordeão, recolhidos, com "Como é contratado" visível em todos; Enter abre, Espaço fecha, foco visível. Desktop: 8 definições visíveis.
+- [ ] **[manual]** O acordeão do Hosting no celular está adequado comercialmente (D-17).
 - [ ] **[manual]** Logo, mascote e cores correspondem às referências visuais aprovadas (PUB-07).
 - [ ] **[manual]** Leitura confortável no celular real (iOS/Android) e em um leitor de tela (NVDA/VoiceOver), que não foram testados (ver relatório).
 

@@ -111,6 +111,8 @@ Hosting reúne serviços distintos. Cada um é avaliado separadamente e só faz 
 | Correção de incidentes | Análise e correção de falhas na execução. | Abrangência e condições definidas em proposta. |
 | Sustentação e evolução das automações | Ajustes por mudanças no processo ou nos sistemas e novas funcionalidades. | Não incluída no desenvolvimento; contratada à parte. |
 
+No celular (acordeão): _Toque em um serviço para ver o que ele significa. A forma de contratação aparece em todos._
+
 CTA: "Solicitar avaliação de viabilidade"
 
 ## 6. Solução combinada
@@ -219,6 +221,10 @@ Formulário "Conte o que você precisa": Nome*, E-mail*, Telefone (opcional), Em
 Modo demonstração: botão "Revisar solicitação"; nota "Modo de demonstração: nenhum dado é enviado ou armazenado."; resultado **Solicitação validada — envio desativado nesta versão** — Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.
 
 Com WhatsApp confirmado: botão "Enviar pelo WhatsApp"; nota "Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página."
+
+- Aba aberta: **WhatsApp aberto em uma nova aba** — A mensagem só é enviada quando você a confirmar no WhatsApp. Se a aba não apareceu, use o botão abaixo.
+- Aba bloqueada: **Não foi possível abrir o WhatsApp automaticamente** — O navegador bloqueou a nova aba. Use o botão abaixo para abrir a conversa com a mensagem pronta.
+- Link manual (sempre): "Abrir conversa no WhatsApp"
 
 ## 10. Rodapé
 

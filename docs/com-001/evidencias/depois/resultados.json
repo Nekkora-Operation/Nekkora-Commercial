@@ -1,6 +1,6 @@
 {
   "baseUrl": "http://127.0.0.1:4174/",
-  "startedAt": "2026-10-15T09:58:02.114Z",
+  "startedAt": "2026-10-15T10:31:13.496Z",
   "checks": [
     {
       "id": "tema-aplicado:sakura-dark:mobile",
@@ -85,7 +85,7 @@
     {
       "id": "axe:sakura-dark:mobile",
       "ok": true,
-      "detail": "28 regras aprovadas"
+      "detail": "29 regras aprovadas"
     },
     {
       "id": "axe-sem-pendencias-de-revisao:sakura-dark:mobile",
@@ -115,7 +115,7 @@
     {
       "id": "axe:sage-light:mobile",
       "ok": true,
-      "detail": "28 regras aprovadas"
+      "detail": "29 regras aprovadas"
     },
     {
       "id": "axe-sem-pendencias-de-revisao:sage-light:mobile",
@@ -240,6 +240,26 @@
       "detail": "aberto=true depois do Esc=false"
     },
     {
+      "id": "hosting-acordeao-no-celular",
+      "ok": true,
+      "detail": "modo=acordeao; itens=8; todos recolhidos=true; altura da página=13735px"
+    },
+    {
+      "id": "hosting-condicoes-visiveis-recolhido",
+      "ok": true,
+      "detail": "8/8 resumos mostram \"Como é contratado\""
+    },
+    {
+      "id": "hosting-acordeao-teclado",
+      "ok": true,
+      "detail": "foco visível=true; Enter abre=true; definição visível=true; Espaço fecha=true"
+    },
+    {
+      "id": "hosting-expandido-no-desktop",
+      "ok": true,
+      "detail": "modo=expandido; definições visíveis=8/8"
+    },
+    {
       "id": "sem-requisicoes-externas",
       "ok": true,
       "detail": "nenhuma"
@@ -264,12 +284,13 @@
     "formulario-erros.png",
     "formulario-resultado-tela.png",
     "formulario-resultado.png",
-    "menu-mobile-aberto.png"
+    "menu-mobile-aberto.png",
+    "hosting-acordeao-mobile.png"
   ],
   "axe": {
     "sakura-dark:mobile": {
       "violations": [],
-      "passes": 28,
+      "passes": 29,
       "incomplete": [
         {
           "id": "color-contrast",
@@ -289,7 +310,7 @@
     },
     "sage-light:mobile": {
       "violations": [],
-      "passes": 28,
+      "passes": 29,
       "incomplete": [
         {
           "id": "color-contrast",
@@ -1869,9 +1890,10 @@
     }
   ],
   "formStatus": "Solicitação validada — envio desativado nesta versão\n\nNenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.\nNome\nPessoa de Teste\nE-mail\nteste@exemplo.invalid\nTelefone\n—\nEmpresa\n—\nQuero avaliar\nDelivery\nProcesso\nTeste automatizado de homologação: processo de conciliação manual.\nEditar solicitação",
-  "finishedAt": "2026-10-15T09:58:34.302Z",
+  "mobilePageHeight": 13735,
+  "finishedAt": "2026-10-15T10:31:51.385Z",
   "summary": {
-    "total": 50,
+    "total": 54,
     "failed": 0
   }
 }

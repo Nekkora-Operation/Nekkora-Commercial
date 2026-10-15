@@ -20,7 +20,7 @@ Menu: Soluções, Delivery, Como funciona, Hosting, Transparência, Contato (sei
 ficam no rodapé e nos links internos para não sobrecarregar a barra).
 
 **Mobile (≤ 900 px):** uma coluna; ilustrações depois do texto; Steps vertical (comportamento da lib); cards de
-oferta empilhados; catálogo do Hosting em 2 colunas até 640 px e 1 coluna abaixo; CTAs do hero ocupam a largura.
+oferta empilhados; catálogo do Hosting em 2 colunas até 640 px e, abaixo disso, acordeão (D-17); CTAs do hero ocupam a largura.
 Menu recolhível da `Navbar` (≤ 960 px), Esc fecha.
 
 ## 2. Direção visual — avaliação do Sakura Dark
@@ -68,6 +68,8 @@ O texto `muted` não é usado em conteúdo informativo da página: o aviso do fo
 | D-13 | Foco no primeiro campo inválido e, depois de validar, no resumo | Teclado e leitor de tela; o resumo ficava sob a barra fixa | `scroll-margin-top` no resumo |
 | D-14 | Tagline oficial fora do rodapé | "AUTOMATE · OBSERVE · EVOLVE" poderia sugerir monitoramento incluído (B-01) | Nada mudou na lib; outras aplicações seguem usando a tagline |
 | D-15 | Aviso "Versão para homologação" no rodapé (`PREVIEW_NOTICE`) | Deixa claro que esta versão não está publicada | Desligar só com autorização de publicação |
+| D-17 | **R1 —** Catálogo do Hosting em acordeão nativo (`<details>`/`<summary>`) até 640 px; expandido em tablet e desktop | Revisão do PR #1: página mobile longa. A condição "Como é contratado" fica **no resumo**, sempre visível; só a definição do serviço recolhe | Teclado nativo (Tab, Enter, Espaço), foco visível com `--nk-focus-ring`, sem dependência nova. Altura mobile 375 px: ~14.300 → 13.735 px |
+| D-18 | **R1 —** WhatsApp: `window.open` sem `noopener` nas features (com ele o retorno é sempre `null`) + `opener = null` em seguida; mensagem conforme o resultado e link manual sempre presente | Revisão do PR #1: não afirmar sucesso sem confirmação | Aba aberta → "WhatsApp aberto em uma nova aba — a mensagem só é enviada quando você a confirmar". Aba bloqueada → aviso + "Abrir conversa no WhatsApp" |
 | D-16 | Brilhos decorativos com intensidade por modo (`--glow-hero`/`--glow-contact`: 16/18 % escuros, 7/10 % claros) e bloco de contato sobre `surface-sunken`, com o brilho atrás do formulário | Medição por pixels: no Sage Light mobile o brilho do hero baixava o texto secundário a 4,32:1; no Sakura Dark o `Alert` de aviso ficava em 3,5–4,1:1 | Variáveis locais de composição, sem alterar token da lib |
 
 ## 4. Inventário de assets
