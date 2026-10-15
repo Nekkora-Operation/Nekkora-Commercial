@@ -1,0 +1,250 @@
+Pular para o conteúdo
+Início
+Studio
+Hospedagem
+Monitoramento
+Suporte
+Contato
+Falar no WhatsApp
+Automação · Hospedagem · Monitoramento · Suporte
+Automação com clareza, operação com confiança.
+
+Da estruturação da automação à hospedagem, monitoramento e suporte operacional. Tudo num só ecossistema, com quem acompanha a sua operação de perto.
+
+Falar no WhatsApp
+Conhecer o Studio
+Studio
+Hospedagem
+Monitoramento
+Suporte
+
+Operação · hoje
+
+Tudo operacional
+156
+Execuções
+98,1%
+Sucesso
+3/3
+Agentes
+Download de Faturas
+10:24
+Concluído
+Leitura de E-mails
+10:31
+Em execução
+Falha detectada e reprocessada
+09:58
+Tratada
+O QUE A NEKKORA ENTREGA
+Da ideia à operação sustentada, num só lugar
+
+Não paramos na entrega do robô. Ajudamos a estruturar, colocamos para rodar, acompanhamos e sustentamos.
+
+Studio
+
+Estruture e documente automações com mais clareza e velocidade.
+
+Menos tempo no levantamento
+Saiba mais
+Hospedagem
+
+Execute automações em ambiente preparado e operado pela Nekkora.
+
+Sem infraestrutura para cuidar
+Saiba mais
+Monitoramento
+
+Acompanhe execuções, falhas e eventos com visibilidade operacional.
+
+Você sabe o que está acontecendo
+Saiba mais
+Suporte operacional
+
+Conte com acompanhamento para sustentar sua operação com segurança.
+
+Gente próxima, não um chamado perdido
+Saiba mais
+COMO FUNCIONA
+Uma jornada clara, do primeiro contato à operação contínua
+
+Cada etapa tem dono, entregável e acompanhamento. Você sabe onde está e o que vem depois.
+
+ETAPA 01
+Entendemos sua necessidade
+Conversamos sobre o processo, as regras e o resultado esperado.
+ETAPA 02
+Estruturamos no Studio
+O processo vira desenho e documentação, prontos para desenvolver.
+ETAPA 03
+Executamos a automação
+A automação roda em ambiente preparado e operado pela Nekkora.
+ETAPA 04
+Monitoramos a operação
+Acompanhamos execuções, falhas e eventos no dia a dia.
+ETAPA 05
+Apoiamos a sustentação
+Tratamos incidentes e evoluímos a automação com você.
+STUDIO · A PORTA DE ENTRADA
+Transforme uma necessidade em automação, com clareza desde o início
+
+O Studio é onde o seu processo ganha forma: você estrutura a automação, entende cada etapa e documenta o que precisa ser feito. Menos tempo em levantamento, mais velocidade para chegar à automação certa.
+
+Menos tempo no levantamento
+Mais clareza
+Mais velocidade
+Acelera a estruturação da automação
+Ajuda a documentar o processo, passo a passo
+Deixa claro o que será desenvolvido, antes de desenvolver
+Reduz retrabalho e idas e vindas
+Cria uma base organizada para escalar novas automações
+Quero conhecer o Studio
+HOSPEDAGEM DE AUTOMAÇÕES
+Não somos só software. Também operamos a execução.
+
+Você não precisa manter servidores, máquinas ou agendas por conta própria. Sua automação roda num ambiente preparado e operado pela Nekkora, com estrutura pensada para isso.
+
+Ambiente preparado
+
+Máquinas e agentes configurados para rodar suas automações com estabilidade.
+
+Segurança e controle
+
+Acessos organizados e credenciais tratadas com cuidado, num ambiente controlado.
+
+Organização e padrão
+
+Cada automação no seu lugar, com versões e agendas sob controle.
+
+Execução no horário certo
+
+Agendamentos e filas gerenciados pela Nekkora, sem depender de alguém lembrar.
+
+MONITORAMENTO E OBSERVABILIDADE
+Não basta executar. É preciso acompanhar.
+
+Acompanhamos execuções, status, falhas, logs e o comportamento da sua automação no dia a dia. Você não recebe só robôs rodando: recebe uma operação supervisionada.
+
+Visibilidade da operação
+
+Um retrato claro do que está rodando agora.
+
+Acompanhamento de execuções
+
+Cada execução registrada, com início, duração e resultado.
+
+Identificação de falhas
+
+Falhas percebidas rápido, antes de virarem problema maior.
+
+Histórico operacional
+
+Logs e eventos guardados para entender o que aconteceu.
+
+Apoio na resposta a incidentes
+
+Quando algo sai do esperado, agimos junto com você.
+
+Execuções acompanhadas
+
+Exemplo de como a operação aparece para você
+
+Monitorando
+Processo	Status	Hora	Evento
+Conciliação Bancária	Concluído	10:24	412 lançamentos conciliados
+Envio de Relatórios	Em execução	10:31	Etapa 3 de 5
+Atualização de Cadastro	Falhou	09:58	Portal indisponível · alerta enviado
+Atualização de Cadastro	Reprocessado	10:06	Concluído na nova tentativa
+SUPORTE OPERACIONAL
+Suporte próximo, operação assistida
+
+Um serviço contínuo e especializado para sustentar a sua operação: acompanhamento, análise de falhas, sustentação e evolução.
+
+Atendimento consultivo e operacional
+
+Conversa direta com quem conhece a sua automação.
+
+Acompanhamento contínuo
+
+Olhamos a operação com você, não só quando algo quebra.
+
+Ajuda nos incidentes
+
+Analisamos a falha, corrigimos e explicamos o que aconteceu.
+
+Continuidade e evolução
+
+Ajustes e melhorias conforme o seu processo muda.
+
+Você não precisa resolver tudo sozinho: a sua operação tem alguém olhando por ela.
+POR QUE A NEKKORA
+Mais completo do que apenas desenvolver automações
+Produto e operação juntos
+
+Studio, execução, monitoramento e suporte no mesmo ecossistema.
+
+Studio como ponto de entrada
+
+Todo projeto começa estruturado e documentado.
+
+Hospedagem das automações
+
+Você não precisa manter infraestrutura própria.
+
+Observabilidade operacional
+
+Execuções, falhas e eventos visíveis no dia a dia.
+
+Suporte próximo
+
+Pessoas que conhecem a sua operação, e não um atendimento genérico.
+
+Pensado para evoluir
+
+Estrutura que cresce junto com o número de automações.
+
+Não vendemos apenas automações. Entregamos clareza, operação e continuidade.
+
+CONTATO
+Vamos conversar sobre a sua operação?
+
+Conte o que você quer automatizar ou o que já roda hoje. Respondemos com um caminho claro, do Studio ao suporte.
+
+Falar no WhatsApp
+contato@nekkora.com
+Instagram
+LinkedIn
+Atendimento em horário comercial
+Conte o que você precisa
+Nome*
+E-mail*
+Telefone / WhatsApp
+Empresa
+Interesse principal
+Selecione (opcional)
+Mensagem*
+0/600
+Enviar pelo WhatsApp
+Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página.
+AUTOMATE · OBSERVE · EVOLVE
+
+Automação com clareza, operação com confiança. Estruturamos, hospedamos, monitoramos e sustentamos as suas automações.
+
+PRODUTO
+Studio
+Hospedagem
+Monitoramento
+Suporte
+EMPRESA
+O que entregamos
+Como funciona
+Diferenciais
+Contato
+FALE COM A GENTE
+WhatsApp
+E-mail
+Instagram
+LinkedIn
+© 2026 Nekkora. Todos os direitos reservados.
+Neko (猫) observa. A Nekkora opera.
+Fale conosco

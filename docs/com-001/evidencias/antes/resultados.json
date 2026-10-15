@@ -1,0 +1,632 @@
+{
+  "baseUrl": "http://127.0.0.1:4174/",
+  "startedAt": "2026-10-15T09:36:15.495Z",
+  "checks": [
+    {
+      "id": "tema-aplicado:sakura-dark:mobile",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:mobile",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:tablet",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:tablet",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:desktop",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:desktop",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:wide",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:wide",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:light:mobile",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:light:mobile",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:light:tablet",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:light:tablet",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:light:desktop",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:light:desktop",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:light:wide",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "sem-rolagem-horizontal:light:wide",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "axe:sakura-dark:mobile",
+      "ok": false,
+      "detail": "color-contrast(8)"
+    },
+    {
+      "id": "axe:sakura-dark:desktop",
+      "ok": false,
+      "detail": "color-contrast(8)"
+    },
+    {
+      "id": "axe:light:mobile",
+      "ok": false,
+      "detail": "color-contrast(8)"
+    },
+    {
+      "id": "axe:light:desktop",
+      "ok": false,
+      "detail": "color-contrast(8)"
+    },
+    {
+      "id": "tema-padrao-sakura-dark",
+      "ok": false,
+      "detail": "data-nk-theme=midnight-blue"
+    },
+    {
+      "id": "ordem-das-secoes",
+      "ok": false,
+      "detail": "inicio > entrega > como-funciona > studio > hospedagem > monitoramento > suporte > diferenciais > contato"
+    },
+    {
+      "id": "um-unico-h1",
+      "ok": true,
+      "detail": "1 h1"
+    },
+    {
+      "id": "ancoras-validas",
+      "ok": true,
+      "detail": "27 âncoras, quebradas: nenhuma"
+    },
+    {
+      "id": "sem-destinos-provisorios",
+      "ok": false,
+      "detail": "links externos: https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o. | https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o. | https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o. | https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20o%20Studio%20da%20Nekkora. | https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o. | mailto:contato@nekkora.com | https://www.instagram.com/ | https://www.linkedin.com/ | https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o. | mailto:contato@nekkora.com | https://www.instagram.com/ | https://www.linkedin.com/ | https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o.; status contato=undefined"
+    },
+    {
+      "id": "sem-whatsapp-flutuante-provisorio",
+      "ok": false,
+      "detail": "botão flutuante presente"
+    },
+    {
+      "id": "sem-alegacoes-proibidas",
+      "ok": false,
+      "detail": "percentual: \"98,1%\""
+    },
+    {
+      "id": "produtos-internos-so-em-bloco-informativo",
+      "ok": false,
+      "detail": "13 menção(ões)"
+    },
+    {
+      "id": "demonstrativos-identificados",
+      "ok": false,
+      "detail": "[]"
+    },
+    {
+      "id": "primeiro-tab-pular-conteudo",
+      "ok": true,
+      "detail": "{\"text\":\"Pular para o conteúdo\",\"href\":\"#conteudo\"}"
+    },
+    {
+      "id": "pular-conteudo-visivel-no-foco",
+      "ok": false
+    },
+    {
+      "id": "foco-visivel-nos-40-primeiros-tabs",
+      "ok": true,
+      "detail": "0 sem indicador de foco"
+    },
+    {
+      "id": "alternancia-de-tema-persiste",
+      "ok": false,
+      "detail": "sage-light → recarregado: sage-light"
+    },
+    {
+      "id": "formulario-erros-obrigatorios",
+      "ok": true,
+      "detail": "3 campos inválidos; foco no primeiro inválido=false"
+    },
+    {
+      "id": "formulario-foco-no-primeiro-erro",
+      "ok": false
+    },
+    {
+      "id": "execucao:funcionais",
+      "ok": false,
+      "detail": "locator.fill: Timeout 30000ms exceeded."
+    },
+    {
+      "id": "menu-mobile-abre-e-fecha-com-esc",
+      "ok": true,
+      "detail": "aberto=true depois do Esc=false"
+    },
+    {
+      "id": "sem-requisicoes-externas",
+      "ok": true,
+      "detail": "nenhuma"
+    },
+    {
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    }
+  ],
+  "screenshots": [
+    "pagina-sakura-dark-mobile-375.jpg",
+    "pagina-sakura-dark-tablet-768.jpg",
+    "pagina-sakura-dark-desktop-1280.jpg",
+    "hero-sakura-dark-desktop.png",
+    "pagina-sakura-dark-wide-1440.jpg",
+    "pagina-light-mobile-375.jpg",
+    "pagina-light-tablet-768.jpg",
+    "pagina-light-desktop-1280.jpg",
+    "hero-light-desktop.png",
+    "pagina-light-wide-1440.jpg",
+    "formulario-erros.png",
+    "menu-mobile-aberto.png"
+  ],
+  "axe": {
+    "sakura-dark:mobile": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 8,
+          "sample": [
+            ".nk-selectmenu__placeholder",
+            ".nk-textarea__count",
+            ".contact__note"
+          ]
+        }
+      ],
+      "passes": 31,
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 51
+        }
+      ]
+    },
+    "sakura-dark:desktop": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 8,
+          "sample": [
+            ".nk-selectmenu__placeholder",
+            ".nk-textarea__count",
+            ".contact__note"
+          ]
+        }
+      ],
+      "passes": 31,
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 51
+        }
+      ]
+    },
+    "light:mobile": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 8,
+          "sample": [
+            ".nk-selectmenu__placeholder",
+            ".nk-textarea__count",
+            ".contact__note"
+          ]
+        }
+      ],
+      "passes": 31,
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 51
+        }
+      ]
+    },
+    "light:desktop": {
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 8,
+          "sample": [
+            ".nk-selectmenu__placeholder",
+            ".nk-textarea__count",
+            ".contact__note"
+          ]
+        }
+      ],
+      "passes": 31,
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 51
+        }
+      ]
+    }
+  },
+  "console": [],
+  "blocked": [],
+  "fonts": [
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com"
+  ],
+  "sections": [
+    "inicio",
+    "entrega",
+    "como-funciona",
+    "studio",
+    "hospedagem",
+    "monitoramento",
+    "suporte",
+    "diferenciais",
+    "contato"
+  ],
+  "externalLinks": [
+    "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o.",
+    "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o.",
+    "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o.",
+    "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20o%20Studio%20da%20Nekkora.",
+    "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o.",
+    "mailto:contato@nekkora.com",
+    "https://www.instagram.com/",
+    "https://www.linkedin.com/",
+    "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o.",
+    "mailto:contato@nekkora.com",
+    "https://www.instagram.com/",
+    "https://www.linkedin.com/",
+    "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20conhecer%20a%20Nekkora%20e%20entender%20como%20voc%C3%AAs%20podem%20ajudar%20na%20minha%20opera%C3%A7%C3%A3o."
+  ],
+  "claimHits": [
+    {
+      "id": "percentual",
+      "match": "98,1%",
+      "text": "98,1%",
+      "exclusion": false
+    }
+  ],
+  "internalProductMentions": [
+    {
+      "text": "Studio",
+      "marked": false
+    },
+    {
+      "text": "Studio",
+      "marked": false
+    },
+    {
+      "text": "Conhecer o Studio",
+      "marked": false
+    },
+    {
+      "text": "Studio",
+      "marked": false
+    },
+    {
+      "text": "Studio",
+      "marked": false
+    },
+    {
+      "text": "Estruturamos no Studio",
+      "marked": false
+    },
+    {
+      "text": "Studio · a porta de entrada",
+      "marked": false
+    },
+    {
+      "text": "O Studio é onde o seu processo ganha forma: você estrutura a automação, entende cada etapa e documenta o que precisa ser feito. Menos tempo em levantamento, mai",
+      "marked": false
+    },
+    {
+      "text": "Quero conhecer o Studio",
+      "marked": false
+    },
+    {
+      "text": "Studio, execução, monitoramento e suporte no mesmo ecossistema.",
+      "marked": false
+    },
+    {
+      "text": "Studio como ponto de entrada",
+      "marked": false
+    },
+    {
+      "text": "Conte o que você quer automatizar ou o que já roda hoje. Respondemos com um caminho claro, do Studio ao suporte.",
+      "marked": false
+    },
+    {
+      "text": "Studio",
+      "marked": false
+    }
+  ],
+  "tabSequence": [
+    {
+      "tag": "a",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Início",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Studio",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Hospedagem",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Monitoramento",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Suporte",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Contato",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema claro",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Falar no WhatsApp",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Falar no WhatsApp",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Conhecer o Studio",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Saiba mais",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Saiba mais",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Saiba mais",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Saiba mais",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Quero conhecer o Studio",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Falar no WhatsApp",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "contato@nekkora.com",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Instagram",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "LinkedIn",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "div",
+      "label": "Selecione (opcional)",
+      "ring": true
+    },
+    {
+      "tag": "textarea",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Enviar pelo WhatsApp",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Studio",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Hospedagem",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Monitoramento",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Suporte",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "O que entregamos",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Como funciona",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Diferenciais",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Contato",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "WhatsApp",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "E-mail",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Instagram",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "LinkedIn",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Fale conosco",
+      "ring": true
+    }
+  ],
+  "finishedAt": "2026-10-15T09:37:06.693Z",
+  "summary": {
+    "total": 39,
+    "failed": 23
+  }
+}

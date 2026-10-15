@@ -1,0 +1,1899 @@
+{
+  "baseUrl": "http://127.0.0.1:4174/",
+  "startedAt": "2026-10-15T10:37:46.593Z",
+  "checks": [
+    {
+      "id": "tema-aplicado:sakura-dark:mobile",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:mobile",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:tablet",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:tablet",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:desktop",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:desktop",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:wide",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:wide",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:mobile",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:mobile",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:tablet",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:tablet",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:desktop",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:desktop",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:wide",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:wide",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "axe:sakura-dark:mobile",
+      "ok": true,
+      "detail": "29 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sakura-dark:mobile",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sakura-dark:mobile",
+      "ok": true,
+      "detail": "55 nós; pior folga: .nk-alert--warning > .nk-alert__content > .nk-alert__body 4.73:1 (mín. 4.5)"
+    },
+    {
+      "id": "axe:sakura-dark:desktop",
+      "ok": true,
+      "detail": "28 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sakura-dark:desktop",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sakura-dark:desktop",
+      "ok": true,
+      "detail": "54 nós; pior folga: li:nth-child(6) > .journey-panel__num[aria-hidden=\"true\"] 5.01:1 (mín. 4.5)"
+    },
+    {
+      "id": "axe:sage-light:mobile",
+      "ok": true,
+      "detail": "29 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sage-light:mobile",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sage-light:mobile",
+      "ok": true,
+      "detail": "55 nós; pior folga: .nk-alert--warning > .nk-alert__content > .nk-alert__body 4.59:1 (mín. 4.5)"
+    },
+    {
+      "id": "axe:sage-light:desktop",
+      "ok": true,
+      "detail": "28 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sage-light:desktop",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sage-light:desktop",
+      "ok": true,
+      "detail": "54 nós; pior folga: .nk-badge--md 4.67:1 (mín. 4.5)"
+    },
+    {
+      "id": "tema-padrao-sakura-dark",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "ordem-das-secoes",
+      "ok": true,
+      "detail": "inicio > solucoes > delivery > como-funciona > hosting > combinado > diferenciais > transparencia > contato"
+    },
+    {
+      "id": "um-unico-h1",
+      "ok": true,
+      "detail": "1 h1"
+    },
+    {
+      "id": "ancoras-validas",
+      "ok": true,
+      "detail": "30 âncoras, quebradas: nenhuma"
+    },
+    {
+      "id": "sem-destinos-provisorios",
+      "ok": true,
+      "detail": "links externos: nenhum; status contato=pendente"
+    },
+    {
+      "id": "sem-whatsapp-flutuante-provisorio",
+      "ok": true,
+      "detail": "ausente"
+    },
+    {
+      "id": "sem-alegacoes-proibidas",
+      "ok": true,
+      "detail": "3 ocorrência(s), todas em listas de exclusão"
+    },
+    {
+      "id": "produtos-internos-so-em-bloco-informativo",
+      "ok": true,
+      "detail": "1 menção(ões)"
+    },
+    {
+      "id": "demonstrativos-identificados",
+      "ok": true,
+      "detail": "[{\"label\":\"jornada\",\"visible\":true}]"
+    },
+    {
+      "id": "primeiro-tab-pular-conteudo",
+      "ok": true,
+      "detail": "{\"text\":\"Pular para o conteúdo\",\"href\":\"#conteudo\"}"
+    },
+    {
+      "id": "pular-conteudo-visivel-no-foco",
+      "ok": true
+    },
+    {
+      "id": "foco-visivel-nos-40-primeiros-tabs",
+      "ok": true,
+      "detail": "0 sem indicador de foco"
+    },
+    {
+      "id": "alternancia-de-tema-persiste",
+      "ok": true,
+      "detail": "sage-light → recarregado: sage-light"
+    },
+    {
+      "id": "formulario-erros-obrigatorios",
+      "ok": true,
+      "detail": "7 campos inválidos; foco no primeiro inválido=true"
+    },
+    {
+      "id": "formulario-foco-no-primeiro-erro",
+      "ok": true
+    },
+    {
+      "id": "formulario-radio-por-teclado",
+      "ok": true
+    },
+    {
+      "id": "formulario-modo-demonstracao",
+      "ok": true,
+      "detail": "Solicitação validada — envio desativado nesta versão Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação. Nome Pessoa de Teste E-mail test"
+    },
+    {
+      "id": "formulario-sem-envio-real",
+      "ok": true,
+      "detail": "popup=false; url inalterada=true"
+    },
+    {
+      "id": "formulario-resultado-visivel-e-focado",
+      "ok": true,
+      "detail": "{\"doneTop\":87.71875,\"navBottom\":69,\"focused\":true}"
+    },
+    {
+      "id": "menu-mobile-abre-e-fecha-com-esc",
+      "ok": true,
+      "detail": "aberto=true depois do Esc=false"
+    },
+    {
+      "id": "hosting-acordeao-no-celular",
+      "ok": true,
+      "detail": "modo=acordeao; itens=8; todos recolhidos=true; altura da página=13735px"
+    },
+    {
+      "id": "hosting-condicoes-visiveis-recolhido",
+      "ok": true,
+      "detail": "8/8 resumos mostram \"Como é contratado\""
+    },
+    {
+      "id": "hosting-acordeao-teclado",
+      "ok": true,
+      "detail": "foco visível=true; Enter abre=true; definição visível=true; Espaço fecha=true"
+    },
+    {
+      "id": "hosting-expandido-no-desktop",
+      "ok": true,
+      "detail": "modo=expandido; definições visíveis=8/8"
+    },
+    {
+      "id": "sem-requisicoes-externas",
+      "ok": true,
+      "detail": "nenhuma"
+    },
+    {
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    }
+  ],
+  "screenshots": [
+    "pagina-sakura-dark-mobile-375.jpg",
+    "pagina-sakura-dark-tablet-768.jpg",
+    "pagina-sakura-dark-desktop-1280.jpg",
+    "hero-sakura-dark-desktop.png",
+    "pagina-sakura-dark-wide-1440.jpg",
+    "pagina-sage-light-mobile-375.jpg",
+    "pagina-sage-light-tablet-768.jpg",
+    "pagina-sage-light-desktop-1280.jpg",
+    "hero-sage-light-desktop.png",
+    "pagina-sage-light-wide-1440.jpg",
+    "formulario-erros.png",
+    "formulario-resultado-tela.png",
+    "formulario-resultado.png",
+    "menu-mobile-aberto.png",
+    "hosting-acordeao-mobile.png"
+  ],
+  "axe": {
+    "sakura-dark:mobile": {
+      "violations": [],
+      "passes": 29,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 55
+        }
+      ]
+    },
+    "sakura-dark:desktop": {
+      "violations": [],
+      "passes": 28,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 54
+        }
+      ]
+    },
+    "sage-light:mobile": {
+      "violations": [],
+      "passes": 29,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 55
+        }
+      ]
+    },
+    "sage-light:desktop": {
+      "violations": [],
+      "passes": 28,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 54
+        }
+      ]
+    }
+  },
+  "console": [],
+  "blocked": [],
+  "fonts": [
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com"
+  ],
+  "pixelContrast": {
+    "sakura-dark:mobile": [
+      {
+        "target": ".nk-badge--md",
+        "required": 4.5,
+        "p10": 7.22,
+        "min": 7.06
+      },
+      {
+        "target": "#hero-title",
+        "required": 3,
+        "p10": 14.07,
+        "min": 13.15
+      },
+      {
+        "target": "#hero-title > em",
+        "required": 3,
+        "p10": 6.19,
+        "min": 1
+      },
+      {
+        "target": ".hero__lead",
+        "required": 4.5,
+        "p10": 5.82,
+        "min": 5.43
+      },
+      {
+        "target": "n--lg.nk-button--primary.nk-button--link > .nk-button__label",
+        "required": 4.5,
+        "p10": 9.55,
+        "min": 9.55
+      },
+      {
+        "target": ".nk-button--secondary > .nk-button__label",
+        "required": 4.5,
+        "p10": 7.87,
+        "min": 7.87
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 7.37,
+        "min": 7.37
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 6.51,
+        "min": 6.48
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 7.37,
+        "min": 7.37
+      },
+      {
+        "target": "#journey-title",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".nk-badge--neutral",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": "li:nth-child(1) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(1) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(2) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(2) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(3) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(3) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(4) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(4) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(5) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(5) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(6) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.01,
+        "min": 5.01
+      },
+      {
+        "target": "li:nth-child(6) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".journey-panel__exec > span",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": ".split > .stack > .note > span",
+        "required": 4.5,
+        "p10": 7.37,
+        "min": 7.37
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 6.69,
+        "min": 6.57
+      },
+      {
+        "target": "#como-title",
+        "required": 3,
+        "p10": 12.2,
+        "min": 11.86
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.4,
+        "min": 5.26
+      },
+      {
+        "target": "#prazo-title",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > p",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": ".timing > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > ul > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > ul > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 6.66,
+        "min": 6.57
+      },
+      {
+        "target": "#combinado-title",
+        "required": 3,
+        "p10": 12.01,
+        "min": 11.8
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.31,
+        "min": 5.18
+      },
+      {
+        "target": ".limits > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 9.59,
+        "min": 9.59
+      },
+      {
+        "target": ".limits > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 9.59,
+        "min": 9.59
+      },
+      {
+        "target": ".limits > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 9.59,
+        "min": 9.59
+      },
+      {
+        "target": ".manifesto > p",
+        "required": 4.5,
+        "p10": 14.22,
+        "min": 14.15
+      },
+      {
+        "target": "p > em",
+        "required": 4.5,
+        "p10": 7.91,
+        "min": 7.91
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 6.67,
+        "min": 6.57
+      },
+      {
+        "target": "#transparencia-title",
+        "required": 3,
+        "p10": 12.03,
+        "min": 11.84
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.33,
+        "min": 5.19
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 8.16,
+        "min": 7.66
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 14.62,
+        "min": 13.7
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 6.4,
+        "min": 5.98
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__title",
+        "required": 4.5,
+        "p10": 10.81,
+        "min": 10.23
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__body",
+        "required": 4.5,
+        "p10": 4.73,
+        "min": 4.48
+      },
+      {
+        "target": ".contact__next > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 16.07,
+        "min": 15.61
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 7.02,
+        "min": 6.84
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 7.17,
+        "min": 6.98
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 7.27,
+        "min": 7.11
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 7.38,
+        "min": 7.25
+      }
+    ],
+    "sakura-dark:desktop": [
+      {
+        "target": ".nk-badge--md",
+        "required": 4.5,
+        "p10": 7.42,
+        "min": 7.42
+      },
+      {
+        "target": "#hero-title",
+        "required": 3,
+        "p10": 16.9,
+        "min": 16.15
+      },
+      {
+        "target": "#hero-title > em",
+        "required": 3,
+        "p10": 9.55,
+        "min": 1
+      },
+      {
+        "target": ".hero__lead",
+        "required": 4.5,
+        "p10": 7.37,
+        "min": 7.37
+      },
+      {
+        "target": "n--lg.nk-button--primary.nk-button--link > .nk-button__label",
+        "required": 4.5,
+        "p10": 9.55,
+        "min": 9.55
+      },
+      {
+        "target": ".nk-button--secondary > .nk-button__label",
+        "required": 4.5,
+        "p10": 7.87,
+        "min": 7.87
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 7.37,
+        "min": 7.37
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 7.37,
+        "min": 7.37
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 7.37,
+        "min": 7.37
+      },
+      {
+        "target": "#journey-title",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".nk-badge--neutral",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": "li:nth-child(1) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(1) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(2) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(2) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(3) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(3) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(4) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(4) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(5) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 8.68,
+        "min": 8.68
+      },
+      {
+        "target": "li:nth-child(5) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "li:nth-child(6) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.01,
+        "min": 5.01
+      },
+      {
+        "target": "li:nth-child(6) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".journey-panel__exec > span",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 6.91,
+        "min": 6.88
+      },
+      {
+        "target": "#como-title",
+        "required": 3,
+        "p10": 12.7,
+        "min": 12.46
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.75,
+        "min": 5.7
+      },
+      {
+        "target": "#prazo-title",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > p",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": ".timing > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > ul > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": ".timing > ul > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 6.9,
+        "min": 6.82
+      },
+      {
+        "target": "#combinado-title",
+        "required": 3,
+        "p10": 12.59,
+        "min": 12.46
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.6,
+        "min": 5.52
+      },
+      {
+        "target": ".limits > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 9.59,
+        "min": 9.59
+      },
+      {
+        "target": ".limits > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 9.59,
+        "min": 9.59
+      },
+      {
+        "target": ".limits > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 9.59,
+        "min": 9.59
+      },
+      {
+        "target": ".manifesto > p",
+        "required": 3,
+        "p10": 14.3,
+        "min": 14.23
+      },
+      {
+        "target": "p > em",
+        "required": 3,
+        "p10": 7.99,
+        "min": 7.95
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 7,
+        "min": 6.9
+      },
+      {
+        "target": "#transparencia-title",
+        "required": 3,
+        "p10": 12.7,
+        "min": 12.46
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.67,
+        "min": 5.59
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 9.86,
+        "min": 9.86
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 17.64,
+        "min": 17.64
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 7.61,
+        "min": 7.61
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__title",
+        "required": 4.5,
+        "p10": 12.85,
+        "min": 12.85
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__body",
+        "required": 4.5,
+        "p10": 5.54,
+        "min": 5.54
+      },
+      {
+        "target": ".contact__next > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 17.64,
+        "min": 17.64
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 7.61,
+        "min": 7.61
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 7.61,
+        "min": 7.61
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 7.61,
+        "min": 7.61
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 7.61,
+        "min": 7.61
+      }
+    ],
+    "sage-light:mobile": [
+      {
+        "target": ".nk-badge--md",
+        "required": 4.5,
+        "p10": 4.63,
+        "min": 4.58
+      },
+      {
+        "target": "#hero-title",
+        "required": 3,
+        "p10": 13.14,
+        "min": 12.88
+      },
+      {
+        "target": "#hero-title > em",
+        "required": 3,
+        "p10": 5,
+        "min": 1.01
+      },
+      {
+        "target": ".hero__lead",
+        "required": 4.5,
+        "p10": 4.76,
+        "min": 4.68
+      },
+      {
+        "target": "n--lg.nk-button--primary.nk-button--link > .nk-button__label",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": ".nk-button--secondary > .nk-button__label",
+        "required": 4.5,
+        "p10": 4.76,
+        "min": 4.76
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 5.13,
+        "min": 5.13
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 4.9,
+        "min": 4.9
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 5.13,
+        "min": 5.13
+      },
+      {
+        "target": "#journey-title",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".nk-badge--neutral",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": "li:nth-child(1) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(1) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(2) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(2) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(3) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(3) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(4) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(4) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(5) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(5) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(6) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(6) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".journey-panel__exec > span",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".split > .stack > .note > span",
+        "required": 4.5,
+        "p10": 5.13,
+        "min": 5.13
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.3,
+        "min": 5.21
+      },
+      {
+        "target": "#como-title",
+        "required": 3,
+        "p10": 14.05,
+        "min": 13.8
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.24,
+        "min": 5.14
+      },
+      {
+        "target": "#prazo-title",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > p",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".timing > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > ul > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > ul > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.25,
+        "min": 5.2
+      },
+      {
+        "target": "#combinado-title",
+        "required": 3,
+        "p10": 13.93,
+        "min": 13.8
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.16,
+        "min": 5.07
+      },
+      {
+        "target": ".limits > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": ".limits > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": ".limits > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": ".manifesto > p",
+        "required": 4.5,
+        "p10": 14.6,
+        "min": 14.57
+      },
+      {
+        "target": "p > em",
+        "required": 4.5,
+        "p10": 5.64,
+        "min": 5.6
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.25,
+        "min": 5.21
+      },
+      {
+        "target": "#transparencia-title",
+        "required": 3,
+        "p10": 13.94,
+        "min": 13.8
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.19,
+        "min": 5.1
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.31,
+        "min": 5.16
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 14.05,
+        "min": 13.68
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.15,
+        "min": 5.01
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__title",
+        "required": 4.5,
+        "p10": 12.5,
+        "min": 12.36
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__body",
+        "required": 4.5,
+        "p10": 4.59,
+        "min": 4.52
+      },
+      {
+        "target": ".contact__next > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 14.48,
+        "min": 14.21
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 5.34,
+        "min": 5.25
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 5.4,
+        "min": 5.34
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 5.44,
+        "min": 5.35
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 5.49,
+        "min": 5.4
+      }
+    ],
+    "sage-light:desktop": [
+      {
+        "target": ".nk-badge--md",
+        "required": 4.5,
+        "p10": 4.67,
+        "min": 4.67
+      },
+      {
+        "target": "#hero-title",
+        "required": 3,
+        "p10": 13.89,
+        "min": 13.65
+      },
+      {
+        "target": "#hero-title > em",
+        "required": 3,
+        "p10": 5.33,
+        "min": 1.01
+      },
+      {
+        "target": ".hero__lead",
+        "required": 4.5,
+        "p10": 5.13,
+        "min": 5.13
+      },
+      {
+        "target": "n--lg.nk-button--primary.nk-button--link > .nk-button__label",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": ".nk-button--secondary > .nk-button__label",
+        "required": 4.5,
+        "p10": 4.76,
+        "min": 4.76
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 5.13,
+        "min": 5.13
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 5.13,
+        "min": 5.13
+      },
+      {
+        "target": ".hero__pillars > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 5.13,
+        "min": 5.13
+      },
+      {
+        "target": "#journey-title",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".nk-badge--neutral",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": "li:nth-child(1) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(1) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(2) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(2) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(3) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(3) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(4) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(4) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(5) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(5) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "li:nth-child(6) > .journey-panel__num[aria-hidden=\"true\"]",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "li:nth-child(6) > span:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".journey-panel__exec > span",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.4,
+        "min": 5.36
+      },
+      {
+        "target": "#como-title",
+        "required": 3,
+        "p10": 14.46,
+        "min": 14.21
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.44,
+        "min": 5.4
+      },
+      {
+        "target": "#prazo-title",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > p",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".timing > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > ul > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".timing > ul > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.39,
+        "min": 5.36
+      },
+      {
+        "target": "#combinado-title",
+        "required": 3,
+        "p10": 14.33,
+        "min": 14.21
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.38,
+        "min": 5.29
+      },
+      {
+        "target": ".limits > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": ".limits > ul > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": ".limits > ul > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": ".manifesto > p",
+        "required": 3,
+        "p10": 14.31,
+        "min": 14.28
+      },
+      {
+        "target": "p > em",
+        "required": 3,
+        "p10": 5.44,
+        "min": 5.43
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.4,
+        "min": 5.39
+      },
+      {
+        "target": "#transparencia-title",
+        "required": 3,
+        "p10": 14.46,
+        "min": 14.33
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.39,
+        "min": 5.35
+      },
+      {
+        "target": "n-header.nk-section-header--md > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.8
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "ader.nk-section-header--md > .nk-section-header__description",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__title",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": ".nk-alert--warning > .nk-alert__content > .nk-alert__body",
+        "required": 4.5,
+        "p10": 4.89,
+        "min": 4.89
+      },
+      {
+        "target": ".contact__next > .nk-text--h4.nk-text--color-default.nk-text",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".contact__next > ol > li:nth-child(4)",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      }
+    ]
+  },
+  "sections": [
+    "inicio",
+    "solucoes",
+    "delivery",
+    "como-funciona",
+    "hosting",
+    "combinado",
+    "diferenciais",
+    "transparencia",
+    "contato"
+  ],
+  "externalLinks": [],
+  "contactStatus": "pendente",
+  "claimHits": [
+    {
+      "id": "24h",
+      "match": "24 horas",
+      "text": "Monitoramento, atendimento 24 horas, alta disponibilidade ou SLA",
+      "exclusion": true
+    },
+    {
+      "id": "sla",
+      "match": "SLA",
+      "text": "Monitoramento, atendimento 24 horas, alta disponibilidade ou SLA",
+      "exclusion": true
+    },
+    {
+      "id": "alta-disponibilidade",
+      "match": "alta disponibilidade",
+      "text": "Monitoramento, atendimento 24 horas, alta disponibilidade ou SLA",
+      "exclusion": true
+    }
+  ],
+  "internalProductMentions": [
+    {
+      "text": "A Nekkora também desenvolve o Studio, a Platform e o Agent. Esses produtos estão em desenvolvimento, não fazem parte das ofertas desta página e não são necessár",
+      "marked": true
+    }
+  ],
+  "tabSequence": [
+    {
+      "tag": "a",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Soluções",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Delivery",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Como funciona",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Hosting",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Transparência",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Contato",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema claro",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Solicitar avaliação",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Solicitar avaliação",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Ver como funciona",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Conhecer o Delivery",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Entender o Hosting",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Ver as combinações",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Solicitar avaliação de uma automação",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Solicitar avaliação de viabilidade",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "input",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "textarea",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Revisar solicitação",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Nekkora Delivery",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Nekkora Hosting",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Delivery + Hosting",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Como funciona",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Diferenciais",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Transparência",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Solicitar avaliação",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Pular para o conteúdo",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Soluções",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Delivery",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Como funciona",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Hosting",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Transparência",
+      "ring": true
+    },
+    {
+      "tag": "a",
+      "label": "Contato",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema claro",
+      "ring": true
+    }
+  ],
+  "formStatus": "Solicitação validada — envio desativado nesta versão\n\nNenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.\nNome\nPessoa de Teste\nE-mail\nteste@exemplo.invalid\nTelefone\n—\nEmpresa\n—\nQuero avaliar\nDelivery\nProcesso\nTeste automatizado de homologação: processo de conciliação manual.\nEditar solicitação",
+  "mobilePageHeight": 13735,
+  "finishedAt": "2026-10-15T10:38:22.980Z",
+  "summary": {
+    "total": 54,
+    "failed": 0
+  }
+}

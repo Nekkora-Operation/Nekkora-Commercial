@@ -1,0 +1,322 @@
+Pular para o conteúdo
+Soluções
+Delivery
+Como funciona
+Hosting
+Transparência
+Contato
+Solicitar avaliação
+Nekkora Delivery · Nekkora Hosting
+Automação sob medida, da necessidade à execução.
+
+Desenvolvemos automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. Se fizer sentido para você, avaliamos também a infraestrutura para executá-las. Cada serviço é contratado de forma independente.
+
+Solicitar avaliação
+Ver como funciona
+Proposta por automação
+Homologação e aceite
+Sem pacote obrigatório
+Jornada de uma automação
+Ilustração
+1
+Necessidade
+2
+Avaliação
+3
+Proposta
+4
+Desenvolvimento e testes
+5
+Homologação e aceite
+6
+Entrega
+
+Execução no seu ambiente ou com o Nekkora Hosting, sujeito a avaliação
+
+SOLUÇÕES
+Duas ofertas complementares, contratadas como você precisar
+
+Delivery desenvolve a automação. Hosting trata da infraestrutura para executá-la, sujeito a avaliação. Use um, outro ou os dois.
+
+Sob proposta
+Nekkora Delivery
+
+Desenvolvimento de automações por demanda.
+
+Escopo, prazo e preço definidos em proposta para cada automação
+Desenvolvimento, testes e homologação com aceite
+Entrega e transferência conforme contratado
+Conhecer o Delivery
+Em avaliação de viabilidade
+Nekkora Hosting
+
+Infraestrutura e serviços associados à execução de automações.
+
+Componentes escolhidos conforme a necessidade, nenhum obrigatório
+Responsabilidades de cada parte delimitadas por escrito
+Disponibilidade confirmada em avaliação de viabilidade
+Entender o Hosting
+
+Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora. 
+Ver as combinações
+
+NEKKORA DELIVERY
+Automação desenvolvida para o seu processo
+
+Cada automação é avaliada e dimensionada individualmente. Antes de qualquer desenvolvimento, você recebe uma proposta com escopo, preço e condições.
+
+Uma automação, uma proposta
+
+Cada processo tem escopo, preço, condições e aceite próprios.
+
+Vários processos, uma fila organizada
+
+Você pode solicitar mais de uma automação. As demandas seguem a fila operacional da Nekkora.
+
+Reuniões quando necessárias
+
+Os encontros são combinados conforme a etapa e a necessidade do projeto.
+
+Tecnologia conforme o caso
+
+Python, UiPath, Power Automate e integrações entre sistemas, escolhidos na avaliação.
+
+Licenças e serviços de terceiros, quando necessários, dependem de avaliação e constam da proposta.
+
+Exemplos de aplicação
+
+Exemplos ilustrativos. A viabilidade de cada caso é avaliada individualmente.
+
+Conciliações e conferências entre planilhas e sistemas
+Extração e lançamento de dados em portais e sistemas web
+Leitura e triagem de e-mails e documentos
+Integração entre sistemas por API
+Geração e envio de relatórios recorrentes
+Solicitar avaliação de uma automação
+COMO FUNCIONA
+Da conversa inicial ao aceite, em etapas claras
+
+O caminho de cada automação contratada pelo Delivery. Nada é desenvolvido sem uma proposta aprovada.
+
+ETAPA 01
+Entendimento da necessidade
+Você descreve o processo, as regras e o resultado esperado.
+ETAPA 02
+Viabilidade e dimensionamento
+Analisamos sistemas, acessos e complexidade para dimensionar a automação.
+ETAPA 03
+Proposta
+Escopo, preço e condições por escrito. O desenvolvimento começa após a sua aprovação.
+ETAPA 04
+Desenvolvimento e testes
+Construímos e testamos a automação conforme o escopo aprovado.
+ETAPA 05
+Homologação e aceite
+Você valida a automação no seu cenário e formaliza o aceite.
+ETAPA 06
+Entrega e transferência
+Entregamos e transferimos o que foi previsto na proposta.
+O que influencia o prazo
+
+O prazo é estimado na proposta e depende de fatores que vão além do desenvolvimento:
+
+Posição da demanda na fila operacional
+Liberação de acessos e credenciais
+Disponibilidade e estabilidade de sistemas externos
+Tempo de homologação da sua equipe
+NEKKORA HOSTING
+Infraestrutura para executar automações, com responsabilidades delimitadas
+
+Hosting reúne serviços distintos. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta. Nenhum deles é necessário para contratar o Delivery.
+
+Disponibilidade em avaliação
+
+A oferta de Hosting está em definição comercial. Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.
+Solicitar avaliação de viabilidade
+O que cada serviço significa
+Infraestrutura para execução
+
+Ambiente (máquinas, servidores ou serviços) onde a automação roda.
+
+Como é contratado: Avaliada conforme requisitos técnicos e compatibilidade.
+
+Configuração inicial
+
+Preparação do ambiente: instalação, dependências e acessos.
+
+Como é contratado: Definida na proposta, quando contratada.
+
+Administração e manutenção do ambiente
+
+Atualizações e cuidados com o ambiente ao longo do tempo.
+
+Como é contratado: Serviço à parte, com escopo próprio.
+
+Monitoramento técnico
+
+Acompanhamento da saúde do ambiente: máquinas e serviços.
+
+Como é contratado: Escopo, horários e forma definidos em proposta, se contratado.
+
+Monitoramento de processos
+
+Acompanhamento das execuções da automação e de seus resultados.
+
+Como é contratado: Escopo definido em proposta, se contratado.
+
+Operação assistida
+
+Acompanhamento de execuções em um período combinado, junto à sua equipe.
+
+Como é contratado: Período e responsabilidades definidos em proposta.
+
+Correção de incidentes
+
+Análise e correção de falhas na execução.
+
+Como é contratado: Abrangência e condições definidas em proposta.
+
+Sustentação e evolução das automações
+
+Ajustes por mudanças no processo ou nos sistemas e novas funcionalidades.
+
+Como é contratado: Não incluída no desenvolvimento; contratada à parte.
+
+DELIVERY, HOSTING OU OS DOIS
+Você escolhe o arranjo
+
+Cada serviço tem proposta e condições próprias. Nenhuma combinação exige o uso de produtos internos da Nekkora.
+
+Delivery independente
+
+A automação é desenvolvida e entregue para rodar no ambiente que você indicar.
+
+Faz sentido quando você já tem infraestrutura e equipe para executar as automações.
+
+Hosting independente
+
+Execução de automações que você já tem, desenvolvidas pela sua equipe ou por terceiros.
+
+Faz sentido quando a automação existe, mas falta um ambiente adequado para executá-la.
+
+Sujeito a compatibilidade técnica e disponibilidade, confirmadas em avaliação.
+
+Delivery + Hosting
+
+Desenvolvimento e ambiente de execução avaliados em conjunto.
+
+Os requisitos do ambiente podem ser considerados desde a proposta, e a passagem da homologação para a execução pode ser planejada junto.
+
+A parte de Hosting segue a mesma avaliação de viabilidade.
+
+Limites da contratação combinada
+Contratar os dois serviços não inclui automaticamente sustentação, evolução, monitoramento ou correção de incidentes — esses itens valem apenas quando constam na proposta.
+Cada serviço mantém escopo, preço, condições e aceite próprios.
+DIFERENCIAIS
+Eficiência que vem do método
+
+Mecanismos concretos de trabalho, não promessas de resultado.
+
+Proposta antes do código
+
+Escopo, preço e condições por escrito antes de iniciar o desenvolvimento.
+
+Aceite formal
+
+A entrega passa por homologação com você e termina com aceite.
+
+Dimensionamento individual
+
+Cada processo é avaliado separadamente, sem escopos genéricos.
+
+Responsabilidades explícitas
+
+O que cabe à Nekkora e o que cabe a você fica descrito na proposta.
+
+Serviços independentes
+
+Delivery e Hosting são contratados juntos ou separados, sem pacote obrigatório.
+
+Ferramenta adequada ao caso
+
+Python, UiPath, Power Automate ou integrações: a escolha parte do processo, não de uma plataforma própria.
+
+Clareza no escopo, eficiência no método e autonomia na escolha.
+
+TRANSPARÊNCIA
+O que esperar da contratação
+
+O que é definido em proposta, do que o andamento depende e o que não está incluído sem acordo explícito.
+
+Definido em proposta
+Escopo de cada automação
+Preço e condições de pagamento
+Prazo estimado
+Tecnologias e licenças necessárias
+Responsabilidades de cada parte
+Critérios de homologação e aceite
+Não incluído automaticamente
+Alterações futuras e novas funcionalidades
+Sustentação e evolução das automações
+Garantia após a entrega, salvo se prevista em proposta
+Infraestrutura e serviços de Hosting
+Licenças e serviços de terceiros
+Monitoramento, atendimento 24 horas, alta disponibilidade ou SLA
+Depende de você e de terceiros
+Liberação de acessos e credenciais
+Estabilidade de sistemas e portais externos
+Disponibilidade da sua equipe para homologação
+Fila operacional da Nekkora
+Produtos em desenvolvimento
+
+A Nekkora também desenvolve o Studio, a Platform e o Agent. Esses produtos estão em desenvolvimento, não fazem parte das ofertas desta página e não são necessários para contratar Delivery ou Hosting.
+
+CONTATO
+Solicite uma avaliação
+
+Conte qual processo você quer automatizar ou executar. A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.
+
+Canais de contato em definição
+
+Os canais oficiais (WhatsApp, e-mail e redes sociais) ainda não foram publicados. O formulário desta versão é de demonstração: valida os dados, mas não envia nem armazena nada.
+Como a avaliação acontece
+Lemos a descrição e, se for preciso, combinamos uma conversa para entender o processo.
+Avaliamos a viabilidade e dimensionamos a automação ou o ambiente.
+Se fizer sentido, você recebe uma proposta com escopo, preço e condições.
+Nada é desenvolvido ou contratado sem a sua aprovação.
+
+Solicitação validada — envio desativado nesta versão
+
+Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.
+Nome
+Pessoa de Teste
+E-mail
+teste@exemplo.invalid
+Telefone
+—
+Empresa
+—
+Quero avaliar
+Delivery
+Processo
+Teste automatizado de homologação: processo de conciliação manual.
+Editar solicitação
+
+Automação sob medida, da necessidade à execução.
+
+SOLUÇÕES
+Nekkora Delivery
+Nekkora Hosting
+Delivery + Hosting
+CONTRATAÇÃO
+Como funciona
+Diferenciais
+Transparência
+Solicitar avaliação
+CONTATO
+
+Canais oficiais em definição.
+
+© 2026 Nekkora. Todos os direitos reservados.
+Versão para homologação — conteúdo sujeito à aprovação da Nekkora.
+Neko (猫) observa os detalhes.

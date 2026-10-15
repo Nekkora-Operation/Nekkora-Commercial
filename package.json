@@ -2,14 +2,16 @@
   "name": "nekkora-commercial",
   "version": "0.1.0",
   "private": true,
-  "description": "Nekkora Commercial — página de apresentação comercial do produto e dos serviços.",
+  "description": "Nekkora Commercial — página comercial do Nekkora Delivery e do Nekkora Hosting.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build"
+    "check": "npm run typecheck && npm run build",
+    "homologacao": "node scripts/homologacao.mjs",
+    "texto": "node scripts/exportar-texto.mjs"
   },
   "dependencies": {
     "nekkora-lib": "file:../Nekkora-lib",

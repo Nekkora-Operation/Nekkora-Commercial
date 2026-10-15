@@ -1,0 +1,87 @@
+{
+  "baseUrl": "http://127.0.0.1:4175/",
+  "at": "2026-10-15T10:38:33.093Z",
+  "checks": [
+    {
+      "id": "status-configurado",
+      "ok": true
+    },
+    {
+      "id": "whatsapp-exibido",
+      "ok": true,
+      "detail": "3 link(s) wa.me"
+    },
+    {
+      "id": "email-exibido",
+      "ok": true
+    },
+    {
+      "id": "linkedin-perfil-exibido",
+      "ok": true
+    },
+    {
+      "id": "instagram-pagina-inicial-rejeitado",
+      "ok": true,
+      "detail": "URL sem caminho de perfil não vira link"
+    },
+    {
+      "id": "botao-flutuante-presente",
+      "ok": true
+    },
+    {
+      "id": "aviso-canais-pendentes-ausente",
+      "ok": true
+    },
+    {
+      "id": "botao-envio-whatsapp",
+      "ok": true
+    },
+    {
+      "id": "formulario-abre-whatsapp-com-mensagem",
+      "ok": true,
+      "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero avaliar: Delivery e Hosting.\n\nTeste de homologação com canal configurado.\n\nContato: teste@exem"
+    },
+    {
+      "id": "aba-sem-opener",
+      "ok": true,
+      "detail": "window.opener === null: true"
+    },
+    {
+      "id": "aba-sem-referer",
+      "ok": true,
+      "detail": "cabeçalho Referer=ausente; document.referrer=\"\""
+    },
+    {
+      "id": "mensagem-neutra-sem-afirmar-abertura",
+      "ok": true,
+      "detail": "Pedimos ao navegador para abrir o WhatsApp"
+    },
+    {
+      "id": "link-manual-sempre-presente",
+      "ok": true,
+      "detail": "rel=\"noopener noreferrer\""
+    },
+    {
+      "id": "bloqueada-mesma-mensagem-neutra",
+      "ok": true,
+      "detail": "Pedimos ao navegador para abrir o WhatsApp"
+    },
+    {
+      "id": "bloqueada-link-manual-com-mensagem",
+      "ok": true,
+      "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero avaliar: Delivery.\n\nTeste de homologação com pop-up bl"
+    },
+    {
+      "id": "sem-requisicao-externa-real",
+      "ok": true,
+      "detail": "wa.me respondido localmente; nenhuma outra requisição externa"
+    }
+  ],
+  "waRequests": [
+    {
+      "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20de%20Teste.%0A%0AQuero%20avaliar%3A%20Delivery%20e%20Hosting.%0A%0ATeste%20de%20homologa%C3%A7%C3%A3o%20com%20canal%20configurado.%0A%0AContato%3A%20teste%40exemplo.invalid",
+      "referer": null
+    }
+  ],
+  "abortedExternal": []
+}

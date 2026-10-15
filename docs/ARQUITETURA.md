@@ -1,93 +1,46 @@
-# Nekkora Commercial Experience V1 — Arquitetura da página
+# Nekkora Commercial — Arquitetura da página
 
-Página única (landing comercial) com navegação por âncoras. Temas: **Midnight Blue** (escuro, padrão) e
-**Sage Light** (claro), alternados pelo `ThemeToggle` da nekkora-lib na barra de navegação. A escolha fica no
-`localStorage` (`nekkora-commercial-theme`) e é aplicada antes da primeira pintura por um script no `index.html`.
-Todos os componentes de interface vêm da **nekkora-lib**; o que é específico da página
-(ilustrações, composição das seções) fica em `src/`.
+Versão atual: **COM-001** (posicionamento comercial Delivery + Hosting). A versão anterior (Commercial Experience
+V1: Studio, hospedagem, monitoramento e suporte) está descrita no histórico do git (`da1f8f3`) e na
+[auditoria](com-001/01-auditoria.md).
+
+Página única (landing comercial) com navegação por âncoras. Temas: **Sakura Dark** (padrão) e **Sage Light**,
+alternados pelo `ThemeToggle` da nekkora-lib na barra de navegação. A escolha fica no `localStorage`
+(`nekkora-commercial-tema`) e é aplicada antes da primeira pintura por um script no `index.html`.
+Todos os componentes de interface vêm da **nekkora-lib**. O que é específico da página (texto, ilustrações,
+composição das seções) fica em `src/`.
+
+## Documentos da COM-001
+
+| Documento | Conteúdo |
+|---|---|
+| [01-auditoria.md](com-001/01-auditoria.md) | Gate 01: inventário e diagnóstico da V1 e da lib |
+| [02-contrato-comercial.md](com-001/02-contrato-comercial.md) | Gate 02: o que a página pode dizer sobre cada oferta |
+| [03-matriz-alegacoes.md](com-001/03-matriz-alegacoes.md) | Gate 02: alegações com status comprovada/condicional/pendente/proibida |
+| [04-arquitetura-ux.md](com-001/04-arquitetura-ux.md) | Gate 03: hierarquia, avaliação de tema, decisões D-01..D-16, assets e componentes |
+| [05-texto-comercial.md](com-001/05-texto-comercial.md) | Texto consolidado (gerado de `src/content.ts`) |
+| [06-roteiro-apresentacao.md](com-001/06-roteiro-apresentacao.md) | Roteiro de apresentação curta |
+| [07-checklist-homologacao.md](com-001/07-checklist-homologacao.md) | Checklist para a responsável |
+| [08-pendencias-publicacao.md](com-001/08-pendencias-publicacao.md) | Decisões pendentes (comerciais, lib, repositório) |
+| [09-relatorio-qualidade.md](com-001/09-relatorio-qualidade.md) | Gate 05: comandos executados, resultados e limitações |
 
 ## Seções (ordem da página)
 
-| # | Âncora | Seção | Objetivo | Blocos | Componentes da lib |
-|---|---|---|---|---|---|
-| — | — | Navbar fixa | Navegar e falar com a gente a qualquer momento | Logo, Início, Studio, Hospedagem, Monitoramento, Suporte, Contato, CTA WhatsApp | `Navbar`, `Logo`, `Button` (href) |
-| 1 | `#inicio` | Hero | Dizer em segundos quem somos e o que oferecemos | Selo dos 4 pilares, headline, subheadline, CTA WhatsApp, CTA Studio, pilares, painel de operação com o gato espiando | `Badge`, `Button`, `Card`, `Icon`, `Text` |
-| 2 | `#entrega` | O que a Nekkora entrega | Apresentar os 4 pilares | 4 cards: ícone, título, descrição, destaque de valor, link | `SectionHeader`, `Card`, `IconBox`, `Link` |
-| 3 | `#como-funciona` | Como funciona | Mostrar a jornada do cliente | Linha do tempo com 5 etapas | `SectionHeader`, `Steps` |
-| 4 | `#studio` | Studio | Vender o Studio como porta de entrada | Texto, 3 selos de valor, 5 benefícios, CTA, ilustração (gato analisando fluxo + documento) | `SectionHeader`, `Badge`, `Icon`, `Button` |
-| 5 | `#hospedagem` | Hospedagem | "Não somos só software: operamos a execução" | Texto, 4 recursos, ilustração (gato guardando o rack) | `SectionHeader`, `IconBox` |
-| 6 | `#monitoramento` | Monitoramento | "Não basta executar, é preciso acompanhar" | Texto, 5 tópicos, ilustração (central de telas), tabela de execuções de exemplo | `SectionHeader`, `IconBox`, `Card`, `Table`, `Badge` |
-| 7 | `#suporte` | Suporte | Apoio humano e contínuo | Texto, 4 itens, frase de destaque, ilustração (gato com fone) | `SectionHeader`, `IconBox` |
-| 8 | `#diferenciais` | Diferenciais | Posicionamento comercial | 6 cards + manifesto "clareza, operação e continuidade" | `SectionHeader`, `Card`, `IconBox`, `Logo` |
-| 9 | `#contato` | Contato | Converter | Chamada, WhatsApp, e-mail, Instagram, LinkedIn, formulário | `SectionHeader`, `Button`, `Link`, `Input`, `SelectMenu`, `Textarea`, `Badge` |
-| — | — | Footer | Fechamento e atalhos | Logo + tagline, links de produto e empresa, contatos, copyright | `Logo`, `Link` |
-| — | — | WhatsApp flutuante | Contato em qualquer ponto | Canto inferior direito, tooltip "Fale conosco" | `FloatingButton` |
+`#inicio` Hero → `#solucoes` Soluções → `#delivery` Delivery → `#como-funciona` Como funciona → `#hosting` Hosting →
+`#combinado` Solução combinada → `#diferenciais` Diferenciais → `#transparencia` Transparência → `#contato` Contato.
+Detalhes em [04-arquitetura-ux.md](com-001/04-arquitetura-ux.md).
 
-## Wireframe (desktop)
+## Contato e formulário
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│ [logo]   Início Studio Hospedagem Monitor. Suporte Contato [WA]│  Navbar fixa
-├──────────────────────────────────────────────────────────────┤
-│ selo · HEADLINE (2–3 linhas)          │   🐱 (espiando)       │
-│ subheadline                           │ ┌ painel operação ┐   │  Hero
-│ [Falar no WhatsApp] [Conhecer Studio] │ │ 156 · 98% · 3/3 │   │
-│ ✦ Studio ▤ Hospedagem ∿ Monit. ☊ Sup.  │ └ execuções ─────┘   │
-├──────────────────────────────────────────────────────────────┤
-│              O QUE A NEKKORA ENTREGA (centralizado)          │
-│   [Studio]   [Hospedagem]   [Monitoramento]   [Suporte]      │  4 cards
-├──────────────────────────────────────────────────────────────┤
-│ COMO FUNCIONA   ①──②──③──④──⑤                                │  Steps
-├──────────────────────────────────────────────────────────────┤
-│ texto + benefícios + CTA            │  ilustração Studio     │
-│ ilustração Hospedagem               │  texto + 4 recursos    │  alterna lados
-│        MONITORAMENTO (faixa destacada, centralizado)         │
-│ ilustração central de telas         │  5 tópicos             │
-│ [ tabela de execuções de exemplo — largura total ]           │
-│ texto + itens + frase               │  ilustração Suporte    │
-├──────────────────────────────────────────────────────────────┤
-│ DIFERENCIAIS  [6 cards 3×2]   [manifesto com o símbolo]      │
-├──────────────────────────────────────────────────────────────┤
-│ ┌ CONTATO (bloco destacado) ────────────────────────────────┐│
-│ │ chamada + WhatsApp + e-mail  │  formulário               ││
-│ │ Instagram · LinkedIn         │  (abre o WhatsApp pronto) ││
-│ └───────────────────────────────────────────────────────────┘│
-├──────────────────────────────────────────────────────────────┤
-│ logo+tagline │ Produto │ Empresa │ Fale com a gente           │  Footer
-└──────────────────────────────────────────────────────────────┘
-                                                        (◉ WA)  flutuante
-```
-
-**Mobile (≤ 900 px):** tudo vira uma coluna, as ilustrações vêm depois do texto e a Navbar vira menu recolhível
-(≤ 960 px). O Steps fica vertical, os cards passam a 2 colunas e depois a 1, e os CTAs do hero ocupam a largura toda.
-O botão flutuante some enquanto a seção de contato está na tela, para não cobrir o formulário.
-
-## Ilustrações
-
-Todas em SVG, desenhadas em código (`src/illustrations/`), com o mesmo gato de óculos Cat-Eye do logo. As cores
-vêm de variáveis `--ill-*` (`src/styles.css`) derivadas dos tokens do tema ativo, então as cenas acompanham o
-tema escolhido — nos temas claros o corpo do gato usa a cor secundária para os óculos continuarem visíveis:
-
-| Componente | Tema | Cena |
-|---|---|---|
-| `NekoPeek` | Operação (hero) | Gato espiando por cima do painel de operação |
-| `StudioScene` | Studio | Gato com lupa diante do fluxo da automação e de um documento gerado |
-| `HostingScene` | Hospedagem | Gato guardando o rack de servidores, com um escudo |
-| `ObservabilityScene` | Monitoramento | Gato numa central de telas (gráfico, volume, status e alerta) |
-| `SupportScene` | Suporte | Gato com fone, entre mensagens e alertas resolvidos |
-
-Cada ilustração tem `role="img"` e texto alternativo descritivo.
-
-## Formulário de contato
-
-Não há back-end nesta fase. O formulário valida os campos e, ao enviar, abre o WhatsApp com a mensagem já
-montada (nome, empresa, interesse, mensagem e contatos). Nada é armazenado.
+Não há backend. Os canais vêm de `src/config.ts`, e só aparecem os que têm valor confirmado e válido. Sem nenhum
+canal, a página mostra "Canais de contato em definição", e o formulário valida e exibe o resumo da solicitação,
+declarando que nada foi enviado. Com WhatsApp confirmado, o formulário abre o WhatsApp com a mensagem montada e o
+botão flutuante volta. Nada é armazenado.
 
 ## Acessibilidade
 
-- Contraste AA: textos sobre fundos sólidos usam os tokens `--nk-solid-*` da lib.
-- Foco visível em links, botões e campos.
-- Link "Pular para o conteúdo".
-- Status nunca depende só da cor: todo badge tem texto.
-- Navegação por teclado no menu mobile (Esc fecha) e no SelectMenu.
-- Rolagem suave desativada com `prefers-reduced-motion`, que também desliga o pulso do botão flutuante.
+- Contraste AA verificado com axe-core nos dois temas (0 violações). Fundos sólidos usam os tokens `--nk-solid-*` da lib.
+- Link "Pular para o conteúdo" visível ao receber foco; foco visível em links, botões e campos.
+- Formulário: rótulos visíveis, `RadioGroup` com legenda, erros associados e foco no primeiro campo inválido. Depois da validação, o foco vai ao resumo.
+- Status nunca depende só da cor; ilustrações com `role="img"` e texto alternativo.
+- Menu mobile operável por teclado (Esc fecha). Rolagem suave desativada com `prefers-reduced-motion`.
