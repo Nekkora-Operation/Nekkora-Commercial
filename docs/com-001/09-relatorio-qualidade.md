@@ -14,7 +14,8 @@ Saída integral dos comandos: [evidencias/comandos.txt](evidencias/comandos.txt)
 | `npm run check` | exit 0 (typecheck + build) |
 | `npm run texto` | exit 0 — gerou `05-texto-comercial.md` a partir de `src/content.ts` |
 | `npm run homologacao` (estado padrão, sem canais) | **54 verificações, 0 falhas** — [resumo](evidencias/depois/resumo.md) (50 na entrega inicial + 4 do acordeão na R1) |
-| `scripts/homologacao-canais.mjs` (build temporário com canais de teste) | **14 verificações, 0 falhas** — [resultados](evidencias/canais/resultados.json) (inclui aba aberta e aba bloqueada, R1) |
+| `scripts/homologacao-canais.mjs` (build temporário com canais de teste) | **16 verificações, 0 falhas** — [resultados](evidencias/canais/resultados.json) (aba aberta e aba bloqueada; `opener` e Referer medidos na aba) |
+| Controle negativo da abertura do WhatsApp (implementação anterior) | 2 falhas esperadas, entre elas o Referer vazando — [LEIA-ME](evidencias/controle-negativo-r1/LEIA-ME.md) |
 | Mesma homologação sobre a V1 (linha de base) | 39 verificações, **23 falhas** — [resumo](evidencias/antes/resumo.md) |
 
 O projeto **não tem testes unitários nem lint** (não havia na base, e a missão não autorizou novas dependências).
@@ -34,7 +35,7 @@ A verificação comportamental é feita pelos scripts em navegador real descrito
 | Formulário | 7 campos marcados inválidos (nome, e-mail, 4 rádios, descrição); foco no primeiro erro; modo demonstração com resumo; sem pop-up, navegação ou requisição; resumo focado e visível abaixo da barra fixa | 6/6 |
 | Rede e console | Nenhuma requisição externa além da fonte Inter importada pela lib; console sem erros nem avisos | 2/2 |
 | Hosting no celular (R1) | Acordeão com 8 itens recolhidos; "Como é contratado" visível nos 8 resumos; Enter abre, Espaço fecha, foco visível; desktop com 8 definições visíveis | 4/4 |
-| Canais configurados (build de teste) | WhatsApp, e-mail e LinkedIn viram links; Instagram com URL de página inicial é **rejeitado**; botão flutuante volta; o formulário abre o WhatsApp com a mensagem montada. **R1:** com a aba aberta, a página não afirma envio, a aba fica sem `opener` e o link manual aparece; com a aba bloqueada (`window.open` → `null`), aparecem o aviso e o link manual com a mensagem | 14/14 |
+| Canais configurados (build de teste) | WhatsApp, e-mail e LinkedIn viram links; Instagram com URL de página inicial é **rejeitado**; botão flutuante volta; o formulário pede a abertura do WhatsApp com a mensagem montada (o `wa.me` é respondido por uma página local de teste). Medido na aba aberta: `opener` nulo, sem cabeçalho Referer e com `document.referrer` vazio. A mensagem neutra é a mesma com a aba aberta ou bloqueada, e o link manual (`noopener noreferrer`) está sempre presente | 16/16 |
 
 ## 3. Problemas resolvidos (V1 → COM-001)
 
@@ -51,7 +52,7 @@ A verificação comportamental é feita pelos scripts em navegador real descrito
 | 9 | Resumo do formulário escondido sob a barra fixa | — | OK, com verificação de posição |
 | 10 | `aria-labelledby` em `div` sem papel (introduzido e corrigido nesta missão) | axe `incomplete` | Removido |
 | 11 | Brilhos decorativos reduzindo o contraste real (achado pela medição por pixels) | 3,5–4,3:1 | ≥ 4,59:1 (D-16) |
-| 12 | **R1:** sucesso do WhatsApp anunciado sem confirmação (`window.open` com `noopener` devolve sempre `null`) | Revisão do PR #1 | Resultado verificado, aviso de bloqueio e link manual (D-18) |
+| 12 | Sucesso do WhatsApp anunciado sem confirmação; na 1ª versão da R1, a abertura sem `noopener,noreferrer` enviava o Referer | Revisões do PR #1; controle negativo | `noopener,noreferrer` desde a abertura, mensagem neutra e link manual sempre visível (D-18) |
 | 13 | **R1:** página mobile extensa | ~14.300 px | 13.735 px, com acordeão do Hosting (D-17) |
 | 14 | **R1:** `.gitignore` sem proteção para `.env` | Alteração local não versionada | PR #2 isolado |
 
@@ -78,7 +79,10 @@ A verificação comportamental é feita pelos scripts em navegador real descrito
   está em Delivery, Transparência e Contato. Novas reduções exigiriam esconder conteúdo de outras seções, decisão
   comercial a tomar na homologação visual.
 - **Bloqueio de pop-up simulado.** O cenário de aba bloqueada sobrescreve `window.open` para devolver `null`, que é o
-  contrato dos bloqueadores. O bloqueador real de cada navegador não foi exercitado.
+  contrato dos bloqueadores. O bloqueador real de cada navegador não foi exercitado. Como a página já não depende do
+  retorno de `window.open`, o resultado não muda com o bloqueador.
+- **Corrida do `opener` não reproduzida.** No Chromium, anular o `opener` logo após a abertura já impedia o acesso.
+  A correção não depende disso: aplica `noopener` desde a abertura.
 
 ## 5. Avaliação comercial
 

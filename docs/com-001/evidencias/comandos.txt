@@ -1,4 +1,4 @@
-# Bateria final COM-001 — 2026-10-15T07:31:08-03:00
+# Bateria final COM-001 — 2026-10-15T07:37:41-03:00
 node v24.19.0 · npm 11.17.0 · branch feat/com-001-commercial-positioning · Playwright 1.63.0 · axe-core 4.13.0
 
 $ npm run typecheck
@@ -16,8 +16,8 @@ rendering chunks...
 computing gzip size...
 dist/index.html                   1.36 kB │ gzip:   0.75 kB
 dist/assets/index-Cz01pShE.css   83.98 kB │ gzip:  13.93 kB
-dist/assets/index-frOj1Js9.js   339.02 kB │ gzip: 104.06 kB
-✓ built in 160ms
+dist/assets/index-9IhCwF5A.js   338.77 kB │ gzip: 103.96 kB
+✓ built in 181ms
 exit=0
 
 $ npm run check
@@ -34,8 +34,8 @@ rendering chunks...
 computing gzip size...
 dist/index.html                   1.36 kB │ gzip:   0.75 kB
 dist/assets/index-Cz01pShE.css   83.98 kB │ gzip:  13.93 kB
-dist/assets/index-frOj1Js9.js   339.02 kB │ gzip: 104.06 kB
-✓ built in 170ms
+dist/assets/index-9IhCwF5A.js   338.77 kB │ gzip: 103.96 kB
+✓ built in 182ms
 exit=0
 
 $ npm run texto
@@ -109,7 +109,7 @@ OK   console-sem-erros — limpo
 exit=0
 
 $ build temporário com canais de teste (src/config.ts alterado e restaurado) → C:/Users/nicol/AppData/Local/Temp/claude/C--Users-nicol-nekkora/15cf64e0-97c2-4505-9dad-943064f62fb4/scratchpad/dist-canal
-✓ built in 171ms
+✓ built in 175ms
 config.ts restaurado: 1 ocorrência de 'whatsappNumber: null'
 $ node scripts/homologacao-canais.mjs http://127.0.0.1:4175/ docs/com-001/evidencias/canais
 OK   status-configurado
@@ -127,15 +127,17 @@ Quero avaliar: Delivery e Hosting.
 Teste de homologação com canal configurado.
 
 Contato: teste@exem
-OK   aba-aberta-sem-afirmar-envio — WhatsApp aberto em uma nova aba
-OK   aba-aberta-sem-opener — window.opener = null na aba do WhatsApp
-OK   link-manual-quando-aberta
-OK   aba-bloqueada-avisa — Não foi possível abrir o WhatsApp automaticamente
-OK   aba-bloqueada-link-manual-com-mensagem — https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.
+OK   aba-sem-opener — window.opener === null: true
+OK   aba-sem-referer — cabeçalho Referer=ausente; document.referrer=""
+OK   mensagem-neutra-sem-afirmar-abertura — Pedimos ao navegador para abrir o WhatsApp
+OK   link-manual-sempre-presente — rel="noopener noreferrer"
+OK   bloqueada-mesma-mensagem-neutra — Pedimos ao navegador para abrir o WhatsApp
+OK   bloqueada-link-manual-com-mensagem — https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.
 
 Quero avaliar: Delivery.
 
 Teste de homologação com pop-up bl
+OK   sem-requisicao-externa-real — wa.me respondido localmente; nenhuma outra requisição externa
 
-14 verificações, 0 falha(s).
+16 verificações, 0 falha(s).
 exit=0

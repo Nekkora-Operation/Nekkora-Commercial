@@ -24,8 +24,8 @@ function ContactForm() {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [reviewed, setReviewed] = useState(false);
-  /** Resultado da tentativa de abrir o WhatsApp: só "aberto" se o navegador devolveu a nova aba. */
-  const [whatsapp, setWhatsapp] = useState<{ url: string; opened: boolean } | null>(null);
+  /** Link do WhatsApp com a mensagem montada — exibido sempre como alternativa manual. */
+  const [whatsapp, setWhatsapp] = useState<string | null>(null);
   const canSend = whatsappUrl() != null;
   const interestLabel = CONTACT_COPY.interests.find((i) => i.value === interest)?.label;
 
@@ -55,11 +55,11 @@ function ContactForm() {
         `Contato: ${email.trim()}${phone ? ` · ${phone}` : ''}`,
       ].join('\n\n');
       const url = whatsappUrl(text)!;
-      // Sem "noopener" na lista de features: com ele, window.open devolve sempre null e não dá para saber se o
-      // navegador bloqueou a aba. O vínculo com esta página é cortado logo em seguida (mesmo efeito do noopener).
-      const win = window.open(url, '_blank');
-      if (win) win.opener = null;
-      setWhatsapp({ url, opened: win != null });
+      // noopener,noreferrer desde a abertura: a aba externa nunca recebe referência a esta página nem o Referer.
+      // Com essas features o navegador não informa se a aba foi criada, então a página só diz que a abertura foi
+      // solicitada e oferece sempre o link manual (D-18).
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setWhatsapp(url);
     }
     setReviewed(true);
   };
@@ -74,14 +74,10 @@ function ContactForm() {
       <div ref={doneRef} tabIndex={-1} className="contact__form contact__done">
         {whatsapp ? (
           <>
-            <Alert
-              tone={whatsapp.opened ? 'info' : 'warning'}
-              title={whatsapp.opened ? CONTACT_COPY.whatsappOpened.title : CONTACT_COPY.whatsappBlocked.title}
-              live="polite"
-            >
-              {whatsapp.opened ? CONTACT_COPY.whatsappOpened.text : CONTACT_COPY.whatsappBlocked.text}
+            <Alert tone="info" title={CONTACT_COPY.whatsappRequested.title} live="polite">
+              {CONTACT_COPY.whatsappRequested.text}
             </Alert>
-            <Button leftIcon="whatsapp" href={whatsapp.url} target="_blank" rel="noopener noreferrer" style={{ alignSelf: 'flex-start' }}>
+            <Button leftIcon="whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer" style={{ alignSelf: 'flex-start' }}>
               {CONTACT_COPY.whatsappManual}
             </Button>
           </>

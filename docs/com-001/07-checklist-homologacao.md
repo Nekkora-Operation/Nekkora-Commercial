@@ -36,7 +36,7 @@ NEKKORA_PW_MODULES=../Nekkora-Platform-Web/node_modules npm run homologacao -- h
 - [ ] **[auto]** Nenhum link para WhatsApp, e-mail ou rede social sem valor confirmado; sem botão flutuante.
 - [ ] **[auto]** Formulário: erros em nome, e-mail, interesse e descrição; foco vai ao primeiro erro.
 - [ ] **[auto]** Formulário válido mostra "envio desativado" e o resumo, sem abrir janela e sem requisição externa.
-- [ ] **[auto, build de teste]** Com canais preenchidos, os links aparecem, URLs inválidas são rejeitadas e o WhatsApp abre com a mensagem montada, sem afirmar envio; se o navegador bloquear a aba, aparecem o aviso e o link manual ([evidencias/canais](evidencias/canais/resultados.json)).
+- [ ] **[auto, build de teste]** Com canais preenchidos, os links aparecem, URLs inválidas são rejeitadas e a abertura do WhatsApp é pedida com `noopener,noreferrer` (sem `opener` e sem Referer na aba), com mensagem neutra e link manual sempre visível, mesmo com a aba bloqueada ([evidencias/canais](evidencias/canais/resultados.json)).
 - [ ] **[manual]** Antes de publicar: preencher os canais reais em `src/config.ts` e conferir cada link manualmente.
 
 ## Visual e acessibilidade

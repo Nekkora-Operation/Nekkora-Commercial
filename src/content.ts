@@ -301,14 +301,10 @@ export const CONTACT_COPY = {
   demoSubmit: 'Revisar solicitação',
   whatsappSubmit: 'Enviar pelo WhatsApp',
   whatsappNote: 'Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página.',
-  // Nunca afirmar envio: a página só sabe se a aba foi aberta, não se a mensagem foi enviada.
-  whatsappOpened: {
-    title: 'WhatsApp aberto em uma nova aba',
-    text: 'A mensagem só é enviada quando você a confirmar no WhatsApp. Se a aba não apareceu, use o botão abaixo.',
-  },
-  whatsappBlocked: {
-    title: 'Não foi possível abrir o WhatsApp automaticamente',
-    text: 'O navegador bloqueou a nova aba. Use o botão abaixo para abrir a conversa com a mensagem pronta.',
+  // Nunca afirmar abertura nem envio: com noopener o navegador não informa se a aba foi criada (D-18).
+  whatsappRequested: {
+    title: 'Pedimos ao navegador para abrir o WhatsApp',
+    text: 'Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.',
   },
   whatsappManual: 'Abrir conversa no WhatsApp',
   demoResult: {

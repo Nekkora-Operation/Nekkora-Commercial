@@ -90,7 +90,7 @@ L.push('', `Formulário "${K.formTitle}": Nome*, E-mail*, Telefone (opcional), E
 list(K.interests.map((i) => `${i.label} — ${i.description}`));
 L.push('', `Modo demonstração: botão "${K.demoSubmit}"; nota "${K.demoNote}"; resultado **${K.demoResult.title}** — ${K.demoResult.text}`);
 L.push('', `Com WhatsApp confirmado: botão "${K.whatsappSubmit}"; nota "${K.whatsappNote}"`);
-L.push('', `- Aba aberta: **${K.whatsappOpened.title}** — ${K.whatsappOpened.text}`, `- Aba bloqueada: **${K.whatsappBlocked.title}** — ${K.whatsappBlocked.text}`, `- Link manual (sempre): "${K.whatsappManual}"`);
+L.push('', `- Após enviar: **${K.whatsappRequested.title}** — ${K.whatsappRequested.text}`, `- Link manual (sempre): "${K.whatsappManual}"`);
 
 h('10. Rodapé');
 list([c.FOOTER.tagline, c.FOOTER.pendingChannels, c.FOOTER.preview, c.FOOTER.signature]);

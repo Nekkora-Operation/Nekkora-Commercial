@@ -1,6 +1,6 @@
 {
   "baseUrl": "http://127.0.0.1:4174/",
-  "startedAt": "2026-10-15T10:31:13.496Z",
+  "startedAt": "2026-10-15T10:37:46.593Z",
   "checks": [
     {
       "id": "tema-aplicado:sakura-dark:mobile",
@@ -1891,7 +1891,7 @@
   ],
   "formStatus": "Solicitação validada — envio desativado nesta versão\n\nNenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.\nNome\nPessoa de Teste\nE-mail\nteste@exemplo.invalid\nTelefone\n—\nEmpresa\n—\nQuero avaliar\nDelivery\nProcesso\nTeste automatizado de homologação: processo de conciliação manual.\nEditar solicitação",
   "mobilePageHeight": 13735,
-  "finishedAt": "2026-10-15T10:31:51.385Z",
+  "finishedAt": "2026-10-15T10:38:22.980Z",
   "summary": {
     "total": 54,
     "failed": 0
