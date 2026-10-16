@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Alert, Button, DescriptionList, Input, Link, RadioGroup, SectionHeader, Text, Textarea } from 'nekkora-lib';
+import { Alert, Button, DescriptionList, Input, Link, Logo, RadioGroup, Text, Textarea } from 'nekkora-lib';
 import { CHANNELS, hasAnyChannel, whatsappUrl } from '../config';
 import { CONTACT_COPY } from '../content';
 
@@ -159,7 +159,7 @@ function Channels() {
   return (
     <div className="contact__channels">
       {wa && (
-        <Button size="lg" leftIcon="whatsapp" href={wa} style={{ alignSelf: 'flex-start' }}>
+        <Button size="lg" pill variant="secondary" leftIcon="whatsapp" href={wa}>
           Falar no WhatsApp
         </Button>
       )}
@@ -182,31 +182,26 @@ function Channels() {
   );
 }
 
+/**
+ * Chamada em pôster centralizado (modelo C). O botão leva ao formulário logo abaixo — o mockup tinha href="#", sem
+ * destino (D-20). Sem canais confirmados, a legenda avisa que o formulário está em demonstração.
+ */
 export function Contact() {
   return (
-    <section id="contato" className="section" aria-labelledby="contato-title">
-      <div className="wrap">
-        <div className="contact" data-contact-status={hasAnyChannel ? 'configurado' : 'pendente'}>
-          <div className="contact__aside">
-            <SectionHeader titleId="contato-title" eyebrow={CONTACT_COPY.eyebrow} title={CONTACT_COPY.title} description={CONTACT_COPY.description} />
-            {hasAnyChannel ? (
-              <Channels />
-            ) : (
-              <Alert tone="warning" title={CONTACT_COPY.pending.title} live="off">
-                {CONTACT_COPY.pending.text}
-              </Alert>
-            )}
-            <div className="contact__next">
-              <Text variant="h4" as="h3">
-                {CONTACT_COPY.next.title}
-              </Text>
-              <ol>
-                {CONTACT_COPY.next.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ol>
-            </div>
-          </div>
+    <section id="contato" className="section section--band" aria-labelledby="contato-title">
+      <div className="wrap contact" data-contact-status={hasAnyChannel ? 'configurado' : 'pendente'}>
+        <div className="contact__poster">
+          <Logo variant="symbol" size={44} aria-hidden="true" />
+          <h2 id="contato-title" className="contact__title">
+            {CONTACT_COPY.title}
+          </h2>
+          <p className="contact__lead">{CONTACT_COPY.description}</p>
+          <Button size="lg" pill rightIcon="arrow-right" href="#solicitacao">
+            {CONTACT_COPY.cta}
+          </Button>
+          {hasAnyChannel ? <Channels /> : <span className="contact__caption">{CONTACT_COPY.pendingCaption}</span>}
+        </div>
+        <div id="solicitacao" className="contact__form-wrap">
           <ContactForm />
         </div>
       </div>

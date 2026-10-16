@@ -34,10 +34,13 @@ const WIDTHS = [
 ];
 const THEME_KEY = 'nekkora-commercial-tema';
 
-/** Alegações proibidas fora de listas marcadas como exclusão (data-exclusion). */
+/**
+ * Alegações proibidas fora de listas marcadas como exclusão (data-exclusion). Preços e percentuais (`pricing: true`)
+ * são aceitos também no bloco de preços autorizado pela responsável (data-pricing, modelo C — PR-01..PR-05).
+ */
 const FORBIDDEN = [
-  { id: 'percentual', re: /\d+(?:[.,]\d+)?\s?%/g },
-  { id: 'preco', re: /R\$\s?\d/g },
+  { id: 'percentual', re: /\d+(?:[.,]\d+)?\s?%/g, pricing: true },
+  { id: 'preco', re: /R\$\s?\d/g, pricing: true },
   { id: '24h', re: /\b24\s?(?:h\b|horas)|24\s?\/\s?7|24x7/gi },
   { id: 'sla', re: /\bSLA\b/g },
   { id: 'roi', re: /\bROI\b/g },
@@ -219,14 +222,14 @@ async function block(id, fn) {
 await block('funcionais', async () => {
   const { context, page } = await newPage({ width: 1280, height: 800 }, null);
   const theme = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
-  check('tema-padrao-sakura-dark', theme === 'sakura-dark', `data-nk-theme=${theme}`);
+  check('tema-padrao-sage-light', theme === 'sage-light', `data-nk-theme=${theme}`);
 
   writeFileSync(path.join(outDir, 'texto-renderizado.txt'), await page.locator('body').innerText());
 
   // Ordem e hierarquia das seções
   const sections = await page.$$eval('main > section[id]', (els) => els.map((e) => e.id));
   results.sections = sections;
-  const expected = ['inicio', 'solucoes', 'delivery', 'como-funciona', 'hosting', 'combinado', 'diferenciais', 'transparencia', 'contato'];
+  const expected = ['inicio', 'solucoes', 'precos', 'como-funciona', 'hosting', 'transparencia', 'contato'];
   check('ordem-das-secoes', JSON.stringify(sections) === JSON.stringify(expected), sections.join(' > '));
   const h1 = await page.$$eval('h1', (els) => els.length);
   check('um-unico-h1', h1 === 1, `${h1} h1`);
@@ -256,15 +259,31 @@ await block('funcionais', async () => {
       if (!el || el.closest('script,style,[aria-hidden="true"]')) continue;
       for (const p of patterns) {
         for (const m of text.matchAll(new RegExp(p.source, p.flags))) {
-          out.push({ id: p.id, match: m[0], text: text.trim().slice(0, 140), exclusion: !!el.closest('[data-exclusion]') });
+          out.push({ id: p.id, match: m[0], text: text.trim().slice(0, 140), exclusion: !!el.closest('[data-exclusion]'), pricing: p.pricing && !!el.closest('[data-pricing]') });
         }
       }
     }
     return out;
-  }, FORBIDDEN.map((f) => ({ id: f.id, source: f.re.source, flags: f.re.flags })));
+  }, FORBIDDEN.map((f) => ({ id: f.id, source: f.re.source, flags: f.re.flags, pricing: !!f.pricing })));
   results.claimHits = hits;
-  const bad = hits.filter((h) => !h.exclusion);
-  check('sem-alegacoes-proibidas', bad.length === 0, bad.length ? bad.map((b) => `${b.id}: "${b.text}"`).join(' | ') : `${hits.length} ocorrência(s), todas em listas de exclusão`);
+  const bad = hits.filter((h) => !h.exclusion && !h.pricing);
+  check('sem-alegacoes-proibidas', bad.length === 0, bad.length ? bad.map((b) => `${b.id}: "${b.text}"`).join(' | ') : `${hits.length} ocorrência(s): ${hits.filter((h) => h.exclusion).length} em exclusões, ${hits.filter((h) => h.pricing).length} no bloco de preços`);
+  // Preços: só no bloco data-pricing, com condição da campanha visível e leitura correta do valor riscado
+  const pricing = await page.evaluate(() => {
+    const block = document.querySelector('[data-pricing]');
+    const text = block?.innerText ?? '';
+    return {
+      blocks: document.querySelectorAll('[data-pricing]').length,
+      condition: /Vale para propostas aprovadas no período/.test(text),
+      confirmedInProposal: /fica registrada na proposta/.test(text),
+      licenses: /não estão incluídos nos valores acima/.test(text),
+      srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
+    };
+  });
+  results.pricing = pricing;
+  check('precos-so-no-bloco-de-precos', pricing.blocks === 1 && hits.filter((h) => h.pricing).length > 0, `${pricing.blocks} bloco(s) data-pricing`);
+  check('precos-com-condicoes-visiveis', pricing.condition && pricing.confirmedInProposal && pricing.licenses, JSON.stringify({ ...pricing, srLabels: undefined }));
+  check('precos-leitura-do-valor-riscado', pricing.srLabels.length === 4 && pricing.srLabels.every((t) => /Valor (sem|com) desconto/.test(t)), pricing.srLabels.join(' | '));
 
   // Produtos internos não aparecem como obrigatórios/disponíveis: cada menção fica em bloco marcado
   const products = await page.evaluate(() => {
@@ -282,7 +301,8 @@ await block('funcionais', async () => {
 
   // Conteúdo demonstrativo identificado
   const demos = await page.$$eval('[data-demo]', (els) => els.map((e) => ({ label: e.getAttribute('data-demo'), visible: e.innerText.toLowerCase().includes('ilustra') })));
-  check('demonstrativos-identificados', demos.length > 0 && demos.every((d) => d.visible), JSON.stringify(demos));
+  // Modelo C não tem ilustração de jornada; se algum bloco demonstrativo voltar, precisa estar rotulado.
+  check('demonstrativos-identificados', demos.every((d) => d.visible), demos.length ? JSON.stringify(demos) : 'nenhum bloco demonstrativo na página');
 
   // Teclado: link de pular conteúdo, foco visível e sequência inicial
   await page.keyboard.press('Tab');
@@ -321,13 +341,15 @@ await block('funcionais', async () => {
   const afterToggle = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
   await page.reload({ waitUntil: 'networkidle' });
   const afterReload = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
-  check('alternancia-de-tema-persiste', afterToggle === 'sage-light' && afterReload === 'sage-light', `${afterToggle} → recarregado: ${afterReload}`);
+  check('alternancia-de-tema-persiste', afterToggle === 'sakura-dark' && afterReload === 'sakura-dark', `${afterToggle} → recarregado: ${afterReload}`);
   await toggle.click();
 
   // Formulário: erros, foco no primeiro erro e envio desativado sem destino real
   const form = page.locator('#contato form');
   await form.locator('button[type="submit"]').click();
   const invalid = await form.locator('[aria-invalid="true"]').count();
+  // O foco vai ao primeiro erro no quadro seguinte (requestAnimationFrame): espera até 1 s em vez de ler na hora.
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-invalid') === 'true', null, { timeout: 1000 }).catch(() => {});
   const focused = await page.evaluate(() => document.activeElement?.getAttribute('aria-invalid'));
   check('formulario-erros-obrigatorios', invalid >= 4, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
   check('formulario-foco-no-primeiro-erro', focused === 'true');
@@ -386,38 +408,23 @@ await block('menu-mobile', async () => {
   await context.close();
 });
 
-// 5. Catálogo do Hosting: acordeão no celular, expandido no desktop
-await block('hosting-acordeao', async () => {
-  const mobile = await newPage({ width: 375, height: 812 }, null);
-  const mp = mobile.page;
-  results.mobilePageHeight = await mp.evaluate(() => document.documentElement.scrollHeight);
-  const mode = await mp.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
-  const items = mp.locator('[data-hosting-catalog] details');
-  const count = await items.count();
-  const summaries = await mp.locator('[data-hosting-catalog] summary').allInnerTexts();
-  const termsVisible = summaries.every((t) => t.includes('Como é contratado:'));
-  const closed = await items.evaluateAll((els) => els.every((d) => !d.open));
-  check('hosting-acordeao-no-celular', mode === 'acordeao' && count === 8 && closed, `modo=${mode}; itens=${count}; todos recolhidos=${closed}; altura da página=${results.mobilePageHeight}px`);
-  check('hosting-condicoes-visiveis-recolhido', termsVisible, `${summaries.filter((t) => t.includes('Como é contratado:')).length}/8 resumos mostram "Como é contratado"`);
-  const first = mp.locator('[data-hosting-catalog] summary').first();
-  await first.focus();
-  const ring = await first.evaluate((el) => getComputedStyle(el).boxShadow !== 'none');
-  await mp.keyboard.press('Enter');
-  const openedEnter = await items.first().evaluate((d) => d.open);
-  const defVisible = await mp.locator('[data-hosting-catalog] .service-item__definition').first().isVisible();
-  await mp.keyboard.press('Space');
-  const closedSpace = await items.first().evaluate((d) => !d.open);
-  check('hosting-acordeao-teclado', ring && openedEnter && defVisible && closedSpace, `foco visível=${ring}; Enter abre=${openedEnter}; definição visível=${defVisible}; Espaço fecha=${closedSpace}`);
-  await items.first().evaluate((d) => (d.open = true));
-  await mp.locator('[data-hosting-catalog]').screenshot({ path: path.join(outDir, 'hosting-acordeao-mobile.png') });
-  results.screenshots.push('hosting-acordeao-mobile.png');
-  await mobile.context.close();
-
-  const desktop = await newPage({ width: 1280, height: 800 }, null);
-  const dmode = await desktop.page.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
-  const defs = await desktop.page.locator('[data-hosting-catalog] > li > p:first-of-type').evaluateAll((els) => els.filter((e) => e.offsetParent !== null).length);
-  check('hosting-expandido-no-desktop', dmode === 'expandido' && defs === 8, `modo=${dmode}; definições visíveis=${defs}/8`);
-  await desktop.context.close();
+// 5. Hosting em faixa pôster: aviso de disponibilidade e condição de contratação visíveis em todas as larguras
+await block('hosting-faixa', async () => {
+  for (const vp of [WIDTHS[0], WIDTHS[2]]) {
+    const { context, page } = await newPage({ width: vp.width, height: vp.height }, null);
+    if (vp.name === 'mobile') results.mobilePageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    const band = page.locator('#hosting');
+    const text = await band.innerText();
+    const notice = await band.locator('.hosting-band__notice').isVisible();
+    check(
+      `hosting-condicoes-visiveis:${vp.name}`,
+      notice && /Disponibilidade em avaliação/.test(text) && /só faz parte do contrato quando consta na proposta/.test(text) && /não representa contratação/.test(text),
+      `aviso visível=${notice}${vp.name === 'mobile' ? `; altura da página=${results.mobilePageHeight}px` : ''}`,
+    );
+    await band.screenshot({ path: path.join(outDir, `hosting-faixa-${vp.name}.png`) });
+    results.screenshots.push(`hosting-faixa-${vp.name}.png`);
+    await context.close();
+  }
 });
 
 check('sem-requisicoes-externas', results.blocked.length === 0, results.blocked.join(' | ') || 'nenhuma');
