@@ -10,7 +10,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider
       target="document"
-      defaultTheme="sakura-dark"
+      defaultTheme="sage-light"
       pair={{ dark: 'sakura-dark', light: 'sage-light' }}
       storageKey={THEME_STORAGE_KEY}
     >
