@@ -120,16 +120,15 @@ O que é definido em proposta, o que não está incluído sem acordo explícito 
 
 A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.
 
-Botão: "Solicitar avaliação" (leva ao formulário)
+Botão: "Solicitar avaliação" (abre o diálogo)
 
 Sem canais confirmados: _Canais oficiais em definição · formulário em modo de demonstração_
 
-Formulário "Conte o que você precisa": Nome*, E-mail*, Telefone (opcional), Empresa (opcional), "O que você quer avaliar?"*, "Descreva o processo"* — Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.
+Diálogo **Solicitar avaliação** — Deixe seus dados e um resumo do processo. A solicitação inicia uma avaliação — não é uma contratação.
 
-- Delivery — Desenvolvimento de uma ou mais automações
-- Hosting — Infraestrutura para executar automações (avaliação de viabilidade)
-- Delivery e Hosting — Desenvolvimento e execução avaliados em conjunto
-- Ainda não sei — Quero ajuda para entender o melhor caminho
+Com WhatsApp confirmado: botão "Falar diretamente pelo WhatsApp" + divisor "ou preencha o formulário". Sem canal: _Canais oficiais em definição · formulário em modo de demonstração_
+
+Formulário: Nome*, E-mail*, Telefone / WhatsApp (opcional), Empresa (opcional), "Descreva o processo"* — Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.. Rodapé: "Cancelar" + envio.
 
 Modo demonstração: botão "Revisar solicitação"; nota "Modo de demonstração: nenhum dado é enviado ou armazenado."; resultado **Solicitação validada — envio desativado nesta versão** — Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.
 
@@ -138,7 +137,11 @@ Com WhatsApp confirmado: botão "Enviar pelo WhatsApp"; nota "Ao enviar, abrimos
 - Após enviar: **Pedimos ao navegador para abrir o WhatsApp** — Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.
 - Link manual (sempre): "Abrir conversa no WhatsApp"
 
-## 8. Rodapé
+## 8. Barra de navegação
+
+Links: Soluções · Preços · Como funciona · Hosting · Transparência. Botão "Entrar" sem destino (indisponível: "Acesso de clientes ainda não disponível.").
+
+## 9. Rodapé
 
 - © Nekkora. Todos os direitos reservados.
 - Versão para homologação

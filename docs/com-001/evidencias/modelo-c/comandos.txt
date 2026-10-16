@@ -1,4 +1,4 @@
-# Bateria modelo C — 2026-10-15T23:12:07-03:00
+# Bateria modelo C — 2026-10-15T23:55:58-03:00
 node v24.19.0 · npm 11.17.0 · branch feat/commercial-modelo-c · Playwright 1.63.0 · axe-core 4.13.0
 
 $ npm run typecheck
@@ -11,13 +11,13 @@ $ npm run build
 > vite build
 vite v8.3.1 building client environment for production...
 transforming...
-✓ 57 modules transformed.
+✓ 58 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                   1.36 kB │ gzip:  0.75 kB
-dist/assets/index-DdD2DZCw.css   77.28 kB │ gzip: 12.94 kB
-dist/assets/index-Bh9oXjyg.js   318.68 kB │ gzip: 99.03 kB
-✓ built in 174ms
+dist/index.html                   1.36 kB │ gzip:   0.75 kB
+dist/assets/index-DAVlWbL7.css   77.34 kB │ gzip:  12.96 kB
+dist/assets/index-CP_7Zbn1.js   324.59 kB │ gzip: 100.96 kB
+✓ built in 161ms
 exit=0
 
 $ npm run check
@@ -29,13 +29,13 @@ $ npm run check
 > vite build
 vite v8.3.1 building client environment for production...
 transforming...
-✓ 57 modules transformed.
+✓ 58 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                   1.36 kB │ gzip:  0.75 kB
-dist/assets/index-DdD2DZCw.css   77.28 kB │ gzip: 12.94 kB
-dist/assets/index-Bh9oXjyg.js   318.68 kB │ gzip: 99.03 kB
-✓ built in 172ms
+dist/index.html                   1.36 kB │ gzip:   0.75 kB
+dist/assets/index-DAVlWbL7.css   77.34 kB │ gzip:  12.96 kB
+dist/assets/index-CP_7Zbn1.js   324.59 kB │ gzip: 100.96 kB
+✓ built in 156ms
 exit=0
 
 $ npm run texto
@@ -66,22 +66,22 @@ OK   tema-aplicado:sage-light:desktop — data-nk-theme=sage-light
 OK   sem-rolagem-horizontal:sage-light:desktop — excesso=0px
 OK   tema-aplicado:sage-light:wide — data-nk-theme=sage-light
 OK   sem-rolagem-horizontal:sage-light:wide — excesso=0px
-OK   axe:sakura-dark:mobile — 27 regras aprovadas
+OK   axe:sakura-dark:mobile — 24 regras aprovadas
 OK   axe-sem-pendencias-de-revisao:sakura-dark:mobile — só color-contrast (medido por pixels)
 OK   contraste-por-pixels:sakura-dark:mobile — 28 nós; pior folga: .nk-badge--info 5.23:1 (mín. 4.5)
-OK   axe:sakura-dark:desktop — 27 regras aprovadas
+OK   axe:sakura-dark:desktop — 24 regras aprovadas
 OK   axe-sem-pendencias-de-revisao:sakura-dark:desktop — só color-contrast (medido por pixels)
 OK   contraste-por-pixels:sakura-dark:desktop — 28 nós; pior folga: .nk-badge--info 5.23:1 (mín. 4.5)
-OK   axe:sage-light:mobile — 27 regras aprovadas
+OK   axe:sage-light:mobile — 24 regras aprovadas
 OK   axe-sem-pendencias-de-revisao:sage-light:mobile — só color-contrast (medido por pixels)
 OK   contraste-por-pixels:sage-light:mobile — 28 nós; pior folga: .nk-badge--soft.nk-badge--accent.nk-badge--sm 4.68:1 (mín. 4.5)
-OK   axe:sage-light:desktop — 27 regras aprovadas
+OK   axe:sage-light:desktop — 24 regras aprovadas
 OK   axe-sem-pendencias-de-revisao:sage-light:desktop — só color-contrast (medido por pixels)
 OK   contraste-por-pixels:sage-light:desktop — 28 nós; pior folga: .nk-badge--soft.nk-badge--accent.nk-badge--sm 4.69:1 (mín. 4.5)
 OK   tema-padrao-sage-light — data-nk-theme=sage-light
 OK   ordem-das-secoes — inicio > solucoes > precos > como-funciona > hosting > transparencia > contato
 OK   um-unico-h1 — 1 h1
-OK   ancoras-validas — 21 âncoras, quebradas: nenhuma
+OK   ancoras-validas — 19 âncoras, quebradas: nenhuma
 OK   sem-destinos-provisorios — links externos: nenhum; status contato=pendente
 OK   sem-whatsapp-flutuante-provisorio — ausente
 OK   sem-alegacoes-proibidas — 10 ocorrência(s): 3 em exclusões, 7 no bloco de preços
@@ -94,23 +94,32 @@ OK   primeiro-tab-pular-conteudo — {"text":"Pular para o conteúdo","href":"#c
 OK   pular-conteudo-visivel-no-foco
 OK   foco-visivel-nos-40-primeiros-tabs — 0 sem indicador de foco
 OK   alternancia-de-tema-persiste — sakura-dark → recarregado: sakura-dark
-OK   formulario-erros-obrigatorios — 7 campos inválidos; foco no primeiro inválido=true
+OK   entrar-sem-destino-e-indisponivel — url inalterada=true; aria-disabled=true; nome acessível="Entrar — Acesso de clientes ainda não disponível."
+OK   dialogo-aberto-pelos-ctas — inicio: Solicitar avaliação | : Solicitar avaliação | hosting: Solicitar avaliação de viabilidade | contato: Solicitar avaliação
+OK   dialogo-abre-com-foco-dentro — {"focusInside":true,"hash":""}
+OK   dialogo-sem-whatsapp-provisorio — sem canal confirmado: atalho do WhatsApp ausente e aviso de canais em definição presente
+OK   dialogo-esc-fecha-e-devolve-foco
+OK   dialogo-ctas-de-precos-hosting-contato — precos=true; hosting=true; contato=true (fechado por "Cancelar")
+OK   formulario-erros-obrigatorios — 3 campos inválidos; foco no primeiro inválido=true
 OK   formulario-foco-no-primeiro-erro
-OK   formulario-radio-por-teclado
 OK   formulario-modo-demonstracao — Solicitação validada — envio desativado nesta versão Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação. Nome Pessoa de Teste E-mail test
 OK   formulario-sem-envio-real — popup=false; url inalterada=true
-OK   formulario-resultado-visivel-e-focado — {"doneTop":242.765625,"navBottom":69,"focused":true}
+OK   formulario-resultado-visivel-e-focado — {"doneTop":281.53125,"viewport":800,"focused":true}
 OK   menu-mobile-abre-e-fecha-com-esc — aberto=true depois do Esc=false
-OK   hosting-condicoes-visiveis:mobile — aviso visível=true; altura da página=8476px
+OK   hosting-condicoes-visiveis:mobile — aviso visível=true; altura da página=7468px
 OK   hosting-condicoes-visiveis:desktop — aviso visível=true
+OK   dialogo-axe:sakura-dark:mobile — sem violações; excesso horizontal=0px
+OK   dialogo-axe:sakura-dark:desktop — sem violações; excesso horizontal=0px
+OK   dialogo-axe:sage-light:mobile — sem violações; excesso horizontal=0px
+OK   dialogo-axe:sage-light:desktop — sem violações; excesso horizontal=0px
 OK   sem-requisicoes-externas — nenhuma
 OK   console-sem-erros — limpo
 
-55 verificações, 0 falha(s). Resultados em docs/com-001/evidencias/modelo-c/pagina
+64 verificações, 0 falha(s). Resultados em docs/com-001/evidencias/modelo-c/pagina
 exit=0
 
 $ build temporário com canais de teste (src/config.ts alterado e restaurado) → C:/Users/nicol/AppData/Local/Temp/claude/C--Users-nicol-nekkora/15cf64e0-97c2-4505-9dad-943064f62fb4/scratchpad/dist-canal
-✓ built in 209ms
+✓ built in 166ms
 config.ts restaurado: 1 ocorrência de 'whatsappNumber: null'
 $ node scripts/homologacao-canais.mjs http://127.0.0.1:4175/ docs/com-001/evidencias/modelo-c/canais
 OK   status-configurado
@@ -120,14 +129,16 @@ OK   linkedin-perfil-exibido
 OK   instagram-pagina-inicial-rejeitado — URL sem caminho de perfil não vira link
 OK   botao-flutuante-presente
 OK   aviso-canais-pendentes-ausente
+OK   dialogo-whatsapp-direto — rel="noopener noreferrer"
+OK   dialogo-sem-aviso-de-canais-pendentes
 OK   botao-envio-whatsapp
 OK   formulario-abre-whatsapp-com-mensagem — https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.
 
-Quero avaliar: Delivery e Hosting.
+Quero solicitar uma avaliação.
 
 Teste de homologação com canal configurado.
 
-Contato: teste@exem
+Contato: teste@exemplo.
 OK   aba-sem-opener — window.opener === null: true
 OK   aba-sem-referer — cabeçalho Referer=ausente; document.referrer=""
 OK   mensagem-neutra-sem-afirmar-abertura — Pedimos ao navegador para abrir o WhatsApp
@@ -135,10 +146,10 @@ OK   link-manual-sempre-presente — rel="noopener noreferrer"
 OK   bloqueada-mesma-mensagem-neutra — Pedimos ao navegador para abrir o WhatsApp
 OK   bloqueada-link-manual-com-mensagem — https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.
 
-Quero avaliar: Delivery.
+Quero solicitar uma avaliação.
 
-Teste de homologação com pop-up bl
+Teste de homologação com pop
 OK   sem-requisicao-externa-real — wa.me respondido localmente; nenhuma outra requisição externa
 
-16 verificações, 0 falha(s).
+18 verificações, 0 falha(s).
 exit=0

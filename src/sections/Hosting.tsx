@@ -1,8 +1,10 @@
 import { Button, Icon, Logo } from 'nekkora-lib';
 import { HOSTING } from '../content';
+import { useRequestTrigger } from '../request';
 
 /** Faixa pôster em acento sólido (modelo C). Texto branco sobre --nk-solid-accent; no Sakura Dark, tom mais fechado. */
 export function Hosting() {
+  const trigger = useRequestTrigger();
   return (
     <section id="hosting" className="hosting-band" aria-labelledby="hosting-title">
       <div className="wrap split">
@@ -19,7 +21,7 @@ export function Hosting() {
             </span>
           </p>
           <div>
-            <Button size="lg" pill rightIcon="arrow-right" href="#contato" className="hosting-band__cta">
+            <Button size="lg" pill rightIcon="arrow-right" className="hosting-band__cta" {...trigger}>
               {HOSTING.cta}
             </Button>
           </div>

@@ -1,6 +1,6 @@
 {
   "baseUrl": "http://127.0.0.1:4175/",
-  "at": "2026-10-16T02:12:49.168Z",
+  "at": "2026-10-16T02:56:39.807Z",
   "checks": [
     {
       "id": "status-configurado",
@@ -33,13 +33,22 @@
       "ok": true
     },
     {
+      "id": "dialogo-whatsapp-direto",
+      "ok": true,
+      "detail": "rel=\"noopener noreferrer\""
+    },
+    {
+      "id": "dialogo-sem-aviso-de-canais-pendentes",
+      "ok": true
+    },
+    {
       "id": "botao-envio-whatsapp",
       "ok": true
     },
     {
       "id": "formulario-abre-whatsapp-com-mensagem",
       "ok": true,
-      "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero avaliar: Delivery e Hosting.\n\nTeste de homologação com canal configurado.\n\nContato: teste@exem"
+      "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero solicitar uma avaliação.\n\nTeste de homologação com canal configurado.\n\nContato: teste@exemplo."
     },
     {
       "id": "aba-sem-opener",
@@ -69,7 +78,7 @@
     {
       "id": "bloqueada-link-manual-com-mensagem",
       "ok": true,
-      "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero avaliar: Delivery.\n\nTeste de homologação com pop-up bl"
+      "detail": "https://wa.me/5511912345678?text=Olá! Sou Pessoa de Teste.\n\nQuero solicitar uma avaliação.\n\nTeste de homologação com pop"
     },
     {
       "id": "sem-requisicao-externa-real",
@@ -79,7 +88,7 @@
   ],
   "waRequests": [
     {
-      "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20de%20Teste.%0A%0AQuero%20avaliar%3A%20Delivery%20e%20Hosting.%0A%0ATeste%20de%20homologa%C3%A7%C3%A3o%20com%20canal%20configurado.%0A%0AContato%3A%20teste%40exemplo.invalid",
+      "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20de%20Teste.%0A%0AQuero%20solicitar%20uma%20avalia%C3%A7%C3%A3o.%0A%0ATeste%20de%20homologa%C3%A7%C3%A3o%20com%20canal%20configurado.%0A%0AContato%3A%20teste%40exemplo.invalid",
       "referer": null
     }
   ],

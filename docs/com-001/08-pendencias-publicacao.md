@@ -20,6 +20,7 @@ Nenhum item abaixo foi presumido. Enquanto estiver pendente, a página **não fa
 | PUB-12 | Segurança, estabilidade ou desempenho do ambiente de Hosting (H-06) | Nenhuma afirmação | Só com definição técnica |
 | PUB-13 | **Modelo C —** datas de início e fim da campanha de lançamento (PR-02). "Nos próximos 2 meses" não tem referência fixa numa página publicada | Texto do mockup, sem datas | Definir período (ex.: "até DD/MM/AAAA") em `PRICING.launch` antes de publicar |
 | PUB-14 | **Modelo C —** confirmação final dos valores R$ 1.000 / R$ 2.800 e do texto "Por que os valores são baixos" (PR-01, PR-04) | Exibidos na seção Preços para revisão da PR | Homologação comercial da responsável |
+| PUB-16 | **Modelo C, etapa 2 —** destino do botão "Entrar" (área do cliente) | Botão sem efeito, marcado como indisponível (D-24) | Definir destino quando houver área do cliente; até lá, avaliar se o botão deve aparecer na página publicada |
 | PUB-15 | **Modelo C —** catálogo detalhado dos 8 serviços de Hosting (com "Como é contratado") e as seções Delivery, Combinado e Diferenciais saíram da página, como no mockup | A faixa do Hosting lista os serviços numa frase e diz que cada um só vale se constar na proposta | Se quiser recuperar algum bloco, ele está no commit `afc7de7` (PR #1) |
 
 ## Da nekkora-lib (não alterada — registrar para o time da lib)
@@ -32,6 +33,7 @@ Nenhum item abaixo foi presumido. Enquanto estiver pendente, a página **não fa
 | P-LIB-04 | Porcelain Light: corpo do `Alert` info = 4,47:1 | axe | Tema não usado |
 | P-LIB-05 | Sakura Dark: corpo do `Alert` warning sobre `--nk-color-surface` fica entre 3,5 e 4,1:1 (fundo translúcido `warning-soft` clareia a superfície) | Medição por pixels (`contraste-por-pixels`) | Bloco de contato sobre `surface-sunken` → 4,73:1 |
 | P-LIB-07 | **Modelo C —** Sage Light: `Badge` success soft sobre card claro = **4,25:1** | axe + pixels (`.price__row .nk-badge--success`) | Selo "−50%" com `variant="solid"` (branco sobre `#15803d`) |
+| P-LIB-08 | **Modelo C, etapa 2 —** `Dialog` sem espaço para ícone no cabeçalho (o mockup usa um `IconBox`) | `Dialog.tsx`: o cabeçalho só tem título, descrição e Fechar | Diálogo sem ícone |
 | P-LIB-06 | `Steps` e outros componentes não expõem contraste mensurável pelo axe quando estão sobre fundo com gradiente (sem violação: apenas "revisão manual") | axe `incomplete` | Medição por pixels no `homologacao.mjs` cobre os 54–55 nós |
 
 ## Do repositório Commercial (pré-existentes, não tocados)

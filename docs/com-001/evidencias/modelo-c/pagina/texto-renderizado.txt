@@ -4,7 +4,7 @@ Preços
 Como funciona
 Hosting
 Transparência
-Solicitar avaliação
+Entrar
 Delivery · Hosting
 Automação sob medida, da necessidade à execução.
 
@@ -159,23 +159,6 @@ A solicitação inicia uma avaliação — não é uma contratação e não gera
 
 Solicitar avaliação
 Canais oficiais em definição · formulário em modo de demonstração
-
-Solicitação validada — envio desativado nesta versão
-
-Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.
-Nome
-Pessoa de Teste
-E-mail
-teste@exemplo.invalid
-Telefone
-—
-Empresa
-—
-Quero avaliar
-Delivery
-Processo
-Teste automatizado de homologação: processo de conciliação manual.
-Editar solicitação
 © 2026 Nekkora. Todos os direitos reservados.
 Versão para homologação
 Neko (猫) observa os detalhes.

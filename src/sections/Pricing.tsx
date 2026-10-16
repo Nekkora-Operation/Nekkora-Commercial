@@ -1,11 +1,13 @@
 import { Badge, Card, IconBox, Link, SectionHeader } from 'nekkora-lib';
 import { PRICING } from '../content';
+import { useRequestTrigger } from '../request';
 
 /**
  * Preços do Delivery (mockup "modelo C" da responsável). Único bloco em que valores e percentuais podem aparecer:
  * marcado com data-pricing e verificado por scripts/homologacao.mjs (precos-so-no-bloco-de-precos).
  */
 export function Pricing() {
+  const trigger = useRequestTrigger();
   return (
     <section id="precos" className="section" aria-labelledby="precos-title" data-pricing="delivery">
       <div className="wrap stack">
@@ -52,7 +54,7 @@ export function Pricing() {
                   )}
                 </div>
                 {'cta' in t && t.cta && (
-                  <Link href="#contato" arrow>
+                  <Link arrow {...trigger}>
                     {t.cta}
                   </Link>
                 )}

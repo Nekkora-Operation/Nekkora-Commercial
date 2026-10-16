@@ -213,13 +213,13 @@ export const CONTACT_COPY = {
   cta: 'Solicitar avaliação',
   // [K-01..K-03] pendentes
   pendingCaption: 'Canais oficiais em definição · formulário em modo de demonstração',
-  formTitle: 'Conte o que você precisa',
-  interests: [
-    { value: 'delivery', label: 'Delivery', description: 'Desenvolvimento de uma ou mais automações' },
-    { value: 'hosting', label: 'Hosting', description: 'Infraestrutura para executar automações (avaliação de viabilidade)' },
-    { value: 'combinado', label: 'Delivery e Hosting', description: 'Desenvolvimento e execução avaliados em conjunto' },
-    { value: 'indefinido', label: 'Ainda não sei', description: 'Quero ajuda para entender o melhor caminho' },
-  ],
+  // Diálogo "Solicitar avaliação" (modelo C, etapa 2)
+  dialogTitle: 'Solicitar avaliação',
+  dialogDescription: 'Deixe seus dados e um resumo do processo. A solicitação inicia uma avaliação — não é uma contratação.',
+  /** Só aparece com WhatsApp confirmado em config.ts (PUB-01). */
+  whatsappDirect: 'Falar diretamente pelo WhatsApp',
+  orForm: 'ou preencha o formulário',
+  formTitle: 'Formulário de solicitação',
   processHint: 'Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.',
   // [K-05]
   demoNote: 'Modo de demonstração: nenhum dado é enviado ou armazenado.',
@@ -241,6 +241,19 @@ export const CONTACT_COPY = {
 /* ------------------------------------------------------------------ */
 /* Rodapé                                                             */
 /* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* Barra de navegação                                                 */
+/* ------------------------------------------------------------------ */
+/**
+ * Botão "Entrar" do modelo C (etapa 2), "sem redirecionamento" por decisão da responsável. Não existe área do
+ * cliente disponível (Platform em desenvolvimento — P-02): o botão fica marcado como indisponível e explica isso
+ * a quem usa leitor de tela ou passa o mouse (D-24, PUB-16).
+ */
+export const LOGIN = {
+  label: 'Entrar',
+  unavailable: 'Acesso de clientes ainda não disponível.',
+};
+
 export const FOOTER = {
   preview: 'Versão para homologação',
   signature: 'Neko (猫) observa os detalhes.',

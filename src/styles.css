@@ -181,12 +181,16 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .contact__lead { margin: 0; max-width: 40em; font-size: var(--nk-font-size-lg); line-height: 1.6; color: var(--nk-color-text-secondary); }
 .contact__caption { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
 .contact__channels { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 20px; }
-.contact__form-wrap { width: 100%; max-width: 760px; scroll-margin-top: 88px; text-align: left; }
-.contact__form { display: flex; flex-direction: column; gap: 18px; padding: clamp(20px, 3vw, 28px); border-radius: var(--nk-radius-lg); background: var(--nk-color-bg); border: 1px solid var(--nk-color-border); }
 .contact__form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 /* text-secondary (não muted): o aviso é informativo e precisa de contraste AA */
 .contact__note { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
-.contact__done { align-items: stretch; scroll-margin-top: 88px; }
+
+/* Diálogo "Solicitar avaliação" (modelo C, etapa 2) */
+.request__body, .request__form, .contact__done { display: flex; flex-direction: column; gap: 16px; }
+.request__pending { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.5; color: var(--nk-color-text-secondary); }
+.request__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.request .nk-dialog__footer { flex-direction: column; align-items: stretch; gap: 12px; }
+.request__note { text-align: center; }
 .contact__done:focus { outline: none; }
 .contact__done > .nk-button { align-self: flex-start; }
 

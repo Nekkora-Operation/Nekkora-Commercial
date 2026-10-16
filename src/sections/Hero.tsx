@@ -1,7 +1,9 @@
 import { Badge, Button } from 'nekkora-lib';
 import { HERO } from '../content';
+import { useRequestTrigger } from '../request';
 
 export function Hero() {
+  const trigger = useRequestTrigger();
   return (
     <section id="inicio" className="hero" aria-labelledby="hero-title">
       <div className="wrap hero__center">
@@ -13,7 +15,7 @@ export function Hero() {
         </h1>
         <p className="hero__lead">{HERO.lead}</p>
         <div className="hero__ctas">
-          <Button size="lg" pill rightIcon="arrow-right" href="#contato">
+          <Button size="lg" pill rightIcon="arrow-right" {...trigger}>
             {HERO.primaryCta}
           </Button>
           <Button size="lg" pill variant="secondary" href="#como-funciona">

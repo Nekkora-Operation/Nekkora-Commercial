@@ -64,14 +64,17 @@ for (const key of ['defined', 'excluded', 'dependencies']) {
 }
 
 h('7. Contato');
-L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (leva ao formulário)`, '', `Sem canais confirmados: _${K.pendingCaption}_`);
-L.push('', `Formulário "${K.formTitle}": Nome*, E-mail*, Telefone (opcional), Empresa (opcional), "O que você quer avaliar?"*, "Descreva o processo"* — ${K.processHint}`, '');
-list(K.interests.map((i) => `${i.label} — ${i.description}`));
+L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (abre o diálogo)`, '', `Sem canais confirmados: _${K.pendingCaption}_`);
+L.push('', `Diálogo **${K.dialogTitle}** — ${K.dialogDescription}`, '', `Com WhatsApp confirmado: botão "${K.whatsappDirect}" + divisor "${K.orForm}". Sem canal: _${K.pendingCaption}_`);
+L.push('', `Formulário: Nome*, E-mail*, Telefone / WhatsApp (opcional), Empresa (opcional), "Descreva o processo"* — ${K.processHint}. Rodapé: "Cancelar" + envio.`);
 L.push('', `Modo demonstração: botão "${K.demoSubmit}"; nota "${K.demoNote}"; resultado **${K.demoResult.title}** — ${K.demoResult.text}`);
 L.push('', `Com WhatsApp confirmado: botão "${K.whatsappSubmit}"; nota "${K.whatsappNote}"`);
 L.push('', `- Após enviar: **${K.whatsappRequested.title}** — ${K.whatsappRequested.text}`, `- Link manual (sempre): "${K.whatsappManual}"`);
 
-h('8. Rodapé');
+h('8. Barra de navegação');
+L.push(`Links: Soluções · Preços · Como funciona · Hosting · Transparência. Botão "${c.LOGIN.label}" sem destino (indisponível: "${c.LOGIN.unavailable}").`);
+
+h('9. Rodapé');
 list(['© Nekkora. Todos os direitos reservados.', c.FOOTER.preview, c.FOOTER.signature]);
 
 const out = path.join(root, 'docs/com-001/05-texto-comercial.md');

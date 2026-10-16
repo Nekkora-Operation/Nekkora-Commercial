@@ -41,11 +41,16 @@ async function isolate(ctx) {
     return route.abort();
   });
 }
-async function fillForm(form, radioIndex, text) {
+/** Abre o diálogo "Solicitar avaliação" pelo botão do contato e preenche o formulário. Devolve o diálogo. */
+async function openAndFill(p, text) {
+  await p.locator('#contato [aria-haspopup="dialog"]').click();
+  const dialog = p.getByRole('dialog');
+  await dialog.waitFor();
+  const form = dialog.locator('form');
   await form.getByLabel(/^Nome/).fill('Pessoa de Teste');
   await form.getByLabel(/^E-mail/).fill('teste@exemplo.invalid');
-  await form.getByRole('radio').nth(radioIndex).check();
   await form.getByLabel(/Descreva o processo/).fill(text);
+  return dialog;
 }
 const NEUTRAL = /Pedimos ao navegador para abrir o WhatsApp/;
 const OVERCLAIM = /WhatsApp aberto|aberto em uma nova aba|enviad[ao] com sucesso|mensagem enviada/i;
@@ -65,25 +70,31 @@ check('botao-flutuante-presente', (await page.locator('a[href^="https://wa.me/"]
 check('aviso-canais-pendentes-ausente', (await page.getByText('Canais oficiais em definição').count()) === 0);
 
 // Navegador que permite a nova aba
-const form = page.locator('#contato form');
-await fillForm(form, 2, 'Teste de homologação com canal configurado.');
-check('botao-envio-whatsapp', /Enviar pelo WhatsApp/.test(await form.locator('button[type="submit"]').innerText()));
+const dialog = await openAndFill(page, 'Teste de homologação com canal configurado.');
+// Atalho "Falar diretamente pelo WhatsApp" do diálogo: só com número confirmado, isolado da página
+const direct = dialog.getByRole('link', { name: /Falar diretamente pelo WhatsApp/ });
+const directRel = (await direct.count()) ? await direct.getAttribute('rel') : null;
+check('dialogo-whatsapp-direto', (await direct.count()) === 1 && (await direct.getAttribute('href')).startsWith('https://wa.me/5511912345678?') && (await direct.getAttribute('target')) === '_blank' && directRel?.includes('noopener') && directRel?.includes('noreferrer'), `rel="${directRel}"`);
+check('dialogo-sem-aviso-de-canais-pendentes', !/Canais oficiais em definição/.test(await dialog.innerText()));
+check('botao-envio-whatsapp', /Enviar pelo WhatsApp/.test(await dialog.locator('button[type="submit"]').innerText()));
 const popupPromise = page.waitForEvent('popup', { timeout: 5000 }).catch(() => null);
-await form.locator('button[type="submit"]').click();
+await dialog.locator('button[type="submit"]').click();
 const popup = await popupPromise;
 if (popup) await popup.waitForLoadState('load').catch(() => {});
 await page.waitForTimeout(300);
 const req = waRequests[0];
 const decoded = decodeURIComponent(req?.url ?? '');
-check('formulario-abre-whatsapp-com-mensagem', decoded.includes('wa.me/5511912345678') && decoded.includes('Quero avaliar: Delivery e Hosting.'), decoded.slice(0, 160));
+check('formulario-abre-whatsapp-com-mensagem', decoded.includes('wa.me/5511912345678') && decoded.includes('Quero solicitar uma avaliação.') && decoded.includes('Teste de homologação com canal configurado.'), decoded.slice(0, 160));
 // Isolamento medido NA aba aberta (sem mascarar erro): noopener ⇒ opener nulo; noreferrer ⇒ sem Referer.
 const isolation = popup ? await popup.evaluate(() => ({ opener: window.opener === null, referrer: document.referrer })) : null;
 check('aba-sem-opener', isolation?.opener === true, isolation ? `window.opener === null: ${isolation.opener}` : 'sem popup');
 check('aba-sem-referer', req != null && req.referer == null && isolation?.referrer === '', `cabeçalho Referer=${req?.referer ?? 'ausente'}; document.referrer="${isolation?.referrer ?? '?'}"`);
-const openedText = await page.locator('#contato .contact__done').innerText();
+const openedText = await dialog.locator('.contact__done').innerText();
 check('mensagem-neutra-sem-afirmar-abertura', NEUTRAL.test(openedText) && !OVERCLAIM.test(openedText), openedText.split('\n')[0]);
-const manual = page.locator('#contato .contact__done a[href^="https://wa.me/5511912345678?"]');
+const manual = dialog.locator('.contact__done a[href^="https://wa.me/5511912345678?"]');
 check('link-manual-sempre-presente', (await manual.count()) === 1 && (await manual.getAttribute('rel'))?.includes('noopener') && (await manual.getAttribute('rel'))?.includes('noreferrer'), `rel="${await manual.getAttribute('rel')}"`);
+await page.screenshot({ path: path.join(outDir, 'dialogo-com-canais.png') });
+await page.keyboard.press('Escape');
 await page.locator('#contato').screenshot({ path: path.join(outDir, 'contato-com-canais.png') });
 
 // Navegador que bloqueia a nova aba (window.open devolve null, como os bloqueadores de pop-up)
@@ -95,15 +106,15 @@ await page.locator('#contato').screenshot({ path: path.join(outDir, 'contato-com
   });
   const bp = await blockedCtx.newPage();
   await bp.goto(baseUrl, { waitUntil: 'networkidle' });
-  await fillForm(bp.locator('#contato form'), 0, 'Teste de homologação com pop-up bloqueado.');
-  await bp.locator('#contato form button[type="submit"]').click();
+  const bd = await openAndFill(bp, 'Teste de homologação com pop-up bloqueado.');
+  await bd.locator('button[type="submit"]').click();
   await bp.waitForTimeout(300);
-  const done = bp.locator('#contato .contact__done');
+  const done = bd.locator('.contact__done');
   const text = await done.innerText();
   const bm = done.locator('a[href^="https://wa.me/5511912345678?"]');
   const href = decodeURIComponent((await bm.getAttribute('href')) ?? '');
   check('bloqueada-mesma-mensagem-neutra', NEUTRAL.test(text) && !OVERCLAIM.test(text), text.split('\n')[0]);
-  check('bloqueada-link-manual-com-mensagem', (await bm.count()) === 1 && href.includes('Quero avaliar: Delivery.') && (await bm.getAttribute('target')) === '_blank', href.slice(0, 120));
+  check('bloqueada-link-manual-com-mensagem', (await bm.count()) === 1 && href.includes('Teste de homologação com pop-up bloqueado.') && (await bm.getAttribute('target')) === '_blank', href.slice(0, 120));
   await done.screenshot({ path: path.join(outDir, 'whatsapp-bloqueado.png') });
   await blockedCtx.close();
 }
