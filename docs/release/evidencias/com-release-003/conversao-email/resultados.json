@@ -1,0 +1,540 @@
+{
+  "baseUrl": "http://127.0.0.1:4176/",
+  "at": "2026-10-22T23:03:02.777Z",
+  "runs": [
+    {
+      "engine": "chromium",
+      "version": "153.0.8010.12",
+      "aborted": []
+    },
+    {
+      "engine": "firefox",
+      "version": "155.0",
+      "aborted": []
+    },
+    {
+      "engine": "webkit",
+      "version": "26.6",
+      "aborted": []
+    }
+  ],
+  "checks": [
+    {
+      "engine": "chromium",
+      "id": "status-configurado",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "email-exibido",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "linkedin-perfil-exibido",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "sem-whatsapp-na-pagina",
+      "ok": true,
+      "detail": "nenhum link, botão flutuante ou menção ao WhatsApp"
+    },
+    {
+      "engine": "chromium",
+      "id": "privacidade-descreve-o-email",
+      "ok": true,
+      "detail": "Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta n"
+    },
+    {
+      "engine": "chromium",
+      "id": "dialogo-email-direto",
+      "ok": true,
+      "detail": "mailto:contato@exemplo.invalid?subject=Solicita%C3%A7%C3%A3o%20de%20avalia%C3%A7%C3%A3o%20%E2%80%94%20Nekkora"
+    },
+    {
+      "engine": "chromium",
+      "id": "botao-revisar-mensagem",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "nota-do-formulario-cita-o-email",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "validacao-campos-obrigatorios",
+      "ok": true,
+      "detail": "nome e descrição"
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-mensagem-exata",
+      "ok": true,
+      "detail": "Olá! Sou Pessoa de Teste, da Empresa Sintética."
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-avisa-transferencia",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-sem-abrir-nada",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-foco-no-conteudo",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-endereco-manual",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "voltar-preserva-dados",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "botao-email-sem-nova-aba",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "email-com-mensagem-exata",
+      "ok": true,
+      "detail": "para=contato@exemplo.invalid; assunto=\"Solicitação de avaliação — Nekkora\"; corpo = mensagem confirmada: true"
+    },
+    {
+      "engine": "chromium",
+      "id": "sem-window-open",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "pagina-continua-no-ar",
+      "ok": true,
+      "detail": "http://127.0.0.1:4176/"
+    },
+    {
+      "engine": "chromium",
+      "id": "mensagem-neutra-sem-afirmar-envio",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "link-manual-depois-da-abertura",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "alternativas-manuais",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "copiar-mensagem-informa-resultado",
+      "ok": true,
+      "detail": "Mensagem copiada."
+    },
+    {
+      "engine": "chromium",
+      "id": "celular-confirmacao-cabe",
+      "ok": true,
+      "detail": "{\"page\":0,\"left\":0,\"right\":375}"
+    },
+    {
+      "engine": "chromium",
+      "id": "axe-etapa-de-confirmacao",
+      "ok": true,
+      "detail": "sem violações"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-durante-campanha",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-antes-do-inicio",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-depois-do-fim",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-ultimo-dia-no-fuso-de-brasilia",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "chromium",
+      "id": "sem-requisicao-externa-real",
+      "ok": true,
+      "detail": "nenhuma requisição externa"
+    },
+    {
+      "engine": "chromium",
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    },
+    {
+      "engine": "firefox",
+      "id": "status-configurado",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "email-exibido",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "linkedin-perfil-exibido",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "sem-whatsapp-na-pagina",
+      "ok": true,
+      "detail": "nenhum link, botão flutuante ou menção ao WhatsApp"
+    },
+    {
+      "engine": "firefox",
+      "id": "privacidade-descreve-o-email",
+      "ok": true,
+      "detail": "Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta n"
+    },
+    {
+      "engine": "firefox",
+      "id": "dialogo-email-direto",
+      "ok": true,
+      "detail": "mailto:contato@exemplo.invalid?subject=Solicita%C3%A7%C3%A3o%20de%20avalia%C3%A7%C3%A3o%20%E2%80%94%20Nekkora"
+    },
+    {
+      "engine": "firefox",
+      "id": "botao-revisar-mensagem",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "nota-do-formulario-cita-o-email",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "validacao-campos-obrigatorios",
+      "ok": true,
+      "detail": "nome e descrição"
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-mensagem-exata",
+      "ok": true,
+      "detail": "Olá! Sou Pessoa de Teste, da Empresa Sintética."
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-avisa-transferencia",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-sem-abrir-nada",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-foco-no-conteudo",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-endereco-manual",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "voltar-preserva-dados",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "botao-email-sem-nova-aba",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "email-com-mensagem-exata",
+      "ok": true,
+      "detail": "para=contato@exemplo.invalid; assunto=\"Solicitação de avaliação — Nekkora\"; corpo = mensagem confirmada: true"
+    },
+    {
+      "engine": "firefox",
+      "id": "sem-window-open",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "pagina-continua-no-ar",
+      "ok": true,
+      "detail": "http://127.0.0.1:4176/"
+    },
+    {
+      "engine": "firefox",
+      "id": "mensagem-neutra-sem-afirmar-envio",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "link-manual-depois-da-abertura",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "alternativas-manuais",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "copiar-mensagem-informa-resultado",
+      "ok": true,
+      "detail": "Mensagem copiada."
+    },
+    {
+      "engine": "firefox",
+      "id": "celular-confirmacao-cabe",
+      "ok": true,
+      "detail": "{\"page\":0,\"left\":0,\"right\":375}"
+    },
+    {
+      "engine": "firefox",
+      "id": "axe-etapa-de-confirmacao",
+      "ok": true,
+      "detail": "sem violações"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-durante-campanha",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-antes-do-inicio",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-depois-do-fim",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-ultimo-dia-no-fuso-de-brasilia",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "firefox",
+      "id": "sem-requisicao-externa-real",
+      "ok": true,
+      "detail": "nenhuma requisição externa"
+    },
+    {
+      "engine": "firefox",
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    },
+    {
+      "engine": "webkit",
+      "id": "status-configurado",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "email-exibido",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "linkedin-perfil-exibido",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "sem-whatsapp-na-pagina",
+      "ok": true,
+      "detail": "nenhum link, botão flutuante ou menção ao WhatsApp"
+    },
+    {
+      "engine": "webkit",
+      "id": "privacidade-descreve-o-email",
+      "ok": true,
+      "detail": "Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta n"
+    },
+    {
+      "engine": "webkit",
+      "id": "dialogo-email-direto",
+      "ok": true,
+      "detail": "mailto:contato@exemplo.invalid?subject=Solicita%C3%A7%C3%A3o%20de%20avalia%C3%A7%C3%A3o%20%E2%80%94%20Nekkora"
+    },
+    {
+      "engine": "webkit",
+      "id": "botao-revisar-mensagem",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "nota-do-formulario-cita-o-email",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "validacao-campos-obrigatorios",
+      "ok": true,
+      "detail": "nome e descrição"
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-mensagem-exata",
+      "ok": true,
+      "detail": "Olá! Sou Pessoa de Teste, da Empresa Sintética."
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-avisa-transferencia",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-sem-abrir-nada",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-foco-no-conteudo",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-endereco-manual",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "voltar-preserva-dados",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "botao-email-sem-nova-aba",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "email-com-mensagem-exata",
+      "ok": true,
+      "detail": "para=contato@exemplo.invalid; assunto=\"Solicitação de avaliação — Nekkora\"; corpo = mensagem confirmada: true"
+    },
+    {
+      "engine": "webkit",
+      "id": "sem-window-open",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "pagina-continua-no-ar",
+      "ok": true,
+      "detail": "http://127.0.0.1:4176/"
+    },
+    {
+      "engine": "webkit",
+      "id": "mensagem-neutra-sem-afirmar-envio",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "link-manual-depois-da-abertura",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "alternativas-manuais",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "copiar-mensagem-informa-resultado",
+      "ok": true,
+      "detail": "Mensagem copiada."
+    },
+    {
+      "engine": "webkit",
+      "id": "celular-confirmacao-cabe",
+      "ok": true,
+      "detail": "{\"page\":0,\"left\":0,\"right\":375}"
+    },
+    {
+      "engine": "webkit",
+      "id": "axe-etapa-de-confirmacao",
+      "ok": true,
+      "detail": "sem violações"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-durante-campanha",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-antes-do-inicio",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-depois-do-fim",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-ultimo-dia-no-fuso-de-brasilia",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "webkit",
+      "id": "sem-requisicao-externa-real",
+      "ok": true,
+      "detail": "nenhuma requisição externa"
+    },
+    {
+      "engine": "webkit",
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    }
+  ],
+  "summary": {
+    "total": 93,
+    "failed": 0
+  }
+}
