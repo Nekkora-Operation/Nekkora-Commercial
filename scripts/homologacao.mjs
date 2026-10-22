@@ -528,7 +528,11 @@ await block('dialogo-acessibilidade', async () => {
 
 check('sem-requisicoes-externas', results.blocked.length === 0, results.blocked.join(' | ') || 'nenhuma');
 check('fonte-servida-pelo-proprio-site', results.fonts.size > 0, [...results.fonts].join(', ') || 'nenhuma fonte carregada');
-const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c));
+// Aviso de otimização do WebKit quando a fonte pré-carregada demora a ser usada (a página é desenhada pelo JS; em
+// máquina lenta passa de "alguns segundos"): registrado em resultados.json, não reprova — a fonte é usada.
+const PRELOAD_ADVISORY = /was preloaded using link preload but not used within a few seconds/;
+results.consoleInformativo = results.console.filter((c) => PRELOAD_ADVISORY.test(c));
+const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c) && !PRELOAD_ADVISORY.test(c));
 check('console-sem-erros', realErrors.length === 0, realErrors.join(' | ') || 'limpo');
 
 await browser.close();
