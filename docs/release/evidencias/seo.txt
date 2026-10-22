@@ -1,0 +1,29 @@
+# SEO / compartilhamento — 2026-10-22T14:12:54-03:00 — http://127.0.0.1:8788 (runtime do Cloudflare Pages, build de produção)
+<title>Nekkora — Automação sob medida, da necessidade à execução</title>
+<meta name="theme-color" content="#f4f6f1" />
+<link rel="canonical" href="https://nekkora.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:url" content="https://nekkora.com/" />
+<meta property="og:title" content="Nekkora — Automação sob medida, da necessidade à execução" />
+<meta property="og:image" content="https://nekkora.com/og-nekkora.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="627" />
+<meta property="og:image:alt" content="Nekkora — Automação sob medida, da necessidade à execução." />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="./favicon.ico" sizes="any" />
+<link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<link rel="preload" href="/assets/inter-latin-wght-normal-Dx4kXJAl.woff2" as="font" type="font/woff2" crossorigin />
+
+og-nekkora.jpg -> 200 image/jpeg 71426B
+favicon.ico -> 200 image/vnd.microsoft.icon 3036B
+favicon.svg -> 200 image/svg+xml 1041B
+apple-touch-icon.png -> 200 image/png 6054B
+robots.txt -> 200 text/plain; charset=utf-8 65B
+sitemap.xml -> 200 application/xml 163B
+inexistente -> 404
+description: Nekkora Delivery: automações desenvolvidas por demanda, com escopo, preço e aceite definidos em proposta. Nekkora Hosting: infraestrutura para executá-las, sujeita a avaliação.
+og:site_name: Nekkora
+og:description: Automações desenvolvidas por demanda, com escopo, preço e aceite definidos em proposta. Peça uma avaliação do seu processo.

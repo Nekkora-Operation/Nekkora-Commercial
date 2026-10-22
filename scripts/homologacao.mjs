@@ -330,9 +330,15 @@ await block('funcionais', async () => {
   check('demonstrativos-identificados', demos.every((d) => d.visible), demos.length ? JSON.stringify(demos) : 'nenhum bloco demonstrativo na página');
 
   // Teclado: link de pular conteúdo, foco visível e sequência inicial
-  await page.keyboard.press('Tab');
+  if (ENGINE === 'webkit') {
+    // WebKit/Safari: por padrão o Tab não percorre links (só controles; links exigem Option+Tab, que o Playwright não
+    // reproduz). Vale para qualquer site — o link é verificado por foco programático: precisa ser focável e aparecer.
+    await page.locator('a.skip-link').focus();
+  } else {
+    await page.keyboard.press('Tab');
+  }
   const first = await page.evaluate(() => ({ text: document.activeElement?.textContent?.trim(), href: document.activeElement?.getAttribute('href') }));
-  check('primeiro-tab-pular-conteudo', first.href === '#conteudo', JSON.stringify(first));
+  check(ENGINE === 'webkit' ? 'pular-conteudo-focavel' : 'primeiro-tab-pular-conteudo', first.href === '#conteudo', JSON.stringify(first));
   const skipVisible = await page.evaluate(() => {
     const r = document.activeElement.getBoundingClientRect();
     return r.width > 1 && r.height > 1 && r.top >= 0;
