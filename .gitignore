@@ -8,3 +8,5 @@ dist-homologacao
 dist-homologacao-email
 /.wrangler
 /evidencias
+/aws-sdk-auditoria
+/auditoria

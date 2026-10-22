@@ -35,8 +35,8 @@ credenciais da AWS, então **nenhum identificador real foi lido**.
 
 | ID | Ação | Onde |
 |---|---|---|
-| INF-01 | Rodar a auditoria somente leitura e informar o nome do bucket: `npm run aws:auditar -- --bucket <nome> --saida auditoria` | máquina da titular (perfil com MFA, nunca root) |
-| INF-02 | **Validar o certificado ACM** (us-east-1, `nekkora.com` + `www.nekkora.com`). Pelos logs públicos de CT, ele **ainda não foi emitido**: criar os CNAMEs de validação na Cloudflare, como DNS only, exige **autorização de DNS** | ACM + Cloudflare |
+| INF-01 | **Próximo passo.** Rodar a auditoria somente leitura no CloudShell (`bash auditar.sh`, ver COM-RELEASE-003-aws §1.2) e enviar o `auditoria.md`. Bucket, CloudFront, OAC e política foram configurados manualmente (informado em 22/10) e falta confirmar o estado real | AWS CloudShell (usuário administrativo com MFA, nunca root) |
+| INF-02 | Certificado ACM (us-east-1, `nekkora.com` + `www.nekkora.com`): CNAMEs de validação **já criados** na Cloudflare (informado em 22/10). Os logs públicos de CT ainda não mostram emissão: confirmar `ISSUED` pela auditoria (K01); se seguir pendente, conferir proxy desligado, nome sem domínio repetido e valor terminando em `.acm-validations.aws.` | ACM |
 | INF-03 | Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json` | CloudFront → Policies |
 | INF-04 | CloudFront Function `deploy/aws/funcao-viewer-request.js` (viewer request) | CloudFront → Functions |
 | INF-05 | Comportamento padrão: CachingOptimized, compressão, GET/HEAD, redirect to HTTPS, política INF-03; páginas de erro 403/404 → `/404.html` (404) | CloudFront → distribuição |
@@ -51,6 +51,8 @@ credenciais da AWS, então **nenhum identificador real foi lido**.
 | ID | Situação | Recomendação |
 |---|---|---|
 | REP-03 | Na pasta `Nekkora-Commercial`, o commit local `34d0aa5` ("fix: changing price") versionava o `.env` com credenciais. Ele nunca foi enviado. **Tratado na COM-RELEASE-003**: o commit foi desfeito localmente, o `.env` ficou intacto no disco e fora do índice, as mudanças de preço daquele commit continuam como alterações não commitadas e `.env`/`.env.*` estão no exclude local do repositório (`.git/info/exclude`), porque o `.gitignore` daquela branch não os cobria. As branches de release já os têm no `.gitignore`. Os preços oficiais foram implementados na branch limpa, **sem usar aquele commit**. Detalhes em [COM-RELEASE-003-relatorio.md](COM-RELEASE-003-relatorio.md) §6 | **Trocar as credenciais do `.env`** (senha do Postgres e `CLIENT_SECRET` do Azure). O conteúdo ainda fica no reflog local por ~90 dias: `git reflog expire --expire=now --all && git gc --prune=now` remove de vez, mas a decisão de apagar histórico é da titular |
+| REP-04 | Contato por e-mail: confirmar que `contato@nekkora.com` **recebe** mensagens (enviar um teste de fora) e testar manualmente o "Abrir no e-mail" num computador e num celular com aplicativo de e-mail configurado. A homologação automatizada confere o mailto exato, mas não abre um aplicativo real. Lembrete: a mensagem só chega se o visitante enviá-la pelo próprio aplicativo | Titular |
+| PR-05 | Depois do merge do PR #6, atualizar a descrição do PR #5 (ainda cita Cloudflare Pages e os preços antigos) | Agente, quando autorizado |
 | REP-02 | `.env` com credenciais de outro contexto dentro da pasta do site | Mover para fora do projeto |
 | L-01 | Merge do PR #6 da nekkora-lib (o Commercial usa o tarball do CI, já fixado por hash) | Titular |
 

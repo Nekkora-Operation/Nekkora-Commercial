@@ -40,18 +40,49 @@ Verificações públicas, sem credencial, feitas em 22/10/2026:
 | Sem DMARC (`_dmarc` inexistente) | consulta TXT. Fora do escopo: só registrado |
 | **O certificado do ACM ainda não foi emitido.** Os logs públicos de Certificate Transparency de `nekkora.com` têm só os certificados automáticos da Cloudflare (Let's Encrypt e Google Trust Services, de 28–29/09/2026), nenhum da Amazon. O ACM registra em CT todo certificado público que emite | certspotter e crt.sh |
 
-O mais provável é que o certificado esteja em **PENDING_VALIDATION**, esperando os registros CNAME de validação na
-Cloudflare. Confirmar com a auditoria (K01), que também lista os registros a criar.
+**Atualização (22/10/2026, noite):**
+- A titular informou que os dois CNAMEs de validação **já foram criados** na Cloudflare, e que bucket, CloudFront, OAC
+  e política do bucket foram configurados manualmente e conferidos por capturas de tela.
+- Consulta nova aos logs de CT: **ainda nenhum certificado da Amazon**.
+- Causas possíveis:
+  - validação em andamento (minutos a algumas horas);
+  - emissão recente ainda não indexada;
+  - erro num registro. Os mais comuns são o proxy da Cloudflare ligado (precisa ser DNS only), o nome com o domínio
+    repetido (`_abc.nekkora.com.nekkora.com`, porque a Cloudflare já acrescenta o domínio) e o valor incompleto (tem de
+    terminar em `.acm-validations.aws.`).
+- A auditoria (K01) mostra o estado e os registros exatos que o ACM espera, e o script do CloudShell lista os
+  certificados também na região do bucket, caso o pedido tenha sido feito fora de `us-east-1`.
 
 ### 1.2 Auditoria somente leitura (`scripts/aws/auditar.mjs`)
 
 Só faz chamadas `Get`, `List` e `Describe`. O teste `somente leitura` prova isso. Resultados: **ok**, **pendente**
 (depende de ação externa), **falha** (configuração errada) ou **info**. Grava `auditoria.json` e `auditoria.md`.
 
+**Caminho recomendado: AWS CloudShell.** Ele abre um terminal já autenticado pelo console, sem instalar nada no
+Windows e sem gerar chaves. Entre no console com o usuário administrativo e MFA (nunca o root), abra o CloudShell
+(ícone `>_` na barra superior) e rode:
+
 ```bash
-# localmente, com as credenciais da titular (perfil da AWS CLI/SSO com MFA — nunca o root):
+curl -fsSL https://raw.githubusercontent.com/Nekkora-Operation/Nekkora-Commercial/feat/com-release-003-aws/scripts/aws/auditar-cloudshell.sh -o auditar.sh
+bash auditar.sh                 # lista os buckets e pergunta qual é o do Commercial
+# ou: bash auditar.sh <nome-do-bucket>
+cat nekkora-commercial-auditoria/auditoria/auditoria.md   # para copiar o relatório
+```
+
+O script [`scripts/aws/auditar-cloudshell.sh`](../../scripts/aws/auditar-cloudshell.sh) faz o seguinte:
+- recusa a identidade root;
+- clona esta branch e instala só o AWS SDK, nas versões fixas e sem scripts de instalação;
+- lista os certificados ACM de `nekkora.com` em `us-east-1` e na região do bucket;
+- roda a auditoria.
+
+O relatório tem IDs e ARNs, mas nenhum segredo.
+
+Alternativas:
+
+```bash
+# máquina local com AWS CLI/SSO configurado:
 npm run aws:auditar -- --bucket <nome-do-bucket> --saida auditoria
-# ou no GitHub: Actions → "Auditoria AWS" (role somente leitura, environment auditoria-aws)
+# GitHub: Actions → "Auditoria AWS" (role somente leitura, environment auditoria-aws), depois do §2
 ```
 
 | ID | Verifica |
@@ -352,8 +383,8 @@ O alerta de orçamento é da titular. Um alarme do CloudWatch na taxa de 5xx (US
 
 | # | Ação | Quem | Situação |
 |---|---|---|---|
-| 1 | Rodar a auditoria (`npm run aws:auditar -- --bucket <nome> --saida auditoria`) e corrigir as **falhas** | titular | pendente |
-| 2 | Validar o certificado: CNAMEs na Cloudflare, DNS only (**autorização de DNS**) | titular | pendente |
+| 1 | Rodar a auditoria no CloudShell (`bash auditar.sh`, §1.2), enviar o `auditoria.md` e corrigir as **falhas** | titular | pendente (próximo passo) |
+| 2 | Validar o certificado: CNAMEs na Cloudflare, DNS only | titular | CNAMEs **criados** (informado em 22/10). Falta confirmar `ISSUED` (K01) |
 | 3 | Criar a Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json`. Console, ou `aws cloudfront create-response-headers-policy --response-headers-policy-config file://deploy/aws/politica-cabecalhos.json` | titular | pendente |
 | 4 | Criar e publicar a função `nekkora-commercial-viewer-request` (cloudfront-js-2.0) com `deploy/aws/funcao-viewer-request.js` e associá-la ao viewer request | titular | pendente |
 | 5 | Ajustar o comportamento padrão: CachingOptimized, compressão, GET/HEAD, redirect to HTTPS, política do passo 3. Páginas de erro 403/404 → `/404.html` (404) | titular | pendente |
