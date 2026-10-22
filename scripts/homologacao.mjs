@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * Homologação automatizada da página comercial (COM-001) num navegador real (Chromium via Playwright).
+ * Homologação automatizada da página comercial num navegador real (Playwright: Chromium, Firefox ou WebKit).
  *
  * Uso:
- *   npm run build && npx vite preview --port 4173 --strictPort      # em outro terminal
- *   node scripts/homologacao.mjs http://localhost:4173/ docs/com-001/evidencias/depois
+ *   npm run build && npm run preview -- --port 4173 --strictPort      # em outro terminal
+ *   node scripts/homologacao.mjs http://127.0.0.1:4173/ docs/release/evidencias/<pasta>
+ *   NEKKORA_NAVEGADOR=firefox node scripts/homologacao.mjs ...        # chromium (padrão), firefox ou webkit
  *
- * Playwright e axe-core NÃO são dependências deste projeto (fora do escopo da missão). O script os resolve a partir
- * de NEKKORA_PW_MODULES (pasta node_modules que os contenha) ou do próprio projeto, se instalados:
- *   NEKKORA_PW_MODULES=../Nekkora-Platform-Web/node_modules node scripts/homologacao.mjs ...
+ * Playwright e axe-core são devDependencies desde a COM-RELEASE-001 (versões fixas). NEKKORA_PW_MODULES continua
+ * aceito para usar outra pasta node_modules que os contenha.
  *
  * Saída: capturas (JPEG), resultados.json e resumo.md na pasta indicada. Código de saída 1 se alguma verificação
  * falhar. Nenhuma requisição sai do localhost: tudo que tentar sair é bloqueado e registrado.
@@ -20,7 +20,9 @@ import path from 'node:path';
 const [, , baseUrl = 'http://localhost:4173/', outDir = 'docs/com-001/evidencias/depois'] = process.argv;
 const modules = process.env.NEKKORA_PW_MODULES;
 const require = createRequire(modules ? path.resolve(modules, 'noop.js') : import.meta.url);
-const { chromium } = require('playwright');
+const ENGINE = process.env.NEKKORA_NAVEGADOR ?? 'chromium';
+const playwright = require('playwright');
+if (!['chromium', 'firefox', 'webkit'].includes(ENGINE)) throw new Error(`NEKKORA_NAVEGADOR inválido: ${ENGINE}`);
 const axeSource = require('node:fs').readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 mkdirSync(outDir, { recursive: true });
@@ -34,10 +36,13 @@ const WIDTHS = [
 ];
 const THEME_KEY = 'nekkora-commercial-tema';
 
-/** Alegações proibidas fora de listas marcadas como exclusão (data-exclusion). */
+/**
+ * Alegações proibidas fora de listas marcadas como exclusão (data-exclusion). Preços e percentuais (`pricing: true`)
+ * são aceitos também no bloco de preços autorizado pela responsável (data-pricing, modelo C — PR-01..PR-05).
+ */
 const FORBIDDEN = [
-  { id: 'percentual', re: /\d+(?:[.,]\d+)?\s?%/g },
-  { id: 'preco', re: /R\$\s?\d/g },
+  { id: 'percentual', re: /\d+(?:[.,]\d+)?\s?%/g, pricing: true },
+  { id: 'preco', re: /R\$\s?\d/g, pricing: true },
   { id: '24h', re: /\b24\s?(?:h\b|horas)|24\s?\/\s?7|24x7/gi },
   { id: 'sla', re: /\bSLA\b/g },
   { id: 'roi', re: /\bROI\b/g },
@@ -47,13 +52,14 @@ const FORBIDDEN = [
   { id: 'monitoramento-continuo', re: /monitoramento cont[ií]nuo|monitoramento 24/gi },
 ];
 
-const results = { baseUrl, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
+const results = { baseUrl, navegador: ENGINE, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
 const check = (id, ok, detail) => {
   results.checks.push({ id, ok: !!ok, detail });
   console.log(`${ok ? 'OK  ' : 'FALHA'} ${id}${detail ? ` — ${typeof detail === 'string' ? detail : JSON.stringify(detail)}` : ''}`);
 };
 
-const browser = await chromium.launch();
+const browser = await playwright[ENGINE].launch();
+results.versaoNavegador = browser.version();
 const local = new URL(baseUrl).origin;
 
 async function newPage(viewport, theme) {
@@ -72,12 +78,10 @@ async function newPage(viewport, theme) {
   // Nada sai do localhost: requisições externas são abortadas e registradas.
   await context.route('**/*', (route) => {
     const url = route.request().url();
+    // Fonte Inter: vem da nekkora-lib 0.2.0 (dist/fonts) e é servida pelo próprio site — registrada à parte.
+    if (url.startsWith(local) && /\.woff2(\?|$)/.test(url)) results.fonts.add(new URL(url).pathname.replace(/-[\w-]{8}\.woff2$/, '.woff2'));
     if (url.startsWith(local) || url.startsWith('data:') || url.startsWith('blob:')) return route.continue();
-    // Fonte Inter: importada pela própria nekkora-lib (foundation.css). Permitida e registrada à parte.
-    if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(url)) {
-      results.fonts.add(new URL(url).origin);
-      return route.continue();
-    }
+    // Qualquer outra origem (inclusive Google Fonts, que a lib usava antes da 0.2.0) é bloqueada e reprova a homologação.
     results.blocked.push(url);
     return route.abort();
   });
@@ -175,7 +179,7 @@ async function measureContrastByPixels(page, selectors) {
 for (const theme of THEMES) {
   for (const vp of [WIDTHS[0], WIDTHS[2]]) {
     const { context, page } = await newPage({ width: vp.width, height: vp.height }, theme);
-    await page.addScriptTag({ content: axeSource });
+    await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
     const axe = await page.evaluate(async () => {
       // eslint-disable-next-line no-undef
       const r = await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
@@ -219,14 +223,14 @@ async function block(id, fn) {
 await block('funcionais', async () => {
   const { context, page } = await newPage({ width: 1280, height: 800 }, null);
   const theme = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
-  check('tema-padrao-sakura-dark', theme === 'sakura-dark', `data-nk-theme=${theme}`);
+  check('tema-padrao-sage-light', theme === 'sage-light', `data-nk-theme=${theme}`);
 
   writeFileSync(path.join(outDir, 'texto-renderizado.txt'), await page.locator('body').innerText());
 
   // Ordem e hierarquia das seções
   const sections = await page.$$eval('main > section[id]', (els) => els.map((e) => e.id));
   results.sections = sections;
-  const expected = ['inicio', 'solucoes', 'delivery', 'como-funciona', 'hosting', 'combinado', 'diferenciais', 'transparencia', 'contato'];
+  const expected = ['inicio', 'solucoes', 'precos', 'como-funciona', 'hosting', 'transparencia', 'contato', 'privacidade'];
   check('ordem-das-secoes', JSON.stringify(sections) === JSON.stringify(expected), sections.join(' > '));
   const h1 = await page.$$eval('h1', (els) => els.length);
   check('um-unico-h1', h1 === 1, `${h1} h1`);
@@ -256,15 +260,55 @@ await block('funcionais', async () => {
       if (!el || el.closest('script,style,[aria-hidden="true"]')) continue;
       for (const p of patterns) {
         for (const m of text.matchAll(new RegExp(p.source, p.flags))) {
-          out.push({ id: p.id, match: m[0], text: text.trim().slice(0, 140), exclusion: !!el.closest('[data-exclusion]') });
+          out.push({ id: p.id, match: m[0], text: text.trim().slice(0, 140), exclusion: !!el.closest('[data-exclusion]'), pricing: p.pricing && !!el.closest('[data-pricing]') });
         }
       }
     }
     return out;
-  }, FORBIDDEN.map((f) => ({ id: f.id, source: f.re.source, flags: f.re.flags })));
+  }, FORBIDDEN.map((f) => ({ id: f.id, source: f.re.source, flags: f.re.flags, pricing: !!f.pricing })));
   results.claimHits = hits;
-  const bad = hits.filter((h) => !h.exclusion);
-  check('sem-alegacoes-proibidas', bad.length === 0, bad.length ? bad.map((b) => `${b.id}: "${b.text}"`).join(' | ') : `${hits.length} ocorrência(s), todas em listas de exclusão`);
+  const bad = hits.filter((h) => !h.exclusion && !h.pricing);
+  check('sem-alegacoes-proibidas', bad.length === 0, bad.length ? bad.map((b) => `${b.id}: "${b.text}"`).join(' | ') : `${hits.length} ocorrência(s): ${hits.filter((h) => h.exclusion).length} em exclusões, ${hits.filter((h) => h.pricing).length} no bloco de preços`);
+  // Preços: só no bloco data-pricing, com condição da campanha visível e leitura correta do valor riscado
+  const pricing = await page.evaluate(() => {
+    const block = document.querySelector('[data-pricing]');
+    const text = block?.innerText ?? '';
+    return {
+      blocks: document.querySelectorAll('[data-pricing]').length,
+      condition: /Vale para propostas aprovadas no período|Desconto sobre o valor da categoria definida na avaliação/.test(text),
+      confirmedInProposal: /fica registrada na proposta/.test(text),
+      licenses: /não estão incluídos nos valores acima/.test(text),
+      // Tabela da NEKKORA-RELEASE-001 §4.4
+      table: {
+        simples: /R\$ 1\.000[\s\S]*?R\$ 500/.test(text),
+        media: /R\$ 2\.800[\s\S]*?R\$ 1\.400/.test(text),
+        complexa: /Automação complexa[\s\S]*?Sob orçamento/.test(text),
+      },
+      criteria: ['Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
+      conditions: /50% na contratação e 50% na entrega/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
+      srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
+    };
+  });
+  results.pricing = pricing;
+  check('precos-so-no-bloco-de-precos', pricing.blocks === 1 && hits.filter((h) => h.pricing).length > 0, `${pricing.blocks} bloco(s) data-pricing`);
+  check('precos-com-condicoes-visiveis', pricing.condition && pricing.confirmedInProposal && pricing.licenses, JSON.stringify({ ...pricing, srLabels: undefined }));
+  check('precos-tabela-da-missao', Object.values(pricing.table).every(Boolean), JSON.stringify(pricing.table));
+  check('precos-criterios-de-categoria', pricing.criteria);
+  check('condicoes-comerciais-visiveis', pricing.conditions);
+  // Delivery: tecnologias citadas sem promessa de compatibilidade universal
+  const delivery = await page.locator('#solucoes').innerText();
+  check(
+    'delivery-tecnologias-com-ressalva',
+    ['Python', 'UiPath', 'Power Automate', 'Integrações via API'].every((t) => delivery.includes(t)) && /viabilidade com cada sistema é confirmada na avaliação/.test(delivery),
+  );
+  // Privacidade: seção própria, link no rodapé e no formulário
+  const privacy = await page.locator('#privacidade').innerText();
+  check(
+    'privacidade-visivel',
+    /O que vai para o WhatsApp/.test(privacy) && /Sem cookies nem rastreamento/.test(privacy) && (await page.locator('footer a[href="#privacidade"]').count()) === 1,
+    privacy.split('\n').slice(0, 2).join(' · '),
+  );
+  check('precos-leitura-do-valor-riscado', pricing.srLabels.length === 4 && pricing.srLabels.every((t) => /Valor (sem|com) desconto/.test(t)), pricing.srLabels.join(' | '));
 
   // Produtos internos não aparecem como obrigatórios/disponíveis: cada menção fica em bloco marcado
   const products = await page.evaluate(() => {
@@ -282,12 +326,19 @@ await block('funcionais', async () => {
 
   // Conteúdo demonstrativo identificado
   const demos = await page.$$eval('[data-demo]', (els) => els.map((e) => ({ label: e.getAttribute('data-demo'), visible: e.innerText.toLowerCase().includes('ilustra') })));
-  check('demonstrativos-identificados', demos.length > 0 && demos.every((d) => d.visible), JSON.stringify(demos));
+  // Modelo C não tem ilustração de jornada; se algum bloco demonstrativo voltar, precisa estar rotulado.
+  check('demonstrativos-identificados', demos.every((d) => d.visible), demos.length ? JSON.stringify(demos) : 'nenhum bloco demonstrativo na página');
 
   // Teclado: link de pular conteúdo, foco visível e sequência inicial
-  await page.keyboard.press('Tab');
+  if (ENGINE === 'webkit') {
+    // WebKit/Safari: por padrão o Tab não percorre links (só controles; links exigem Option+Tab, que o Playwright não
+    // reproduz). Vale para qualquer site — o link é verificado por foco programático: precisa ser focável e aparecer.
+    await page.locator('a.skip-link').focus();
+  } else {
+    await page.keyboard.press('Tab');
+  }
   const first = await page.evaluate(() => ({ text: document.activeElement?.textContent?.trim(), href: document.activeElement?.getAttribute('href') }));
-  check('primeiro-tab-pular-conteudo', first.href === '#conteudo', JSON.stringify(first));
+  check(ENGINE === 'webkit' ? 'pular-conteudo-focavel' : 'primeiro-tab-pular-conteudo', first.href === '#conteudo', JSON.stringify(first));
   const skipVisible = await page.evaluate(() => {
     const r = document.activeElement.getBoundingClientRect();
     return r.width > 1 && r.height > 1 && r.top >= 0;
@@ -321,50 +372,97 @@ await block('funcionais', async () => {
   const afterToggle = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
   await page.reload({ waitUntil: 'networkidle' });
   const afterReload = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
-  check('alternancia-de-tema-persiste', afterToggle === 'sage-light' && afterReload === 'sage-light', `${afterToggle} → recarregado: ${afterReload}`);
+  check('alternancia-de-tema-persiste', afterToggle === 'sakura-dark' && afterReload === 'sakura-dark', `${afterToggle} → recarregado: ${afterReload}`);
   await toggle.click();
 
-  // Formulário: erros, foco no primeiro erro e envio desativado sem destino real
-  const form = page.locator('#contato form');
-  await form.locator('button[type="submit"]').click();
+  // Botão "Entrar" (etapa 2): sem destino por decisão da responsável — não navega, não abre nada e se declara indisponível
+  {
+    const login = page.getByRole('button', { name: /^Entrar/ }).first();
+    const urlBefore = page.url();
+    // force: o Playwright não clica em aria-disabled, mas o navegador entrega o clique — é ele que precisa ficar sem efeito
+    await login.click({ force: true });
+    await page.waitForTimeout(200);
+    const info = await login.evaluate((el) => ({ disabled: el.getAttribute('aria-disabled'), desc: el.getAttribute('aria-label') }));
+    check('entrar-sem-destino-e-indisponivel', page.url() === urlBefore && info.disabled === 'true' && /ainda não disponível/.test(info.desc ?? ''), `url inalterada=${page.url() === urlBefore}; aria-disabled=${info.disabled}; nome acessível="${info.desc}"`);
+  }
+
+  // Diálogo "Solicitar avaliação": aberto pelos CTAs, foco dentro, Esc fecha e devolve o foco ao botão que abriu
+  const triggers = await page.$$eval('[aria-haspopup="dialog"]', (els) => els.map((e) => `${e.closest('section')?.id}: ${e.textContent.trim()}`));
+  results.dialogTriggers = triggers;
+  check('dialogo-aberto-pelos-ctas', triggers.length === 4, triggers.join(' | '));
+  const dialog = page.getByRole('dialog');
+  const heroCta = page.locator('#inicio [aria-haspopup="dialog"]');
+  await heroCta.focus();
+  await page.keyboard.press('Enter');
+  await dialog.waitFor();
+  const opened = await page.evaluate(() => ({ focusInside: !!document.activeElement?.closest('[role="dialog"]'), hash: location.hash }));
+  check('dialogo-abre-com-foco-dentro', opened.focusInside && opened.hash === '', JSON.stringify(opened));
+  const dialogText = await dialog.innerText();
+  check(
+    'dialogo-sem-whatsapp-provisorio',
+    (await dialog.locator('a[href*="wa.me"]').count()) === 0 && /Canais oficiais em definição/.test(dialogText) && !/Falar diretamente pelo WhatsApp/.test(dialogText),
+    'sem canal confirmado: atalho do WhatsApp ausente e aviso de canais em definição presente',
+  );
+  await page.screenshot({ path: path.join(outDir, 'dialogo-solicitacao.png') });
+  results.screenshots.push('dialogo-solicitacao.png');
+  await page.keyboard.press('Escape');
+  await dialog.waitFor({ state: 'detached' });
+  const returned = await page.evaluate(() => !!document.activeElement?.closest('#inicio') && document.activeElement?.getAttribute('aria-haspopup') === 'dialog');
+  check('dialogo-esc-fecha-e-devolve-foco', returned);
+  const others = [];
+  for (const sec of ['precos', 'hosting', 'contato']) {
+    await page.locator(`#${sec} [aria-haspopup="dialog"]`).click();
+    const ok = await dialog.isVisible();
+    await dialog.getByRole('button', { name: 'Cancelar' }).click();
+    await dialog.waitFor({ state: 'detached' });
+    others.push(`${sec}=${ok}`);
+  }
+  check('dialogo-ctas-de-precos-hosting-contato', others.every((o) => o.endsWith('true')), `${others.join('; ')} (fechado por "Cancelar")`);
+
+  // Formulário (no diálogo): erros, foco no primeiro erro e envio desativado sem destino real
+  await page.locator('#contato [aria-haspopup="dialog"]').click();
+  await dialog.waitFor();
+  const form = dialog.locator('form');
+  const submit = dialog.locator('button[type="submit"]');
+  await submit.click();
   const invalid = await form.locator('[aria-invalid="true"]').count();
+  // O foco vai ao primeiro erro no quadro seguinte (requestAnimationFrame): espera até 1 s em vez de ler na hora.
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-invalid') === 'true', null, { timeout: 1000 }).catch(() => {});
   const focused = await page.evaluate(() => document.activeElement?.getAttribute('aria-invalid'));
-  check('formulario-erros-obrigatorios', invalid >= 4, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
+  // Obrigatórios: nome e descrição (e-mail é opcional desde a COM-RELEASE-002 — só o necessário para o contato)
+  check('formulario-erros-obrigatorios', invalid === 2, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
   check('formulario-foco-no-primeiro-erro', focused === 'true');
-  await page.screenshot({ path: path.join(outDir, 'formulario-erros.png'), clip: await form.boundingBox() });
+  await page.screenshot({ path: path.join(outDir, 'formulario-erros.png') });
   results.screenshots.push('formulario-erros.png');
   await form.getByLabel(/^Nome/).fill('Pessoa de Teste');
   await form.getByLabel(/^E-mail/).fill('teste@exemplo.invalid');
   await form.getByLabel(/Descreva o processo/).fill('Teste automatizado de homologação: processo de conciliação manual.');
-  // Interesse marcado pelo teclado: foco na primeira opção do grupo e Espaço.
-  await form.getByRole('radio').first().focus();
-  await page.keyboard.press('Space');
-  check('formulario-radio-por-teclado', await form.getByRole('radio').first().isChecked());
   let popup = false;
   page.on('popup', () => (popup = true));
   const urlBefore = page.url();
   const blockedBefore = results.blocked.length;
-  await form.locator('button[type="submit"]').click();
+  await submit.click();
   await page.waitForTimeout(400);
-  const done = page.locator('#contato .contact__done');
+  const done = dialog.locator('.contact__done');
   const doneText = (await done.count()) ? await done.innerText() : '';
   results.formStatus = doneText;
   const contactStatus = await page.evaluate(() => document.querySelector('[data-contact-status]')?.getAttribute('data-contact-status'));
   if (contactStatus === 'pendente') {
     check('formulario-modo-demonstracao', /envio desativado/i.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
+  } else {
+    // Com canal: a etapa seguinte é a confirmação da mensagem — nada é aberto antes do clique do visitante
+    check('formulario-vai-para-confirmacao', /Confirme a sua solicitação/.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
   }
   check('formulario-sem-envio-real', !popup && page.url() === urlBefore && results.blocked.length === blockedBefore, `popup=${popup}; url inalterada=${page.url() === urlBefore}`);
-  // O resumo precisa ficar visível abaixo da barra fixa, sem rolagem manual.
+  // O resumo precisa ficar visível na janela e receber o foco.
   const placement = await page.evaluate(() => {
-    const d = document.querySelector('#contato .contact__done')?.getBoundingClientRect();
-    const nav = document.querySelector('header, nav')?.getBoundingClientRect();
-    return { doneTop: d?.top, navBottom: nav?.bottom, focused: document.activeElement?.classList.contains('contact__done') };
+    const d = document.querySelector('[role="dialog"] .contact__done')?.getBoundingClientRect();
+    return { doneTop: d?.top, viewport: innerHeight, focused: document.activeElement?.classList.contains('contact__done') };
   });
-  check('formulario-resultado-visivel-e-focado', placement.focused && placement.doneTop >= placement.navBottom && placement.doneTop < 800, JSON.stringify(placement));
+  check('formulario-resultado-visivel-e-focado', placement.focused && placement.doneTop >= 0 && placement.doneTop < placement.viewport, JSON.stringify(placement));
   await page.screenshot({ path: path.join(outDir, 'formulario-resultado-tela.png') });
   results.screenshots.push('formulario-resultado-tela.png');
-  await done.screenshot({ path: path.join(outDir, 'formulario-resultado.png') });
-  results.screenshots.push('formulario-resultado.png');
+  await page.keyboard.press('Escape');
 
   // Texto renderizado (para revisão do conteúdo)
   writeFileSync(path.join(outDir, 'texto-renderizado.txt'), await page.locator('body').innerText());
@@ -386,42 +484,55 @@ await block('menu-mobile', async () => {
   await context.close();
 });
 
-// 5. Catálogo do Hosting: acordeão no celular, expandido no desktop
-await block('hosting-acordeao', async () => {
-  const mobile = await newPage({ width: 375, height: 812 }, null);
-  const mp = mobile.page;
-  results.mobilePageHeight = await mp.evaluate(() => document.documentElement.scrollHeight);
-  const mode = await mp.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
-  const items = mp.locator('[data-hosting-catalog] details');
-  const count = await items.count();
-  const summaries = await mp.locator('[data-hosting-catalog] summary').allInnerTexts();
-  const termsVisible = summaries.every((t) => t.includes('Como é contratado:'));
-  const closed = await items.evaluateAll((els) => els.every((d) => !d.open));
-  check('hosting-acordeao-no-celular', mode === 'acordeao' && count === 8 && closed, `modo=${mode}; itens=${count}; todos recolhidos=${closed}; altura da página=${results.mobilePageHeight}px`);
-  check('hosting-condicoes-visiveis-recolhido', termsVisible, `${summaries.filter((t) => t.includes('Como é contratado:')).length}/8 resumos mostram "Como é contratado"`);
-  const first = mp.locator('[data-hosting-catalog] summary').first();
-  await first.focus();
-  const ring = await first.evaluate((el) => getComputedStyle(el).boxShadow !== 'none');
-  await mp.keyboard.press('Enter');
-  const openedEnter = await items.first().evaluate((d) => d.open);
-  const defVisible = await mp.locator('[data-hosting-catalog] .service-item__definition').first().isVisible();
-  await mp.keyboard.press('Space');
-  const closedSpace = await items.first().evaluate((d) => !d.open);
-  check('hosting-acordeao-teclado', ring && openedEnter && defVisible && closedSpace, `foco visível=${ring}; Enter abre=${openedEnter}; definição visível=${defVisible}; Espaço fecha=${closedSpace}`);
-  await items.first().evaluate((d) => (d.open = true));
-  await mp.locator('[data-hosting-catalog]').screenshot({ path: path.join(outDir, 'hosting-acordeao-mobile.png') });
-  results.screenshots.push('hosting-acordeao-mobile.png');
-  await mobile.context.close();
+// 5. Hosting em faixa pôster: aviso de disponibilidade e condição de contratação visíveis em todas as larguras
+await block('hosting-faixa', async () => {
+  for (const vp of [WIDTHS[0], WIDTHS[2]]) {
+    const { context, page } = await newPage({ width: vp.width, height: vp.height }, null);
+    if (vp.name === 'mobile') results.mobilePageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    const band = page.locator('#hosting');
+    const text = await band.innerText();
+    const notice = await band.locator('.hosting-band__notice').isVisible();
+    check(
+      `hosting-condicoes-visiveis:${vp.name}`,
+      notice && /Disponibilidade em avaliação/.test(text) && /só faz parte do contrato quando consta na proposta/.test(text) && /não representa contratação/.test(text),
+      `aviso visível=${notice}${vp.name === 'mobile' ? `; altura da página=${results.mobilePageHeight}px` : ''}`,
+    );
+    await band.screenshot({ path: path.join(outDir, `hosting-faixa-${vp.name}.png`) });
+    results.screenshots.push(`hosting-faixa-${vp.name}.png`);
+    await context.close();
+  }
+});
 
-  const desktop = await newPage({ width: 1280, height: 800 }, null);
-  const dmode = await desktop.page.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
-  const defs = await desktop.page.locator('[data-hosting-catalog] > li > p:first-of-type').evaluateAll((els) => els.filter((e) => e.offsetParent !== null).length);
-  check('hosting-expandido-no-desktop', dmode === 'expandido' && defs === 8, `modo=${dmode}; definições visíveis=${defs}/8`);
-  await desktop.context.close();
+// 6. Diálogo aberto: axe e rolagem horizontal nos dois temas, celular e desktop
+await block('dialogo-acessibilidade', async () => {
+  for (const theme of THEMES) {
+    for (const vp of [WIDTHS[0], WIDTHS[2]]) {
+      const { context, page } = await newPage({ width: vp.width, height: vp.height }, theme);
+      await page.locator('#inicio [aria-haspopup="dialog"]').click();
+      await page.getByRole('dialog').waitFor();
+      await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
+      const r = await page.evaluate(async () => {
+        // eslint-disable-next-line no-undef
+        const res = await axe.run(document.querySelector('[role="dialog"]'), { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
+        return res.violations.map((v) => `${v.id}(${v.nodes.length})`);
+      });
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      check(`dialogo-axe:${theme}:${vp.name}`, r.length === 0 && overflow <= 0, r.join(', ') || `sem violações; excesso horizontal=${overflow}px`);
+      const file = `dialogo-${theme}-${vp.name}.png`;
+      await page.screenshot({ path: path.join(outDir, file) });
+      results.screenshots.push(file);
+      await context.close();
+    }
+  }
 });
 
 check('sem-requisicoes-externas', results.blocked.length === 0, results.blocked.join(' | ') || 'nenhuma');
-const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c));
+check('fonte-servida-pelo-proprio-site', results.fonts.size > 0, [...results.fonts].join(', ') || 'nenhuma fonte carregada');
+// Aviso de otimização do WebKit quando a fonte pré-carregada demora a ser usada (a página é desenhada pelo JS; em
+// máquina lenta passa de "alguns segundos"): registrado em resultados.json, não reprova — a fonte é usada.
+const PRELOAD_ADVISORY = /was preloaded using link preload but not used within a few seconds/;
+results.consoleInformativo = results.console.filter((c) => PRELOAD_ADVISORY.test(c));
+const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c) && !PRELOAD_ADVISORY.test(c));
 check('console-sem-erros', realErrors.length === 0, realErrors.join(' | ') || 'limpo');
 
 await browser.close();
@@ -432,7 +543,7 @@ writeFileSync(path.join(outDir, 'resultados.json'), JSON.stringify(results, null
 const md = [
   `# Homologação automatizada — ${results.finishedAt}`,
   '',
-  `URL: ${baseUrl} · Chromium (Playwright) · ${results.summary.total} verificações · ${results.summary.failed} falha(s)`,
+  `URL: ${baseUrl} · ${ENGINE} ${results.versaoNavegador} (Playwright) · ${results.summary.total} verificações · ${results.summary.failed} falha(s)`,
   '',
   '| Verificação | Resultado | Detalhe |',
   '|---|---|---|',

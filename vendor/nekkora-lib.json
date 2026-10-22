@@ -1,0 +1,12 @@
+{
+  "$comentario": "Procedência da nekkora-lib usada pelo Commercial (LIB-RELEASE-001). O tarball é o artefato do CI da lib; scripts/verificar-lib.mjs confere hash, lockfile e — com --reconstruir — que o build do commit abaixo gera o mesmo arquivo.",
+  "pacote": "nekkora-lib",
+  "versao": "0.2.0",
+  "arquivo": "nekkora-lib-0.2.0.tgz",
+  "repositorio": "https://github.com/Nekkora-Operation/Nekkora-lib.git",
+  "commit": "638f0300a5351eff33f3600d537effe13c25a9ba",
+  "pullRequest": "https://github.com/Nekkora-Operation/Nekkora-lib/pull/6",
+  "ci": "https://github.com/Nekkora-Operation/Nekkora-lib/actions/runs/39813175256",
+  "sha256": "1a2e614576f7c33ec98bbaf1dfe9f0eb6098637ca1075113c666aea6662526a6",
+  "integridade": "sha512-LE1ZO5MkrPi38W5oKykk5/bT322ewlpcWgrZJ/MPHOmOtARreSQ4J0GNMst4T6rgdiTnikZOZTFVeoingIcT4A=="
+}

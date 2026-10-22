@@ -1,29 +1,24 @@
 /**
  * Texto comercial da página — fonte única para revisão.
  *
- * Toda frase aqui segue o contrato comercial (docs/com-001/02-contrato-comercial.md). Os comentários [A-01], [H-03]…
- * apontam a linha da matriz de alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho.
- * Antes de mudar uma promessa, atualize a matriz.
+ * Layout "modelo C — Poster" (mockup da responsável, 2026-10-15). Toda frase segue o contrato comercial
+ * (docs/com-001/02-contrato-comercial.md). Os comentários [A-01], [H-03], [PR-01]… apontam a linha da matriz de
+ * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
  */
 import type { IconName } from 'nekkora-lib';
-
-export interface Feature {
-  icon: IconName;
-  title: string;
-  text: string;
-}
+import { DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD } from './config';
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
 /* ------------------------------------------------------------------ */
 export const HERO = {
-  badge: 'Nekkora Delivery · Nekkora Hosting',
+  badge: 'Delivery · Hosting',
   titleLead: 'Automação sob medida,',
   titleAccent: 'da necessidade à execução.',
   // [A-01] [A-02] [H-01] [H-02 → avaliação] [C-01]
   lead:
-    'Desenvolvemos automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. ' +
-    'Se fizer sentido para você, avaliamos também a infraestrutura para executá-las. Cada serviço é contratado de forma independente.',
+    'Automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. ' +
+    'Infraestrutura para executá-las, sujeita a avaliação. Cada serviço contratado de forma independente.',
   primaryCta: 'Solicitar avaliação',
   secondaryCta: 'Ver como funciona',
   // [D-01] [D-02] [D-04]
@@ -32,13 +27,6 @@ export const HERO = {
     { icon: 'check-circle', label: 'Homologação e aceite' },
     { icon: 'layers', label: 'Sem pacote obrigatório' },
   ] as { icon: IconName; label: string }[],
-  /** Ilustração da jornada — demonstrativa, sem dados (X-11, X-12). [A-03] */
-  journey: {
-    label: 'Ilustração',
-    title: 'Jornada de uma automação',
-    steps: ['Necessidade', 'Avaliação', 'Proposta', 'Desenvolvimento e testes', 'Homologação e aceite', 'Entrega'],
-    execution: 'Execução no seu ambiente ou com o Nekkora Hosting, sujeito a avaliação',
-  },
 };
 
 /* ------------------------------------------------------------------ */
@@ -46,30 +34,37 @@ export const HERO = {
 /* ------------------------------------------------------------------ */
 export const SOLUTIONS = {
   eyebrow: 'Soluções',
-  title: 'Duas ofertas complementares, contratadas como você precisar',
-  description: 'Delivery desenvolve a automação. Hosting trata da infraestrutura para executá-la, sujeito a avaliação. Use um, outro ou os dois.',
+  title: 'Duas ofertas. Você escolhe o arranjo.',
   cards: [
     {
       id: 'delivery',
-      icon: 'code' as IconName,
+      number: '01',
       name: 'Nekkora Delivery',
       stage: 'Sob proposta',
       stageTone: 'accent' as const,
+      variant: 'raised' as const,
       summary: 'Desenvolvimento de automações por demanda.', // [A-01]
       items: [
         'Escopo, prazo e preço definidos em proposta para cada automação', // [A-02]
-        'Desenvolvimento, testes e homologação com aceite', // [A-03]
+        'Entrega considerada pronta só com documentação, desenvolvimento, testes e homologação com você — cada etapa mediante a sua aprovação', // [A-03] [A-14]
         'Entrega e transferência conforme contratado', // [A-13]
       ],
-      href: '#delivery',
+      // [A-15] [A-16] — tecnologias com que a Nekkora trabalha; nenhuma promessa de compatibilidade universal
+      technologies: {
+        label: 'Tecnologias, conforme o caso',
+        items: ['Python', 'UiPath', 'Power Automate', 'Integrações via API', 'Sistemas web', 'Dados e planilhas'],
+        note: 'A viabilidade com cada sistema é confirmada na avaliação.',
+      },
+      href: '#precos',
       cta: 'Conhecer o Delivery',
     },
     {
       id: 'hosting',
-      icon: 'server' as IconName,
+      number: '02',
       name: 'Nekkora Hosting',
       stage: 'Em avaliação de viabilidade',
       stageTone: 'info' as const,
+      variant: 'raised' as const,
       summary: 'Infraestrutura e serviços associados à execução de automações.', // [H-01]
       items: [
         'Componentes escolhidos conforme a necessidade, nenhum obrigatório', // [H-03]
@@ -82,39 +77,101 @@ export const SOLUTIONS = {
   ],
   // [C-01] [C-02]
   note: 'Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.',
-  noteLink: 'Ver as combinações',
 };
 
 /* ------------------------------------------------------------------ */
-/* Delivery                                                           */
+/* Preços do Delivery — bloco data-pricing                            */
 /* ------------------------------------------------------------------ */
-export const DELIVERY = {
-  eyebrow: 'Nekkora Delivery',
-  title: 'Automação desenvolvida para o seu processo',
-  // [A-04] [A-02]
-  description:
-    'Cada automação é avaliada e dimensionada individualmente. Antes de qualquer desenvolvimento, você recebe uma proposta com escopo, preço e condições.',
-  features: [
-    { icon: 'file', title: 'Uma automação, uma proposta', text: 'Cada processo tem escopo, preço, condições e aceite próprios.' }, // [A-02] [A-04]
-    { icon: 'layers', title: 'Vários processos, uma fila organizada', text: 'Você pode solicitar mais de uma automação. As demandas seguem a fila operacional da Nekkora.' }, // [A-05] [A-06]
-    { icon: 'calendar', title: 'Reuniões quando necessárias', text: 'Os encontros são combinados conforme a etapa e a necessidade do projeto.' }, // [A-07]
-    { icon: 'code', title: 'Tecnologia conforme o caso', text: 'Python, UiPath, Power Automate e integrações entre sistemas, escolhidos na avaliação.' }, // [A-08]
-  ] as Feature[],
-  // [A-09]
-  licenses: 'Licenças e serviços de terceiros, quando necessários, dependem de avaliação e constam da proposta.',
-  applications: {
-    title: 'Exemplos de aplicação',
-    // [A-12]
-    caption: 'Exemplos ilustrativos. A viabilidade de cada caso é avaliada individualmente.',
+/**
+ * Valores e desconto de lançamento do mockup "modelo C" da responsável [PR-01..PR-05]. Só podem aparecer dentro do
+ * bloco `data-pricing` (verificado por scripts/homologacao.mjs). Datas da campanha e confirmação final dos valores
+ * antes da publicação: pendências PUB-13 e PUB-14.
+ */
+export const PRICING = {
+  eyebrow: 'Preços · Nekkora Delivery',
+  title: 'Quanto custa uma automação',
+  // [PR-01] [PR-06]
+  description: 'Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
+  // [PR-02] Com as datas da campanha em publicacao.json (PUB-13), o período aparece por extenso; sem elas, o texto do
+  // mockup continua e o deploy de produção fica bloqueado (scripts/verificar-publicacao.mjs).
+  launch: {
+    badge: 'Lançamento',
+    text: LAUNCH_PERIOD
+      ? `50% de desconto em todas as automações com proposta aprovada de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
+      : '50% de desconto em todas as automações nos próximos 2 meses.',
+    condition: LAUNCH_PERIOD ? 'Desconto sobre o valor da categoria definida na avaliação.' : 'Vale para propostas aprovadas no período.',
+  },
+  // [PR-06] — nenhum processo é enquadrado de antemão como simples ou médio
+  criteria: {
+    title: 'O que define a categoria',
     items: [
-      'Conciliações e conferências entre planilhas e sistemas',
-      'Extração e lançamento de dados em portais e sistemas web',
-      'Leitura e triagem de e-mails e documentos',
-      'Integração entre sistemas por API',
-      'Geração e envio de relatórios recorrentes',
+      'Quantidade de sistemas envolvidos',
+      'Complexidade das integrações',
+      'Regras de negócio e exceções',
+      'Volume de processamento',
+      'Exigências de infraestrutura',
+      'Necessidade de licenciamento',
+    ],
+    note: 'Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta.',
+  },
+  // [CO-01..CO-06] — modelo de atendimento (NEKKORA-RELEASE-001 §5.5); nada aqui promete prazo, resultado ou disponibilidade
+  conditions: {
+    title: 'Condições comerciais',
+    items: [
+      'Desenvolvimento sob demanda, com escopo formalizado em proposta',
+      'Preço aprovado por você antes do início do desenvolvimento',
+      'Pagamento de 50% na contratação e 50% na entrega, conforme a proposta',
+      'Demandas organizadas em fila: o início depende da fila e da aprovação da proposta',
+      'Reuniões e acompanhamento conforme as condições acordadas',
+      'Licenças e custos externos tratados à parte, quando aplicáveis',
     ],
   },
-  cta: 'Solicitar avaliação de uma automação',
+  // [PR-01] [PR-02]
+  tiers: [
+    {
+      overline: 'Simples',
+      title: 'Automação simples',
+      fit: 'Um sistema ou planilha, regras diretas, poucas exceções.',
+      variant: 'surface' as const,
+      price: { from: 'R$ 1.000', to: 'R$ 500', discount: '−50%', unit: 'por automação · lançamento' },
+    },
+    {
+      overline: 'Média',
+      title: 'Automação média',
+      fit: 'Mais de um sistema, validações, tratamento de exceções e relatórios.',
+      variant: 'raised' as const,
+      price: { from: 'R$ 2.800', to: 'R$ 1.400', discount: '−50%', unit: 'por automação · lançamento' },
+    },
+    {
+      overline: 'Complexa · pacotes',
+      title: 'Automação complexa',
+      fit: 'Processos ponta a ponta, várias integrações por API ou várias automações contratadas em conjunto.',
+      variant: 'outlined' as const,
+      // [PR-03]
+      negotiated: { label: 'Sob orçamento', unit: 'dimensionada na avaliação · desconto de lançamento aplicável' },
+      cta: 'Solicitar avaliação',
+    },
+  ],
+  /** Rótulos lidos por leitor de tela (o valor riscado não é anunciado como riscado). */
+  srFrom: 'Valor sem desconto:',
+  srTo: 'Valor com desconto de lançamento:',
+  notes: [
+    {
+      icon: 'studio' as IconName,
+      tone: 'accent' as const,
+      // [PR-04] — ferramenta interna, sem nome de produto e sem exigência para o cliente (P-02 continua proibida)
+      title: 'Por que os valores são baixos',
+      text: 'Usamos uma ferramenta própria que agiliza a documentação e o desenvolvimento de cada automação. Menos horas de levantamento e retrabalho, preço menor para você — sem cortar etapas: documentação, testes e homologação continuam no escopo.',
+    },
+    {
+      icon: 'key' as IconName,
+      tone: 'warning' as const,
+      // [A-09] [PR-05]
+      title: 'Licenças ficam por conta do cliente',
+      text: 'Qualquer licença de software ou serviço de terceiros (UiPath, Power Automate, APIs, servidores) é responsabilidade do cliente. Indicamos o que é necessário na proposta; a contratação e o custo não estão incluídos nos valores acima.',
+    },
+  ],
+  hostingNote: 'Hosting tem avaliação e proposta próprias.', // [H-02]
 };
 
 /* ------------------------------------------------------------------ */
@@ -122,112 +179,33 @@ export const DELIVERY = {
 /* ------------------------------------------------------------------ */
 export const HOW_IT_WORKS = {
   eyebrow: 'Como funciona',
-  title: 'Da conversa inicial ao aceite, em etapas claras',
-  description: 'O caminho de cada automação contratada pelo Delivery. Nada é desenvolvido sem uma proposta aprovada.', // [D-01]
+  title: 'Seis etapas. Nenhuma sem a sua aprovação.', // [D-01]
   // [A-03] [A-13]
   steps: [
-    { icon: 'message' as IconName, title: 'Entendimento da necessidade', description: 'Você descreve o processo, as regras e o resultado esperado.' },
-    { icon: 'search' as IconName, title: 'Viabilidade e dimensionamento', description: 'Analisamos sistemas, acessos e complexidade para dimensionar a automação.' },
-    { icon: 'file' as IconName, title: 'Proposta', description: 'Escopo, preço e condições por escrito. O desenvolvimento começa após a sua aprovação.' },
-    { icon: 'code' as IconName, title: 'Desenvolvimento e testes', description: 'Construímos e testamos a automação conforme o escopo aprovado.' },
-    { icon: 'check-circle' as IconName, title: 'Homologação e aceite', description: 'Você valida a automação no seu cenário e formaliza o aceite.' },
-    { icon: 'send' as IconName, title: 'Entrega e transferência', description: 'Entregamos e transferimos o que foi previsto na proposta.' },
+    { title: 'Entendimento da necessidade', description: 'Você descreve o processo, as regras e o resultado esperado.' },
+    { title: 'Viabilidade e dimensionamento', description: 'Analisamos sistemas, acessos e complexidade para dimensionar a automação.' },
+    { title: 'Proposta', description: 'Escopo, preço e condições por escrito. O desenvolvimento começa após a sua aprovação.' },
+    { title: 'Desenvolvimento e testes', description: 'Construímos e testamos a automação conforme o escopo aprovado.' },
+    { title: 'Homologação e aceite', description: 'Você valida a automação no seu cenário e formaliza o aceite.' },
+    { title: 'Entrega e transferência', description: 'Entregamos e transferimos o que foi previsto na proposta.' },
   ],
-  // [A-11] [A-06]
-  timing: {
-    title: 'O que influencia o prazo',
-    text: 'O prazo é estimado na proposta e depende de fatores que vão além do desenvolvimento:',
-    items: ['Posição da demanda na fila operacional', 'Liberação de acessos e credenciais', 'Disponibilidade e estabilidade de sistemas externos', 'Tempo de homologação da sua equipe'],
-  },
 };
 
 /* ------------------------------------------------------------------ */
-/* Hosting                                                            */
+/* Hosting — faixa pôster                                             */
 /* ------------------------------------------------------------------ */
 export const HOSTING = {
   eyebrow: 'Nekkora Hosting',
-  title: 'Infraestrutura para executar automações, com responsabilidades delimitadas',
-  // [H-03] [C-02]
+  title: 'Infraestrutura para executar automações, com responsabilidades delimitadas.',
+  // [H-03] [A-10] — nenhum serviço apresentado como incluído
   description:
-    'Hosting reúne serviços distintos. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta. Nenhum deles é necessário para contratar o Delivery.',
+    'Hosting reúne serviços distintos — infraestrutura, configuração, administração, monitoramento, operação assistida, correção de incidentes, sustentação. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta.',
   // [H-02] [H-05]
   availability: {
-    title: 'Disponibilidade em avaliação',
-    text: 'A oferta de Hosting está em definição comercial. Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.',
+    title: 'Disponibilidade em avaliação.',
+    text: 'Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.',
   },
-  catalogTitle: 'O que cada serviço significa',
-  // [H-03] [A-10] — nenhum item é apresentado como incluído
-  services: [
-    { icon: 'server', title: 'Infraestrutura para execução', text: 'Ambiente (máquinas, servidores ou serviços) onde a automação roda.', terms: 'Avaliada conforme requisitos técnicos e compatibilidade.' },
-    { icon: 'settings', title: 'Configuração inicial', text: 'Preparação do ambiente: instalação, dependências e acessos.', terms: 'Definida na proposta, quando contratada.' },
-    { icon: 'refresh', title: 'Administração e manutenção do ambiente', text: 'Atualizações e cuidados com o ambiente ao longo do tempo.', terms: 'Serviço à parte, com escopo próprio.' },
-    { icon: 'monitor', title: 'Monitoramento técnico', text: 'Acompanhamento da saúde do ambiente: máquinas e serviços.', terms: 'Escopo, horários e forma definidos em proposta, se contratado.' },
-    { icon: 'pulse', title: 'Monitoramento de processos', text: 'Acompanhamento das execuções da automação e de seus resultados.', terms: 'Escopo definido em proposta, se contratado.' },
-    { icon: 'users', title: 'Operação assistida', text: 'Acompanhamento de execuções em um período combinado, junto à sua equipe.', terms: 'Período e responsabilidades definidos em proposta.' },
-    { icon: 'alert', title: 'Correção de incidentes', text: 'Análise e correção de falhas na execução.', terms: 'Abrangência e condições definidas em proposta.' },
-    { icon: 'workflow', title: 'Sustentação e evolução das automações', text: 'Ajustes por mudanças no processo ou nos sistemas e novas funcionalidades.', terms: 'Não incluída no desenvolvimento; contratada à parte.' },
-  ] as (Feature & { terms: string })[],
-  termsLabel: 'Como é contratado',
-  accordionHint: 'Toque em um serviço para ver o que ele significa. A forma de contratação aparece em todos.',
   cta: 'Solicitar avaliação de viabilidade',
-};
-
-/* ------------------------------------------------------------------ */
-/* Solução combinada                                                  */
-/* ------------------------------------------------------------------ */
-export const COMBINED = {
-  eyebrow: 'Delivery, Hosting ou os dois',
-  title: 'Você escolhe o arranjo',
-  description: 'Cada serviço tem proposta e condições próprias. Nenhuma combinação exige o uso de produtos internos da Nekkora.', // [C-01] [C-02]
-  options: [
-    {
-      icon: 'code' as IconName,
-      title: 'Delivery independente',
-      text: 'A automação é desenvolvida e entregue para rodar no ambiente que você indicar.',
-      fit: 'Faz sentido quando você já tem infraestrutura e equipe para executar as automações.',
-      condition: null as string | null,
-    },
-    {
-      icon: 'server' as IconName,
-      title: 'Hosting independente',
-      text: 'Execução de automações que você já tem, desenvolvidas pela sua equipe ou por terceiros.',
-      fit: 'Faz sentido quando a automação existe, mas falta um ambiente adequado para executá-la.',
-      condition: 'Sujeito a compatibilidade técnica e disponibilidade, confirmadas em avaliação.', // [H-04]
-    },
-    {
-      icon: 'layers' as IconName,
-      title: 'Delivery + Hosting',
-      text: 'Desenvolvimento e ambiente de execução avaliados em conjunto.',
-      fit: 'Os requisitos do ambiente podem ser considerados desde a proposta, e a passagem da homologação para a execução pode ser planejada junto.', // [C-03]
-      condition: 'A parte de Hosting segue a mesma avaliação de viabilidade.', // [H-02]
-    },
-  ],
-  // [A-10] [X-09]
-  limits: {
-    title: 'Limites da contratação combinada',
-    items: [
-      'Contratar os dois serviços não inclui automaticamente sustentação, evolução, monitoramento ou correção de incidentes — esses itens valem apenas quando constam na proposta.',
-      'Cada serviço mantém escopo, preço, condições e aceite próprios.',
-    ],
-  },
-};
-
-/* ------------------------------------------------------------------ */
-/* Diferenciais                                                       */
-/* ------------------------------------------------------------------ */
-export const DIFFERENTIALS = {
-  eyebrow: 'Diferenciais',
-  title: 'Eficiência que vem do método',
-  description: 'Mecanismos concretos de trabalho, não promessas de resultado.',
-  items: [
-    { icon: 'file', title: 'Proposta antes do código', text: 'Escopo, preço e condições por escrito antes de iniciar o desenvolvimento.' }, // [D-01]
-    { icon: 'check-circle', title: 'Aceite formal', text: 'A entrega passa por homologação com você e termina com aceite.' }, // [D-02]
-    { icon: 'search', title: 'Dimensionamento individual', text: 'Cada processo é avaliado separadamente, sem escopos genéricos.' }, // [A-04]
-    { icon: 'id-card', title: 'Responsabilidades explícitas', text: 'O que cabe à Nekkora e o que cabe a você fica descrito na proposta.' }, // [D-03]
-    { icon: 'layers', title: 'Serviços independentes', text: 'Delivery e Hosting são contratados juntos ou separados, sem pacote obrigatório.' }, // [D-04]
-    { icon: 'workflow', title: 'Ferramenta adequada ao caso', text: 'Python, UiPath, Power Automate ou integrações: a escolha parte do processo, não de uma plataforma própria.' }, // [D-05] [A-08]
-  ] as Feature[],
-  manifesto: { lead: 'Clareza no escopo, eficiência no método', accent: 'e autonomia na escolha.' },
 };
 
 /* ------------------------------------------------------------------ */
@@ -235,8 +213,8 @@ export const DIFFERENTIALS = {
 /* ------------------------------------------------------------------ */
 export const TRANSPARENCY = {
   eyebrow: 'Transparência',
-  title: 'O que esperar da contratação',
-  description: 'O que é definido em proposta, do que o andamento depende e o que não está incluído sem acordo explícito.',
+  title: 'Letras grandes, não miúdas',
+  description: 'O que é definido em proposta, o que não está incluído sem acordo explícito e do que o andamento depende.',
   defined: {
     title: 'Definido em proposta',
     // [A-02] [A-08] [A-09] [D-03] [D-02]
@@ -244,25 +222,20 @@ export const TRANSPARENCY = {
   },
   excluded: {
     title: 'Não incluído automaticamente',
-    // [A-10] [X-05] [X-06] [X-07] [X-08] [X-09] — bloco de exclusão (data-exclusion)
+    // [A-10] [X-05] [X-06] [X-07] [X-08] [X-09] [PR-05] — bloco de exclusão (data-exclusion)
     items: [
       'Alterações futuras e novas funcionalidades',
       'Sustentação e evolução das automações',
-      'Garantia após a entrega, salvo se prevista em proposta',
+      'Garantia após a entrega, salvo se prevista',
       'Infraestrutura e serviços de Hosting',
-      'Licenças e serviços de terceiros',
-      'Monitoramento, atendimento 24 horas, alta disponibilidade ou SLA',
+      'Licenças e serviços de terceiros — responsabilidade do cliente',
+      'Monitoramento, 24 horas, alta disponibilidade ou SLA',
     ],
   },
   dependencies: {
     title: 'Depende de você e de terceiros',
     // [A-11] [A-06]
-    items: ['Liberação de acessos e credenciais', 'Estabilidade de sistemas e portais externos', 'Disponibilidade da sua equipe para homologação', 'Fila operacional da Nekkora'],
-  },
-  // [P-01] — única menção permitida aos produtos internos (data-internal-products)
-  products: {
-    title: 'Produtos em desenvolvimento',
-    text: 'A Nekkora também desenvolve o Studio, a Platform e o Agent. Esses produtos estão em desenvolvimento, não fazem parte das ofertas desta página e não são necessários para contratar Delivery ou Hosting.',
+    items: ['Liberação de acessos e credenciais', 'Estabilidade de sistemas externos', 'Disponibilidade da sua equipe para homologação', 'Fila operacional da Nekkora'],
   },
 };
 
@@ -270,37 +243,42 @@ export const TRANSPARENCY = {
 /* Contato                                                            */
 /* ------------------------------------------------------------------ */
 export const CONTACT_COPY = {
-  eyebrow: 'Contato',
-  title: 'Solicite uma avaliação',
-  description: 'Conte qual processo você quer automatizar ou executar. A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.',
+  title: 'Vamos olhar o seu processo de perto?',
+  description: 'A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.',
+  cta: 'Solicitar avaliação',
+  // Alternativa sem formulário (§5.4): canais diretos, sem preencher nada no site
+  directTitle: 'Prefere falar direto?',
   // [K-01..K-03] pendentes
-  pending: {
-    title: 'Canais de contato em definição',
-    text: 'Os canais oficiais (WhatsApp, e-mail e redes sociais) ainda não foram publicados. O formulário desta versão é de demonstração: valida os dados, mas não envia nem armazena nada.',
-  },
-  // [A-03] [A-07] [D-01]
-  next: {
-    title: 'Como a avaliação acontece',
-    items: [
-      'Lemos a descrição e, se for preciso, combinamos uma conversa para entender o processo.',
-      'Avaliamos a viabilidade e dimensionamos a automação ou o ambiente.',
-      'Se fizer sentido, você recebe uma proposta com escopo, preço e condições.',
-      'Nada é desenvolvido ou contratado sem a sua aprovação.',
-    ],
-  },
-  formTitle: 'Conte o que você precisa',
-  interests: [
-    { value: 'delivery', label: 'Delivery', description: 'Desenvolvimento de uma ou mais automações' },
-    { value: 'hosting', label: 'Hosting', description: 'Infraestrutura para executar automações (avaliação de viabilidade)' },
-    { value: 'combinado', label: 'Delivery e Hosting', description: 'Desenvolvimento e execução avaliados em conjunto' },
-    { value: 'indefinido', label: 'Ainda não sei', description: 'Quero ajuda para entender o melhor caminho' },
-  ],
+  pendingCaption: 'Canais oficiais em definição · formulário em modo de demonstração',
+  // Diálogo "Solicitar avaliação" (modelo C, etapa 2)
+  dialogTitle: 'Solicitar avaliação',
+  dialogDescription: 'Conte qual processo você quer automatizar. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.',
+  /** Só aparece com WhatsApp confirmado em config.ts (PUB-01). */
+  whatsappDirect: 'Falar diretamente pelo WhatsApp',
+  orForm: 'ou preencha o formulário',
+  formTitle: 'Formulário de solicitação',
   processHint: 'Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.',
+  emailHint: 'Opcional — só se preferir retorno por e-mail.',
+  privacyLink: 'Como tratamos seus dados',
   // [K-05]
   demoNote: 'Modo de demonstração: nenhum dado é enviado ou armazenado.',
   demoSubmit: 'Revisar solicitação',
-  whatsappSubmit: 'Enviar pelo WhatsApp',
-  whatsappNote: 'Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página.',
+  whatsappSubmit: 'Revisar mensagem',
+  whatsappNote: 'Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página.',
+  // Etapa "Confirmar solicitação" (§5.2/§5.3)
+  review: {
+    title: 'Confirme a sua solicitação',
+    intro: 'Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.',
+    transfer:
+      'Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.',
+    open: 'Abrir no WhatsApp',
+    back: 'Voltar e editar',
+    copy: 'Copiar mensagem',
+    copied: 'Mensagem copiada.',
+    copyFailed: 'Não foi possível copiar automaticamente — selecione o texto da mensagem acima.',
+    manual: 'Se o WhatsApp não abrir, copie a mensagem e envie para',
+    email: 'Prefere e-mail? Escreva para',
+  },
   // Nunca afirmar abertura nem envio: com noopener o navegador não informa se a aba foi criada (D-18).
   whatsappRequested: {
     title: 'Pedimos ao navegador para abrir o WhatsApp',
@@ -316,9 +294,63 @@ export const CONTACT_COPY = {
 /* ------------------------------------------------------------------ */
 /* Rodapé                                                             */
 /* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* Barra de navegação                                                 */
+/* ------------------------------------------------------------------ */
+/**
+ * Botão "Entrar" do modelo C (etapa 2), "sem redirecionamento" por decisão da responsável. Não existe área do
+ * cliente disponível (Platform em desenvolvimento — P-02): o botão fica marcado como indisponível e explica isso
+ * a quem usa leitor de tela ou passa o mouse (D-24, PUB-16).
+ */
+export const LOGIN = {
+  label: 'Entrar',
+  unavailable: 'Acesso de clientes ainda não disponível.',
+};
+
+/* ------------------------------------------------------------------ */
+/* Privacidade (§5.4) — minuta para revisão da titular                */
+/* ------------------------------------------------------------------ */
+/**
+ * Só fatos do código e da hospedagem: sem cookies, sem análise, sem envio pelo formulário. Controlador e provedor de
+ * hospedagem vêm de publicacao.json; enquanto pendentes, o texto usa termos genéricos e o deploy de produção fica
+ * bloqueado (aprovação "avisoDePrivacidade").
+ */
+const controller = DATA_CONTROLLER.name ? `${DATA_CONTROLLER.name}${DATA_CONTROLLER.document ? ` (${DATA_CONTROLLER.document})` : ''}` : 'a Nekkora';
+export const PRIVACY = {
+  eyebrow: 'Privacidade',
+  title: 'Como tratamos seus dados',
+  description: `Responsável pelos dados pessoais desta página: ${controller}.`,
+  items: [
+    {
+      icon: 'shield' as IconName,
+      title: 'O formulário não envia nada',
+      text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
+    },
+    {
+      icon: 'whatsapp' as IconName,
+      title: 'O que vai para o WhatsApp',
+      text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
+    },
+    {
+      icon: 'eye' as IconName,
+      title: 'Sem cookies nem rastreamento',
+      text: 'Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.',
+    },
+    {
+      icon: 'server' as IconName,
+      title: 'Registros de acesso',
+      text: `${HOSTING_PROVIDER ?? 'O provedor de hospedagem'} registra dados técnicos de acesso, como endereço IP e navegador, para segurança e funcionamento do site.`,
+    },
+    {
+      icon: 'user' as IconName,
+      title: 'Uso e seus direitos',
+      text: 'Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.',
+    },
+  ],
+};
+
 export const FOOTER = {
-  tagline: 'Automação sob medida, da necessidade à execução.',
-  pendingChannels: 'Canais oficiais em definição.',
-  preview: 'Versão para homologação — conteúdo sujeito à aprovação da Nekkora.',
+  privacy: 'Privacidade',
+  preview: 'Versão para homologação',
   signature: 'Neko (猫) observa os detalhes.',
 };

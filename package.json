@@ -1,20 +1,24 @@
 {
   "name": "nekkora-commercial",
-  "version": "0.1.0",
+  "version": "1.0.0-rc.1",
   "private": true,
   "description": "Nekkora Commercial — página comercial do Nekkora Delivery e do Nekkora Hosting.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build",
+    "test": "node --test scripts/testes/rollback-pages.test.mjs scripts/testes/verificar-publicacao.test.mjs",
+    "check": "npm run typecheck && npm test && npm run build",
     "homologacao": "node scripts/homologacao.mjs",
+    "homologacao:canais": "node scripts/homologacao-canais.mjs",
+    "verificar:publicacao": "node scripts/verificar-publicacao.mjs",
+    "verificar:lib": "node scripts/verificar-lib.mjs",
     "texto": "node scripts/exportar-texto.mjs"
   },
   "dependencies": {
-    "nekkora-lib": "file:../Nekkora-lib",
+    "nekkora-lib": "file:vendor/nekkora-lib-0.2.0.tgz",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -23,6 +27,11 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "typescript": "^7.0.2",
-    "vite": "^8.3.1"
+    "vite": "^8.3.1",
+    "playwright": "1.63.0",
+    "axe-core": "4.13.0"
+  },
+  "engines": {
+    "node": ">=20.19"
   }
 }

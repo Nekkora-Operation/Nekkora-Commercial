@@ -1,15 +1,15 @@
-# COM-001 — Texto comercial consolidado
+# Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002)
 
 > Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere
 > o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.
 
 ## 1. Hero
 
-Selo: Nekkora Delivery · Nekkora Hosting
+Selo: Delivery · Hosting
 
 **Automação sob medida, da necessidade à execução.**
 
-Desenvolvemos automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. Se fizer sentido para você, avaliamos também a infraestrutura para executá-las. Cada serviço é contratado de forma independente.
+Automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. Infraestrutura para executá-las, sujeita a avaliação. Cada serviço contratado de forma independente.
 
 CTAs: "Solicitar avaliação" · "Ver como funciona"
 
@@ -17,25 +17,23 @@ CTAs: "Solicitar avaliação" · "Ver como funciona"
 - Homologação e aceite
 - Sem pacote obrigatório
 
-Ilustração (selo "Ilustração") — Jornada de uma automação: Necessidade → Avaliação → Proposta → Desenvolvimento e testes → Homologação e aceite → Entrega. Execução no seu ambiente ou com o Nekkora Hosting, sujeito a avaliação.
-
 ## 2. Soluções
 
-**Soluções** — Duas ofertas complementares, contratadas como você precisar
+**Soluções** — Duas ofertas. Você escolhe o arranjo.
 
-Delivery desenvolve a automação. Hosting trata da infraestrutura para executá-la, sujeito a avaliação. Use um, outro ou os dois.
-
-### Nekkora Delivery · _Sob proposta_
+### 01 · Nekkora Delivery · _Sob proposta_
 
 Desenvolvimento de automações por demanda.
 
 - Escopo, prazo e preço definidos em proposta para cada automação
-- Desenvolvimento, testes e homologação com aceite
+- Entrega considerada pronta só com documentação, desenvolvimento, testes e homologação com você — cada etapa mediante a sua aprovação
 - Entrega e transferência conforme contratado
 
-Link: "Conhecer o Delivery"
+Tecnologias, conforme o caso: Python · UiPath · Power Automate · Integrações via API · Sistemas web · Dados e planilhas. _A viabilidade com cada sistema é confirmada na avaliação._
 
-### Nekkora Hosting · _Em avaliação de viabilidade_
+Link: "Conhecer o Delivery" (#precos)
+
+### 02 · Nekkora Hosting · _Em avaliação de viabilidade_
 
 Infraestrutura e serviços associados à execução de automações.
 
@@ -43,38 +41,52 @@ Infraestrutura e serviços associados à execução de automações.
 - Responsabilidades de cada parte delimitadas por escrito
 - Disponibilidade confirmada em avaliação de viabilidade
 
-Link: "Entender o Hosting"
+Link: "Entender o Hosting" (#hosting)
 
-Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora. (Ver as combinações)
+Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.
 
-## 3. Delivery
+## 3. Preços (bloco data-pricing)
 
-**Nekkora Delivery** — Automação desenvolvida para o seu processo
+**Preços · Nekkora Delivery** — Quanto custa uma automação
 
-Cada automação é avaliada e dimensionada individualmente. Antes de qualquer desenvolvimento, você recebe uma proposta com escopo, preço e condições.
+Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
 
-- **Uma automação, uma proposta** — Cada processo tem escopo, preço, condições e aceite próprios.
-- **Vários processos, uma fila organizada** — Você pode solicitar mais de uma automação. As demandas seguem a fila operacional da Nekkora.
-- **Reuniões quando necessárias** — Os encontros são combinados conforme a etapa e a necessidade do projeto.
-- **Tecnologia conforme o caso** — Python, UiPath, Power Automate e integrações entre sistemas, escolhidos na avaliação.
+> **Lançamento** — 50% de desconto em todas as automações nos próximos 2 meses. Vale para propostas aprovadas no período.
 
-Licenças e serviços de terceiros, quando necessários, dependem de avaliação e constam da proposta.
+| Faixa | Para | Valor |
+|---|---|---|
+| Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | ~~R$ 1.000~~ **R$ 500** −50% — por automação · lançamento |
+| Automação média | Mais de um sistema, validações, tratamento de exceções e relatórios. | ~~R$ 2.800~~ **R$ 1.400** −50% — por automação · lançamento |
+| Automação complexa | Processos ponta a ponta, várias integrações por API ou várias automações contratadas em conjunto. | **Sob orçamento** — dimensionada na avaliação · desconto de lançamento aplicável |
 
-**Exemplos de aplicação** — _Exemplos ilustrativos. A viabilidade de cada caso é avaliada individualmente._
+- **Por que os valores são baixos** — Usamos uma ferramenta própria que agiliza a documentação e o desenvolvimento de cada automação. Menos horas de levantamento e retrabalho, preço menor para você — sem cortar etapas: documentação, testes e homologação continuam no escopo.
+- **Licenças ficam por conta do cliente** — Qualquer licença de software ou serviço de terceiros (UiPath, Power Automate, APIs, servidores) é responsabilidade do cliente. Indicamos o que é necessário na proposta; a contratação e o custo não estão incluídos nos valores acima.
 
-- Conciliações e conferências entre planilhas e sistemas
-- Extração e lançamento de dados em portais e sistemas web
-- Leitura e triagem de e-mails e documentos
-- Integração entre sistemas por API
-- Geração e envio de relatórios recorrentes
+**O que define a categoria**
 
-CTA: "Solicitar avaliação de uma automação"
+- Quantidade de sistemas envolvidos
+- Complexidade das integrações
+- Regras de negócio e exceções
+- Volume de processamento
+- Exigências de infraestrutura
+- Necessidade de licenciamento
+
+Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta.
+
+**Condições comerciais**
+
+- Desenvolvimento sob demanda, com escopo formalizado em proposta
+- Preço aprovado por você antes do início do desenvolvimento
+- Pagamento de 50% na contratação e 50% na entrega, conforme a proposta
+- Demandas organizadas em fila: o início depende da fila e da aprovação da proposta
+- Reuniões e acompanhamento conforme as condições acordadas
+- Licenças e custos externos tratados à parte, quando aplicáveis
+
+Hosting tem avaliação e proposta próprias.
 
 ## 4. Como funciona
 
-**Como funciona** — Da conversa inicial ao aceite, em etapas claras
-
-O caminho de cada automação contratada pelo Delivery. Nada é desenvolvido sem uma proposta aprovada.
+**Como funciona** — Seis etapas. Nenhuma sem a sua aprovação.
 
 1. **Entendimento da necessidade** — Você descreve o processo, as regras e o resultado esperado.
 2. **Viabilidade e dimensionamento** — Analisamos sistemas, acessos e complexidade para dimensionar a automação.
@@ -83,91 +95,21 @@ O caminho de cada automação contratada pelo Delivery. Nada é desenvolvido sem
 5. **Homologação e aceite** — Você valida a automação no seu cenário e formaliza o aceite.
 6. **Entrega e transferência** — Entregamos e transferimos o que foi previsto na proposta.
 
-**O que influencia o prazo** — O prazo é estimado na proposta e depende de fatores que vão além do desenvolvimento:
-
-- Posição da demanda na fila operacional
-- Liberação de acessos e credenciais
-- Disponibilidade e estabilidade de sistemas externos
-- Tempo de homologação da sua equipe
-
 ## 5. Hosting
 
-**Nekkora Hosting** — Infraestrutura para executar automações, com responsabilidades delimitadas
+**Nekkora Hosting** — Infraestrutura para executar automações, com responsabilidades delimitadas.
 
-Hosting reúne serviços distintos. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta. Nenhum deles é necessário para contratar o Delivery.
+Hosting reúne serviços distintos — infraestrutura, configuração, administração, monitoramento, operação assistida, correção de incidentes, sustentação. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta.
 
-> **Disponibilidade em avaliação** — A oferta de Hosting está em definição comercial. Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.
-
-**O que cada serviço significa**
-
-| Serviço | O que significa | Como é contratado |
-|---|---|---|
-| Infraestrutura para execução | Ambiente (máquinas, servidores ou serviços) onde a automação roda. | Avaliada conforme requisitos técnicos e compatibilidade. |
-| Configuração inicial | Preparação do ambiente: instalação, dependências e acessos. | Definida na proposta, quando contratada. |
-| Administração e manutenção do ambiente | Atualizações e cuidados com o ambiente ao longo do tempo. | Serviço à parte, com escopo próprio. |
-| Monitoramento técnico | Acompanhamento da saúde do ambiente: máquinas e serviços. | Escopo, horários e forma definidos em proposta, se contratado. |
-| Monitoramento de processos | Acompanhamento das execuções da automação e de seus resultados. | Escopo definido em proposta, se contratado. |
-| Operação assistida | Acompanhamento de execuções em um período combinado, junto à sua equipe. | Período e responsabilidades definidos em proposta. |
-| Correção de incidentes | Análise e correção de falhas na execução. | Abrangência e condições definidas em proposta. |
-| Sustentação e evolução das automações | Ajustes por mudanças no processo ou nos sistemas e novas funcionalidades. | Não incluída no desenvolvimento; contratada à parte. |
-
-No celular (acordeão): _Toque em um serviço para ver o que ele significa. A forma de contratação aparece em todos._
+> **Disponibilidade em avaliação.** Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.
 
 CTA: "Solicitar avaliação de viabilidade"
 
-## 6. Solução combinada
+## 6. Transparência
 
-**Delivery, Hosting ou os dois** — Você escolhe o arranjo
+**Transparência** — Letras grandes, não miúdas
 
-Cada serviço tem proposta e condições próprias. Nenhuma combinação exige o uso de produtos internos da Nekkora.
-
-### Delivery independente
-
-A automação é desenvolvida e entregue para rodar no ambiente que você indicar.
-
-_Faz sentido quando você já tem infraestrutura e equipe para executar as automações._
-
-### Hosting independente
-
-Execução de automações que você já tem, desenvolvidas pela sua equipe ou por terceiros.
-
-_Faz sentido quando a automação existe, mas falta um ambiente adequado para executá-la._
-
-Condição: Sujeito a compatibilidade técnica e disponibilidade, confirmadas em avaliação.
-
-### Delivery + Hosting
-
-Desenvolvimento e ambiente de execução avaliados em conjunto.
-
-_Os requisitos do ambiente podem ser considerados desde a proposta, e a passagem da homologação para a execução pode ser planejada junto._
-
-Condição: A parte de Hosting segue a mesma avaliação de viabilidade.
-
-**Limites da contratação combinada**
-
-- Contratar os dois serviços não inclui automaticamente sustentação, evolução, monitoramento ou correção de incidentes — esses itens valem apenas quando constam na proposta.
-- Cada serviço mantém escopo, preço, condições e aceite próprios.
-
-## 7. Diferenciais
-
-**Diferenciais** — Eficiência que vem do método
-
-Mecanismos concretos de trabalho, não promessas de resultado.
-
-- **Proposta antes do código** — Escopo, preço e condições por escrito antes de iniciar o desenvolvimento.
-- **Aceite formal** — A entrega passa por homologação com você e termina com aceite.
-- **Dimensionamento individual** — Cada processo é avaliado separadamente, sem escopos genéricos.
-- **Responsabilidades explícitas** — O que cabe à Nekkora e o que cabe a você fica descrito na proposta.
-- **Serviços independentes** — Delivery e Hosting são contratados juntos ou separados, sem pacote obrigatório.
-- **Ferramenta adequada ao caso** — Python, UiPath, Power Automate ou integrações: a escolha parte do processo, não de uma plataforma própria.
-
-Manifesto: "Clareza no escopo, eficiência no método e autonomia na escolha."
-
-## 8. Transparência
-
-**Transparência** — O que esperar da contratação
-
-O que é definido em proposta, do que o andamento depende e o que não está incluído sem acordo explícito.
+O que é definido em proposta, o que não está incluído sem acordo explícito e do que o andamento depende.
 
 **Definido em proposta**
 
@@ -182,52 +124,68 @@ O que é definido em proposta, do que o andamento depende e o que não está inc
 
 - Alterações futuras e novas funcionalidades
 - Sustentação e evolução das automações
-- Garantia após a entrega, salvo se prevista em proposta
+- Garantia após a entrega, salvo se prevista
 - Infraestrutura e serviços de Hosting
-- Licenças e serviços de terceiros
-- Monitoramento, atendimento 24 horas, alta disponibilidade ou SLA
+- Licenças e serviços de terceiros — responsabilidade do cliente
+- Monitoramento, 24 horas, alta disponibilidade ou SLA
 
 **Depende de você e de terceiros**
 
 - Liberação de acessos e credenciais
-- Estabilidade de sistemas e portais externos
+- Estabilidade de sistemas externos
 - Disponibilidade da sua equipe para homologação
 - Fila operacional da Nekkora
 
-**Produtos em desenvolvimento** — A Nekkora também desenvolve o Studio, a Platform e o Agent. Esses produtos estão em desenvolvimento, não fazem parte das ofertas desta página e não são necessários para contratar Delivery ou Hosting.
+## 7. Contato
 
-## 9. Contato
+**Vamos olhar o seu processo de perto?**
 
-**Contato** — Solicite uma avaliação
+A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.
 
-Conte qual processo você quer automatizar ou executar. A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.
+Botão: "Solicitar avaliação" (abre o diálogo)
 
-Sem canais confirmados: **Canais de contato em definição** — Os canais oficiais (WhatsApp, e-mail e redes sociais) ainda não foram publicados. O formulário desta versão é de demonstração: valida os dados, mas não envia nem armazena nada.
+Sem canais confirmados: _Canais oficiais em definição · formulário em modo de demonstração_
 
-**Como a avaliação acontece**
+Diálogo **Solicitar avaliação** — Conte qual processo você quer automatizar. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.
 
-1. Lemos a descrição e, se for preciso, combinamos uma conversa para entender o processo.
-2. Avaliamos a viabilidade e dimensionamos a automação ou o ambiente.
-3. Se fizer sentido, você recebe uma proposta com escopo, preço e condições.
-4. Nada é desenvolvido ou contratado sem a sua aprovação.
+Com WhatsApp confirmado: botão "Falar diretamente pelo WhatsApp" + divisor "ou preencha o formulário". Sem canal: _Canais oficiais em definição · formulário em modo de demonstração_
 
-Formulário "Conte o que você precisa": Nome*, E-mail*, Telefone (opcional), Empresa (opcional), "O que você quer avaliar?"*, "Descreva o processo"* — Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.
-
-- Delivery — Desenvolvimento de uma ou mais automações
-- Hosting — Infraestrutura para executar automações (avaliação de viabilidade)
-- Delivery e Hosting — Desenvolvimento e execução avaliados em conjunto
-- Ainda não sei — Quero ajuda para entender o melhor caminho
+Formulário: Nome*, Empresa (opcional), E-mail (Opcional — só se preferir retorno por e-mail.), "Descreva o processo"* — Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.. Rodapé: "Cancelar" + envio; link "Como tratamos seus dados".
 
 Modo demonstração: botão "Revisar solicitação"; nota "Modo de demonstração: nenhum dado é enviado ou armazenado."; resultado **Solicitação validada — envio desativado nesta versão** — Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.
 
-Com WhatsApp confirmado: botão "Enviar pelo WhatsApp"; nota "Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página."
+Com WhatsApp confirmado: botão "Revisar mensagem"; nota "Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página."
 
-- Após enviar: **Pedimos ao navegador para abrir o WhatsApp** — Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.
+Etapa de confirmação: **Confirme a sua solicitação** — Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.
+
+> **Antes de continuar** — Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.
+
+Botões: "Voltar e editar" · "Abrir no WhatsApp". Alternativas: "Copiar mensagem"; "Se o WhatsApp não abrir, copie a mensagem e envie para <número>"; "Prefere e-mail? Escreva para <e-mail>".
+
+- Após abrir: **Pedimos ao navegador para abrir o WhatsApp** — Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.
 - Link manual (sempre): "Abrir conversa no WhatsApp"
 
-## 10. Rodapé
+Canais diretos (sem formulário): "Prefere falar direto?"
 
-- Automação sob medida, da necessidade à execução.
-- Canais oficiais em definição.
-- Versão para homologação — conteúdo sujeito à aprovação da Nekkora.
+## 7a. Privacidade
+
+**Privacidade** — Como tratamos seus dados
+
+Responsável pelos dados pessoais desta página: a Nekkora.
+
+- **O formulário não envia nada** — O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.
+- **O que vai para o WhatsApp** — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.
+- **Sem cookies nem rastreamento** — Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.
+- **Registros de acesso** — O provedor de hospedagem registra dados técnicos de acesso, como endereço IP e navegador, para segurança e funcionamento do site.
+- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.
+
+## 8. Barra de navegação
+
+Links: Soluções · Preços · Como funciona · Hosting · Transparência. Botão "Entrar" sem destino (indisponível: "Acesso de clientes ainda não disponível.").
+
+## 9. Rodapé
+
+- © Nekkora. Todos os direitos reservados.
+- Link "Privacidade"
+- Versão para homologação (enquanto publicacao.json mantiver avisoHomologacao)
 - Neko (猫) observa os detalhes.

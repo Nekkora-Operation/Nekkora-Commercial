@@ -1,0 +1,27 @@
+{
+  "$comentario": "SINTÉTICO — só para builds de homologação (NEKKORA_PUBLICACAO). Nenhum valor é real: wa.me é atendido por uma página local nos testes e os domínios .invalid não existem. O build feito com este arquivo é marcado em dist/release.json e recusado por scripts/verificar-publicacao.mjs.",
+  "canais": {
+    "whatsapp": "5511912345678",
+    "email": "contato@exemplo.invalid",
+    "linkedin": "https://www.linkedin.com/company/exemplo-homologacao/",
+    "instagram": "https://www.instagram.com/"
+  },
+  "campanhaLancamento": {
+    "inicio": "2026-11-01",
+    "fim": "2026-12-31"
+  },
+  "controlador": {
+    "nome": "Empresa de Teste (dado sintético)",
+    "documento": "00.000.000/0000-00"
+  },
+  "hospedagem": {
+    "provedor": "Provedor de teste (dado sintético)"
+  },
+  "aprovacoes": {
+    "precosECondicoes": true,
+    "textosComerciais": true,
+    "avisoDePrivacidade": true,
+    "publicacao": true
+  },
+  "avisoHomologacao": true
+}

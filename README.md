@@ -68,3 +68,13 @@ docs/com-001/            auditoria, contrato, matriz, arquitetura, texto, roteir
                          relatório e evidências
 public/                  favicons da marca (idênticos aos da nekkora-lib)
 ```
+
+## Release, homologação e publicação (NEKKORA-RELEASE-001)
+
+- Dados que só a titular confirma (canais, campanha, controlador, aprovações): [`publicacao.json`](publicacao.json).
+  `npm run verificar:publicacao` lista o que falta e **bloqueia o deploy de produção**.
+- nekkora-lib: tarball do CI em [`vendor/`](vendor/) (`npm run verificar:lib -- --reconstruir` refaz e confere o hash).
+- `npm test` (portão + rollback) · `npm run homologacao` (página) · `npm run homologacao:canais` (jornada, build sintético)
+  · `node scripts/desempenho.mjs` — Playwright e axe-core são devDependencies (`npx playwright install`).
+- CI, preview, deploy de produção manual e rollback: [`docs/release/COM-RELEASE-003-operacao.md`](docs/release/COM-RELEASE-003-operacao.md).
+- Relatórios: [`docs/release/`](docs/release/) · pendências: [`COM-RELEASE-PENDENCIAS.md`](docs/release/COM-RELEASE-PENDENCIAS.md).

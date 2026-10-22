@@ -1,39 +1,57 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Alert, Button, DescriptionList, Input, Link, RadioGroup, SectionHeader, Text, Textarea } from 'nekkora-lib';
-import { CHANNELS, hasAnyChannel, whatsappUrl } from '../config';
+import { Alert, Button, DescriptionList, Dialog, Divider, Input, Link, Logo, Textarea } from 'nekkora-lib';
+import { CHANNELS, hasAnyChannel, whatsappDisplay, whatsappUrl } from '../config';
 import { CONTACT_COPY } from '../content';
+import { useRequestTrigger } from '../request';
 
-type Field = 'name' | 'email' | 'interest' | 'message';
+type Field = 'name' | 'email' | 'message';
 type Errors = Partial<Record<Field, string>>;
+/** Etapas da jornada (§5.2): informar a necessidade → confirmar a mensagem → WhatsApp solicitado ao navegador. */
+type Step = 'form' | 'review' | 'requested';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_MESSAGE = 1000;
+const FORM_ID = 'form-solicitacao';
+
+/** Mensagem estruturada enviada ao WhatsApp — exatamente o texto exibido na etapa de confirmação. */
+export function buildMessage({ name, company, email, message }: { name: string; company: string; email: string; message: string }) {
+  return [
+    `Olá! Sou ${name.trim()}${company.trim() ? `, da ${company.trim()}` : ''}.`,
+    'Quero solicitar uma avaliação de automação.',
+    message.trim(),
+    ...(email.trim() ? [`E-mail para retorno: ${email.trim()}`] : []),
+  ].join('\n\n');
+}
 
 /**
- * Formulário sem back-end (fora do escopo). Com WhatsApp confirmado em config.ts, abre o WhatsApp com a mensagem
- * montada; sem canal confirmado, funciona em modo de demonstração — valida e mostra o resumo, sem enviar nada (K-05).
+ * Diálogo "Solicitar avaliação" (modelo C, etapa 2; jornada da COM-RELEASE-002). Sem back-end: nada é enviado nem
+ * armazenado pela página.
+ *
+ * Com WhatsApp confirmado em publicacao.json: o formulário valida, a etapa de confirmação mostra a mensagem exata e o que
+ * será transferido ao WhatsApp, e só então o visitante abre a conversa por um link comum (target=_blank,
+ * rel=noopener noreferrer) — um clique em link não é barrado por bloqueador de pop-up, e o navegador não informa se a
+ * aba abriu, por isso a página nunca afirma abertura nem envio (D-18). Alternativas manuais sempre visíveis: copiar a
+ * mensagem e o número para digitar. Sem canal confirmado, o formulário funciona em modo de demonstração (K-05).
  */
-function ContactForm() {
+export function RequestDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const doneRef = useRef<HTMLDivElement>(null);
+  const stepRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
-  const [interest, setInterest] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<Errors>({});
-  const [reviewed, setReviewed] = useState(false);
-  /** Link do WhatsApp com a mensagem montada — exibido sempre como alternativa manual. */
-  const [whatsapp, setWhatsapp] = useState<string | null>(null);
-  const canSend = whatsappUrl() != null;
-  const interestLabel = CONTACT_COPY.interests.find((i) => i.value === interest)?.label;
+  const [step, setStep] = useState<Step>('form');
+  const [copy, setCopy] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const directWhatsapp = whatsappUrl();
+  const canSend = directWhatsapp != null;
+  const text = buildMessage({ name, company, email, message });
+  const link = whatsappUrl(text);
 
   const validate = (): Errors => {
     const e: Errors = {};
     if (name.trim().length < 2) e.name = 'Informe como podemos chamar você.';
-    if (!EMAIL_RE.test(email.trim())) e.email = 'Informe um e-mail válido, como nome@empresa.com.';
-    if (!interest) e.interest = 'Escolha o que você quer avaliar.';
+    if (email.trim() && !EMAIL_RE.test(email.trim())) e.email = 'Confira o e-mail, como nome@empresa.com — ou deixe em branco.';
     if (message.trim().length < 20) e.message = 'Descreva o processo com pelo menos 20 caracteres.';
     return e;
   };
@@ -47,167 +65,246 @@ function ContactForm() {
       requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
       return;
     }
-    if (canSend) {
-      const text = [
-        `Olá! Sou ${name.trim()}${company.trim() ? `, da ${company.trim()}` : ''}.`,
-        `Quero avaliar: ${interestLabel}.`,
-        message.trim(),
-        `Contato: ${email.trim()}${phone ? ` · ${phone}` : ''}`,
-      ].join('\n\n');
-      const url = whatsappUrl(text)!;
-      // noopener,noreferrer desde a abertura: a aba externa nunca recebe referência a esta página nem o Referer.
-      // Com essas features o navegador não informa se a aba foi criada, então a página só diz que a abertura foi
-      // solicitada e oferece sempre o link manual (D-18).
-      window.open(url, '_blank', 'noopener,noreferrer');
-      setWhatsapp(url);
-    }
-    setReviewed(true);
+    setCopy('idle');
+    setStep('review');
   };
 
-  // Ao trocar o formulário pelo resumo, leva foco e rolagem ao resultado (sem ficar sob a barra fixa).
+  // A cada troca de etapa, o foco vai para o início do novo conteúdo.
   useEffect(() => {
-    if (reviewed) doneRef.current?.focus();
-  }, [reviewed]);
+    if (step !== 'form') stepRef.current?.focus();
+  }, [step]);
 
-  if (reviewed) {
-    return (
-      <div ref={doneRef} tabIndex={-1} className="contact__form contact__done">
-        {whatsapp ? (
+  const edit = () => {
+    setStep('form');
+    setCopy('idle');
+  };
+
+  const copyMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopy('copied');
+    } catch {
+      setCopy('failed');
+    }
+  };
+
+  const manual = (
+    <div className="request__manual">
+      <Button variant="secondary" size="sm" leftIcon="copy" onClick={copyMessage}>
+        {CONTACT_COPY.review.copy}
+      </Button>
+      <span role="status" className="contact__note" data-testid="status-copia">
+        {copy === 'copied' ? CONTACT_COPY.review.copied : copy === 'failed' ? CONTACT_COPY.review.copyFailed : ''}
+      </span>
+      {CHANNELS.whatsapp && (
+        <p className="contact__note">
+          {CONTACT_COPY.review.manual} <strong className="request__number">{whatsappDisplay()}</strong>.
+        </p>
+      )}
+      {CHANNELS.email && (
+        <p className="contact__note">
+          {CONTACT_COPY.review.email} <Link href={`mailto:${CHANNELS.email}`}>{CHANNELS.email}</Link>.
+        </p>
+      )}
+    </div>
+  );
+
+  const summary = (
+    <DescriptionList
+      items={[
+        { term: 'Nome', description: name.trim() },
+        { term: 'Empresa', description: company.trim() || null },
+        { term: 'E-mail', description: email.trim() || null },
+        { term: 'Processo', description: message.trim() },
+      ]}
+    />
+  );
+
+  let body;
+  let footer;
+  if (step === 'form') {
+    footer = (
+      <>
+        <div className="request__actions">
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" form={FORM_ID} rightIcon={canSend ? 'arrow-right' : 'check'}>
+            {canSend ? CONTACT_COPY.whatsappSubmit : CONTACT_COPY.demoSubmit}
+          </Button>
+        </div>
+        <span className="contact__note request__note">
+          {canSend ? CONTACT_COPY.whatsappNote : CONTACT_COPY.demoNote} <Link href="#privacidade" onClick={onClose}>{CONTACT_COPY.privacyLink}</Link>
+        </span>
+      </>
+    );
+    body = (
+      <div className="request__body">
+        {directWhatsapp ? (
           <>
-            <Alert tone="info" title={CONTACT_COPY.whatsappRequested.title} live="polite">
-              {CONTACT_COPY.whatsappRequested.text}
-            </Alert>
-            <Button leftIcon="whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer" style={{ alignSelf: 'flex-start' }}>
-              {CONTACT_COPY.whatsappManual}
+            <Button variant="secondary" leftIcon="whatsapp" href={directWhatsapp} target="_blank" rel="noopener noreferrer" fullWidth>
+              {CONTACT_COPY.whatsappDirect}
             </Button>
+            <Divider label={CONTACT_COPY.orForm} />
           </>
         ) : (
-          <Alert tone="info" title={CONTACT_COPY.demoResult.title} live="polite">
-            {CONTACT_COPY.demoResult.text}
-          </Alert>
+          <p className="request__pending">{CONTACT_COPY.pendingCaption}</p>
         )}
-        <DescriptionList
-          items={[
-            { term: 'Nome', description: name.trim() },
-            { term: 'E-mail', description: email.trim() },
-            { term: 'Telefone', description: phone || null },
-            { term: 'Empresa', description: company.trim() || null },
-            { term: 'Quero avaliar', description: interestLabel },
-            { term: 'Processo', description: message.trim() },
-          ]}
-        />
-        <Button
-          variant="secondary"
-          leftIcon="edit"
-          onClick={() => {
-            setReviewed(false);
-            setWhatsapp(null);
-          }}
-        >
+        <form id={FORM_ID} ref={formRef} className="request__form" onSubmit={submit} noValidate aria-label={CONTACT_COPY.formTitle}>
+          <div className="contact__form-grid">
+            <Input label="Nome" required placeholder="Seu nome" leftIcon="user" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} error={errors.name} fullWidth />
+            <Input label="Empresa" placeholder="Nome da empresa" leftIcon="building" autoComplete="organization" value={company} onChange={(e) => setCompany(e.target.value)} hint="Opcional" fullWidth />
+          </div>
+          <Input
+            label="E-mail"
+            type="email"
+            placeholder="nome@empresa.com"
+            leftIcon="mail"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={errors.email}
+            hint={CONTACT_COPY.emailHint}
+            fullWidth
+          />
+          <Textarea
+            label="Descreva o processo"
+            required
+            placeholder="Ex.: conferimos todo dia os pagamentos do banco com o sistema financeiro, manualmente."
+            rows={4}
+            maxLength={MAX_MESSAGE}
+            hint={CONTACT_COPY.processHint}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            error={errors.message}
+            fullWidth
+          />
+        </form>
+      </div>
+    );
+  } else if (!canSend) {
+    // Modo de demonstração: validado, nada enviado.
+    footer = (
+      <div className="request__actions">
+        <Button variant="ghost" leftIcon="edit" onClick={edit}>
           Editar solicitação
         </Button>
+        <Button onClick={onClose}>Fechar</Button>
+      </div>
+    );
+    body = (
+      <div ref={stepRef} tabIndex={-1} className="contact__done">
+        <Alert tone="info" title={CONTACT_COPY.demoResult.title} live="polite">
+          {CONTACT_COPY.demoResult.text}
+        </Alert>
+        {summary}
+      </div>
+    );
+  } else if (step === 'review') {
+    footer = (
+      <div className="request__actions">
+        <Button variant="ghost" leftIcon="edit" onClick={edit}>
+          {CONTACT_COPY.review.back}
+        </Button>
+        {/* Link comum: aberto pelo próprio clique do visitante (não é pop-up), sem opener e sem Referer. */}
+        <Button leftIcon="whatsapp" href={link!} target="_blank" rel="noopener noreferrer" onClick={() => setStep('requested')}>
+          {CONTACT_COPY.review.open}
+        </Button>
+      </div>
+    );
+    body = (
+      <div ref={stepRef} tabIndex={-1} className="contact__done" aria-labelledby="request-review-title">
+        <h3 id="request-review-title" className="request__step-title">
+          {CONTACT_COPY.review.title}
+        </h3>
+        <p className="contact__note">{CONTACT_COPY.review.intro}</p>
+        <pre className="request__message" data-testid="mensagem-whatsapp">
+          {text}
+        </pre>
+        <Alert tone="info" title="Antes de continuar">
+          {CONTACT_COPY.review.transfer}
+        </Alert>
+        {manual}
+      </div>
+    );
+  } else {
+    footer = (
+      <div className="request__actions">
+        <Button variant="ghost" leftIcon="edit" onClick={edit}>
+          Editar solicitação
+        </Button>
+        <Button onClick={onClose}>Fechar</Button>
+      </div>
+    );
+    body = (
+      <div ref={stepRef} tabIndex={-1} className="contact__done">
+        <Alert tone="info" title={CONTACT_COPY.whatsappRequested.title} live="polite">
+          {CONTACT_COPY.whatsappRequested.text}
+        </Alert>
+        <Button leftIcon="whatsapp" href={link!} target="_blank" rel="noopener noreferrer">
+          {CONTACT_COPY.whatsappManual}
+        </Button>
+        {manual}
+        {summary}
       </div>
     );
   }
 
   return (
-    <form ref={formRef} className="contact__form" onSubmit={submit} noValidate aria-labelledby="form-title">
-      <Text id="form-title" variant="h4" as="h3">
-        {CONTACT_COPY.formTitle}
-      </Text>
-      <div className="contact__form-grid">
-        <Input label="Nome" required placeholder="Seu nome" leftIcon="user" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} error={errors.name} fullWidth />
-        <Input
-          label="E-mail"
-          required
-          type="email"
-          placeholder="nome@empresa.com"
-          leftIcon="mail"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={errors.email}
-          fullWidth
-        />
-        <Input label="Telefone" mask="phone" placeholder="(00) 00000-0000" leftIcon="phone" autoComplete="tel" value={phone} onValueChange={(masked) => setPhone(masked)} hint="Opcional" fullWidth />
-        <Input label="Empresa" placeholder="Nome da empresa" leftIcon="building" autoComplete="organization" value={company} onChange={(e) => setCompany(e.target.value)} hint="Opcional" fullWidth />
-      </div>
-      <RadioGroup legend="O que você quer avaliar?" required options={CONTACT_COPY.interests} value={interest} onChange={setInterest} error={errors.interest} />
-      <Textarea
-        label="Descreva o processo"
-        required
-        placeholder="Ex.: conferimos todo dia os pagamentos do banco com o sistema financeiro, manualmente."
-        rows={5}
-        maxLength={MAX_MESSAGE}
-        hint={CONTACT_COPY.processHint}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        error={errors.message}
-        fullWidth
-      />
-      <Button type="submit" size="lg" rightIcon={canSend ? 'send' : 'check'} fullWidth>
-        {canSend ? CONTACT_COPY.whatsappSubmit : CONTACT_COPY.demoSubmit}
-      </Button>
-      <span className="contact__note">{canSend ? CONTACT_COPY.whatsappNote : CONTACT_COPY.demoNote}</span>
-    </form>
+    <Dialog open={open} onClose={onClose} title={CONTACT_COPY.dialogTitle} description={CONTACT_COPY.dialogDescription} footer={footer} size="md" className="request">
+      {body}
+    </Dialog>
   );
 }
 
-/** Lista apenas os canais confirmados e válidos (config.ts). */
+/** Canais confirmados e válidos (publicacao.json) — contato direto, sem preencher nada no site. */
 function Channels() {
   const wa = whatsappUrl();
   return (
-    <div className="contact__channels">
-      {wa && (
-        <Button size="lg" leftIcon="whatsapp" href={wa} style={{ alignSelf: 'flex-start' }}>
-          Falar no WhatsApp
-        </Button>
-      )}
-      {CHANNELS.email && (
-        <Link href={`mailto:${CHANNELS.email}`} variant="default" leftIcon="mail">
-          {CHANNELS.email}
-        </Link>
-      )}
-      {CHANNELS.instagram && (
-        <Link href={CHANNELS.instagram} variant="default" leftIcon="instagram" external>
-          Instagram
-        </Link>
-      )}
-      {CHANNELS.linkedin && (
-        <Link href={CHANNELS.linkedin} variant="default" leftIcon="linkedin" external>
-          LinkedIn
-        </Link>
-      )}
+    <div className="contact__direct">
+      <span className="contact__caption">{CONTACT_COPY.directTitle}</span>
+      <div className="contact__channels">
+        {wa && (
+          <Button size="lg" pill variant="secondary" leftIcon="whatsapp" href={wa} target="_blank" rel="noopener noreferrer">
+            Falar no WhatsApp
+          </Button>
+        )}
+        {CHANNELS.email && (
+          <Link href={`mailto:${CHANNELS.email}`} variant="default" leftIcon="mail">
+            {CHANNELS.email}
+          </Link>
+        )}
+        {CHANNELS.linkedin && (
+          <Link href={CHANNELS.linkedin} variant="default" leftIcon="linkedin" external>
+            LinkedIn
+          </Link>
+        )}
+        {CHANNELS.instagram && (
+          <Link href={CHANNELS.instagram} variant="default" leftIcon="instagram" external>
+            Instagram
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
 
+/** Chamada em pôster centralizado (modelo C). O botão abre o diálogo "Solicitar avaliação" (D-23). */
 export function Contact() {
+  const trigger = useRequestTrigger();
   return (
-    <section id="contato" className="section" aria-labelledby="contato-title">
-      <div className="wrap">
-        <div className="contact" data-contact-status={hasAnyChannel ? 'configurado' : 'pendente'}>
-          <div className="contact__aside">
-            <SectionHeader titleId="contato-title" eyebrow={CONTACT_COPY.eyebrow} title={CONTACT_COPY.title} description={CONTACT_COPY.description} />
-            {hasAnyChannel ? (
-              <Channels />
-            ) : (
-              <Alert tone="warning" title={CONTACT_COPY.pending.title} live="off">
-                {CONTACT_COPY.pending.text}
-              </Alert>
-            )}
-            <div className="contact__next">
-              <Text variant="h4" as="h3">
-                {CONTACT_COPY.next.title}
-              </Text>
-              <ol>
-                {CONTACT_COPY.next.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ol>
-            </div>
-          </div>
-          <ContactForm />
+    <section id="contato" className="section section--band" aria-labelledby="contato-title">
+      <div className="wrap contact" data-contact-status={hasAnyChannel ? 'configurado' : 'pendente'}>
+        <div className="contact__poster">
+          <Logo variant="symbol" size={44} aria-hidden="true" />
+          <h2 id="contato-title" className="contact__title">
+            {CONTACT_COPY.title}
+          </h2>
+          <p className="contact__lead">{CONTACT_COPY.description}</p>
+          <Button size="lg" pill rightIcon="arrow-right" {...trigger}>
+            {CONTACT_COPY.cta}
+          </Button>
+          {hasAnyChannel ? <Channels /> : <span className="contact__caption">{CONTACT_COPY.pendingCaption}</span>}
         </div>
       </div>
     </section>

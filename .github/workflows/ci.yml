@@ -1,0 +1,136 @@
+# Pipeline do Nekkora Commercial (COM-RELEASE-003 §6.2):
+#   PR → validação de código → build da nekkora-lib (reprodução do tarball versionado) → build do Commercial
+#   → testes automatizados e de integração (Chromium, Firefox, WebKit) → artefato versionado → preview (se configurado)
+# O deploy de produção NÃO acontece aqui: é o workflow "Deploy de produção", manual e com aprovação de release.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  WRANGLER_VERSION: 4.149.0
+
+jobs:
+  lib:
+    name: Build nekkora-lib (tarball reproduzível)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Tarball, lockfile e reconstrução a partir do commit registrado
+        run: node scripts/verificar-lib.mjs --reconstruir
+
+  commercial:
+    name: Validação e build do Commercial
+    needs: lib
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Testes automatizados (portão de publicação e rollback)
+        run: npm test
+      - name: Build de produção
+        run: npm run build
+      - name: Portão de publicação (informativo no CI; bloqueante no deploy)
+        run: |
+          {
+            echo '## Portão de publicação'
+            echo '```'
+            node scripts/verificar-publicacao.mjs --dist dist || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: commercial-dist-${{ github.sha }}
+          path: dist/
+          include-hidden-files: true
+          retention-days: 90
+
+  integracao:
+    name: Testes de integração (navegador real)
+    needs: commercial
+    runs-on: ubuntu-24.04
+    # Imagem oficial do Playwright na MESMA versão do lockfile (1.63.0): navegadores e dependências do sistema já
+    # instalados. Instalar com --with-deps dependia do espelho apt do runner, que chegou a estourar 30 min.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
+    env:
+      # Firefox recusa rodar como root com HOME de outro usuário (orientação do Playwright para a imagem)
+      HOME: /root
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Builds de produção e de homologação (dados sintéticos)
+        run: |
+          npm run build
+          NEKKORA_PUBLICACAO=scripts/fixtures/publicacao-homologacao.json npx vite build --outDir dist-homologacao
+      - name: Servidores locais
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort &
+          npx vite preview --host 127.0.0.1 --port 4175 --strictPort --outDir dist-homologacao &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://127.0.0.1:4173/ && curl -sf -o /dev/null http://127.0.0.1:4175/ && exit 0; sleep 1; done; exit 1
+      - name: Homologação da página (Chromium, Firefox, WebKit)
+        run: |
+          for b in chromium firefox webkit; do
+            NEKKORA_NAVEGADOR=$b node scripts/homologacao.mjs http://127.0.0.1:4173/ evidencias/pagina-$b
+          done
+      - name: Jornada de conversão (Chromium, Firefox, WebKit)
+        run: node scripts/homologacao-canais.mjs http://127.0.0.1:4175/ evidencias/conversao chromium,firefox,webkit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencias-${{ github.sha }}
+          path: evidencias/
+          retention-days: 30
+
+  preview:
+    name: Preview (Cloudflare Pages)
+    needs: integracao
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    environment: preview
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: commercial-dist-${{ github.sha }}
+          path: dist
+      - name: Publicar preview do PR
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$PROJECT" ]; then
+            echo "Cloudflare não configurado (secrets/variável ausentes) — preview pulado." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          npx --yes "wrangler@${WRANGLER_VERSION}" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
+            --commit-hash "${{ github.event.pull_request.head.sha }}" --commit-dirty=false | tee deploy.log
+          echo "Preview: $(grep -Eo 'https://[^ ]+\.pages\.dev' deploy.log | tail -1)" >> "$GITHUB_STEP_SUMMARY"

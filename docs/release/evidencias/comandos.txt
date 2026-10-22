@@ -1,0 +1,101 @@
+# COM-RELEASE — bateria final 2026-10-22T14:07:49-03:00
+commit ef090f248a319c4a18121c8122a5612fe1da1de9 · node v24.19.0 · npm 11.17.0 · Windows 11
+
+$ rm -rf node_modules dist dist-homologacao && npm ci
+added 57 packages, and audited 58 packages in 2s
+found 0 vulnerabilities
+
+$ npm run typecheck
+exit=0
+
+$ npm test
+✔ sem destino: volta para o deploy de produção bem-sucedido anterior (pula falhos e previews) (128.5994ms)
+✔ com destino explícito (118.337ms)
+✔ destino inexistente, falho ou de preview é recusado sem chamar o rollback (577.6589ms)
+✔ sem deploy anterior: falha sem chamar o rollback (189.5946ms)
+✔ token errado: falha (76.3402ms)
+✔ tudo confirmado: libera (61.784ms)
+✔ bloqueia: sem WhatsApp (61.092ms)
+✔ bloqueia: WhatsApp marcador (zeros) (54.4939ms)
+✔ bloqueia: e-mail de domínio reservado (.invalid) (56.8274ms)
+✔ bloqueia: LinkedIn na página inicial (54.9419ms)
+✔ bloqueia: LinkedIn de outro domínio (53.5523ms)
+✔ bloqueia: campanha sem datas (55.0879ms)
+✔ bloqueia: campanha encerrada (53.4975ms)
+✔ bloqueia: sem controlador (55.8025ms)
+✔ bloqueia: sem provedor (54.2833ms)
+✔ bloqueia: preços não aprovados (53.3371ms)
+✔ bloqueia: publicação não autorizada (51.7406ms)
+✔ bloqueia: aviso de homologação ligado (52.984ms)
+✔ bloqueia artefato de homologação, árvore suja, outra lib e _headers com marcador (217.536ms)
+ℹ tests 19
+ℹ pass 19
+ℹ fail 0
+
+$ npm run build
+dist/release.json                                         0.49 kB │ gzip:   0.38 kB
+dist/_headers                                             1.57 kB
+dist/index.html                                           2.60 kB │ gzip:   1.08 kB
+dist/assets/inter-latin-wght-normal-Dx4kXJAl.woff2       48.25 kB
+dist/assets/inter-latin-ext-wght-normal-DO1Apj_S.woff2   85.06 kB
+dist/assets/index-BWlGHuZz.css                           79.65 kB │ gzip:  13.46 kB
+dist/assets/index-BADvQjNK.js                           333.24 kB │ gzip: 103.45 kB
+[32m✓ built in 236ms[39m
+
+$ cat dist/release.json
+{
+  "aplicacao": "nekkora-commercial@1.0.0-rc.1",
+  "commit": "ef090f248a319c4a18121c8122a5612fe1da1de9",
+  "arvoreLimpa": true,
+  "nekkoraLib": {
+    "versao": "0.2.0",
+    "origem": "file:vendor/nekkora-lib-0.2.0.tgz",
+    "integridade": "sha512-LE1ZO5MkrPi38W5oKykk5/bT322ewlpcWgrZJ/MPHOmOtARreSQ4J0GNMst4T6rgdiTnikZOZTFVeoingIcT4A=="
+  },
+  "publicacao": "publicacao.json",
+  "homologacao": false,
+  "cspScriptHashes": [
+    "'sha256-JDd2nuaninfZZDJOM3fEvC7cCoIy0w7m1A5JfhKL6tE='"
+  ]
+}
+
+$ node scripts/verificar-lib.mjs --reconstruir
+OK  sha256 do tarball — 1a2e614576f7c33ec98bbaf1dfe9f0eb6098637ca1075113c666aea6662526a6
+OK  integridade (sha512) do tarball — sha512-LE1ZO5MkrPi38W5oKykk5/bT322ewlpcWgrZJ/MPHOmOtARreSQ4J0GNMst4T6rgdiTnikZOZTFVeoingIcT4A==
+OK  package-lock aponta para o tarball — file:vendor/nekkora-lib-0.2.0.tgz 0.2.0
+OK  versão — 0.2.0 · commit 638f0300a5351eff33f3600d537effe13c25a9ba
+OK  build reproduzível a partir do commit registrado — nekkora-lib-0.2.0.tgz sha256 1a2e614576f7c33ec98bbaf1dfe9f0eb6098637ca1075113c666aea6662526a6
+
+$ npm run verificar:publicacao
+PUBLICAÇÃO BLOQUEADA — 11 pendência(s):
+  - PUB-01 — WhatsApp oficial (DDI+DDD+número, só dígitos)
+  - PUB-02 — e-mail comercial
+  - PUB-03 — página oficial do LinkedIn (URL de perfil)
+  - PUB-13 — datas de início e fim da campanha de lançamento
+  - PUB-09 — controlador dos dados (nome e CNPJ/CPF) para o aviso de privacidade
+  - PUB-11 — provedor de hospedagem citado no aviso de privacidade
+  - PUB-14 — aprovação dos preços e condições comerciais
+  - PUB-17 — aprovação dos textos comerciais
+  - PUB-09 — aprovação do aviso de privacidade
+  - PUB-18 — autorização expressa de publicação em produção
+  - PUB-10 — desligar o aviso "Versão para homologação"
+
+$ NEKKORA_PUBLICACAO=scripts/fixtures/publicacao-homologacao.json npx vite build --outDir dist-homologacao
+[32m✓ built in 232ms[39m
+$ node scripts/verificar-publicacao.mjs --dist dist-homologacao  (deve recusar o artefato sintético)
+  - BUILD — artefato feito com dados de homologação (NEKKORA_PUBLICACAO)
+
+$ npm audit
+found 0 vulnerabilities
+
+## Homologação em navegador real — runtime do Cloudflare Pages (npx wrangler@4.149.0 pages dev), Playwright 1.63.0, axe-core 4.13.0
+$ NEKKORA_NAVEGADOR=chromium node scripts/homologacao.mjs http://127.0.0.1:8788/ (build de produção)
+70 verificações, 0 falha(s). Resultados em C:/Users/nicol/AppData/Local/Temp/ev/pagina-chromium
+$ NEKKORA_NAVEGADOR=firefox node scripts/homologacao.mjs http://127.0.0.1:8788/ (build de produção)
+70 verificações, 0 falha(s). Resultados em C:/Users/nicol/AppData/Local/Temp/ev/pagina-firefox
+$ NEKKORA_NAVEGADOR=webkit node scripts/homologacao.mjs http://127.0.0.1:8788/ (build de produção)
+70 verificações, 0 falha(s). Resultados em C:/Users/nicol/AppData/Local/Temp/ev/pagina-webkit
+$ node scripts/homologacao-canais.mjs http://127.0.0.1:8789/ (build sintético) chromium,firefox,webkit
+99 verificações, 0 falha(s).
+$ node scripts/desempenho.mjs http://127.0.0.1:8788/
+{"fcpMs":1580,"lcpMs":1580,"cls":0,"kbTransferidos":165,"requisicoes":4}
