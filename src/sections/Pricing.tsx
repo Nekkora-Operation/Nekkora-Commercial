@@ -1,4 +1,4 @@
-import { Badge, Card, IconBox, Link, SectionHeader } from 'nekkora-lib';
+import { Badge, Card, Icon, IconBox, Link, SectionHeader } from 'nekkora-lib';
 import { PRICING } from '../content';
 import { useRequestTrigger } from '../request';
 
@@ -72,6 +72,31 @@ export function Pricing() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="cards cards--2 cards--poster">
+          <div className="poster-tile" data-criteria>
+            <h3 className="poster-tile__title">{PRICING.criteria.title}</h3>
+            <ul className="checklist checklist--sm">
+              {PRICING.criteria.items.map((item) => (
+                <li key={item}>
+                  <Icon name="arrow-right" size="sm" color="var(--nk-color-accent)" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="poster-tile__text">{PRICING.criteria.note}</p>
+          </div>
+          <div className="poster-tile" data-conditions>
+            <h3 className="poster-tile__title">{PRICING.conditions.title}</h3>
+            <ul className="checklist checklist--sm">
+              {PRICING.conditions.items.map((item) => (
+                <li key={item}>
+                  <Icon name="check" size="sm" color="var(--nk-color-success-text, var(--nk-color-success))" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         <p className="center-note">{PRICING.hostingNote}</p>
       </div>

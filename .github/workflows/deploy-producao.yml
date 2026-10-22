@@ -1,0 +1,81 @@
+# Deploy de produção (COM-RELEASE-003 §6.4) — manual, com aprovação de release e portão de publicação.
+#
+# Pré-requisitos (titular): projeto no Cloudflare Pages ligado ao domínio nekkora.com; secrets CLOUDFLARE_API_TOKEN
+# (permissão "Cloudflare Pages: Edit") e CLOUDFLARE_ACCOUNT_ID e variável CLOUDFLARE_PAGES_PROJECT no environment
+# "production", que deve exigir aprovação de revisor (Settings → Environments → Required reviewers).
+#
+# O artefato publicado é reconstruído a partir da tag/commit informado — o build é determinístico (mesma lib, mesmo
+# lockfile) — e só sai se scripts/verificar-publicacao.mjs liberar. Depois do deploy, confere o domínio público.
+name: Deploy de produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag ou commit homologado (ex.: v1.0.0)'
+        required: true
+      confirmacao:
+        description: 'Digite PUBLICAR para confirmar a publicação em nekkora.com'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: producao
+  cancel-in-progress: false
+
+env:
+  WRANGLER_VERSION: 4.149.0
+  DOMINIO: https://nekkora.com
+
+jobs:
+  deploy:
+    name: Publicar ${{ inputs.ref }}
+    if: inputs.confirmacao == 'PUBLICAR'
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: https://nekkora.com
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: nekkora-lib versionada e reproduzível
+        run: node scripts/verificar-lib.mjs --reconstruir
+      - name: Build de produção
+        run: npm run typecheck && npm run build
+      - name: Portão de publicação (bloqueante)
+        run: node scripts/verificar-publicacao.mjs --dist dist
+      - name: Publicar no Cloudflare Pages (branch de produção)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$PROJECT"
+          npx --yes "wrangler@${WRANGLER_VERSION}" pages deploy dist --project-name "$PROJECT" --branch main \
+            --commit-hash "$(git rev-parse HEAD)" --commit-message "release ${{ inputs.ref }}" --commit-dirty=false
+      - name: Verificação pública (HTTPS, versão publicada, cabeçalhos)
+        run: |
+          set -euo pipefail
+          esperado=$(git rev-parse HEAD)
+          for i in $(seq 1 30); do
+            publicado=$(curl -sf "$DOMINIO/release.json" | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{try{console.log(JSON.parse(d).commit)}catch{}})' || true)
+            [ "$publicado" = "$esperado" ] && break
+            sleep 10
+          done
+          echo "commit publicado: $publicado · esperado: $esperado"
+          test "$publicado" = "$esperado"
+          curl -sfI "$DOMINIO/" | tee headers.txt
+          grep -qi '^content-security-policy:' headers.txt
+          grep -qi '^strict-transport-security:' headers.txt
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://nekkora.com/)" -ge 301
+          echo "Publicado: $DOMINIO (commit $esperado)" >> "$GITHUB_STEP_SUMMARY"

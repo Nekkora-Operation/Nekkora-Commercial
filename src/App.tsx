@@ -10,6 +10,7 @@ import { Hero } from './sections/Hero';
 import { Hosting } from './sections/Hosting';
 import { HowItWorks } from './sections/HowItWorks';
 import { Pricing } from './sections/Pricing';
+import { Privacy } from './sections/Privacy';
 import { Solutions } from './sections/Solutions';
 import { Transparency } from './sections/Transparency';
 
@@ -63,8 +64,9 @@ export function App() {
   // No celular, o botão flutuante sai de cena enquanto o contato está visível.
   const contactVisible = useContactVisible();
   const isMobile = useMediaQuery('(max-width: 900px)');
-  const tucked = contactVisible && isMobile;
   const [requestOpen, setRequestOpen] = useState(false);
+  // Também sai de cena com o diálogo aberto: ficaria por cima das ações do diálogo no celular.
+  const tucked = (contactVisible && isMobile) || requestOpen;
   const openRequest = useCallback(() => setRequestOpen(true), []);
 
   return (
@@ -96,6 +98,7 @@ export function App() {
           <Hosting />
           <Transparency />
           <Contact />
+          <Privacy />
         </main>
         <Footer />
         {WHATSAPP && (

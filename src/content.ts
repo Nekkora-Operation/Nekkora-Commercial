@@ -6,6 +6,7 @@
  * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
  */
 import type { IconName } from 'nekkora-lib';
+import { DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD } from './config';
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
@@ -48,6 +49,12 @@ export const SOLUTIONS = {
         'Entrega considerada pronta só com documentação, desenvolvimento, testes e homologação com você — cada etapa mediante a sua aprovação', // [A-03] [A-14]
         'Entrega e transferência conforme contratado', // [A-13]
       ],
+      // [A-15] [A-16] — tecnologias com que a Nekkora trabalha; nenhuma promessa de compatibilidade universal
+      technologies: {
+        label: 'Tecnologias, conforme o caso',
+        items: ['Python', 'UiPath', 'Power Automate', 'Integrações via API', 'Sistemas web', 'Dados e planilhas'],
+        note: 'A viabilidade com cada sistema é confirmada na avaliação.',
+      },
       href: '#precos',
       cta: 'Conhecer o Delivery',
     },
@@ -83,13 +90,41 @@ export const SOLUTIONS = {
 export const PRICING = {
   eyebrow: 'Preços · Nekkora Delivery',
   title: 'Quanto custa uma automação',
-  // [PR-01]
-  description: 'Valores por automação. A faixa é confirmada na avaliação e fica registrada na proposta, junto com escopo e condições.',
-  // [PR-02]
+  // [PR-01] [PR-06]
+  description: 'Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
+  // [PR-02] Com as datas da campanha em publicacao.json (PUB-13), o período aparece por extenso; sem elas, o texto do
+  // mockup continua e o deploy de produção fica bloqueado (scripts/verificar-publicacao.mjs).
   launch: {
     badge: 'Lançamento',
-    text: '50% de desconto em todas as automações nos próximos 2 meses.',
-    condition: 'Vale para propostas aprovadas no período.',
+    text: LAUNCH_PERIOD
+      ? `50% de desconto em todas as automações com proposta aprovada de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
+      : '50% de desconto em todas as automações nos próximos 2 meses.',
+    condition: LAUNCH_PERIOD ? 'Desconto sobre o valor da categoria definida na avaliação.' : 'Vale para propostas aprovadas no período.',
+  },
+  // [PR-06] — nenhum processo é enquadrado de antemão como simples ou médio
+  criteria: {
+    title: 'O que define a categoria',
+    items: [
+      'Quantidade de sistemas envolvidos',
+      'Complexidade das integrações',
+      'Regras de negócio e exceções',
+      'Volume de processamento',
+      'Exigências de infraestrutura',
+      'Necessidade de licenciamento',
+    ],
+    note: 'Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta.',
+  },
+  // [CO-01..CO-06] — modelo de atendimento (NEKKORA-RELEASE-001 §5.5); nada aqui promete prazo, resultado ou disponibilidade
+  conditions: {
+    title: 'Condições comerciais',
+    items: [
+      'Desenvolvimento sob demanda, com escopo formalizado em proposta',
+      'Preço aprovado por você antes do início do desenvolvimento',
+      'Pagamento de 50% na contratação e 50% na entrega, conforme a proposta',
+      'Demandas organizadas em fila: o início depende da fila e da aprovação da proposta',
+      'Reuniões e acompanhamento conforme as condições acordadas',
+      'Licenças e custos externos tratados à parte, quando aplicáveis',
+    ],
   },
   // [PR-01] [PR-02]
   tiers: [
@@ -108,12 +143,12 @@ export const PRICING = {
       price: { from: 'R$ 2.800', to: 'R$ 1.400', discount: '−50%', unit: 'por automação · lançamento' },
     },
     {
-      overline: 'Completa · pacotes',
-      title: 'Automações completas e pacotes',
-      fit: 'Processos ponta a ponta, integrações por API ou várias automações contratadas em conjunto.',
+      overline: 'Complexa · pacotes',
+      title: 'Automação complexa',
+      fit: 'Processos ponta a ponta, várias integrações por API ou várias automações contratadas em conjunto.',
       variant: 'outlined' as const,
       // [PR-03]
-      negotiated: { label: 'Negociação à parte', unit: 'dimensionada na avaliação · desconto de lançamento aplicável' },
+      negotiated: { label: 'Sob orçamento', unit: 'dimensionada na avaliação · desconto de lançamento aplicável' },
       cta: 'Solicitar avaliação',
     },
   ],
@@ -211,21 +246,39 @@ export const CONTACT_COPY = {
   title: 'Vamos olhar o seu processo de perto?',
   description: 'A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.',
   cta: 'Solicitar avaliação',
+  // Alternativa sem formulário (§5.4): canais diretos, sem preencher nada no site
+  directTitle: 'Prefere falar direto?',
   // [K-01..K-03] pendentes
   pendingCaption: 'Canais oficiais em definição · formulário em modo de demonstração',
   // Diálogo "Solicitar avaliação" (modelo C, etapa 2)
   dialogTitle: 'Solicitar avaliação',
-  dialogDescription: 'Deixe seus dados e um resumo do processo. A solicitação inicia uma avaliação — não é uma contratação.',
+  dialogDescription: 'Conte qual processo você quer automatizar. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.',
   /** Só aparece com WhatsApp confirmado em config.ts (PUB-01). */
   whatsappDirect: 'Falar diretamente pelo WhatsApp',
   orForm: 'ou preencha o formulário',
   formTitle: 'Formulário de solicitação',
   processHint: 'Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.',
+  emailHint: 'Opcional — só se preferir retorno por e-mail.',
+  privacyLink: 'Como tratamos seus dados',
   // [K-05]
   demoNote: 'Modo de demonstração: nenhum dado é enviado ou armazenado.',
   demoSubmit: 'Revisar solicitação',
-  whatsappSubmit: 'Enviar pelo WhatsApp',
-  whatsappNote: 'Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página.',
+  whatsappSubmit: 'Revisar mensagem',
+  whatsappNote: 'Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página.',
+  // Etapa "Confirmar solicitação" (§5.2/§5.3)
+  review: {
+    title: 'Confirme a sua solicitação',
+    intro: 'Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.',
+    transfer:
+      'Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.',
+    open: 'Abrir no WhatsApp',
+    back: 'Voltar e editar',
+    copy: 'Copiar mensagem',
+    copied: 'Mensagem copiada.',
+    copyFailed: 'Não foi possível copiar automaticamente — selecione o texto da mensagem acima.',
+    manual: 'Se o WhatsApp não abrir, copie a mensagem e envie para',
+    email: 'Prefere e-mail? Escreva para',
+  },
   // Nunca afirmar abertura nem envio: com noopener o navegador não informa se a aba foi criada (D-18).
   whatsappRequested: {
     title: 'Pedimos ao navegador para abrir o WhatsApp',
@@ -254,7 +307,50 @@ export const LOGIN = {
   unavailable: 'Acesso de clientes ainda não disponível.',
 };
 
+/* ------------------------------------------------------------------ */
+/* Privacidade (§5.4) — minuta para revisão da titular                */
+/* ------------------------------------------------------------------ */
+/**
+ * Só fatos do código e da hospedagem: sem cookies, sem análise, sem envio pelo formulário. Controlador e provedor de
+ * hospedagem vêm de publicacao.json; enquanto pendentes, o texto usa termos genéricos e o deploy de produção fica
+ * bloqueado (aprovação "avisoDePrivacidade").
+ */
+const controller = DATA_CONTROLLER.name ? `${DATA_CONTROLLER.name}${DATA_CONTROLLER.document ? ` (${DATA_CONTROLLER.document})` : ''}` : 'a Nekkora';
+export const PRIVACY = {
+  eyebrow: 'Privacidade',
+  title: 'Como tratamos seus dados',
+  description: `Responsável pelos dados pessoais desta página: ${controller}.`,
+  items: [
+    {
+      icon: 'shield' as IconName,
+      title: 'O formulário não envia nada',
+      text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
+    },
+    {
+      icon: 'whatsapp' as IconName,
+      title: 'O que vai para o WhatsApp',
+      text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
+    },
+    {
+      icon: 'eye' as IconName,
+      title: 'Sem cookies nem rastreamento',
+      text: 'Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.',
+    },
+    {
+      icon: 'server' as IconName,
+      title: 'Registros de acesso',
+      text: `${HOSTING_PROVIDER ?? 'O provedor de hospedagem'} registra dados técnicos de acesso, como endereço IP e navegador, para segurança e funcionamento do site.`,
+    },
+    {
+      icon: 'user' as IconName,
+      title: 'Uso e seus direitos',
+      text: 'Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.',
+    },
+  ],
+};
+
 export const FOOTER = {
+  privacy: 'Privacidade',
   preview: 'Versão para homologação',
   signature: 'Neko (猫) observa os detalhes.',
 };

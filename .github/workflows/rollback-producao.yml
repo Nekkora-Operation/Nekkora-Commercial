@@ -1,0 +1,43 @@
+# Rollback de produção (COM-RELEASE-003 §6.5): volta nekkora.com para um deploy anterior JÁ PUBLICADO no Cloudflare
+# Pages, sem reconstruir nada (API de rollback do Pages). Sem deployment_id, usa o deploy de produção imediatamente
+# anterior ao atual. Exige a mesma aprovação do environment "production". Procedimento manual equivalente (painel do
+# Cloudflare) em docs/release/COM-RELEASE-003-operacao.md.
+name: Rollback de produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: 'ID do deploy de destino (vazio = o anterior ao atual)'
+        required: false
+      motivo:
+        description: 'Motivo do rollback (registro)'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: producao
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: https://nekkora.com
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Rollback via API do Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+          DESTINO: ${{ inputs.deployment_id }}
+          MOTIVO: ${{ inputs.motivo }}
+        run: node scripts/rollback-pages.mjs

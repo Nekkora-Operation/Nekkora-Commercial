@@ -100,7 +100,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .offer-card h3 { margin: 0; font-size: var(--nk-font-size-xl); font-weight: 600; color: var(--nk-color-text); }
 .offer-card__summary { margin: 0; font-size: var(--nk-font-size-md); line-height: 1.55; color: var(--nk-color-text); }
 .offer-card__fit { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); flex: 1; }
-.offer-card .checklist { flex: 1; }
+.offer-card .checklist { flex: 1; align-content: start; } /* ocupa o espaço (CTA no rodapé do card) sem espaçar os itens */
 
 /* Bloco simples com borda (etapas, notas e transparência) */
 .poster-tile {
@@ -188,9 +188,25 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 /* Diálogo "Solicitar avaliação" (modelo C, etapa 2) */
 .request__body, .request__form, .contact__done { display: flex; flex-direction: column; gap: 16px; }
 .request__pending { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.5; color: var(--nk-color-text-secondary); }
-.request__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.request__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; }
 .request .nk-dialog__footer { flex-direction: column; align-items: stretch; gap: 12px; }
 .request__note { text-align: center; }
+/* Etapa de confirmação (COM-RELEASE-002): a mensagem exata que vai para o WhatsApp */
+.request__step-title { margin: 0; font-size: var(--nk-font-size-lg); font-weight: 600; color: var(--nk-color-text); }
+.request__message {
+  margin: 0; padding: 12px 14px; max-height: 220px; overflow: auto; min-width: 0;
+  white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--nk-font-family); font-size: var(--nk-font-size-sm); line-height: 1.55;
+  color: var(--nk-color-text); background: var(--nk-color-surface-sunken); border: 1px solid var(--nk-color-border); border-radius: var(--nk-radius-md);
+}
+.request__manual { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.request__manual .contact__note { margin: 0; }
+.request__number { white-space: nowrap; color: var(--nk-color-text); }
+.contact__direct { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+/* Tecnologias do Delivery */
+.tech { display: flex; flex-direction: column; gap: 8px; }
+.tech__label { font-size: var(--nk-font-size-xs); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--nk-color-text-secondary); }
+.tech__list { display: flex; flex-wrap: wrap; gap: 6px; }
+.tech__note { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
 .contact__done:focus { outline: none; }
 .contact__done > .nk-button { align-self: flex-start; }
 
@@ -211,6 +227,9 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 @media (max-width: 640px) {
   .wrap { padding-inline: 16px; }
   .contact__form-grid { grid-template-columns: minmax(0, 1fr); }
+  /* diálogo: ações empilhadas, a principal em cima (como o rodapé do Dialog da lib abaixo de 480 px) */
+  .request__actions { grid-template-columns: minmax(0, 1fr); }
+  .request__actions > :last-child { order: -1; }
   .hero__ctas > * { flex: 1 1 100%; }
   .hosting-band__visual { display: none; }
   /* espaço para o botão flutuante (só existe com WhatsApp confirmado) não cobrir o fim da página */

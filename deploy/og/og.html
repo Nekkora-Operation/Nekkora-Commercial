@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- Modelo da imagem de compartilhamento (Open Graph / LinkedIn), 1200×627. Gere public/og-nekkora.jpg com
+     `node scripts/gerar-og.mjs`. Fonte: Inter do pacote nekkora-lib; logotipo: brand/nekkora-lockup-dark.svg da lib. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 100 900; src: url('../../node_modules/nekkora-lib/dist/fonts/inter-latin-wght-normal.woff2') format('woff2'); }
+  html, body { margin: 0; }
+  body { width: 1200px; height: 627px; overflow: hidden; font-family: 'Inter', sans-serif; color: #f8f2f7;
+    background: radial-gradient(120% 90% at 85% 10%, #4b2138 0%, #2a1428 38%, #1b0c1a 72%); }
+  .wrap { box-sizing: border-box; height: 100%; padding: 64px 80px; display: flex; flex-direction: column; justify-content: space-between; }
+  .logo { height: 58px; width: auto; align-self: flex-start; }
+  h1 { margin: 0; font-size: 64px; line-height: 1.06; letter-spacing: -0.03em; font-weight: 700; max-width: 19ch; }
+  h1 em { font-style: normal; color: #f0a3b8; }
+  .row { display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 500; color: #e8dce6; }
+  .pill { padding: 8px 18px; border-radius: 999px; border: 2px solid rgba(240,163,184,.55); color: #f8f2f7; font-size: 22px; font-weight: 600; }
+  .url { margin-left: auto; font-size: 24px; font-weight: 600; color: #f0a3b8; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <img class="logo" src="nekkora-lockup-dark.svg" alt="Nekkora" />
+    <h1>Automação sob medida, <em>da necessidade à execução.</em></h1>
+    <div class="row"><span class="pill">Delivery</span><span>Automações por demanda, com escopo, preço e aceite em proposta</span></div>
+    <div class="row"><span class="url">nekkora.com</span></div>
+  </div>
+</body>
+</html>

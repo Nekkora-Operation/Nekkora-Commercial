@@ -28,6 +28,21 @@ export function Solutions() {
                     </li>
                   ))}
                 </ul>
+                {'technologies' in s && s.technologies && (
+                  <div className="tech">
+                    <span className="tech__label">{s.technologies.label}</span>
+                    <ul className="tech__list plain-list">
+                      {s.technologies.items.map((t) => (
+                        <li key={t}>
+                          <Badge tone="neutral" variant="outline" size="sm">
+                            {t}
+                          </Badge>
+                        </li>
+                      ))}
+                    </ul>
+                    <span className="tech__note">{s.technologies.note}</span>
+                  </div>
+                )}
                 <Link href={s.href} arrow>
                   {s.cta}
                 </Link>

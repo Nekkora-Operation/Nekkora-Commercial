@@ -1,4 +1,4 @@
-# COM-001 — Texto comercial consolidado (modelo C — Poster)
+# Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002)
 
 > Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere
 > o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.
@@ -29,6 +29,8 @@ Desenvolvimento de automações por demanda.
 - Entrega considerada pronta só com documentação, desenvolvimento, testes e homologação com você — cada etapa mediante a sua aprovação
 - Entrega e transferência conforme contratado
 
+Tecnologias, conforme o caso: Python · UiPath · Power Automate · Integrações via API · Sistemas web · Dados e planilhas. _A viabilidade com cada sistema é confirmada na avaliação._
+
 Link: "Conhecer o Delivery" (#precos)
 
 ### 02 · Nekkora Hosting · _Em avaliação de viabilidade_
@@ -47,7 +49,7 @@ Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum de
 
 **Preços · Nekkora Delivery** — Quanto custa uma automação
 
-Valores por automação. A faixa é confirmada na avaliação e fica registrada na proposta, junto com escopo e condições.
+Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
 
 > **Lançamento** — 50% de desconto em todas as automações nos próximos 2 meses. Vale para propostas aprovadas no período.
 
@@ -55,10 +57,30 @@ Valores por automação. A faixa é confirmada na avaliação e fica registrada 
 |---|---|---|
 | Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | ~~R$ 1.000~~ **R$ 500** −50% — por automação · lançamento |
 | Automação média | Mais de um sistema, validações, tratamento de exceções e relatórios. | ~~R$ 2.800~~ **R$ 1.400** −50% — por automação · lançamento |
-| Automações completas e pacotes | Processos ponta a ponta, integrações por API ou várias automações contratadas em conjunto. | **Negociação à parte** — dimensionada na avaliação · desconto de lançamento aplicável |
+| Automação complexa | Processos ponta a ponta, várias integrações por API ou várias automações contratadas em conjunto. | **Sob orçamento** — dimensionada na avaliação · desconto de lançamento aplicável |
 
 - **Por que os valores são baixos** — Usamos uma ferramenta própria que agiliza a documentação e o desenvolvimento de cada automação. Menos horas de levantamento e retrabalho, preço menor para você — sem cortar etapas: documentação, testes e homologação continuam no escopo.
 - **Licenças ficam por conta do cliente** — Qualquer licença de software ou serviço de terceiros (UiPath, Power Automate, APIs, servidores) é responsabilidade do cliente. Indicamos o que é necessário na proposta; a contratação e o custo não estão incluídos nos valores acima.
+
+**O que define a categoria**
+
+- Quantidade de sistemas envolvidos
+- Complexidade das integrações
+- Regras de negócio e exceções
+- Volume de processamento
+- Exigências de infraestrutura
+- Necessidade de licenciamento
+
+Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta.
+
+**Condições comerciais**
+
+- Desenvolvimento sob demanda, com escopo formalizado em proposta
+- Preço aprovado por você antes do início do desenvolvimento
+- Pagamento de 50% na contratação e 50% na entrega, conforme a proposta
+- Demandas organizadas em fila: o início depende da fila e da aprovação da proposta
+- Reuniões e acompanhamento conforme as condições acordadas
+- Licenças e custos externos tratados à parte, quando aplicáveis
 
 Hosting tem avaliação e proposta próprias.
 
@@ -124,18 +146,38 @@ Botão: "Solicitar avaliação" (abre o diálogo)
 
 Sem canais confirmados: _Canais oficiais em definição · formulário em modo de demonstração_
 
-Diálogo **Solicitar avaliação** — Deixe seus dados e um resumo do processo. A solicitação inicia uma avaliação — não é uma contratação.
+Diálogo **Solicitar avaliação** — Conte qual processo você quer automatizar. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.
 
 Com WhatsApp confirmado: botão "Falar diretamente pelo WhatsApp" + divisor "ou preencha o formulário". Sem canal: _Canais oficiais em definição · formulário em modo de demonstração_
 
-Formulário: Nome*, E-mail*, Telefone / WhatsApp (opcional), Empresa (opcional), "Descreva o processo"* — Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.. Rodapé: "Cancelar" + envio.
+Formulário: Nome*, Empresa (opcional), E-mail (Opcional — só se preferir retorno por e-mail.), "Descreva o processo"* — Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.. Rodapé: "Cancelar" + envio; link "Como tratamos seus dados".
 
 Modo demonstração: botão "Revisar solicitação"; nota "Modo de demonstração: nenhum dado é enviado ou armazenado."; resultado **Solicitação validada — envio desativado nesta versão** — Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.
 
-Com WhatsApp confirmado: botão "Enviar pelo WhatsApp"; nota "Ao enviar, abrimos o WhatsApp com a sua mensagem pronta. Nada é armazenado nesta página."
+Com WhatsApp confirmado: botão "Revisar mensagem"; nota "Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página."
 
-- Após enviar: **Pedimos ao navegador para abrir o WhatsApp** — Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.
+Etapa de confirmação: **Confirme a sua solicitação** — Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.
+
+> **Antes de continuar** — Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.
+
+Botões: "Voltar e editar" · "Abrir no WhatsApp". Alternativas: "Copiar mensagem"; "Se o WhatsApp não abrir, copie a mensagem e envie para <número>"; "Prefere e-mail? Escreva para <e-mail>".
+
+- Após abrir: **Pedimos ao navegador para abrir o WhatsApp** — Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.
 - Link manual (sempre): "Abrir conversa no WhatsApp"
+
+Canais diretos (sem formulário): "Prefere falar direto?"
+
+## 7a. Privacidade
+
+**Privacidade** — Como tratamos seus dados
+
+Responsável pelos dados pessoais desta página: a Nekkora.
+
+- **O formulário não envia nada** — O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.
+- **O que vai para o WhatsApp** — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.
+- **Sem cookies nem rastreamento** — Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.
+- **Registros de acesso** — O provedor de hospedagem registra dados técnicos de acesso, como endereço IP e navegador, para segurança e funcionamento do site.
+- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.
 
 ## 8. Barra de navegação
 
@@ -144,5 +186,6 @@ Links: Soluções · Preços · Como funciona · Hosting · Transparência. Bot�
 ## 9. Rodapé
 
 - © Nekkora. Todos os direitos reservados.
-- Versão para homologação
+- Link "Privacidade"
+- Versão para homologação (enquanto publicacao.json mantiver avisoHomologacao)
 - Neko (猫) observa os detalhes.

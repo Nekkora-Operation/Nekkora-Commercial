@@ -1,3 +1,4 @@
+import { Link } from 'nekkora-lib';
 import { PREVIEW_NOTICE } from '../config';
 import { FOOTER } from '../content';
 
@@ -8,6 +9,9 @@ export function Footer() {
     <footer className="footer">
       <div className="wrap footer__bottom">
         <span>© {year} Nekkora. Todos os direitos reservados.</span>
+        <Link href="#privacidade" variant="subtle" size="sm">
+          {FOOTER.privacy}
+        </Link>
         {PREVIEW_NOTICE && <span className="footer__preview">{FOOTER.preview}</span>}
         <span>{FOOTER.signature}</span>
       </div>

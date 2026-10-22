@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * Homologação automatizada da página comercial (COM-001) num navegador real (Chromium via Playwright).
+ * Homologação automatizada da página comercial num navegador real (Playwright: Chromium, Firefox ou WebKit).
  *
  * Uso:
- *   npm run build && npx vite preview --port 4173 --strictPort      # em outro terminal
- *   node scripts/homologacao.mjs http://localhost:4173/ docs/com-001/evidencias/depois
+ *   npm run build && npm run preview -- --port 4173 --strictPort      # em outro terminal
+ *   node scripts/homologacao.mjs http://127.0.0.1:4173/ docs/release/evidencias/<pasta>
+ *   NEKKORA_NAVEGADOR=firefox node scripts/homologacao.mjs ...        # chromium (padrão), firefox ou webkit
  *
- * Playwright e axe-core NÃO são dependências deste projeto (fora do escopo da missão). O script os resolve a partir
- * de NEKKORA_PW_MODULES (pasta node_modules que os contenha) ou do próprio projeto, se instalados:
- *   NEKKORA_PW_MODULES=../Nekkora-Platform-Web/node_modules node scripts/homologacao.mjs ...
+ * Playwright e axe-core são devDependencies desde a COM-RELEASE-001 (versões fixas). NEKKORA_PW_MODULES continua
+ * aceito para usar outra pasta node_modules que os contenha.
  *
  * Saída: capturas (JPEG), resultados.json e resumo.md na pasta indicada. Código de saída 1 se alguma verificação
  * falhar. Nenhuma requisição sai do localhost: tudo que tentar sair é bloqueado e registrado.
@@ -20,7 +20,9 @@ import path from 'node:path';
 const [, , baseUrl = 'http://localhost:4173/', outDir = 'docs/com-001/evidencias/depois'] = process.argv;
 const modules = process.env.NEKKORA_PW_MODULES;
 const require = createRequire(modules ? path.resolve(modules, 'noop.js') : import.meta.url);
-const { chromium } = require('playwright');
+const ENGINE = process.env.NEKKORA_NAVEGADOR ?? 'chromium';
+const playwright = require('playwright');
+if (!['chromium', 'firefox', 'webkit'].includes(ENGINE)) throw new Error(`NEKKORA_NAVEGADOR inválido: ${ENGINE}`);
 const axeSource = require('node:fs').readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 mkdirSync(outDir, { recursive: true });
@@ -50,13 +52,14 @@ const FORBIDDEN = [
   { id: 'monitoramento-continuo', re: /monitoramento cont[ií]nuo|monitoramento 24/gi },
 ];
 
-const results = { baseUrl, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
+const results = { baseUrl, navegador: ENGINE, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
 const check = (id, ok, detail) => {
   results.checks.push({ id, ok: !!ok, detail });
   console.log(`${ok ? 'OK  ' : 'FALHA'} ${id}${detail ? ` — ${typeof detail === 'string' ? detail : JSON.stringify(detail)}` : ''}`);
 };
 
-const browser = await chromium.launch();
+const browser = await playwright[ENGINE].launch();
+results.versaoNavegador = browser.version();
 const local = new URL(baseUrl).origin;
 
 async function newPage(viewport, theme) {
@@ -75,12 +78,10 @@ async function newPage(viewport, theme) {
   // Nada sai do localhost: requisições externas são abortadas e registradas.
   await context.route('**/*', (route) => {
     const url = route.request().url();
+    // Fonte Inter: vem da nekkora-lib 0.2.0 (dist/fonts) e é servida pelo próprio site — registrada à parte.
+    if (url.startsWith(local) && /\.woff2(\?|$)/.test(url)) results.fonts.add(new URL(url).pathname.replace(/-[\w-]{8}\.woff2$/, '.woff2'));
     if (url.startsWith(local) || url.startsWith('data:') || url.startsWith('blob:')) return route.continue();
-    // Fonte Inter: importada pela própria nekkora-lib (foundation.css). Permitida e registrada à parte.
-    if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(url)) {
-      results.fonts.add(new URL(url).origin);
-      return route.continue();
-    }
+    // Qualquer outra origem (inclusive Google Fonts, que a lib usava antes da 0.2.0) é bloqueada e reprova a homologação.
     results.blocked.push(url);
     return route.abort();
   });
@@ -178,7 +179,7 @@ async function measureContrastByPixels(page, selectors) {
 for (const theme of THEMES) {
   for (const vp of [WIDTHS[0], WIDTHS[2]]) {
     const { context, page } = await newPage({ width: vp.width, height: vp.height }, theme);
-    await page.addScriptTag({ content: axeSource });
+    await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
     const axe = await page.evaluate(async () => {
       // eslint-disable-next-line no-undef
       const r = await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
@@ -229,7 +230,7 @@ await block('funcionais', async () => {
   // Ordem e hierarquia das seções
   const sections = await page.$$eval('main > section[id]', (els) => els.map((e) => e.id));
   results.sections = sections;
-  const expected = ['inicio', 'solucoes', 'precos', 'como-funciona', 'hosting', 'transparencia', 'contato'];
+  const expected = ['inicio', 'solucoes', 'precos', 'como-funciona', 'hosting', 'transparencia', 'contato', 'privacidade'];
   check('ordem-das-secoes', JSON.stringify(sections) === JSON.stringify(expected), sections.join(' > '));
   const h1 = await page.$$eval('h1', (els) => els.length);
   check('um-unico-h1', h1 === 1, `${h1} h1`);
@@ -274,15 +275,39 @@ await block('funcionais', async () => {
     const text = block?.innerText ?? '';
     return {
       blocks: document.querySelectorAll('[data-pricing]').length,
-      condition: /Vale para propostas aprovadas no período/.test(text),
+      condition: /Vale para propostas aprovadas no período|Desconto sobre o valor da categoria definida na avaliação/.test(text),
       confirmedInProposal: /fica registrada na proposta/.test(text),
       licenses: /não estão incluídos nos valores acima/.test(text),
+      // Tabela da NEKKORA-RELEASE-001 §4.4
+      table: {
+        simples: /R\$ 1\.000[\s\S]*?R\$ 500/.test(text),
+        media: /R\$ 2\.800[\s\S]*?R\$ 1\.400/.test(text),
+        complexa: /Automação complexa[\s\S]*?Sob orçamento/.test(text),
+      },
+      criteria: ['Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
+      conditions: /50% na contratação e 50% na entrega/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
       srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
     };
   });
   results.pricing = pricing;
   check('precos-so-no-bloco-de-precos', pricing.blocks === 1 && hits.filter((h) => h.pricing).length > 0, `${pricing.blocks} bloco(s) data-pricing`);
   check('precos-com-condicoes-visiveis', pricing.condition && pricing.confirmedInProposal && pricing.licenses, JSON.stringify({ ...pricing, srLabels: undefined }));
+  check('precos-tabela-da-missao', Object.values(pricing.table).every(Boolean), JSON.stringify(pricing.table));
+  check('precos-criterios-de-categoria', pricing.criteria);
+  check('condicoes-comerciais-visiveis', pricing.conditions);
+  // Delivery: tecnologias citadas sem promessa de compatibilidade universal
+  const delivery = await page.locator('#solucoes').innerText();
+  check(
+    'delivery-tecnologias-com-ressalva',
+    ['Python', 'UiPath', 'Power Automate', 'Integrações via API'].every((t) => delivery.includes(t)) && /viabilidade com cada sistema é confirmada na avaliação/.test(delivery),
+  );
+  // Privacidade: seção própria, link no rodapé e no formulário
+  const privacy = await page.locator('#privacidade').innerText();
+  check(
+    'privacidade-visivel',
+    /O que vai para o WhatsApp/.test(privacy) && /Sem cookies nem rastreamento/.test(privacy) && (await page.locator('footer a[href="#privacidade"]').count()) === 1,
+    privacy.split('\n').slice(0, 2).join(' · '),
+  );
   check('precos-leitura-do-valor-riscado', pricing.srLabels.length === 4 && pricing.srLabels.every((t) => /Valor (sem|com) desconto/.test(t)), pricing.srLabels.join(' | '));
 
   // Produtos internos não aparecem como obrigatórios/disponíveis: cada menção fica em bloco marcado
@@ -398,7 +423,8 @@ await block('funcionais', async () => {
   // O foco vai ao primeiro erro no quadro seguinte (requestAnimationFrame): espera até 1 s em vez de ler na hora.
   await page.waitForFunction(() => document.activeElement?.getAttribute('aria-invalid') === 'true', null, { timeout: 1000 }).catch(() => {});
   const focused = await page.evaluate(() => document.activeElement?.getAttribute('aria-invalid'));
-  check('formulario-erros-obrigatorios', invalid >= 3, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
+  // Obrigatórios: nome e descrição (e-mail é opcional desde a COM-RELEASE-002 — só o necessário para o contato)
+  check('formulario-erros-obrigatorios', invalid === 2, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
   check('formulario-foco-no-primeiro-erro', focused === 'true');
   await page.screenshot({ path: path.join(outDir, 'formulario-erros.png') });
   results.screenshots.push('formulario-erros.png');
@@ -417,6 +443,9 @@ await block('funcionais', async () => {
   const contactStatus = await page.evaluate(() => document.querySelector('[data-contact-status]')?.getAttribute('data-contact-status'));
   if (contactStatus === 'pendente') {
     check('formulario-modo-demonstracao', /envio desativado/i.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
+  } else {
+    // Com canal: a etapa seguinte é a confirmação da mensagem — nada é aberto antes do clique do visitante
+    check('formulario-vai-para-confirmacao', /Confirme a sua solicitação/.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
   }
   check('formulario-sem-envio-real', !popup && page.url() === urlBefore && results.blocked.length === blockedBefore, `popup=${popup}; url inalterada=${page.url() === urlBefore}`);
   // O resumo precisa ficar visível na janela e receber o foco.
@@ -475,7 +504,7 @@ await block('dialogo-acessibilidade', async () => {
       const { context, page } = await newPage({ width: vp.width, height: vp.height }, theme);
       await page.locator('#inicio [aria-haspopup="dialog"]').click();
       await page.getByRole('dialog').waitFor();
-      await page.addScriptTag({ content: axeSource });
+      await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
       const r = await page.evaluate(async () => {
         // eslint-disable-next-line no-undef
         const res = await axe.run(document.querySelector('[role="dialog"]'), { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
@@ -492,6 +521,7 @@ await block('dialogo-acessibilidade', async () => {
 });
 
 check('sem-requisicoes-externas', results.blocked.length === 0, results.blocked.join(' | ') || 'nenhuma');
+check('fonte-servida-pelo-proprio-site', results.fonts.size > 0, [...results.fonts].join(', ') || 'nenhuma fonte carregada');
 const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c));
 check('console-sem-erros', realErrors.length === 0, realErrors.join(' | ') || 'limpo');
 
@@ -503,7 +533,7 @@ writeFileSync(path.join(outDir, 'resultados.json'), JSON.stringify(results, null
 const md = [
   `# Homologação automatizada — ${results.finishedAt}`,
   '',
-  `URL: ${baseUrl} · Chromium (Playwright) · ${results.summary.total} verificações · ${results.summary.failed} falha(s)`,
+  `URL: ${baseUrl} · ${ENGINE} ${results.versaoNavegador} (Playwright) · ${results.summary.total} verificações · ${results.summary.failed} falha(s)`,
   '',
   '| Verificação | Resultado | Detalhe |',
   '|---|---|---|',

@@ -1,0 +1,27 @@
+{
+  "$comentario": "Dados que só a titular pode confirmar. Enquanto um valor for null/false, a página não faz a afirmação correspondente e scripts/verificar-publicacao.mjs bloqueia o deploy de produção. Veja docs/release/COM-RELEASE-PENDENCIAS.md.",
+  "canais": {
+    "whatsapp": null,
+    "email": null,
+    "linkedin": null,
+    "instagram": null
+  },
+  "campanhaLancamento": {
+    "inicio": null,
+    "fim": null
+  },
+  "controlador": {
+    "nome": null,
+    "documento": null
+  },
+  "hospedagem": {
+    "provedor": null
+  },
+  "aprovacoes": {
+    "precosECondicoes": false,
+    "textosComerciais": false,
+    "avisoDePrivacidade": false,
+    "publicacao": false
+  },
+  "avisoHomologacao": true
+}
