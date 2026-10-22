@@ -62,7 +62,7 @@ check('email-exibido', links.includes('mailto:teste@exemplo.invalid'));
 check('linkedin-perfil-exibido', links.includes('https://www.linkedin.com/company/exemplo-invalido'));
 check('instagram-pagina-inicial-rejeitado', !links.some((h) => h.includes('instagram.com')), 'URL sem caminho de perfil não vira link');
 check('botao-flutuante-presente', (await page.locator('a[href^="https://wa.me/"][aria-label], .nk-fab').count()) > 0);
-check('aviso-canais-pendentes-ausente', (await page.getByText('Canais de contato em definição').count()) === 0);
+check('aviso-canais-pendentes-ausente', (await page.getByText('Canais oficiais em definição').count()) === 0);
 
 // Navegador que permite a nova aba
 const form = page.locator('#contato form');

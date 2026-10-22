@@ -1,28 +1,24 @@
-import { Badge, Card, Icon, IconBox, Link, SectionHeader } from 'nekkora-lib';
+import { Badge, Card, Icon, Link, SectionHeader } from 'nekkora-lib';
 import { SOLUTIONS } from '../content';
 
 export function Solutions() {
   return (
-    <section id="solucoes" className="section" aria-labelledby="solucoes-title">
+    <section id="solucoes" className="section section--band section--tight-top" aria-labelledby="solucoes-title">
       <div className="wrap stack">
-        <SectionHeader
-          titleId="solucoes-title"
-          align="center"
-          eyebrow={SOLUTIONS.eyebrow}
-          title={SOLUTIONS.title}
-          description={SOLUTIONS.description}
-        />
-        <ul className="cards cards--2 plain-list">
+        <SectionHeader titleId="solucoes-title" align="center" size="lg" eyebrow={SOLUTIONS.eyebrow} title={SOLUTIONS.title} />
+        <ul className="cards cards--2 cards--poster plain-list">
           {SOLUTIONS.cards.map((s) => (
             <li key={s.id}>
-              <Card className="offer-card" variant="surface" padding="lg">
+              <Card className="offer-card" variant={s.variant} padding="lg">
+                <span className="poster-num" aria-hidden="true">
+                  {s.number}
+                </span>
                 <div className="offer-card__head">
-                  <IconBox icon={s.icon} tone="accent" size="lg" />
+                  <h3>{s.name}</h3>
                   <Badge tone={s.stageTone} variant="soft" size="sm">
                     {s.stage}
                   </Badge>
                 </div>
-                <h3>{s.name}</h3>
                 <p className="offer-card__summary">{s.summary}</p>
                 <ul className="checklist checklist--sm">
                   {s.items.map((item) => (
@@ -39,15 +35,7 @@ export function Solutions() {
             </li>
           ))}
         </ul>
-        <p className="note">
-          <Icon name="info" size="sm" />
-          <span>
-            {SOLUTIONS.note}{' '}
-            <Link href="#combinado" size="sm">
-              {SOLUTIONS.noteLink}
-            </Link>
-          </span>
-        </p>
+        <p className="center-note">{SOLUTIONS.note}</p>
       </div>
     </section>
   );

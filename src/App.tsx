@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react';
 import { Button, FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
 import { NAV_LINKS, whatsappUrl } from './config';
 import { useMediaQuery } from './hooks';
-import { Combined } from './sections/Combined';
 import { Contact } from './sections/Contact';
-import { Delivery } from './sections/Delivery';
-import { Differentials } from './sections/Differentials';
 import { Footer } from './sections/Footer';
 import { Hero } from './sections/Hero';
 import { Hosting } from './sections/Hosting';
 import { HowItWorks } from './sections/HowItWorks';
+import { Pricing } from './sections/Pricing';
 import { Solutions } from './sections/Solutions';
 import { Transparency } from './sections/Transparency';
 
@@ -77,7 +75,7 @@ export function App() {
         activeHref={active}
         tools={<ThemeToggle />}
         actions={
-          <Button size="sm" rightIcon="arrow-right" href="#contato">
+          <Button size="sm" pill href="#contato">
             Solicitar avaliação
           </Button>
         }
@@ -85,11 +83,9 @@ export function App() {
       <main id="conteudo" tabIndex={-1}>
         <Hero />
         <Solutions />
-        <Delivery />
+        <Pricing />
         <HowItWorks />
         <Hosting />
-        <Combined />
-        <Differentials />
         <Transparency />
         <Contact />
       </main>
