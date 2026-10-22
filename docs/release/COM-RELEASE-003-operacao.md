@@ -27,7 +27,7 @@ PULL REQUEST / push na main
   │                    vendor/nekkora-lib.json, npm ci + build + pack e exige o MESMO sha256 do tarball versionado
   └─ commercial ...... npm ci (lockfile) → typecheck → npm test (portão + rollback) → build → portão (informativo)
   │                    → artefato commercial-dist-<sha> (90 dias), com release.json (commit, lib, origem dos dados)
-  └─ integracao ...... Playwright 1.63.0 (Chromium, Firefox, WebKit): homologacao.mjs na página e
+  └─ integracao ...... imagem mcr.microsoft.com/playwright:v1.63.0-noble (Chromium, Firefox, WebKit): homologacao.mjs na página e
   │                    homologacao-canais.mjs na jornada de conversão (build com dados sintéticos)
   └─ preview ......... (PR) Cloudflare Pages, branch do PR — pulado enquanto INF-01..03 não existirem
 APROVAÇÃO DE RELEASE → workflow "Deploy de produção" (manual, environment production com revisor)
@@ -97,6 +97,7 @@ favicons. Rotas: página única com âncoras; endereço inexistente → 404 (nã
 
 | Verificação | Resultado |
 |---|---|
+| CI no GitHub — [run 39826399640](https://github.com/Nekkora-Operation/Nekkora-Commercial/actions/runs/39826399640) (Ubuntu, imagem Playwright 1.63.0) | **verde**: lib reconstruída com o mesmo sha256; typecheck, 19 testes, build; página 70/70 em Chromium, Firefox e WebKit; jornada 99/99; preview pulado (Cloudflare não configurado) |
 | Reconstrução da lib a partir do GitHub (Windows) | mesmo sha256 do CI (`1a2e6145…`) |
 | `npm test` (portão de publicação 14 + rollback 5) | 19/19 testes (`node:test`) |
 | Portão no estado atual | **BLOQUEADO** — 11 pendências da titular (esperado) |

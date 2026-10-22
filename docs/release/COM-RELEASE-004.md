@@ -62,7 +62,7 @@ avaliação de automação". Ativar qualquer análise exige atualizar o aviso de
 | G06 | Preços e condições aprovados | **Pendente** — aprovação da titular (PUB-13/14) |
 | G07 | Privacidade revisada | **Pendente** — minuta pronta; aprovação (PUB-09) |
 | G08 | Build reproduzível | **Atendido** — lib e Commercial (mesmo sha256 no Windows e no CI) |
-| G09 | CI/CD validado | **Parcial** — CI executado no GitHub; deploy/preview dependem de INF-01..04 |
+| G09 | CI/CD validado | **Parcial** — CI verde no GitHub (run 39826399640, mesmos 70/70 ×3 e 99/99); deploy/preview dependem de INF-01..04 |
 | G10 | HTTPS e DNS funcionando | **Pendente** — exige autorização para alterar DNS |
 | G11 | Site público homologado | **Pendente** |
 | G12 | Rollback disponível | **Parcial** — implementado e testado com API simulada; teste real pendente |

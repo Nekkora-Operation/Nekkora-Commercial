@@ -81,6 +81,7 @@ Visitante → Soluções → Preços e condições → "Solicitar avaliação" (
 |---|---|---|
 | Página — `homologacao.mjs` (layout 375/768/1280/1440 × 2 temas, axe + contraste por pixels, alegações, preços, privacidade, teclado, foco, tema, diálogo, formulário, menu, rede, console) | runtime do Cloudflare Pages com CSP (`wrangler pages dev`) | **Chromium 70/70 · Firefox 70/70 · WebKit 70/70** |
 | Jornada de conversão — `homologacao-canais.mjs` (33 verificações por motor) | build sintético no runtime do Pages | **99/99** (Chromium, Firefox, WebKit) |
+| As duas baterias acima no CI do GitHub (Ubuntu) | [run 39826399640](https://github.com/Nekkora-Operation/Nekkora-Commercial/actions/runs/39826399640) | 70/70 ×3 · 99/99 |
 | Testes automatizados (`npm test`) | Node | 19/19 |
 | Typecheck, build, `npm audit` | — | OK · OK · 0 vulnerabilidades |
 
