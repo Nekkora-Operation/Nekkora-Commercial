@@ -60,15 +60,14 @@ export const PREVIEW_NOTICE = true;
 
 export const NAV_LINKS = [
   { label: 'Soluções', href: '#solucoes' },
-  { label: 'Delivery', href: '#delivery' },
+  { label: 'Preços', href: '#precos' },
   { label: 'Como funciona', href: '#como-funciona' },
   { label: 'Hosting', href: '#hosting' },
   { label: 'Transparência', href: '#transparencia' },
-  { label: 'Contato', href: '#contato' },
 ];
 
 /**
- * Chave do localStorage com o tema escolhido (Sakura Dark ↔ Sage Light). Lida também no index.html.
- * Chave nova na COM-001: a preferência antiga (Midnight Blue / Sage Light) não é migrada — decisão D-06.
+ * Chave do localStorage com o tema escolhido (Sage Light, padrão desde o modelo C ↔ Sakura Dark). Lida também no
+ * index.html. Chave nova na COM-001: a preferência antiga (Midnight Blue / Sage Light) não é migrada — decisão D-06.
  */
 export const THEME_STORAGE_KEY = 'nekkora-commercial-tema';

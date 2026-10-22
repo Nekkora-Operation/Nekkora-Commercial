@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
 import { NAV_LINKS, whatsappUrl } from './config';
+import { LOGIN } from './content';
+import { RequestDialogContext } from './request';
 import { useMediaQuery } from './hooks';
-import { Combined } from './sections/Combined';
-import { Contact } from './sections/Contact';
-import { Delivery } from './sections/Delivery';
-import { Differentials } from './sections/Differentials';
+import { Contact, RequestDialog } from './sections/Contact';
 import { Footer } from './sections/Footer';
 import { Hero } from './sections/Hero';
 import { Hosting } from './sections/Hosting';
 import { HowItWorks } from './sections/HowItWorks';
+import { Pricing } from './sections/Pricing';
 import { Solutions } from './sections/Solutions';
 import { Transparency } from './sections/Transparency';
 
@@ -64,48 +64,54 @@ export function App() {
   const contactVisible = useContactVisible();
   const isMobile = useMediaQuery('(max-width: 900px)');
   const tucked = contactVisible && isMobile;
+  const [requestOpen, setRequestOpen] = useState(false);
+  const openRequest = useCallback(() => setRequestOpen(true), []);
 
   return (
-    <div className={WHATSAPP ? 'page page--fab' : 'page'}>
-      <a className="skip-link" href="#conteudo">
-        Pular para o conteúdo
-      </a>
-      <Navbar
-        brand={<Logo size={26} title="Nekkora — início" />}
-        brandHref="#inicio"
-        links={NAV_LINKS}
-        activeHref={active}
-        tools={<ThemeToggle />}
-        actions={
-          <Button size="sm" rightIcon="arrow-right" href="#contato">
-            Solicitar avaliação
-          </Button>
-        }
-      />
-      <main id="conteudo" tabIndex={-1}>
-        <Hero />
-        <Solutions />
-        <Delivery />
-        <HowItWorks />
-        <Hosting />
-        <Combined />
-        <Differentials />
-        <Transparency />
-        <Contact />
-      </main>
-      <Footer />
-      {WHATSAPP && (
-        <FloatingButton
-          href={WHATSAPP}
-          icon="whatsapp"
-          label="Fale conosco"
-          tone="whatsapp"
-          pulse
-          className={tucked ? 'fab--tucked' : undefined}
-          aria-hidden={tucked || undefined}
-          tabIndex={tucked ? -1 : undefined}
+    <RequestDialogContext.Provider value={openRequest}>
+      <div className={WHATSAPP ? 'page page--fab' : 'page'}>
+        <a className="skip-link" href="#conteudo">
+          Pular para o conteúdo
+        </a>
+        <Navbar
+          brand={<Logo size={26} title="Nekkora — início" />}
+          brandHref="#inicio"
+          links={NAV_LINKS}
+          activeHref={active}
+          tools={<ThemeToggle />}
+          actions={
+            // Sem destino por decisão da responsável (etapa 2) e sem área do cliente disponível: marcado como
+            // indisponível, com a explicação no nome acessível e no title (D-24). Sem id: a Navbar renderiza as ações
+            // duas vezes (barra e menu do celular).
+            <Button size="sm" pill leftIcon="user" aria-disabled="true" aria-label={`${LOGIN.label} — ${LOGIN.unavailable}`} title={LOGIN.unavailable} onClick={(e) => e.preventDefault()}>
+              {LOGIN.label}
+            </Button>
+          }
         />
-      )}
-    </div>
+        <main id="conteudo" tabIndex={-1}>
+          <Hero />
+          <Solutions />
+          <Pricing />
+          <HowItWorks />
+          <Hosting />
+          <Transparency />
+          <Contact />
+        </main>
+        <Footer />
+        {WHATSAPP && (
+          <FloatingButton
+            href={WHATSAPP}
+            icon="whatsapp"
+            label="Fale conosco"
+            tone="whatsapp"
+            pulse
+            className={tucked ? 'fab--tucked' : undefined}
+            aria-hidden={tucked || undefined}
+            tabIndex={tucked ? -1 : undefined}
+          />
+        )}
+        <RequestDialog open={requestOpen} onClose={() => setRequestOpen(false)} />
+      </div>
+    </RequestDialogContext.Provider>
   );
 }
