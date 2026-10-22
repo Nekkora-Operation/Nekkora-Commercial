@@ -70,6 +70,11 @@ jobs:
     name: Testes de integração (navegador real)
     needs: commercial
     runs-on: ubuntu-24.04
+    # Imagem oficial do Playwright na MESMA versão do lockfile (1.63.0): navegadores e dependências do sistema já
+    # instalados. Instalar com --with-deps dependia do espelho apt do runner, que chegou a estourar 30 min.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -78,8 +83,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Navegadores do Playwright (versão do lockfile)
-        run: npx playwright install --with-deps chromium firefox webkit
       - name: Builds de produção e de homologação (dados sintéticos)
         run: |
           npm run build
