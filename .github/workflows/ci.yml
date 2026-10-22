@@ -1,7 +1,9 @@
-# Pipeline do Nekkora Commercial (COM-RELEASE-003 §6.2):
-#   PR → validação de código → build da nekkora-lib (reprodução do tarball versionado) → build do Commercial
-#   → testes automatizados e de integração (Chromium, Firefox, WebKit) → artefato versionado → preview (se configurado)
-# O deploy de produção NÃO acontece aqui: é o workflow "Deploy de produção", manual e com aprovação de release.
+# Pipeline do Nekkora Commercial (COM-RELEASE-003-B §5.4):
+#   reproduzir a nekkora-lib → validar integridade → npm ci → typecheck → testes automatizados → build de produção
+#   → política de cabeçalhos do CloudFront conferida → artefato versionado → homologação em navegadores reais
+#   (Chromium, Firefox, WebKit) servida com a MESMA configuração do CloudFront (servidor local) → preview.
+# Nenhum job daqui tem credencial da AWS. O deploy de produção é o workflow "Deploy de produção", que chama este
+# pipeline para o commit escolhido e só então pede a aprovação humana do environment "production".
 name: CI
 
 on:
@@ -9,16 +11,19 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit a validar (chamado pelo deploy de produção)
+        type: string
+        required: true
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  WRANGLER_VERSION: 4.149.0
+  group: ci-${{ inputs.ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lib:
@@ -27,6 +32,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || '' }}
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -38,19 +45,27 @@ jobs:
     needs: lib
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    outputs:
+      commit: ${{ steps.commit.outputs.commit }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || '' }}
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
+      - id: commit
+        run: echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - run: npm ci
       - name: Typecheck
         run: npm run typecheck
-      - name: Testes automatizados (portão de publicação e rollback)
+      - name: Testes automatizados (preços, portão, publicação, rollback, auditoria, CloudFront)
         run: npm test
       - name: Build de produção
         run: npm run build
+      - name: Política de cabeçalhos do CloudFront corresponde ao build (CSP dos scripts inline)
+        run: npm run aws:config:verificar
       - name: Portão de publicação (informativo no CI; bloqueante no deploy)
         run: |
           {
@@ -61,7 +76,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
-          name: commercial-dist-${{ github.sha }}
+          name: commercial-dist-${{ steps.commit.outputs.commit }}
           path: dist/
           include-hidden-files: true
           retention-days: 90
@@ -81,56 +96,67 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || '' }}
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Builds de produção e de homologação (dados sintéticos)
+      - uses: actions/download-artifact@v4
+        with:
+          name: commercial-dist-${{ needs.commercial.outputs.commit }}
+          path: dist
+      - name: Builds de homologação (dados sintéticos — WhatsApp e só e-mail)
         run: |
-          npm run build
-          NEKKORA_PUBLICACAO=scripts/fixtures/publicacao-homologacao.json npx vite build --outDir dist-homologacao
-      - name: Servidores locais
+          NEKKORA_PUBLICACAO=scripts/fixtures/publicacao-homologacao.json npx vite build --outDir dist-homologacao --logLevel warn
+          NEKKORA_PUBLICACAO=scripts/fixtures/publicacao-homologacao-email.json npx vite build --outDir dist-homologacao-email --logLevel warn
+      - name: CloudFront local (política de cabeçalhos, função, erros e cache versionados)
         run: |
-          npx vite preview --host 127.0.0.1 --port 4173 --strictPort &
-          npx vite preview --host 127.0.0.1 --port 4175 --strictPort --outDir dist-homologacao &
-          for i in $(seq 1 60); do curl -sf -o /dev/null http://127.0.0.1:4173/ && curl -sf -o /dev/null http://127.0.0.1:4175/ && exit 0; sleep 1; done; exit 1
+          node scripts/servidor-cloudfront-local.mjs --dist dist --porta 4173 &
+          node scripts/servidor-cloudfront-local.mjs --dist dist-homologacao --porta 4175 &
+          node scripts/servidor-cloudfront-local.mjs --dist dist-homologacao-email --porta 4176 &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://127.0.0.1:4173/ && curl -sf -o /dev/null http://127.0.0.1:4175/ && curl -sf -o /dev/null http://127.0.0.1:4176/ && exit 0; sleep 1; done; exit 1
+      - name: Artefato servido como no CloudFront (integridade, cabeçalhos, 404, prefixo interno)
+        run: node scripts/aws/verificar-site.mjs --base http://127.0.0.1:4173/ --dist dist --bucket-url http://127.0.0.1:4173/__s3/
       - name: Homologação da página (Chromium, Firefox, WebKit)
         run: |
           for b in chromium firefox webkit; do
             NEKKORA_NAVEGADOR=$b node scripts/homologacao.mjs http://127.0.0.1:4173/ evidencias/pagina-$b
           done
-      - name: Jornada de conversão (Chromium, Firefox, WebKit)
-        run: node scripts/homologacao-canais.mjs http://127.0.0.1:4175/ evidencias/conversao chromium,firefox,webkit
+      - name: Jornada de conversão — e-mail, canal da publicação (Chromium, Firefox, WebKit)
+        run: NEKKORA_CANAL=email node scripts/homologacao-canais.mjs http://127.0.0.1:4176/ evidencias/conversao-email chromium,firefox,webkit
+      - name: Jornada de conversão — WhatsApp, quando houver número (Chromium, Firefox, WebKit)
+        run: node scripts/homologacao-canais.mjs http://127.0.0.1:4175/ evidencias/conversao-whatsapp chromium,firefox,webkit
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: evidencias-${{ github.sha }}
+          name: evidencias-${{ needs.commercial.outputs.commit }}
           path: evidencias/
           retention-days: 30
 
   preview:
-    name: Preview (Cloudflare Pages)
-    needs: integracao
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    # Ambiente "preview": homologação sem publicação — sem nenhuma credencial (nenhuma role da AWS confia neste
+    # environment). Resume no PR o que a produção receberia: commit, hash do artefato e o resultado do portão.
+    name: Preview (homologação, sem publicação)
+    needs: [commercial, integracao]
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     environment: preview
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
       - uses: actions/download-artifact@v4
         with:
-          name: commercial-dist-${{ github.sha }}
+          name: commercial-dist-${{ needs.commercial.outputs.commit }}
           path: dist
-      - name: Publicar preview do PR
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
-          BRANCH: ${{ github.head_ref }}
+      - name: Resumo da release candidata
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$PROJECT" ]; then
-            echo "Cloudflare não configurado (secrets/variável ausentes) — preview pulado." | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          npx --yes "wrangler@${WRANGLER_VERSION}" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
-            --commit-hash "${{ github.event.pull_request.head.sha }}" --commit-dirty=false | tee deploy.log
-          echo "Preview: $(grep -Eo 'https://[^ ]+\.pages\.dev' deploy.log | tail -1)" >> "$GITHUB_STEP_SUMMARY"
+          node --input-type=module -e '
+            const { planFromDist, buildManifest } = await import("./scripts/aws/plano.mjs");
+            const plan = planFromDist("dist");
+            const m = buildManifest(plan, { publishedAt: null });
+            console.log(["## Release candidata", "", `- Commit: \`${m.commit}\``, `- Aplicação: ${m.aplicacao}`, `- nekkora-lib: ${m.nekkoraLib.versao} (${m.nekkoraLib.integridade})`, `- Hash do artefato: \`${m.hashDoArtefato}\``, `- Arquivos: ${m.arquivos.length}`, "- Homologação em navegadores: job \"Testes de integração\" deste run", ""].join("\n"));
+          ' >> "$GITHUB_STEP_SUMMARY"

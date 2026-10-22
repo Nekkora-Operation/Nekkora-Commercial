@@ -1,0 +1,36 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CloudFrontLeObjetosPeloOAC",
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::${AWS_S3_BUCKET}/*",
+      "Condition": { "StringEquals": { "AWS:SourceArn": "arn:aws:cloudfront::${AWS_ACCOUNT_ID}:distribution/${AWS_CLOUDFRONT_DISTRIBUTION_ID}" } }
+    },
+    {
+      "Sid": "CloudFrontNuncaServeOPrefixoInterno",
+      "Effect": "Deny",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::${AWS_S3_BUCKET}/_releases/*"
+    },
+    {
+      "Sid": "SomenteHTTPS",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::${AWS_S3_BUCKET}", "arn:aws:s3:::${AWS_S3_BUCKET}/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Sid": "AssetsEReleasesGravadosUmaVez",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": ["arn:aws:s3:::${AWS_S3_BUCKET}/assets/*", "arn:aws:s3:::${AWS_S3_BUCKET}/_releases/*/*"],
+      "Condition": { "Null": { "s3:if-none-match": "true" } }
+    }
+  ]
+}

@@ -146,6 +146,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .price__from { font-size: var(--nk-font-size-sm); color: var(--nk-color-text-secondary); }
 .price__row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
 .price__value { font-size: clamp(1.8rem, 1.2rem + 1.4vw, 2.4rem); font-weight: 700; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; color: var(--nk-color-text); }
+.price__savings { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
 .price__negotiated { font-size: 1.6rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--nk-color-text); }
 .price__unit { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
 

@@ -5,7 +5,7 @@ declare module '@publicacao' {
     campanhaLancamento: { inicio: string | null; fim: string | null };
     controlador: { nome: string | null; documento: string | null };
     hospedagem: { provedor: string | null };
-    aprovacoes: { precosECondicoes: boolean; textosComerciais: boolean; avisoDePrivacidade: boolean; publicacao: boolean };
+    aprovacoes: { precos: boolean; condicoesComerciais: boolean; textosComerciais: boolean; avisoDePrivacidade: boolean; publicacao: boolean };
     avisoHomologacao: boolean;
   };
   export default publicacao;

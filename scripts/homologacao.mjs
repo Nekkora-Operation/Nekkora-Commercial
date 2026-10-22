@@ -50,6 +50,8 @@ const FORBIDDEN = [
   { id: 'economia', re: /econom(?:ia|ize)\s+de\s+\d/gi },
   { id: 'alta-disponibilidade', re: /alta disponibilidade/gi },
   { id: 'monitoramento-continuo', re: /monitoramento cont[ií]nuo|monitoramento 24/gi },
+  // COM-RELEASE-003-R1 §3.3: nenhum desconto único de 50% — nem no bloco de preços (a condição 50/50 é pagamento)
+  { id: 'desconto-50', re: /50\s?%\s*de\s+desconto|desconto\s+(?:universal\s+)?de\s+50|promo[cç][aã]o\s+de\s+50|metade\s+do\s+pre[cç]o|pela\s+metade|[−-]\s?50\s?%|todas\s+as\s+automa[cç][oõ]es/gi },
 ];
 
 const results = { baseUrl, navegador: ENGINE, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
@@ -104,6 +106,13 @@ for (const theme of THEMES) {
     const file = `pagina-${theme}-${vp.name}-${vp.width}.jpg`;
     await page.screenshot({ path: path.join(outDir, file), fullPage: true, type: 'jpeg', quality: 72 });
     results.screenshots.push(file);
+    // Conferência visual dos preços (COM-RELEASE-003 §11.2): os três cartões, em cada tema, no celular e no desktop
+    if (vp.name === 'desktop' || vp.name === 'mobile') {
+      const cards = `precos-${theme}-${vp.name}.png`;
+      // a barra fixa do topo cobriria o primeiro cartão no recorte: escondida só nesta captura
+      await page.locator('#precos .cards--3').screenshot({ path: path.join(outDir, cards), style: 'header, nav { visibility: hidden !important; }' });
+      results.screenshots.push(cards);
+    }
     if (vp.name === 'desktop') {
       const hero = `hero-${theme}-desktop.png`;
       await page.screenshot({ path: path.join(outDir, hero) });
@@ -243,8 +252,10 @@ await block('funcionais', async () => {
   // Links externos e destinos provisórios
   const external = await page.$$eval('a[href]', (els) => els.map((a) => a.getAttribute('href')).filter((h) => !h.startsWith('#')));
   results.externalLinks = external;
-  const fake = external.filter((h) => /wa\.me\/0*$|wa\.me\/55?0{8,}|instagram\.com\/?$|linkedin\.com\/?$|^mailto:/.test(h));
   const contactsConfigured = await page.evaluate(() => document.querySelector('[data-contact-status]')?.getAttribute('data-contact-status'));
+  // mailto só com canal confirmado e domínio real (nada de .invalid/.example/.test)
+  const fakeMail = (h) => /^mailto:/.test(h) && (contactsConfigured !== 'configurado' || /@[^?]+\.(invalid|example|test)(\?|$)/i.test(h));
+  const fake = external.filter((h) => /wa\.me\/0*$|wa\.me\/55?0{8,}|instagram\.com\/?$|linkedin\.com\/?$/.test(h) || fakeMail(h));
   results.contactStatus = contactsConfigured;
   check('sem-destinos-provisorios', fake.length === 0, `links externos: ${external.length ? external.join(' | ') : 'nenhum'}; status contato=${contactsConfigured}`);
   const fab = await page.$('.nk-fab, [class*="floating"]');
@@ -275,15 +286,17 @@ await block('funcionais', async () => {
     const text = block?.innerText ?? '';
     return {
       blocks: document.querySelectorAll('[data-pricing]').length,
-      condition: /Vale para propostas aprovadas no período|Desconto sobre o valor da categoria definida na avaliação/.test(text),
+      condition: /Valem para automações simples e médias com proposta aprovada durante a campanha/.test(text) && /A automação complexa tem orçamento individual/.test(text),
       confirmedInProposal: /fica registrada na proposta/.test(text),
       licenses: /não estão incluídos nos valores acima/.test(text),
-      // Tabela da NEKKORA-RELEASE-001 §4.4
-      table: {
-        simples: /R\$ 1\.000[\s\S]*?R\$ 500/.test(text),
-        media: /R\$ 2\.800[\s\S]*?R\$ 1\.400/.test(text),
-        complexa: /Automação complexa[\s\S]*?Sob orçamento/.test(text),
-      },
+      // Tabela oficial da COM-RELEASE-003-R1 §3.1, lida do que está NA TELA (data-price de cada valor)
+      table: Object.fromEntries(
+        [...(block?.querySelectorAll('[data-price-tier]') ?? [])].map((el) => [
+          el.getAttribute('data-price-tier'),
+          Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.getAttribute('data-price'), v.textContent.trim()])),
+        ]),
+      ),
+      complexa: /Automação complexa[\s\S]*?Sob orçamento[\s\S]*?orçamento individual/.test(text),
       criteria: ['Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
       conditions: /50% na contratação e 50% na entrega/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
       srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
@@ -292,7 +305,20 @@ await block('funcionais', async () => {
   results.pricing = pricing;
   check('precos-so-no-bloco-de-precos', pricing.blocks === 1 && hits.filter((h) => h.pricing).length > 0, `${pricing.blocks} bloco(s) data-pricing`);
   check('precos-com-condicoes-visiveis', pricing.condition && pricing.confirmedInProposal && pricing.licenses, JSON.stringify({ ...pricing, srLabels: undefined }));
-  check('precos-tabela-da-missao', Object.values(pricing.table).every(Boolean), JSON.stringify(pricing.table));
+  const TABLE = {
+    simples: { padrao: 'R$ 1.500', lancamento: 'R$ 1.000', percentual: '−33,33%', economia: 'Economia de R$ 500' },
+    media: { padrao: 'R$ 3.500', lancamento: 'R$ 2.800', percentual: '−20%', economia: 'Economia de R$ 700' },
+    complexa: {},
+  };
+  check('precos-tabela-oficial', JSON.stringify(pricing.table) === JSON.stringify(TABLE) && pricing.complexa, JSON.stringify(pricing.table));
+  // Coerência matemática do que é exibido: economia = padrão − lançamento; percentual = economia / padrão (2 casas, truncado)
+  const num = (s) => Number(String(s).replace(/[^\d,]/g, '').replace(',', '.'));
+  const coherent = ['simples', 'media'].every((t) => {
+    const v = pricing.table[t] ?? {};
+    const saved = num(v.padrao) - num(v.lancamento);
+    return saved === num(v.economia) && Math.floor((saved / num(v.padrao)) * 10000) / 100 === num(v.percentual);
+  });
+  check('precos-descontos-coerentes', coherent, 'economia = padrão − lançamento; percentual = economia ÷ padrão');
   check('precos-criterios-de-categoria', pricing.criteria);
   check('condicoes-comerciais-visiveis', pricing.conditions);
   // Delivery: tecnologias citadas sem promessa de compatibilidade universal
@@ -305,10 +331,14 @@ await block('funcionais', async () => {
   const privacy = await page.locator('#privacidade').innerText();
   check(
     'privacidade-visivel',
-    /O que vai para o WhatsApp/.test(privacy) && /Sem cookies nem rastreamento/.test(privacy) && (await page.locator('footer a[href="#privacidade"]').count()) === 1,
+    /O que vai para o (WhatsApp|e-mail)/.test(privacy) && /Sem cookies nem rastreamento/.test(privacy) && (await page.locator('footer a[href="#privacidade"]').count()) === 1,
     privacy.split('\n').slice(0, 2).join(' · '),
   );
-  check('precos-leitura-do-valor-riscado', pricing.srLabels.length === 4 && pricing.srLabels.every((t) => /Valor (sem|com) desconto/.test(t)), pricing.srLabels.join(' | '));
+  check(
+    'precos-leitura-do-valor-riscado',
+    JSON.stringify(pricing.srLabels) === JSON.stringify(['Preço padrão:', 'Preço especial de lançamento:', 'Desconto de', 'Preço padrão:', 'Preço especial de lançamento:', 'Desconto de']),
+    pricing.srLabels.join(' | '),
+  );
 
   // Produtos internos não aparecem como obrigatórios/disponíveis: cada menção fica em bloco marcado
   const products = await page.evaluate(() => {
@@ -398,10 +428,14 @@ await block('funcionais', async () => {
   const opened = await page.evaluate(() => ({ focusInside: !!document.activeElement?.closest('[role="dialog"]'), hash: location.hash }));
   check('dialogo-abre-com-foco-dentro', opened.focusInside && opened.hash === '', JSON.stringify(opened));
   const dialogText = await dialog.innerText();
+  // Publicação atual: só e-mail e LinkedIn (decisão da titular, 22/10/2026) — nenhum WhatsApp, atalho de e-mail presente
+  const mailDirect = await dialog.locator('a[href^="mailto:"]').count();
   check(
-    'dialogo-sem-whatsapp-provisorio',
-    (await dialog.locator('a[href*="wa.me"]').count()) === 0 && /Canais oficiais em definição/.test(dialogText) && !/Falar diretamente pelo WhatsApp/.test(dialogText),
-    'sem canal confirmado: atalho do WhatsApp ausente e aviso de canais em definição presente',
+    'dialogo-canal-da-publicacao',
+    (await dialog.locator('a[href*="wa.me"]').count()) === 0 &&
+      !/Falar diretamente pelo WhatsApp/.test(dialogText) &&
+      (contactsConfigured === 'configurado' ? mailDirect === 1 && /Escrever diretamente por e-mail/.test(dialogText) : /Canais oficiais em definição/.test(dialogText)),
+    contactsConfigured === 'configurado' ? `atalho de e-mail: ${mailDirect}; WhatsApp ausente` : 'sem canal confirmado: aviso de canais em definição presente',
   );
   await page.screenshot({ path: path.join(outDir, 'dialogo-solicitacao.png') });
   results.screenshots.push('dialogo-solicitacao.png');
