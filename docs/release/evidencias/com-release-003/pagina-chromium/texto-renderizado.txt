@@ -1,0 +1,222 @@
+Pular para o conteúdo
+Soluções
+Preços
+Como funciona
+Hosting
+Transparência
+Entrar
+Delivery · Hosting
+Automação sob medida, da necessidade à execução.
+
+Automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. Infraestrutura para executá-las, sujeita a avaliação. Cada serviço contratado de forma independente.
+
+Solicitar avaliação
+Ver como funciona
+Proposta por automação
+Homologação e aceite
+Sem pacote obrigatório
+SOLUÇÕES
+Duas ofertas. Você escolhe o arranjo.
+01
+Nekkora Delivery
+Sob proposta
+
+Desenvolvimento de automações por demanda.
+
+Escopo, prazo e preço definidos em proposta para cada automação
+Entrega considerada pronta só com documentação, desenvolvimento, testes e homologação com você — cada etapa mediante a sua aprovação
+Entrega e transferência conforme contratado
+TECNOLOGIAS, CONFORME O CASO
+Python
+UiPath
+Power Automate
+Integrações via API
+Sistemas web
+Dados e planilhas
+A viabilidade com cada sistema é confirmada na avaliação.
+Conhecer o Delivery
+02
+Nekkora Hosting
+Em avaliação de viabilidade
+
+Infraestrutura e serviços associados à execução de automações.
+
+Componentes escolhidos conforme a necessidade, nenhum obrigatório
+Responsabilidades de cada parte delimitadas por escrito
+Disponibilidade confirmada em avaliação de viabilidade
+Entender o Hosting
+
+Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.
+
+PREÇOS · NEKKORA DELIVERY
+Quanto custa uma automação
+
+Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
+
+Lançamento
+Preços especiais de lançamento.
+Valem para automações simples e médias com proposta aprovada durante a campanha. A automação complexa tem orçamento individual.
+
+SIMPLES
+Automação simples
+
+Um sistema ou planilha, regras diretas, poucas exceções.
+
+Preço padrão:
+R$ 1.500
+Preço especial de lançamento:
+R$ 1.000
+Desconto de
+−33,33%
+Economia de R$ 500
+por automação · preço de lançamento
+MÉDIA
+Automação média
+
+Mais de um sistema, validações, tratamento de exceções e relatórios.
+
+Preço padrão:
+R$ 3.500
+Preço especial de lançamento:
+R$ 2.800
+Desconto de
+−20%
+Economia de R$ 700
+por automação · preço de lançamento
+COMPLEXA · PACOTES
+Automação complexa
+
+Processos ponta a ponta, várias integrações por API ou várias automações contratadas em conjunto.
+
+Sob orçamento
+dimensionada na avaliação · orçamento individual
+Solicitar avaliação
+Por que os valores são baixos
+
+Usamos uma ferramenta própria que agiliza a documentação e o desenvolvimento de cada automação. Menos horas de levantamento e retrabalho, preço menor para você — sem cortar etapas: documentação, testes e homologação continuam no escopo.
+
+Licenças ficam por conta do cliente
+
+Qualquer licença de software ou serviço de terceiros (UiPath, Power Automate, APIs, servidores) é responsabilidade do cliente. Indicamos o que é necessário na proposta; a contratação e o custo não estão incluídos nos valores acima.
+
+O que define a categoria
+Quantidade de sistemas envolvidos
+Complexidade das integrações
+Regras de negócio e exceções
+Volume de processamento
+Exigências de infraestrutura
+Necessidade de licenciamento
+
+Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta.
+
+Condições comerciais
+Desenvolvimento sob demanda, com escopo formalizado em proposta
+Preço aprovado por você antes do início do desenvolvimento
+Pagamento de 50% na contratação e 50% na entrega, conforme a proposta
+Demandas organizadas em fila: o início depende da fila e da aprovação da proposta
+Reuniões e acompanhamento conforme as condições acordadas
+Licenças e custos externos tratados à parte, quando aplicáveis
+
+Hosting tem avaliação e proposta próprias.
+
+COMO FUNCIONA
+Seis etapas. Nenhuma sem a sua aprovação.
+1
+Entendimento da necessidade
+
+Você descreve o processo, as regras e o resultado esperado.
+
+2
+Viabilidade e dimensionamento
+
+Analisamos sistemas, acessos e complexidade para dimensionar a automação.
+
+3
+Proposta
+
+Escopo, preço e condições por escrito. O desenvolvimento começa após a sua aprovação.
+
+4
+Desenvolvimento e testes
+
+Construímos e testamos a automação conforme o escopo aprovado.
+
+5
+Homologação e aceite
+
+Você valida a automação no seu cenário e formaliza o aceite.
+
+6
+Entrega e transferência
+
+Entregamos e transferimos o que foi previsto na proposta.
+
+NEKKORA HOSTING
+Infraestrutura para executar automações, com responsabilidades delimitadas.
+
+Hosting reúne serviços distintos — infraestrutura, configuração, administração, monitoramento, operação assistida, correção de incidentes, sustentação. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta.
+
+Disponibilidade em avaliação. Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.
+
+Solicitar avaliação de viabilidade
+TRANSPARÊNCIA
+Letras grandes, não miúdas
+
+O que é definido em proposta, o que não está incluído sem acordo explícito e do que o andamento depende.
+
+Definido em proposta
+Escopo de cada automação
+Preço e condições de pagamento
+Prazo estimado
+Tecnologias e licenças necessárias
+Responsabilidades de cada parte
+Critérios de homologação e aceite
+Não incluído automaticamente
+Alterações futuras e novas funcionalidades
+Sustentação e evolução das automações
+Garantia após a entrega, salvo se prevista
+Infraestrutura e serviços de Hosting
+Licenças e serviços de terceiros — responsabilidade do cliente
+Monitoramento, 24 horas, alta disponibilidade ou SLA
+Depende de você e de terceiros
+Liberação de acessos e credenciais
+Estabilidade de sistemas externos
+Disponibilidade da sua equipe para homologação
+Fila operacional da Nekkora
+Vamos olhar o seu processo de perto?
+
+A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.
+
+Solicitar avaliação
+Prefere falar direto?
+contato@nekkora.com
+LinkedIn
+PRIVACIDADE
+Como tratamos seus dados
+
+Responsável pelos dados pessoais desta página: a Nekkora.
+
+O formulário não envia nada
+
+O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.
+
+O que vai para o e-mail
+
+Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a contato@nekkora.com. Ela só é enviada se você a enviar pelo aplicativo.
+
+Sem cookies nem rastreamento
+
+Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.
+
+Registros de acesso
+
+A Amazon Web Services (AWS), que hospeda este site, processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.
+
+Uso e seus direitos
+
+Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.
+
+© 2026 Nekkora. Todos os direitos reservados.
+Privacidade
+Versão para homologação
+Neko (猫) observa os detalhes.

@@ -1,0 +1,1668 @@
+{
+  "baseUrl": "http://127.0.0.1:4173/",
+  "navegador": "webkit",
+  "startedAt": "2026-10-22T23:01:33.228Z",
+  "checks": [
+    {
+      "id": "tema-aplicado:sakura-dark:mobile",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:mobile",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:tablet",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:tablet",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:desktop",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:desktop",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sakura-dark:wide",
+      "ok": true,
+      "detail": "data-nk-theme=sakura-dark"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sakura-dark:wide",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:mobile",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:mobile",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:tablet",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:tablet",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:desktop",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:desktop",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "tema-aplicado:sage-light:wide",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "sem-rolagem-horizontal:sage-light:wide",
+      "ok": true,
+      "detail": "excesso=0px"
+    },
+    {
+      "id": "axe:sakura-dark:mobile",
+      "ok": true,
+      "detail": "24 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sakura-dark:mobile",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sakura-dark:mobile",
+      "ok": true,
+      "detail": "39 nós; pior folga: .nk-badge--info 5.23:1 (mín. 4.5)"
+    },
+    {
+      "id": "axe:sakura-dark:desktop",
+      "ok": true,
+      "detail": "24 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sakura-dark:desktop",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sakura-dark:desktop",
+      "ok": true,
+      "detail": "39 nós; pior folga: .nk-badge--info 5.23:1 (mín. 4.5)"
+    },
+    {
+      "id": "axe:sage-light:mobile",
+      "ok": true,
+      "detail": "24 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sage-light:mobile",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sage-light:mobile",
+      "ok": true,
+      "detail": "39 nós; pior folga: .nk-badge--soft.nk-badge--accent.nk-badge--sm 4.67:1 (mín. 4.5)"
+    },
+    {
+      "id": "axe:sage-light:desktop",
+      "ok": true,
+      "detail": "24 regras aprovadas"
+    },
+    {
+      "id": "axe-sem-pendencias-de-revisao:sage-light:desktop",
+      "ok": true,
+      "detail": "só color-contrast (medido por pixels)"
+    },
+    {
+      "id": "contraste-por-pixels:sage-light:desktop",
+      "ok": true,
+      "detail": "39 nós; pior folga: .nk-badge--soft.nk-badge--accent.nk-badge--sm 4.68:1 (mín. 4.5)"
+    },
+    {
+      "id": "tema-padrao-sage-light",
+      "ok": true,
+      "detail": "data-nk-theme=sage-light"
+    },
+    {
+      "id": "ordem-das-secoes",
+      "ok": true,
+      "detail": "inicio > solucoes > precos > como-funciona > hosting > transparencia > contato > privacidade"
+    },
+    {
+      "id": "um-unico-h1",
+      "ok": true,
+      "detail": "1 h1"
+    },
+    {
+      "id": "ancoras-validas",
+      "ok": true,
+      "detail": "20 âncoras, quebradas: nenhuma"
+    },
+    {
+      "id": "sem-destinos-provisorios",
+      "ok": true,
+      "detail": "links externos: mailto:contato@nekkora.com | https://www.linkedin.com/company/nekkora; status contato=configurado"
+    },
+    {
+      "id": "sem-whatsapp-flutuante-provisorio",
+      "ok": true,
+      "detail": "ausente"
+    },
+    {
+      "id": "sem-alegacoes-proibidas",
+      "ok": true,
+      "detail": "13 ocorrência(s): 3 em exclusões, 10 no bloco de preços"
+    },
+    {
+      "id": "precos-so-no-bloco-de-precos",
+      "ok": true,
+      "detail": "1 bloco(s) data-pricing"
+    },
+    {
+      "id": "precos-com-condicoes-visiveis",
+      "ok": true,
+      "detail": "{\"blocks\":1,\"condition\":true,\"confirmedInProposal\":true,\"licenses\":true,\"table\":{\"simples\":{\"padrao\":\"R$ 1.500\",\"lancamento\":\"R$ 1.000\",\"percentual\":\"−33,33%\",\"economia\":\"Economia de R$ 500\"},\"media\":{\"padrao\":\"R$ 3.500\",\"lancamento\":\"R$ 2.800\",\"percentual\":\"−20%\",\"economia\":\"Economia de R$ 700\"},\"complexa\":{}},\"complexa\":true,\"criteria\":true,\"conditions\":true}"
+    },
+    {
+      "id": "precos-tabela-oficial",
+      "ok": true,
+      "detail": "{\"simples\":{\"padrao\":\"R$ 1.500\",\"lancamento\":\"R$ 1.000\",\"percentual\":\"−33,33%\",\"economia\":\"Economia de R$ 500\"},\"media\":{\"padrao\":\"R$ 3.500\",\"lancamento\":\"R$ 2.800\",\"percentual\":\"−20%\",\"economia\":\"Economia de R$ 700\"},\"complexa\":{}}"
+    },
+    {
+      "id": "precos-descontos-coerentes",
+      "ok": true,
+      "detail": "economia = padrão − lançamento; percentual = economia ÷ padrão"
+    },
+    {
+      "id": "precos-criterios-de-categoria",
+      "ok": true
+    },
+    {
+      "id": "condicoes-comerciais-visiveis",
+      "ok": true
+    },
+    {
+      "id": "delivery-tecnologias-com-ressalva",
+      "ok": true
+    },
+    {
+      "id": "privacidade-visivel",
+      "ok": true,
+      "detail": "PRIVACIDADE · Como tratamos seus dados"
+    },
+    {
+      "id": "precos-leitura-do-valor-riscado",
+      "ok": true,
+      "detail": "Preço padrão: | Preço especial de lançamento: | Desconto de | Preço padrão: | Preço especial de lançamento: | Desconto de"
+    },
+    {
+      "id": "produtos-internos-so-em-bloco-informativo",
+      "ok": true,
+      "detail": "0 menção(ões)"
+    },
+    {
+      "id": "demonstrativos-identificados",
+      "ok": true,
+      "detail": "nenhum bloco demonstrativo na página"
+    },
+    {
+      "id": "pular-conteudo-focavel",
+      "ok": true,
+      "detail": "{\"text\":\"Pular para o conteúdo\",\"href\":\"#conteudo\"}"
+    },
+    {
+      "id": "pular-conteudo-visivel-no-foco",
+      "ok": true
+    },
+    {
+      "id": "foco-visivel-nos-40-primeiros-tabs",
+      "ok": true,
+      "detail": "0 sem indicador de foco"
+    },
+    {
+      "id": "alternancia-de-tema-persiste",
+      "ok": true,
+      "detail": "sakura-dark → recarregado: sakura-dark"
+    },
+    {
+      "id": "entrar-sem-destino-e-indisponivel",
+      "ok": true,
+      "detail": "url inalterada=true; aria-disabled=true; nome acessível=\"Entrar — Acesso de clientes ainda não disponível.\""
+    },
+    {
+      "id": "dialogo-aberto-pelos-ctas",
+      "ok": true,
+      "detail": "inicio: Solicitar avaliação | : Solicitar avaliação | hosting: Solicitar avaliação de viabilidade | contato: Solicitar avaliação"
+    },
+    {
+      "id": "dialogo-abre-com-foco-dentro",
+      "ok": true,
+      "detail": "{\"focusInside\":true,\"hash\":\"\"}"
+    },
+    {
+      "id": "dialogo-canal-da-publicacao",
+      "ok": true,
+      "detail": "atalho de e-mail: 1; WhatsApp ausente"
+    },
+    {
+      "id": "dialogo-esc-fecha-e-devolve-foco",
+      "ok": true
+    },
+    {
+      "id": "dialogo-ctas-de-precos-hosting-contato",
+      "ok": true,
+      "detail": "precos=true; hosting=true; contato=true (fechado por \"Cancelar\")"
+    },
+    {
+      "id": "formulario-erros-obrigatorios",
+      "ok": true,
+      "detail": "2 campos inválidos; foco no primeiro inválido=true"
+    },
+    {
+      "id": "formulario-foco-no-primeiro-erro",
+      "ok": true
+    },
+    {
+      "id": "formulario-vai-para-confirmacao",
+      "ok": true,
+      "detail": "Confirme a sua solicitação Esta é a mensagem que será aberta no seu aplicativo de e-mail, endereçada à Nekkora. Confira antes de continuar. Olá! Sou Pessoa de Teste. Quero solicitar uma avaliação de automação. Teste auto"
+    },
+    {
+      "id": "formulario-sem-envio-real",
+      "ok": true,
+      "detail": "popup=false; url inalterada=true"
+    },
+    {
+      "id": "formulario-resultado-visivel-e-focado",
+      "ok": true,
+      "detail": "{\"doneTop\":185.3125,\"viewport\":800,\"focused\":true}"
+    },
+    {
+      "id": "menu-mobile-abre-e-fecha-com-esc",
+      "ok": true,
+      "detail": "aberto=true depois do Esc=false"
+    },
+    {
+      "id": "hosting-condicoes-visiveis:mobile",
+      "ok": true,
+      "detail": "aviso visível=true; altura da página=9537px"
+    },
+    {
+      "id": "hosting-condicoes-visiveis:desktop",
+      "ok": true,
+      "detail": "aviso visível=true"
+    },
+    {
+      "id": "dialogo-axe:sakura-dark:mobile",
+      "ok": true,
+      "detail": "sem violações; excesso horizontal=0px"
+    },
+    {
+      "id": "dialogo-axe:sakura-dark:desktop",
+      "ok": true,
+      "detail": "sem violações; excesso horizontal=0px"
+    },
+    {
+      "id": "dialogo-axe:sage-light:mobile",
+      "ok": true,
+      "detail": "sem violações; excesso horizontal=0px"
+    },
+    {
+      "id": "dialogo-axe:sage-light:desktop",
+      "ok": true,
+      "detail": "sem violações; excesso horizontal=0px"
+    },
+    {
+      "id": "sem-requisicoes-externas",
+      "ok": true,
+      "detail": "nenhuma"
+    },
+    {
+      "id": "fonte-servida-pelo-proprio-site",
+      "ok": true,
+      "detail": "/assets/inter-latin-wght-normal.woff2"
+    },
+    {
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    }
+  ],
+  "screenshots": [
+    "pagina-sakura-dark-mobile-375.jpg",
+    "precos-sakura-dark-mobile.png",
+    "pagina-sakura-dark-tablet-768.jpg",
+    "pagina-sakura-dark-desktop-1280.jpg",
+    "precos-sakura-dark-desktop.png",
+    "hero-sakura-dark-desktop.png",
+    "pagina-sakura-dark-wide-1440.jpg",
+    "pagina-sage-light-mobile-375.jpg",
+    "precos-sage-light-mobile.png",
+    "pagina-sage-light-tablet-768.jpg",
+    "pagina-sage-light-desktop-1280.jpg",
+    "precos-sage-light-desktop.png",
+    "hero-sage-light-desktop.png",
+    "pagina-sage-light-wide-1440.jpg",
+    "dialogo-solicitacao.png",
+    "formulario-erros.png",
+    "formulario-resultado-tela.png",
+    "menu-mobile-aberto.png",
+    "hosting-faixa-mobile.png",
+    "hosting-faixa-desktop.png",
+    "dialogo-sakura-dark-mobile.png",
+    "dialogo-sakura-dark-desktop.png",
+    "dialogo-sage-light-mobile.png",
+    "dialogo-sage-light-desktop.png"
+  ],
+  "axe": {
+    "sakura-dark:mobile": {
+      "violations": [],
+      "passes": 24,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 39
+        }
+      ]
+    },
+    "sakura-dark:desktop": {
+      "violations": [],
+      "passes": 24,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 39
+        }
+      ]
+    },
+    "sage-light:mobile": {
+      "violations": [],
+      "passes": 24,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 39
+        }
+      ]
+    },
+    "sage-light:desktop": {
+      "violations": [],
+      "passes": 24,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 39
+        }
+      ]
+    }
+  },
+  "console": [],
+  "blocked": [],
+  "fonts": [
+    "/assets/inter-latin-wght-normal.woff2"
+  ],
+  "versaoNavegador": "26.6",
+  "pixelContrast": {
+    "sakura-dark:mobile": [
+      {
+        "target": ".nk-section-header--lg > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 6.63,
+        "min": 6.63
+      },
+      {
+        "target": "#solucoes-title",
+        "required": 3,
+        "p10": 12.18,
+        "min": 11.86
+      },
+      {
+        "target": "(1) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 7.07,
+        "min": 6.99
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 12.84,
+        "min": 12.84
+      },
+      {
+        "target": ".nk-badge--soft.nk-badge--accent.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.44,
+        "min": 5.44
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 13.05,
+        "min": 12.97
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.14,
+        "min": 13.12
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.31,
+        "min": 13.24
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 13.52,
+        "min": 13.52
+      },
+      {
+        "target": ".tech__label",
+        "required": 4.5,
+        "p10": 5.81,
+        "min": 5.81
+      },
+      {
+        "target": "child(1) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(2) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(3) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(4) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.9,
+        "min": 5.88
+      },
+      {
+        "target": "child(5) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.9,
+        "min": 5.88
+      },
+      {
+        "target": "child(6) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.85,
+        "min": 5.85
+      },
+      {
+        "target": ".tech__note",
+        "required": 4.5,
+        "p10": 5.88,
+        "min": 5.88
+      },
+      {
+        "target": "-link--accent.nk-link--md[href$=\"#precos\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 7.67,
+        "min": 7.66
+      },
+      {
+        "target": "(2) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 7.3,
+        "min": 7.27
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 13.19,
+        "min": 13.19
+      },
+      {
+        "target": ".nk-badge--info",
+        "required": 4.5,
+        "p10": 5.23,
+        "min": 5.23
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 13.24,
+        "min": 13.24
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.36,
+        "min": 13.36
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.51,
+        "min": 13.46
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 13.58,
+        "min": 13.58
+      },
+      {
+        "target": "link--accent.nk-link--md[href$=\"#hosting\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 7.67,
+        "min": 7.65
+      },
+      {
+        "target": "#solucoes > .stack.wrap > .center-note",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .price-overline",
+        "required": 4.5,
+        "p10": 8.12,
+        "min": 8.12
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > h3",
+        "required": 4.5,
+        "p10": 14.44,
+        "min": 14.44
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .offer-card__fit",
+        "required": 4.5,
+        "p10": 6.21,
+        "min": 6.21
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__from > s",
+        "required": 4.5,
+        "p10": 6.2,
+        "min": 6.2
+      },
+      {
+        "target": "dia\"] > .price__row > .price__value[data-price=\"lancamento\"]",
+        "required": 3,
+        "p10": 14.33,
+        "min": 14.33
+      },
+      {
+        "target": "price-tier=\"media\"] > .price__savings[data-price=\"economia\"]",
+        "required": 4.5,
+        "p10": 14.27,
+        "min": 14.27
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__unit",
+        "required": 4.5,
+        "p10": 6.15,
+        "min": 6.15
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 13.6,
+        "min": 13.43
+      },
+      {
+        "target": ".contact__lead",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": ".contact__caption",
+        "required": 4.5,
+        "p10": 5.8,
+        "min": 5.79
+      },
+      {
+        "target": "a[href=\"mailto:contato@nekkora.com\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "a[target=\"_blank\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      }
+    ],
+    "sakura-dark:desktop": [
+      {
+        "target": ".nk-section-header--lg > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 6.69,
+        "min": 6.69
+      },
+      {
+        "target": "#solucoes-title",
+        "required": 3,
+        "p10": 12.53,
+        "min": 12.2
+      },
+      {
+        "target": "(1) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 7.29,
+        "min": 7.2
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 13.19,
+        "min": 13.19
+      },
+      {
+        "target": ".nk-badge--soft.nk-badge--accent.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.54,
+        "min": 5.54
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 13.3,
+        "min": 13.3
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.31,
+        "min": 13.31
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 13.52,
+        "min": 13.41
+      },
+      {
+        "target": ".tech__label",
+        "required": 4.5,
+        "p10": 5.85,
+        "min": 5.85
+      },
+      {
+        "target": "child(1) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(2) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(3) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(4) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(5) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.83,
+        "min": 5.83
+      },
+      {
+        "target": "child(6) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.85,
+        "min": 5.85
+      },
+      {
+        "target": ".tech__note",
+        "required": 4.5,
+        "p10": 5.88,
+        "min": 5.88
+      },
+      {
+        "target": "-link--accent.nk-link--md[href$=\"#precos\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 7.67,
+        "min": 7.67
+      },
+      {
+        "target": "(2) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 7.29,
+        "min": 7.2
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 13.19,
+        "min": 13.19
+      },
+      {
+        "target": ".nk-badge--info",
+        "required": 4.5,
+        "p10": 5.23,
+        "min": 5.23
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 13.3,
+        "min": 13.3
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 13.35,
+        "min": 13.35
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 13.31,
+        "min": 13.31
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 13.36,
+        "min": 13.36
+      },
+      {
+        "target": "link--accent.nk-link--md[href$=\"#hosting\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 7.67,
+        "min": 7.67
+      },
+      {
+        "target": "#solucoes > .stack.wrap > .center-note",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .price-overline",
+        "required": 4.5,
+        "p10": 8.12,
+        "min": 8.12
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > h3",
+        "required": 4.5,
+        "p10": 14.44,
+        "min": 14.44
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .offer-card__fit",
+        "required": 4.5,
+        "p10": 6.21,
+        "min": 6.21
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__from > s",
+        "required": 4.5,
+        "p10": 6.2,
+        "min": 6.2
+      },
+      {
+        "target": "dia\"] > .price__row > .price__value[data-price=\"lancamento\"]",
+        "required": 3,
+        "p10": 14.33,
+        "min": 14.33
+      },
+      {
+        "target": "price-tier=\"media\"] > .price__savings[data-price=\"economia\"]",
+        "required": 4.5,
+        "p10": 14.27,
+        "min": 14.27
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__unit",
+        "required": 4.5,
+        "p10": 6.15,
+        "min": 6.15
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 13.6,
+        "min": 13.43
+      },
+      {
+        "target": ".contact__lead",
+        "required": 4.5,
+        "p10": 5.94,
+        "min": 5.94
+      },
+      {
+        "target": ".contact__caption",
+        "required": 4.5,
+        "p10": 5.85,
+        "min": 5.79
+      },
+      {
+        "target": "a[href=\"mailto:contato@nekkora.com\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      },
+      {
+        "target": "a[target=\"_blank\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 13.78,
+        "min": 13.78
+      }
+    ],
+    "sage-light:mobile": [
+      {
+        "target": ".nk-section-header--lg > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.25,
+        "min": 5.2
+      },
+      {
+        "target": "#solucoes-title",
+        "required": 3,
+        "p10": 14.05,
+        "min": 13.81
+      },
+      {
+        "target": "(1) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 5.24,
+        "min": 5.24
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 13.93,
+        "min": 13.93
+      },
+      {
+        "target": ".nk-badge--soft.nk-badge--accent.nk-badge--sm",
+        "required": 4.5,
+        "p10": 4.67,
+        "min": 4.67
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 14.06,
+        "min": 14.06
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 14.18,
+        "min": 14.16
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 14.31,
+        "min": 14.31
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 14.57,
+        "min": 14.57
+      },
+      {
+        "target": ".tech__label",
+        "required": 4.5,
+        "p10": 5.38,
+        "min": 5.38
+      },
+      {
+        "target": "child(1) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.38,
+        "min": 5.38
+      },
+      {
+        "target": "child(2) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.38,
+        "min": 5.38
+      },
+      {
+        "target": "child(3) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.38,
+        "min": 5.38
+      },
+      {
+        "target": "child(4) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.43,
+        "min": 5.43
+      },
+      {
+        "target": "child(5) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.43,
+        "min": 5.43
+      },
+      {
+        "target": "child(6) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.44,
+        "min": 5.44
+      },
+      {
+        "target": ".tech__note",
+        "required": 4.5,
+        "p10": 5.49,
+        "min": 5.49
+      },
+      {
+        "target": "-link--accent.nk-link--md[href$=\"#precos\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 5.75,
+        "min": 5.75
+      },
+      {
+        "target": "(2) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 5.29,
+        "min": 5.24
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 14.06,
+        "min": 14.06
+      },
+      {
+        "target": ".nk-badge--info",
+        "required": 4.5,
+        "p10": 5.45,
+        "min": 5.45
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 14.28,
+        "min": 14.19
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 14.44,
+        "min": 14.44
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 14.69,
+        "min": 14.69
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 14.85,
+        "min": 14.83
+      },
+      {
+        "target": "link--accent.nk-link--md[href$=\"#hosting\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 5.74,
+        "min": 5.74
+      },
+      {
+        "target": "#solucoes > .stack.wrap > .center-note",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .price-overline",
+        "required": 4.5,
+        "p10": 5.29,
+        "min": 5.29
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > h3",
+        "required": 4.5,
+        "p10": 14.02,
+        "min": 14.02
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .offer-card__fit",
+        "required": 4.5,
+        "p10": 5.23,
+        "min": 5.2
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__from > s",
+        "required": 4.5,
+        "p10": 5.33,
+        "min": 5.33
+      },
+      {
+        "target": "dia\"] > .price__row > .price__value[data-price=\"lancamento\"]",
+        "required": 3,
+        "p10": 14.7,
+        "min": 14.69
+      },
+      {
+        "target": "price-tier=\"media\"] > .price__savings[data-price=\"economia\"]",
+        "required": 4.5,
+        "p10": 14.85,
+        "min": 14.85
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__unit",
+        "required": 4.5,
+        "p10": 5.49,
+        "min": 5.49
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 15.12,
+        "min": 14.86
+      },
+      {
+        "target": ".contact__lead",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".contact__caption",
+        "required": 4.5,
+        "p10": 5.54,
+        "min": 5.54
+      },
+      {
+        "target": "a[href=\"mailto:contato@nekkora.com\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "a[target=\"_blank\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      }
+    ],
+    "sage-light:desktop": [
+      {
+        "target": ".nk-section-header--lg > .nk-section-header__eyebrow",
+        "required": 4.5,
+        "p10": 5.26,
+        "min": 5.25
+      },
+      {
+        "target": "#solucoes-title",
+        "required": 3,
+        "p10": 14.21,
+        "min": 14.05
+      },
+      {
+        "target": "(1) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 5.24,
+        "min": 5.24
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 14.02,
+        "min": 14.02
+      },
+      {
+        "target": ".nk-badge--soft.nk-badge--accent.nk-badge--sm",
+        "required": 4.5,
+        "p10": 4.68,
+        "min": 4.68
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 14.16,
+        "min": 14.16
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 14.28,
+        "min": 14.28
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 14.4,
+        "min": 14.4
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 14.57,
+        "min": 14.57
+      },
+      {
+        "target": ".tech__label",
+        "required": 4.5,
+        "p10": 5.38,
+        "min": 5.38
+      },
+      {
+        "target": "child(1) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.43,
+        "min": 5.39
+      },
+      {
+        "target": "child(2) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.43,
+        "min": 5.39
+      },
+      {
+        "target": "child(3) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.43,
+        "min": 5.39
+      },
+      {
+        "target": "child(4) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.43,
+        "min": 5.39
+      },
+      {
+        "target": "child(5) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.43,
+        "min": 5.39
+      },
+      {
+        "target": "child(6) > .nk-badge--neutral.nk-badge--outline.nk-badge--sm",
+        "required": 4.5,
+        "p10": 5.44,
+        "min": 5.44
+      },
+      {
+        "target": ".tech__note",
+        "required": 4.5,
+        "p10": 5.49,
+        "min": 5.49
+      },
+      {
+        "target": "-link--accent.nk-link--md[href$=\"#precos\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 5.75,
+        "min": 5.74
+      },
+      {
+        "target": "(2) > .nk-card--raised.nk-card.nk-card--pad-lg > .poster-num",
+        "required": 3,
+        "p10": 5.24,
+        "min": 5.24
+      },
+      {
+        "target": "ard--raised.nk-card.nk-card--pad-lg > .offer-card__head > h3",
+        "required": 4.5,
+        "p10": 14.02,
+        "min": 14.02
+      },
+      {
+        "target": ".nk-badge--info",
+        "required": 4.5,
+        "p10": 5.44,
+        "min": 5.44
+      },
+      {
+        "target": "-card--raised.nk-card.nk-card--pad-lg > .offer-card__summary",
+        "required": 4.5,
+        "p10": 14.16,
+        "min": 14.16
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(1)",
+        "required": 4.5,
+        "p10": 14.28,
+        "min": 14.28
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(2)",
+        "required": 4.5,
+        "p10": 14.4,
+        "min": 14.4
+      },
+      {
+        "target": "nk-card--pad-lg > .checklist.checklist--sm > li:nth-child(3)",
+        "required": 4.5,
+        "p10": 14.44,
+        "min": 14.44
+      },
+      {
+        "target": "link--accent.nk-link--md[href$=\"#hosting\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 5.75,
+        "min": 5.74
+      },
+      {
+        "target": "#solucoes > .stack.wrap > .center-note",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .price-overline",
+        "required": 4.5,
+        "p10": 5.29,
+        "min": 5.29
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > h3",
+        "required": 4.5,
+        "p10": 14.02,
+        "min": 14.02
+      },
+      {
+        "target": ".nk-card--raised.nk-card.nk-card--pad-lg > .offer-card__fit",
+        "required": 4.5,
+        "p10": 5.2,
+        "min": 5.19
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__from > s",
+        "required": 4.5,
+        "p10": 5.33,
+        "min": 5.33
+      },
+      {
+        "target": "dia\"] > .price__row > .price__value[data-price=\"lancamento\"]",
+        "required": 3,
+        "p10": 14.69,
+        "min": 14.69
+      },
+      {
+        "target": "price-tier=\"media\"] > .price__savings[data-price=\"economia\"]",
+        "required": 4.5,
+        "p10": 14.85,
+        "min": 14.85
+      },
+      {
+        "target": "div[data-price-tier=\"media\"] > .price__unit",
+        "required": 4.5,
+        "p10": 5.49,
+        "min": 5.49
+      },
+      {
+        "target": "#contato-title",
+        "required": 3,
+        "p10": 15.12,
+        "min": 14.99
+      },
+      {
+        "target": ".contact__lead",
+        "required": 4.5,
+        "p10": 5.58,
+        "min": 5.58
+      },
+      {
+        "target": ".contact__caption",
+        "required": 4.5,
+        "p10": 5.54,
+        "min": 5.54
+      },
+      {
+        "target": "a[href=\"mailto:contato@nekkora.com\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      },
+      {
+        "target": "a[target=\"_blank\"] > .nk-link__label",
+        "required": 4.5,
+        "p10": 15.25,
+        "min": 15.25
+      }
+    ]
+  },
+  "sections": [
+    "inicio",
+    "solucoes",
+    "precos",
+    "como-funciona",
+    "hosting",
+    "transparencia",
+    "contato",
+    "privacidade"
+  ],
+  "externalLinks": [
+    "mailto:contato@nekkora.com",
+    "https://www.linkedin.com/company/nekkora"
+  ],
+  "contactStatus": "configurado",
+  "claimHits": [
+    {
+      "id": "preco",
+      "match": "R$ 1",
+      "text": "R$ 1.500",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "preco",
+      "match": "R$ 1",
+      "text": "R$ 1.000",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "percentual",
+      "match": "33,33%",
+      "text": "33,33%",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "preco",
+      "match": "R$ 5",
+      "text": "Economia de R$ 500",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "preco",
+      "match": "R$ 3",
+      "text": "R$ 3.500",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "preco",
+      "match": "R$ 2",
+      "text": "R$ 2.800",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "percentual",
+      "match": "20%",
+      "text": "20%",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "preco",
+      "match": "R$ 7",
+      "text": "Economia de R$ 700",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "percentual",
+      "match": "50%",
+      "text": "Pagamento de 50% na contratação e 50% na entrega, conforme a proposta",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "percentual",
+      "match": "50%",
+      "text": "Pagamento de 50% na contratação e 50% na entrega, conforme a proposta",
+      "exclusion": false,
+      "pricing": true
+    },
+    {
+      "id": "24h",
+      "match": "24 horas",
+      "text": "Monitoramento, 24 horas, alta disponibilidade ou SLA",
+      "exclusion": true,
+      "pricing": false
+    },
+    {
+      "id": "sla",
+      "match": "SLA",
+      "text": "Monitoramento, 24 horas, alta disponibilidade ou SLA",
+      "exclusion": true,
+      "pricing": false
+    },
+    {
+      "id": "alta-disponibilidade",
+      "match": "alta disponibilidade",
+      "text": "Monitoramento, 24 horas, alta disponibilidade ou SLA",
+      "exclusion": true,
+      "pricing": false
+    }
+  ],
+  "pricing": {
+    "blocks": 1,
+    "condition": true,
+    "confirmedInProposal": true,
+    "licenses": true,
+    "table": {
+      "simples": {
+        "padrao": "R$ 1.500",
+        "lancamento": "R$ 1.000",
+        "percentual": "−33,33%",
+        "economia": "Economia de R$ 500"
+      },
+      "media": {
+        "padrao": "R$ 3.500",
+        "lancamento": "R$ 2.800",
+        "percentual": "−20%",
+        "economia": "Economia de R$ 700"
+      },
+      "complexa": {}
+    },
+    "complexa": true,
+    "criteria": true,
+    "conditions": true,
+    "srLabels": [
+      "Preço padrão:",
+      "Preço especial de lançamento:",
+      "Desconto de",
+      "Preço padrão:",
+      "Preço especial de lançamento:",
+      "Desconto de"
+    ]
+  },
+  "internalProductMentions": [],
+  "tabSequence": [
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Entrar — Acesso de clientes ainda não di",
+      "ring": true
+    },
+    {
+      "tag": "button",
+      "label": "Mudar para o tema escuro",
+      "ring": true
+    }
+  ],
+  "dialogTriggers": [
+    "inicio: Solicitar avaliação",
+    ": Solicitar avaliação",
+    "hosting: Solicitar avaliação de viabilidade",
+    "contato: Solicitar avaliação"
+  ],
+  "formStatus": "Confirme a sua solicitação\n\nEsta é a mensagem que será aberta no seu aplicativo de e-mail, endereçada à Nekkora. Confira antes de continuar.\n\nOlá! Sou Pessoa de Teste.\n\nQuero solicitar uma avaliação de automação.\n\nTeste automatizado de homologação: processo de conciliação manual.\n\nE-mail para retorno: teste@exemplo.invalid\n\nAntes de continuar\n\nAo continuar, o seu aplicativo de e-mail é aberto com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você a enviar pelo aplicativo. Esta página não guarda o que você digitou.\nCopiar mensagem\n\nSe o aplicativo de e-mail não abrir, copie a mensagem e envie para contato@nekkora.com\n.",
+  "mobilePageHeight": 9537,
+  "consoleInformativo": [],
+  "finishedAt": "2026-10-22T23:02:37.705Z",
+  "summary": {
+    "total": 71,
+    "failed": 0
+  }
+}

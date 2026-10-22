@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Alert, Button, DescriptionList, Dialog, Divider, Input, Link, Logo, Textarea } from 'nekkora-lib';
-import { CHANNELS, hasAnyChannel, whatsappDisplay, whatsappUrl } from '../config';
+import { CHANNELS, REQUEST_CHANNEL, hasAnyChannel, mailtoUrl, whatsappDisplay, whatsappUrl } from '../config';
 import { CONTACT_COPY } from '../content';
 import { useRequestTrigger } from '../request';
 
 type Field = 'name' | 'email' | 'message';
 type Errors = Partial<Record<Field, string>>;
-/** Etapas da jornada (§5.2): informar a necessidade → confirmar a mensagem → WhatsApp solicitado ao navegador. */
+/** Etapas da jornada (§5.2): informar a necessidade → confirmar a mensagem → WhatsApp ou e-mail solicitado ao navegador. */
 type Step = 'form' | 'review' | 'requested';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_MESSAGE = 1000;
 const FORM_ID = 'form-solicitacao';
 
-/** Mensagem estruturada enviada ao WhatsApp — exatamente o texto exibido na etapa de confirmação. */
+/** Mensagem estruturada enviada ao WhatsApp ou ao e-mail — exatamente o texto exibido na etapa de confirmação. */
 export function buildMessage({ name, company, email, message }: { name: string; company: string; email: string; message: string }) {
   return [
     `Olá! Sou ${name.trim()}${company.trim() ? `, da ${company.trim()}` : ''}.`,
@@ -31,7 +31,12 @@ export function buildMessage({ name, company, email, message }: { name: string; 
  * será transferido ao WhatsApp, e só então o visitante abre a conversa por um link comum (target=_blank,
  * rel=noopener noreferrer) — um clique em link não é barrado por bloqueador de pop-up, e o navegador não informa se a
  * aba abriu, por isso a página nunca afirma abertura nem envio (D-18). Alternativas manuais sempre visíveis: copiar a
- * mensagem e o número para digitar. Sem canal confirmado, o formulário funciona em modo de demonstração (K-05).
+ * mensagem e o número para digitar.
+ *
+ * Sem WhatsApp e com e-mail confirmado (REQUEST_CHANNEL = 'email'): a mesma jornada termina num link mailto, que abre o
+ * aplicativo de e-mail do visitante com o assunto e a mensagem confirmada; a página também não sabe se ele abriu, então
+ * diz só que pediu ao navegador e mantém a cópia da mensagem e o endereço à vista. Sem canal confirmado, o formulário
+ * funciona em modo de demonstração (K-05).
  */
 export function RequestDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -43,10 +48,16 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
   const [errors, setErrors] = useState<Errors>({});
   const [step, setStep] = useState<Step>('form');
   const [copy, setCopy] = useState<'idle' | 'copied' | 'failed'>('idle');
-  const directWhatsapp = whatsappUrl();
-  const canSend = directWhatsapp != null;
+  const channel = REQUEST_CHANNEL;
+  const canSend = channel != null;
+  const viaEmail = channel === 'email';
+  const flow = viaEmail ? CONTACT_COPY.email : CONTACT_COPY.whatsapp;
+  const direct = viaEmail ? mailtoUrl() : whatsappUrl();
   const text = buildMessage({ name, company, email, message });
-  const link = whatsappUrl(text);
+  const link = viaEmail ? mailtoUrl(text) : whatsappUrl(text);
+  // WhatsApp abre em outra aba, sem opener nem Referer; o mailto entrega ao aplicativo de e-mail, sem aba nova.
+  const linkProps = viaEmail ? {} : { target: '_blank', rel: 'noopener noreferrer' };
+  const icon = viaEmail ? 'mail' : 'whatsapp';
 
   const validate = (): Errors => {
     const e: Errors = {};
@@ -103,7 +114,7 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
       )}
       {CHANNELS.email && (
         <p className="contact__note">
-          {CONTACT_COPY.review.email} <Link href={`mailto:${CHANNELS.email}`}>{CHANNELS.email}</Link>.
+          {viaEmail ? CONTACT_COPY.email.manual : CONTACT_COPY.review.email} <Link href={`mailto:${CHANNELS.email}`}>{CHANNELS.email}</Link>.
         </p>
       )}
     </div>
@@ -130,20 +141,20 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
             Cancelar
           </Button>
           <Button type="submit" form={FORM_ID} rightIcon={canSend ? 'arrow-right' : 'check'}>
-            {canSend ? CONTACT_COPY.whatsappSubmit : CONTACT_COPY.demoSubmit}
+            {canSend ? CONTACT_COPY.reviewSubmit : CONTACT_COPY.demoSubmit}
           </Button>
         </div>
         <span className="contact__note request__note">
-          {canSend ? CONTACT_COPY.whatsappNote : CONTACT_COPY.demoNote} <Link href="#privacidade" onClick={onClose}>{CONTACT_COPY.privacyLink}</Link>
+          {canSend ? flow.note : CONTACT_COPY.demoNote} <Link href="#privacidade" onClick={onClose}>{CONTACT_COPY.privacyLink}</Link>
         </span>
       </>
     );
     body = (
       <div className="request__body">
-        {directWhatsapp ? (
+        {direct ? (
           <>
-            <Button variant="secondary" leftIcon="whatsapp" href={directWhatsapp} target="_blank" rel="noopener noreferrer" fullWidth>
-              {CONTACT_COPY.whatsappDirect}
+            <Button variant="secondary" leftIcon={icon} href={direct} {...linkProps} fullWidth>
+              {flow.direct}
             </Button>
             <Divider label={CONTACT_COPY.orForm} />
           </>
@@ -206,9 +217,9 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
         <Button variant="ghost" leftIcon="edit" onClick={edit}>
           {CONTACT_COPY.review.back}
         </Button>
-        {/* Link comum: aberto pelo próprio clique do visitante (não é pop-up), sem opener e sem Referer. */}
-        <Button leftIcon="whatsapp" href={link!} target="_blank" rel="noopener noreferrer" onClick={() => setStep('requested')}>
-          {CONTACT_COPY.review.open}
+        {/* Link comum: aberto pelo próprio clique do visitante (não é pop-up); WhatsApp sem opener e sem Referer. */}
+        <Button leftIcon={icon} href={link!} {...linkProps} onClick={() => setStep('requested')}>
+          {flow.open}
         </Button>
       </div>
     );
@@ -217,12 +228,12 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
         <h3 id="request-review-title" className="request__step-title">
           {CONTACT_COPY.review.title}
         </h3>
-        <p className="contact__note">{CONTACT_COPY.review.intro}</p>
-        <pre className="request__message" data-testid="mensagem-whatsapp">
+        <p className="contact__note">{flow.intro}</p>
+        <pre className="request__message" data-testid="mensagem-solicitacao">
           {text}
         </pre>
         <Alert tone="info" title="Antes de continuar">
-          {CONTACT_COPY.review.transfer}
+          {flow.transfer}
         </Alert>
         {manual}
       </div>
@@ -238,11 +249,11 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
     );
     body = (
       <div ref={stepRef} tabIndex={-1} className="contact__done">
-        <Alert tone="info" title={CONTACT_COPY.whatsappRequested.title} live="polite">
-          {CONTACT_COPY.whatsappRequested.text}
+        <Alert tone="info" title={flow.requested.title} live="polite">
+          {flow.requested.text}
         </Alert>
-        <Button leftIcon="whatsapp" href={link!} target="_blank" rel="noopener noreferrer">
-          {CONTACT_COPY.whatsappManual}
+        <Button leftIcon={icon} href={link!} {...linkProps}>
+          {flow.again}
         </Button>
         {manual}
         {summary}

@@ -1,0 +1,155 @@
+# COM-RELEASE-003 — comandos e saídas (2026-10-22T22:59:28Z), commit 06448fb883d3e46c7cd135e9f7bfa77e4c024651
+
+$ npm run typecheck
+> tsc --noEmit
+
+
+$ npm test
+✔ conta bem configurada: nenhuma falha e inventário com os identificadores reais (6.6649ms)
+✔ somente leitura: só operações Get/List/Describe (1.0285ms)
+✔ certificado aguardando validação DNS: pendente, com os registros a criar (1.1763ms)
+✔ erros comuns de configuração manual viram falha, com o motivo (9.3294ms)
+✔ IP dedicado (vip) é apontado como custo de US$ 600/mês (0.4982ms)
+✔ erro convertido em 200 (fallback de SPA) não é aceito (0.3643ms)
+✔ descobre a distribuição pela origem quando o ID não é informado (0.5161ms)
+✔ primeira publicação: raiz completa, metadados, cópia da release, manifesto e registro (25.7881ms)
+✔ ordem: assets e manifesto antes de qualquer arquivo de entrada; index.html e release.json por último (14.9626ms)
+✔ republicar o mesmo commit é idempotente: nada trocado, nada invalidado (27.0668ms)
+✔ segunda release: assets anteriores continuam no bucket (cache e rollback) e só o que mudou é invalidado (33.861ms)
+✔ bloqueia: asset com o mesmo nome e outro conteúdo — e a raiz não muda (28.1017ms)
+✔ bloqueia antes de gravar: CSP da distribuição não aceita os scripts do artefato (12.4194ms)
+✔ bloqueia: sem o ID da política de cabeçalhos não há publicação (11.9462ms)
+✔ bloqueia: artefato de homologação e mesmo commit com artefato diferente (37.6378ms)
+✔ falha no meio da troca: o site continua íntegro (index antigo + seus assets), estado não avança (37.0745ms)
+✔ concorrência: outra operação alterou atual.json → interrompe antes de trocar a raiz (22.2339ms)
+✔ o bucket recusa gravar asset sem If-None-Match (política de escrita única) (0.295ms)
+✔ rollback sem destino: volta para a release anterior aprovada, confere a raiz e registra (26.4034ms)
+✔ rollback para commit informado; recusa commit nunca publicado, destino igual ao atual e motivo vazio (21.5624ms)
+✔ rollback recusa destino corrompido ou incompleto — e não toca na raiz (111.1197ms)
+✔ rollback --simular valida e não grava nada (19.175ms)
+✔ rollback sem release anterior ou sem publicação: erro claro (9.2084ms)
+✔ publicar depois de um rollback: a release nova entra normalmente e o histórico guarda tudo (31.0979ms)
+✔ função viewer-request: www → https://nekkora.com com caminho e query; apex segue (2.0705ms)
+✔ função viewer-request: _releases/ nunca chega ao bucket (inclusive com escape e maiúsculas) (1.1129ms)
+✔ política versionada = cabeçalhos esperados, com a CSP exata dos scripts inline do build (T12) (3.8087ms)
+✔ servidor local + verificação pós-publicação: o build real passa em tudo (T13, T20) (332.8898ms)
+✔ erros: inexistente → 404 com a página de erro (nunca 200); só "/" usa o objeto raiz; 304 na revalidação (21.0413ms)
+✔ verificação negativa: cabeçalho de segurança ausente na política → falha (243.5963ms)
+✔ verificação negativa: site servindo outro artefato → release.json e arquivos divergem (371.6794ms)
+✔ verificação negativa: bucket que responde publicamente → falha (230.3868ms)
+✔ tabela oficial de 22/10/2026 (itens 1 a 4) (2.3956ms)
+✔ descontos matematicamente corretos (item 5): R$ 500 = 33,33% e R$ 700 = 20% (0.4665ms)
+✔ vigência controlada pelas datas aprovadas (item 10) (23.7504ms)
+✔ nenhuma alegação de 50% de desconto nem desconto universal (item 6) (6.5625ms)
+✔ valores antigos (R$ 500 e R$ 1.400 como preço; R$ 1.000 e R$ 2.800 como preço padrão) não existem mais (6.3693ms)
+✔ condição 50/50 preservada e separada do desconto (item 7); complexa sob orçamento, sem desconto (item 8) (0.4819ms)
+✔ tudo confirmado: libera (só e-mail e LinkedIn, sem WhatsApp) (130.3517ms)
+✔ WhatsApp válido também é aceito (106.0794ms)
+✔ o publicacao.json versionado continua bloqueado (nenhuma aprovação presumida) (101.6613ms)
+✔ bloqueia: WhatsApp marcador (zeros) (98.9744ms)
+✔ bloqueia: sem e-mail (101.8361ms)
+✔ bloqueia: e-mail de domínio reservado (.invalid) (85.9055ms)
+✔ bloqueia: sem LinkedIn (92.2984ms)
+✔ bloqueia: LinkedIn na página inicial (81.9071ms)
+✔ bloqueia: LinkedIn de outro domínio (104.8131ms)
+✔ bloqueia: campanha sem datas (74.3043ms)
+✔ bloqueia: campanha encerrada (74.4605ms)
+✔ bloqueia: sem razão social (84.0482ms)
+✔ bloqueia: sem documento (80.2242ms)
+✔ bloqueia: CNPJ com dígito errado (86.6753ms)
+✔ bloqueia: CNPJ marcador (zeros) (93.9436ms)
+✔ bloqueia: sem provedor (83.9559ms)
+✔ bloqueia: preços não aprovados (79.6041ms)
+✔ bloqueia: condições não aprovadas (77.1126ms)
+✔ bloqueia: textos não aprovados (81.803ms)
+✔ bloqueia: privacidade não aprovada (83.2787ms)
+✔ bloqueia: publicação não autorizada (79.8161ms)
+✔ bloqueia: aprovação como texto "true" (não é aprovação) (77.0865ms)
+✔ bloqueia: aviso de homologação ligado (74.3971ms)
+✔ aceita CPF válido no lugar do CNPJ (77.507ms)
+✔ bloqueia artefato de homologação, árvore suja, outra lib, CSP divergente e _headers (492.2128ms)
+ℹ tests 63
+ℹ pass 63
+ℹ fail 0
+
+$ npm run build
+dist/release.json                                         0.49 kB │ gzip:   0.37 kB
+dist/index.html                                           2.60 kB │ gzip:   1.08 kB
+dist/assets/inter-latin-wght-normal-Dx4kXJAl.woff2       48.25 kB
+dist/assets/inter-latin-ext-wght-normal-DO1Apj_S.woff2   85.06 kB
+dist/assets/index-pux4Y6YA.css                           79.74 kB │ gzip:  13.48 kB
+dist/assets/index-CCk9919-.js                           336.70 kB │ gzip: 104.52 kB
+✓ built in 293ms
+
+$ npm run aws:config:verificar
+deploy/aws/politica-cabecalhos.json corresponde ao build
+
+$ node scripts/verificar-lib.mjs --reconstruir
+npm notice unpacked size: 464.6 kB
+npm notice shasum: 3c978ad0c5e066ec7034905be1285800b8e80abd
+npm notice integrity: sha512-LE1ZO5MkrPi38[...]TFVeoingIcT4A==
+npm notice total files: 88
+npm notice
+OK  build reproduzível a partir do commit registrado — nekkora-lib-0.2.0.tgz sha256 1a2e614576f7c33ec98bbaf1dfe9f0eb6098637ca1075113c666aea6662526a6
+
+$ node scripts/verificar-publicacao.mjs --dist dist   (esperado: bloqueado só por itens da titular)
+PUBLICAÇÃO BLOQUEADA — 7 pendência(s):
+  - PUB-13 — datas de início e fim da campanha de lançamento
+  - PUB-09 — controlador dos dados: razão social (ou nome) para o aviso de privacidade
+  - PUB-19 — aprovação das condições comerciais (50/50, fila, reuniões, licenças, garantia e aceite)
+  - PUB-17 — aprovação dos textos comerciais
+  - PUB-09 — aprovação do aviso de privacidade
+  - PUB-18 — autorização expressa de publicação em produção
+  - PUB-10 — desligar o aviso "Versão para homologação"
+(saída 1)
+
+$ node scripts/aws/verificar-site.mjs --base http://127.0.0.1:4173/ --dist dist --bucket-url http://127.0.0.1:4173/__s3/   (CloudFront LOCAL)
+OK   release-json-do-commit — servido 06448fb883d3e46c7cd135e9f7bfa77e4c024651 · esperado 06448fb883d3e46c7cd135e9f7bfa77e4c024651
+OK   pagina-inicial-200 — HTTP 200 text/html; charset=utf-8
+OK   pagina-inicial-e-o-index-do-artefato
+OK   cabecalhos-de-seguranca — 7 cabeçalhos idênticos
+OK   documento-revalidado — cache-control: no-cache
+OK   arquivos-do-artefato-integros — 13 arquivos com hash, tipo e cache esperados
+OK   inexistente-404-com-pagina-de-erro — HTTP 404
+OK   prefixo-interno-nao-servido — 404, 404, 404, 404
+OK   sem-listagem-do-bucket
+OK   bucket-sem-acesso-publico — GET direto no S3: HTTP 403
+
+site confere com o artefato 06448fb883d3e46c7cd135e9f7bfa77e4c024651
+
+$ curl -sI http://127.0.0.1:4173/   (cabeçalhos servidos)
+HTTP/1.1 200 OK
+content-type: text/html; charset=utf-8
+cache-control: no-cache
+content-length: 2602
+content-security-policy: default-src 'self'; script-src 'self' 'sha256-JDd2nuaninfZZDJOM3fEvC7cCoIy0w7m1A5JfhKL6tE='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: strict-origin-when-cross-origin
+permissions-policy: camera=(), microphone=(), geolocation=(), payment=()
+cross-origin-opener-policy: same-origin
+
+$ curl -sI -H "Host: www.nekkora.com" http://127.0.0.1:4173/precos?x=1
+HTTP/1.1 301 Moved Permanently
+location: https://nekkora.com/precos?x=1
+$ curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173/_releases/atual.json
+404
+
+$ NEKKORA_NAVEGADOR=chromium node scripts/homologacao.mjs http://127.0.0.1:4173/ docs/release/evidencias/com-release-003/pagina-chromium
+71 verificações, 0 falha(s). Resultados em docs/release/evidencias/com-release-003/pagina-chromium
+
+$ NEKKORA_NAVEGADOR=firefox node scripts/homologacao.mjs http://127.0.0.1:4173/ docs/release/evidencias/com-release-003/pagina-firefox
+71 verificações, 0 falha(s). Resultados em docs/release/evidencias/com-release-003/pagina-firefox
+
+$ NEKKORA_NAVEGADOR=webkit node scripts/homologacao.mjs http://127.0.0.1:4173/ docs/release/evidencias/com-release-003/pagina-webkit
+71 verificações, 0 falha(s). Resultados em docs/release/evidencias/com-release-003/pagina-webkit
+
+$ NEKKORA_CANAL=email node scripts/homologacao-canais.mjs http://127.0.0.1:4176/ docs/release/evidencias/com-release-003/conversao-email chromium,firefox,webkit
+93 verificações, 0 falha(s).
+
+$ node scripts/homologacao-canais.mjs http://127.0.0.1:4175/ docs/release/evidencias/com-release-003/conversao-whatsapp chromium,firefox,webkit
+111 verificações, 0 falha(s).
+
+$ node scripts/desempenho.mjs http://127.0.0.1:4173/ docs/release/evidencias/com-release-003/desempenho.json
+{"fcpMs":1752,"lcpMs":1752,"cls":0,"kbTransferidos":150,"requisicoes":4}

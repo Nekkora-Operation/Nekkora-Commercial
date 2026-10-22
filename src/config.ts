@@ -11,6 +11,7 @@
  * NEKKORA_PUBLICACAO — veja vite.config.ts.
  */
 import publicacao from '@publicacao';
+import { launchActive, todayInBrazil } from './precos';
 
 /** WhatsApp com DDI + DDD, só dígitos. E-mail. URLs de perfil (não a página inicial da rede). */
 export const CONTACT: { whatsappNumber: string | null; email: string | null; instagram: string | null; linkedin: string | null } = {
@@ -51,6 +52,21 @@ export const hasAnyChannel = Object.values(CHANNELS).some((c) => c != null);
 export const whatsappUrl = (message: string = WHATSAPP_MESSAGE) =>
   CHANNELS.whatsapp ? `https://wa.me/${CHANNELS.whatsapp}?text=${encodeURIComponent(message)}` : null;
 
+/**
+ * Canal da jornada "Solicitar avaliação": o WhatsApp, quando confirmado; senão o e-mail comercial (a mensagem é aberta
+ * no aplicativo de e-mail do visitante por um link mailto). Sem nenhum dos dois, o formulário fica em modo de
+ * demonstração. Decisão da titular em 22/10/2026: por enquanto só e-mail e LinkedIn (sem WhatsApp).
+ */
+export const REQUEST_CHANNEL: 'whatsapp' | 'email' | null = CHANNELS.whatsapp ? 'whatsapp' : CHANNELS.email ? 'email' : null;
+
+export const EMAIL_SUBJECT = 'Solicitação de avaliação — Nekkora';
+
+/** mailto com assunto e, se houver, corpo. Quebras de linha como CRLF (RFC 6068). */
+export const mailtoUrl = (body?: string) =>
+  CHANNELS.email
+    ? `mailto:${CHANNELS.email}?subject=${encodeURIComponent(EMAIL_SUBJECT)}${body ? `&body=${encodeURIComponent(body.replace(/\r?\n/g, '\r\n'))}` : ''}`
+    : null;
+
 /** Número do WhatsApp para digitar à mão (alternativa quando o link não abre): +55 11 91234-5678. */
 export const whatsappDisplay = (n: string | null = CHANNELS.whatsapp) => {
   if (!n) return null;
@@ -61,15 +77,22 @@ export const whatsappDisplay = (n: string | null = CHANNELS.whatsapp) => {
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const toBr = (iso: string) => iso.split('-').reverse().join('/');
 
-/**
- * Vigência da campanha de lançamento (PUB-13). Com as duas datas definidas e válidas, a página informa o período
- * ("de 01/11/2026 a 31/12/2026"); sem elas, mantém o texto do mockup e a publicação fica bloqueada.
- */
-export const LAUNCH_PERIOD = (() => {
+/** Datas da campanha de lançamento (PUB-13) — só quando as duas existem, são AAAA-MM-DD e estão em ordem. */
+export const LAUNCH_DATES = (() => {
   const { inicio, fim } = publicacao.campanhaLancamento;
   if (inicio == null || fim == null || !ISO_DATE.test(inicio) || !ISO_DATE.test(fim) || inicio > fim) return null;
-  return { start: toBr(inicio), end: toBr(fim) };
+  return { inicio, fim };
 })();
+
+/**
+ * Vigência da campanha de lançamento (PUB-13). Com as duas datas definidas e válidas, a página informa o período
+ * ("de 01/11/2026 a 31/12/2026") e só mostra os preços de lançamento dentro dele (isLaunchActive).
+ */
+export const LAUNCH_PERIOD = LAUNCH_DATES && { start: toBr(LAUNCH_DATES.inicio), end: toBr(LAUNCH_DATES.fim) };
+
+/** Preços de lançamento em vigor hoje (fuso de Brasília)? Sem datas aprovadas: sim, para revisão (o deploy fica bloqueado). */
+export const isLaunchActive = (now: Date = new Date()) =>
+  launchActive(LAUNCH_DATES ?? { inicio: null, fim: null }, todayInBrazil(now));
 
 /** Quem responde pelos dados pessoais (aviso de privacidade). Sem o dado confirmado, o aviso usa "a Nekkora". */
 export const DATA_CONTROLLER = {

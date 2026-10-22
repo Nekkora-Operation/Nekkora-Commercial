@@ -18,7 +18,8 @@
     "provedor": "Provedor de teste (dado sintético)"
   },
   "aprovacoes": {
-    "precosECondicoes": true,
+    "precos": true,
+    "condicoesComerciais": true,
     "textosComerciais": true,
     "avisoDePrivacidade": true,
     "publicacao": true
