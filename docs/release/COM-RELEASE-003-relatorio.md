@@ -112,4 +112,13 @@ Os preços oficiais foram implementados na branch limpa, a partir da especifica�
 
 ## 7. CI no GitHub
 
-Preenchido depois do push.
+[Run 39869410524](https://github.com/Nekkora-Operation/Nekkora-Commercial/actions/runs/39869410524) (PR #6, commit
+`bd363c5`; artefato gerado do merge de teste `1235c9f`, Ubuntu 24.04 com a imagem do Playwright 1.63.0): **verde nos 4
+jobs**.
+
+| Job | Resultado |
+|---|---|
+| Build nekkora-lib | tarball reproduzido com o mesmo sha256 |
+| Validação e build | typecheck; **63/63** testes; build; política do CloudFront corresponde ao build |
+| Integração | `verificar-site` no CloudFront local OK; página **71/71** em Chromium, Firefox e WebKit; e-mail **93/93** e WhatsApp **111/111** nos 3 |
+| Preview (sem publicação) | resumo da release candidata no environment `preview`, sem credenciais |
