@@ -66,7 +66,7 @@ async function putOnce(store, key, file, log) {
 
 /** A CSP da Response Headers Policy em uso precisa aceitar os scripts inline deste build — senão a página quebraria. */
 export function checkPolicy(live, release) {
-  const expected = responseHeadersPolicy(release.cspScriptHashes ?? []).SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy;
+  const expected = responseHeadersPolicy(release.cspScriptHashes ?? [], release.cspOrigens).SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy;
   const got = live?.SecurityHeadersConfig?.ContentSecurityPolicy?.ContentSecurityPolicy;
   if (got !== expected) {
     fail(`a Response Headers Policy da distribuição não corresponde a este artefato.\n  esperada: ${expected}\n  em uso:   ${got ?? '(sem CSP)'}\n  Atualize a política com deploy/aws/politica-cabecalhos.json ANTES de publicar (docs/release/COM-RELEASE-003-aws.md).`);

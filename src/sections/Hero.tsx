@@ -1,4 +1,6 @@
 import { Badge, Button } from 'nekkora-lib';
+import { ScheduleButton } from '../agendamento';
+import { BOOKINGS_URL } from '../config';
 import { HERO } from '../content';
 import { useRequestTrigger } from '../request';
 
@@ -18,9 +20,15 @@ export function Hero() {
           <Button size="lg" pill rightIcon="arrow-right" {...trigger}>
             {HERO.primaryCta}
           </Button>
-          <Button size="lg" pill variant="secondary" href="#como-funciona">
-            {HERO.secondaryCta}
-          </Button>
+          {/* Dois caminhos de contato (COM-RELEASE-005 §4.4): com o Bookings configurado, "Agendar conversa" ocupa o
+              lugar de "Ver como funciona" (que continua no menu); sem ele, nada muda. */}
+          {BOOKINGS_URL ? (
+            <ScheduleButton />
+          ) : (
+            <Button size="lg" pill variant="secondary" href="#como-funciona">
+              {HERO.secondaryCta}
+            </Button>
+          )}
         </div>
         <ul className="hero__pillars plain-list" aria-label="Princípios da contratação">
           {HERO.points.map((p) => (

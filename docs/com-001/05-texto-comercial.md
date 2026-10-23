@@ -184,6 +184,32 @@ Botões: "Voltar e editar" · "Abrir no WhatsApp". Alternativas: "Copiar mensage
 
 Canais diretos (sem formulário): "Prefere falar direto?"
 
+## 7b. Envio automático e agendamento (COM-RELEASE-005 — só com endpoint e URL do Bookings confirmados)
+
+Precedência: envio automático (se houver endpoint) → WhatsApp → e-mail. Um único mecanismo de envio por vez.
+
+Formulário: E-mail obrigatório — "Obrigatório — é por ele que respondemos." (erro: "Informe um e-mail para recebermos e respondermos a sua solicitação, como nome@empresa.com."). Nota: "Na próxima etapa você confere os dados antes de enviar."
+
+Confirmação: **Confirme a sua solicitação** — Confira os dados abaixo. Eles serão enviados à Nekkora quando você tocar em "Enviar solicitação".
+
+> **Antes de enviar** — Ao enviar, nome, empresa, e-mail e descrição vão para a Nekkora por um serviço da AWS, que entrega a solicitação na caixa de e-mail comercial. Só usamos os dados para responder e preparar a avaliação.
+
+Desafio: "Verificação de segurança automática (Cloudflare Turnstile) para evitar envios por robôs." · aguardando: "Aguardando a verificação de segurança…" · indisponível: "A verificação de segurança não carregou. Você pode tentar de novo ou usar o e-mail abaixo."
+
+Botões: "Voltar e editar" · "Enviar solicitação" (durante o envio: "Enviando…"; leitor de tela: "Enviando a solicitação. Aguarde a confirmação.")
+
+- Recebida (só com a confirmação do servidor): **Solicitação recebida** — Protocolo NK-XXXXXXXX. Vamos responder pelo e-mail informado. A solicitação inicia uma avaliação — não é uma contratação.
+- Falha: **A solicitação não foi enviada**
+- _rede_: Não conseguimos falar com o servidor. Confira a sua conexão e tente de novo — os dados continuam aqui.
+- _limite_: Recebemos muitas solicitações em pouco tempo. Tente de novo mais tarde ou use o e-mail abaixo.
+- _desafio_: Não foi possível confirmar a verificação de segurança. Faça a verificação de novo e tente enviar.
+- _indisponivel_: O envio não foi concluído por uma falha temporária. Os dados continuam aqui: tente de novo em instantes ou use o e-mail abaixo.
+- _recusada_: Não foi possível enviar esta solicitação. Revise os dados ou escreva diretamente para o e-mail abaixo.
+
+Ações na falha: "Tentar novamente" (não aparece quando a solicitação é recusada) · "Se preferir, envie a mesma mensagem pelo seu e-mail para <e-mail>" · "Abrir no e-mail" · "Copiar mensagem"
+
+**Agendamento** — botão "Agendar conversa" (nome acessível: "Agendar conversa (abre o Microsoft Bookings em outra aba)") no topo e no contato; no diálogo: "Prefere conversar antes? Agendar conversa". Nota no contato: "Escolha um horário na agenda da Nekkora, no Microsoft Bookings. A conversa só fica marcada quando o Bookings confirmar."
+
 ## 7a. Privacidade
 
 **Privacidade** — Como tratamos seus dados
@@ -194,7 +220,7 @@ Responsável pelos dados pessoais desta página: a Nekkora.
 - **O que vai para o e-mail** — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a contato@nekkora.com. Ela só é enviada se você a enviar pelo aplicativo.
 - **Sem cookies nem rastreamento** — Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.
 - **Registros de acesso** — A Amazon Web Services (AWS), que hospeda este site, processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.
-- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.
+- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir confirmação, acesso, correção, exclusão ou informações sobre o compartilhamento dos seus dados (LGPD, art. 18) pelo e-mail contato@nekkora.com.
 
 ## 8. Barra de navegação
 

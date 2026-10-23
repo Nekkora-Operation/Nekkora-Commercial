@@ -60,6 +60,43 @@ need(pub.canais.whatsapp == null || isWhatsapp(pub.canais.whatsapp), 'PUB-01', '
 need(isEmail(pub.canais.email), 'PUB-02', 'e-mail comercial');
 need(isProfile(pub.canais.linkedin) && /linkedin\.com$/i.test(new URL(pub.canais.linkedin ?? 'https://x/').hostname.replace(/^www\./, '')), 'PUB-03', 'página oficial do LinkedIn (URL de perfil)');
 need(pub.canais.instagram == null || isProfile(pub.canais.instagram), 'PUB-03', 'Instagram: URL de perfil ou null (opcional)');
+// Agendamento — Microsoft Bookings (COM-RELEASE-005 §4.5). Mesma regra de src/config.ts (isBookingsUrl), mais a recusa
+// de domínios de exemplo. Obrigatório quando faz parte do lançamento; a titular confirma que testou a página oficial.
+const emailDomain = isEmail(pub.canais.email) ? pub.canais.email.split('@')[1].toLowerCase() : null;
+function isBookings(u) {
+  try {
+    const url = new URL(u);
+    const path = decodeURIComponent(url.pathname).toLowerCase();
+    const domain = /^\/(?:book|owa\/calendar)\/[^/@]+@([^/]+)\//.exec(path.endsWith('/') ? path : `${path}/`)?.[1] ?? '';
+    const okPath = path.startsWith('/book/') || (path.startsWith('/owa/calendar/') && path.includes('/bookings'));
+    return (
+      url.protocol === 'https:' &&
+      ['outlook.office365.com', 'outlook.office.com'].includes(url.hostname.toLowerCase()) &&
+      url.username === '' &&
+      okPath &&
+      emailDomain != null &&
+      (domain === emailDomain || /^[a-z0-9-]+\.onmicrosoft\.com$/.test(domain)) &&
+      !/\.(invalid|example|test)$/.test(domain)
+    );
+  } catch {
+    return false;
+  }
+}
+const booking = pub.agendamento ?? { url: null, obrigatorio: false };
+need(booking.url == null ? booking.obrigatorio !== true : isBookings(booking.url), 'PUB-20', 'URL oficial da página do Microsoft Bookings (https://outlook.office365.com/book/<caixa>@<domínio da Nekkora>/)');
+need(booking.url == null || pub.aprovacoes.agendamento === true, 'PUB-20', 'confirmação da titular: serviço do Bookings configurado e página oficial testada');
+// Recebimento automático (COM-RELEASE-005 §5): opcional; se houver endpoint, só https, com desafio e aprovação.
+const intake = pub.envioAutomatico ?? { endpoint: null, chaveDoSiteTurnstile: null };
+if (intake.endpoint != null) {
+  let okEndpoint = false;
+  try {
+    const u = new URL(intake.endpoint);
+    okEndpoint = u.protocol === 'https:' && u.pathname === '/v1/commercial/requests' && u.search === '' && u.username === '';
+  } catch {}
+  need(okEndpoint, 'PUB-21', 'endpoint do recebimento automático: https://…/v1/commercial/requests');
+  need(typeof intake.chaveDoSiteTurnstile === 'string' && /^[0-9a-zA-Z_-]{10,64}$/.test(intake.chaveDoSiteTurnstile) && !/^[123]x0{20}[AB]{2}$/.test(intake.chaveDoSiteTurnstile), 'PUB-21', 'chave do site do Turnstile (não a chave de teste da Cloudflare)');
+  need(pub.aprovacoes.envioAutomatico === true, 'PUB-21', 'autorização do recebimento automático (backend publicado e homologado na AWS)');
+}
 // Campanha (§4.4, COM-RELEASE-003-R1)
 const { inicio, fim } = pub.campanhaLancamento;
 need(iso(inicio) && iso(fim) && inicio <= fim, 'PUB-13', 'datas de início e fim da campanha de lançamento');
@@ -94,7 +131,7 @@ if (!existsSync(releaseFile)) {
   const versioned = existsSync(policyFile) ? readFileSync(policyFile, 'utf8') : null;
   let expected = null;
   try {
-    expected = `${JSON.stringify(responseHeadersPolicy(rel.cspScriptHashes ?? []), null, 2)}\n`;
+    expected = `${JSON.stringify(responseHeadersPolicy(rel.cspScriptHashes ?? [], rel.cspOrigens), null, 2)}\n`;
   } catch {}
   need(versioned != null && versioned === expected, 'BUILD', 'deploy/aws/politica-cabecalhos.json não corresponde aos scripts inline do artefato (node scripts/aws/gerar-config.mjs)');
   need(!existsSync(resolve(dist, '_headers')), 'BUILD', 'artefato com _headers do Cloudflare Pages (a hospedagem é a AWS)');

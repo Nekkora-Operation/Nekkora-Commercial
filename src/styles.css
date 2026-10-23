@@ -210,6 +210,17 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .tech__note { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
 .contact__done:focus { outline: none; }
 .contact__done > .nk-button { align-self: flex-start; }
+/* Dois caminhos de contato (COM-RELEASE-005 §4.4): "Solicitar avaliação" e "Agendar conversa" lado a lado */
+.contact__ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.contact__schedule-note { margin: 0; max-width: 36em; }
+.request__schedule { margin: 0; }
+.request__actions > :only-child { grid-column: 1 / -1; }
+.request__actions--start { display: flex; flex-wrap: wrap; width: auto; }
+/* Envio automático: desafio e armadilha para robôs (fora da tela, fora da ordem de foco) */
+.request__challenge-box { display: flex; flex-direction: column; gap: 8px; }
+.request__challenge-box .contact__note { margin: 0; }
+.request__challenge:empty { display: none; }
+.request__trap { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 
 /* ---------- Botão flutuante ---------- */
 /* No celular, some enquanto o contato está na tela (o bloco de contato já tem WhatsApp e o formulário fica livre). */
@@ -231,7 +242,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
   /* diálogo: ações empilhadas, a principal em cima (como o rodapé do Dialog da lib abaixo de 480 px) */
   .request__actions { grid-template-columns: minmax(0, 1fr); }
   .request__actions > :last-child { order: -1; }
-  .hero__ctas > * { flex: 1 1 100%; }
+  .hero__ctas > *, .contact__ctas > * { flex: 1 1 100%; }
   .hosting-band__visual { display: none; }
   /* espaço para o botão flutuante (só existe com WhatsApp confirmado) não cobrir o fim da página */
   .page--fab .footer { padding-bottom: 96px; }

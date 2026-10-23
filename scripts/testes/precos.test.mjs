@@ -75,6 +75,15 @@ test('valores antigos (R$ 500 e R$ 1.400 como preço; R$ 1.000 e R$ 2.800 como p
   assert.match(text, /~~R\$ 3\.500~~ \*\*R\$ 2\.800\*\*/);
 });
 
+test('nenhum percentual de desconto digitado no código (COM-RELEASE-005 §3.4): o selo vem de priceFacts', () => {
+  const files = walk(join(root, 'src')).filter((f) => /\.(ts|tsx)$/.test(f));
+  const hits = files.flatMap((f) => [...readFileSync(f, 'utf8').matchAll(/−\s?\d+(?:[.,]\d+)?\s?%|\bdiscount\s*:/g)].map((m) => `${f.slice(root.length + 1)}: "${m[0]}"`));
+  assert.deepEqual(hits, []);
+  const pricing = readFileSync(join(root, 'src/sections/Pricing.tsx'), 'utf8');
+  assert.match(pricing, /<span data-price="percentual">−\{t\.price\.percentLabel\}<\/span>/);
+  assert.match(pricing, /<s data-price="padrao">\{t\.price\.standardLabel\}<\/s>/);
+});
+
 test('condição 50/50 preservada e separada do desconto (item 7); complexa sob orçamento, sem desconto (item 8)', () => {
   const content = readFileSync(join(root, 'src/content.ts'), 'utf8');
   assert.match(content, /'Pagamento de 50% na contratação e 50% na entrega, conforme a proposta'/);

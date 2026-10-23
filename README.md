@@ -80,10 +80,16 @@ public/                  favicons da marca (idênticos aos da nekkora-lib)
 - Hospedagem: **AWS S3 + CloudFront** (DNS na Cloudflare). Cabeçalhos, cache, função e políticas IAM estão em
   [`deploy/aws/`](deploy/aws/), e os scripts de publicação, rollback, verificação e auditoria em
   [`scripts/aws/`](scripts/aws/).
-- `npm test`: preços, portão, publicação/rollback simulados, auditoria e CloudFront local.
+- `npm test`: preços, portão, publicação/rollback simulados, auditoria, CloudFront local e backend de solicitações.
 - `npm run cloudfront:local`: serve o `dist/` como o CloudFront (CSP, erros, cache, função).
 - `npm run homologacao` (página) e `npm run homologacao:canais` (jornadas; `NEKKORA_CANAL=email` para o e-mail).
 - `npm run aws:auditar -- --bucket <nome>`: auditoria somente leitura da conta AWS.
+- `npm run verificar:precos`: confere que o bundle tem a tabela de `src/precos.ts` e nenhum percentual digitado.
+- **Contato (COM-RELEASE-005)**:
+  - "Agendar conversa" abre o Microsoft Bookings e só aparece com `agendamento.url`;
+  - o envio automático do formulário vai para o backend serverless em [`api/solicitacoes/`](api/solicitacoes/), que
+    ainda não foi publicado. Localmente: `npm run api:local` e `scripts/homologacao-leads.mjs`;
+  - arquitetura, Graph × SES, Bookings e custos: [`COM-RELEASE-005-leads.md`](docs/release/COM-RELEASE-005-leads.md).
 - CI, deploy manual com aprovação, rollback, OIDC, DNS e custos:
   [`docs/release/COM-RELEASE-003-aws.md`](docs/release/COM-RELEASE-003-aws.md).
 - Relatórios: [`docs/release/`](docs/release/) · pendências: [`COM-RELEASE-PENDENCIAS.md`](docs/release/COM-RELEASE-PENDENCIAS.md).
