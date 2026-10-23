@@ -27,16 +27,17 @@ export function expectedFrom({ dist, manifest }) {
     return {
       commit: manifest.commit,
       cspScriptHashes: manifest.cspScriptHashes ?? [],
+      cspOrigens: manifest.cspOrigens,
       files: manifest.arquivos.map((f) => ({ key: f.caminho, sha256: f.sha256, contentType: f.contentType, cacheControl: f.cacheControl })),
     };
   }
   const plan = planFromDist(dist);
-  return { commit: plan.commit, cspScriptHashes: plan.release.cspScriptHashes ?? [], files: plan.files };
+  return { commit: plan.commit, cspScriptHashes: plan.release.cspScriptHashes ?? [], cspOrigens: plan.release.cspOrigens, files: plan.files };
 }
 
 export async function verifySite({ base, dist = null, manifest = null, bucketUrl = null, wwwUrl = null, httpUrl = null, tries = 1, waitMs = 10000, fetchImpl = fetch, log = console.log }) {
   const plan = expectedFrom({ dist, manifest });
-  const expectedHeaders = securityHeaders(plan.cspScriptHashes);
+  const expectedHeaders = securityHeaders(plan.cspScriptHashes, plan.cspOrigens);
   const url = (p) => new URL(p, base).href;
   const get = async (p, init) => {
     const r = await fetchImpl(url(p), { redirect: 'manual', cache: 'no-store', ...init });

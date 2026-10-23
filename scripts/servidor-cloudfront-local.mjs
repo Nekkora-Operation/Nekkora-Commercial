@@ -15,6 +15,7 @@
  * Também responde /__s3/<chave> com 403 (AccessDenied), simulando o acesso direto ao bucket privado.
  *
  *   node scripts/servidor-cloudfront-local.mjs --dist dist --porta 4173 [--politica deploy/aws/politica-cabecalhos.json]
+ *   node scripts/servidor-cloudfront-local.mjs --dist dist-homologacao-api --porta 4177 --politica-do-build
  *
  * É uma simulação: comprova a configuração, não substitui a homologação pública (COM-RELEASE-004).
  */
@@ -25,7 +26,7 @@ import { brotliCompressSync, gzipSync } from 'node:zlib';
 import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import vm from 'node:vm';
-import { ERROR_RESPONSES } from '../deploy/aws/cabecalhos.mjs';
+import { ERROR_RESPONSES, responseHeadersPolicy } from '../deploy/aws/cabecalhos.mjs';
 import { planFromDist } from './aws/plano.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '../..');
@@ -55,10 +56,13 @@ export function headersFromPolicy(policy) {
   return out;
 }
 
-export function createCloudFrontServer({ dist, policyFile = resolve(root, 'deploy/aws/politica-cabecalhos.json'), log = () => {} }) {
+export function createCloudFrontServer({ dist, policyFile = resolve(root, 'deploy/aws/politica-cabecalhos.json'), policyFromBuild = false, log = () => {} }) {
   const plan = planFromDist(dist);
   const objects = new Map(plan.files.map((f) => [f.key, { ...f, etag: `"${createHash('md5').update(f.body).digest('hex')}"` }]));
-  const policyHeaders = headersFromPolicy(JSON.parse(readFileSync(policyFile, 'utf8')));
+  // --politica-do-build: builds de homologação com origens próprias (backend local, COM-RELEASE-005) — a política é
+  // gerada do release.json do próprio build, pelo mesmo código que gera a versionada.
+  const policy = policyFromBuild ? responseHeadersPolicy(plan.release.cspScriptHashes ?? [], plan.release.cspOrigens) : JSON.parse(readFileSync(policyFile, 'utf8'));
+  const policyHeaders = headersFromPolicy(policy);
   const viewerRequest = loadViewerRequest();
   const errors = new Map(ERROR_RESPONSES.map((e) => [e.ErrorCode, e]));
 
@@ -118,6 +122,6 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const argv = process.argv.slice(2);
   const opt = (n, d) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : d);
   const port = Number(opt('--porta', 4173));
-  const server = createCloudFrontServer({ dist: resolve(opt('--dist', 'dist')), policyFile: opt('--politica') ? resolve(opt('--politica')) : undefined, log: argv.includes('--log') ? console.log : () => {} });
+  const server = createCloudFrontServer({ dist: resolve(opt('--dist', 'dist')), policyFile: opt('--politica') ? resolve(opt('--politica')) : undefined, policyFromBuild: argv.includes('--politica-do-build'), log: argv.includes('--log') ? console.log : () => {} });
   server.listen(port, '127.0.0.1', () => console.log(`CloudFront local: http://127.0.0.1:${port}/ (${opt('--dist', 'dist')})`));
 }

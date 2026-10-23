@@ -70,6 +70,8 @@ export function buildManifest(plan, { publishedAt, checks = null }) {
     publicadoEm: publishedAt,
     nekkoraLib: release.nekkoraLib,
     cspScriptHashes: release.cspScriptHashes,
+    // Origens externas da CSP (COM-RELEASE-005): só existem com recebimento automático configurado
+    ...(release.cspOrigens ? { cspOrigens: release.cspOrigens } : {}),
     verificacoes: checks,
     // Hash do conjunto: sha256 da lista "caminho sha256" ordenada — compara releases inteiras de uma vez.
     hashDoArtefato: sha256(plan.files.map((f) => `${f.key} ${f.sha256}`).join('\n')).digest('hex'),

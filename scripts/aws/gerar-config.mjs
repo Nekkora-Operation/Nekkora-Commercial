@@ -9,6 +9,9 @@
  *   node scripts/aws/gerar-config.mjs --conta 123456789012 --bucket <nome> --distribuicao <ID> \
  *       --politica-cabecalhos <ID> --saida <pasta>
  *       preenche os modelos de deploy/aws/iam/ com os identificadores reais (para colar no console ou na CLI).
+ *   node scripts/aws/gerar-config.mjs --solicitacoes --conta 123456789012 --regiao us-east-1 --identidade nekkora.com \
+ *       --remetente formulario@nekkora.com --destino contato@nekkora.com --tabela nekkora-commercial-solicitacoes --saida <pasta>
+ *       idem para deploy/aws/solicitacoes/ (função de recebimento de solicitações, COM-RELEASE-005 §6).
  */
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -19,14 +22,20 @@ import { readRelease } from './plano.mjs';
 const root = resolve(fileURLToPath(import.meta.url), '../../..');
 export const POLICY_FILE = join(root, 'deploy/aws/politica-cabecalhos.json');
 const IAM_DIR = join(root, 'deploy/aws/iam');
+const LEADS_DIR = join(root, 'deploy/aws/solicitacoes');
 
-export const policyText = (release) => `${JSON.stringify(responseHeadersPolicy(release.cspScriptHashes ?? []), null, 2)}\n`;
+export const policyText = (release) => `${JSON.stringify(responseHeadersPolicy(release.cspScriptHashes ?? [], release.cspOrigens), null, 2)}\n`;
 
 const FORMATS = {
   AWS_ACCOUNT_ID: /^\d{12}$/,
   AWS_S3_BUCKET: /^(?!xn--)(?!.*\.\.)[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/,
   AWS_CLOUDFRONT_DISTRIBUTION_ID: /^E[A-Z0-9]{12,13}$/,
   AWS_RESPONSE_HEADERS_POLICY_ID: /^[0-9a-f-]{36}$/,
+  AWS_REGION: /^[a-z]{2}-[a-z]+-\d$/,
+  SES_IDENTITY: /^[a-z0-9.-]+\.[a-z]{2,}$/,
+  SES_FROM: /^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/,
+  SES_TO: /^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/,
+  DYNAMODB_TABLE: /^[A-Za-z0-9_.-]{3,255}$/,
 };
 
 /** Substitui ${VARIAVEL} nos modelos; recusa valor fora do formato e marcador sem valor. */
@@ -43,7 +52,22 @@ export function renderTemplate(text, values) {
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const argv = process.argv.slice(2);
   const opt = (n) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : null);
-  if (opt('--conta')) {
+  if (argv.includes('--solicitacoes')) {
+    const values = {
+      AWS_ACCOUNT_ID: opt('--conta'),
+      AWS_REGION: opt('--regiao') ?? 'us-east-1',
+      SES_IDENTITY: opt('--identidade'),
+      SES_FROM: opt('--remetente'),
+      SES_TO: opt('--destino'),
+      DYNAMODB_TABLE: opt('--tabela') ?? 'nekkora-commercial-solicitacoes',
+    };
+    const out = resolve(opt('--saida') ?? 'aws-config-solicitacoes');
+    mkdirSync(out, { recursive: true });
+    for (const file of readdirSync(LEADS_DIR).filter((f) => f.endsWith('.json'))) {
+      writeFileSync(join(out, file), renderTemplate(readFileSync(join(LEADS_DIR, file), 'utf8'), values));
+      console.log(`${join(out, file)}`);
+    }
+  } else if (opt('--conta')) {
     const values = {
       AWS_ACCOUNT_ID: opt('--conta'),
       AWS_S3_BUCKET: opt('--bucket'),

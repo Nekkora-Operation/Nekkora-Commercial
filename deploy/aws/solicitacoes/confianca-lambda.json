@@ -1,0 +1,15 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SomenteOLambdaDestaConta",
+      "Effect": "Allow",
+      "Principal": { "Service": "lambda.amazonaws.com" },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": { "aws:SourceAccount": "${AWS_ACCOUNT_ID}" },
+        "ArnLike": { "aws:SourceArn": "arn:aws:lambda:${AWS_REGION}:${AWS_ACCOUNT_ID}:function:nekkora-commercial-solicitacoes" }
+      }
+    }
+  ]
+}
