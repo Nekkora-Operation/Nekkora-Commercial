@@ -166,8 +166,26 @@ node scripts/aws/gerar-config.mjs --conta <12 dígitos> --bucket <nome> --distri
 
 | Role | Confiança (`sub` do token) | Permissões |
 |---|---|---|
-| `nekkora-commercial-deploy` | `repo:Nekkora-Operation/Nekkora-Commercial:environment:production` | [`permissoes-deploy.json`](../../deploy/aws/iam/permissoes-deploy.json) |
-| `nekkora-commercial-auditoria` | `repo:Nekkora-Operation/Nekkora-Commercial:environment:auditoria-aws` | [`permissoes-auditoria.json`](../../deploy/aws/iam/permissoes-auditoria.json): Get/List/Describe |
+| `nekkora-commercial-deploy` | `repo:Nekkora-Operation@333915842/Nekkora-Commercial@1389833224:environment:production` | [`permissoes-deploy.json`](../../deploy/aws/iam/permissoes-deploy.json) |
+| `nekkora-commercial-auditoria` | `repo:Nekkora-Operation@333915842/Nekkora-Commercial@1389833224:environment:auditoria-aws` | [`permissoes-auditoria.json`](../../deploy/aws/iam/permissoes-auditoria.json): Get/List/Describe |
+
+As duas confianças ([`confianca-deploy.json`](../../deploy/aws/iam/confianca-deploy.json),
+[`confianca-auditoria.json`](../../deploy/aws/iam/confianca-auditoria.json)) exigem, todas com `StringEquals`:
+
+- `token.actions.githubusercontent.com:aud` = `sts.amazonaws.com`;
+- `token.actions.githubusercontent.com:sub` = a identidade **imutável** do repositório (`owner@id/repo@id`, formato
+  que o GitHub confirmou para este repositório) mais o environment da role. Como os IDs entram no `sub`, uma
+  organização ou um repositório recriado com o mesmo nome não herda a confiança. Já uma renomeação muda o `sub` e
+  bloqueia o acesso até a confiança ser atualizada;
+- `token.actions.githubusercontent.com:ref` = `refs/heads/main`: além da restrição de branches dos environments, o
+  STS recusa token de qualquer outra branch. O STS aceita essa chave entre as específicas do GitHub; sem ela no token,
+  a condição falha e o acesso é negado, nunca liberado.
+
+O IAM Access Analyzer validou as duas políticas sem erros nem avisos. Ficou só uma sugestão informativa sobre o
+campo `aud`, que já está fixado em `sts.amazonaws.com`. Os testes de
+[`scripts/testes/aws-iam.test.mjs`](../../scripts/testes/aws-iam.test.mjs) conferem os dois modelos (só as três
+chaves, sem curingas, um environment por role), as permissões mínimas, o preenchimento pelo gerador e que só os
+jobs do environment certo, disparados da `main`, pedem token OIDC.
 
 A role de deploy **só** pode ser assumida por um job que declara o environment `production`. Esse environment exige
 aprovação humana e só aceita a `main`. Por isso nenhum Pull Request publica:
@@ -201,6 +219,23 @@ Como o repositório é **público**, revisor obrigatório e restrição de branc
 
 Os workflows de deploy e de rollback **recusam rodar** se o environment `production` não tiver revisor obrigatório e
 restrição de branches. Assim, ele não é criado "aberto" pelo primeiro uso.
+
+### 2.4 Primeiro teste de autenticação OIDC (só a role de auditoria)
+
+Ainda não executado. Os workflows deste PR não estão na `main`, então o GitHub não oferece o `workflow_dispatch`
+deles. Além disso, as três barreiras exigem a `main`: o `if` do job, a restrição de branches do environment e a
+condição `ref` da confiança. O teste só é possível **depois do merge**, e deve vir antes de qualquer deploy:
+
+1. Actions → "Auditoria AWS" → Run workflow, branch `main`. Usa só `nekkora-commercial-auditoria`, que tem apenas
+   Get/List/Describe. Nenhuma escrita é possível, e o workflow não toca na role de deploy.
+2. Esperado: o passo "Credenciais temporárias" assume a role, e a auditoria registra em A01 a identidade
+   `assumed-role/nekkora-commercial-auditoria/…` e repete o resultado do CloudShell (nenhuma falha). O relatório fica
+   no artefato `auditoria-aws-<run>`.
+3. Se o STS recusar (`Not authorized to perform sts:AssumeRoleWithWebIdentity`), conferir no próprio log o `sub` e
+   o `ref` do token contra a confiança. A recusa nunca concede acesso.
+
+Teste negativo opcional, também só com a role de auditoria: disparar o workflow de outra branch. O job é pulado pelo
+`if`, e o environment recusaria a branch antes de emitir o token.
 
 ## 3. Pipeline (D04)
 
@@ -428,15 +463,15 @@ O alerta de orçamento é da titular. Um alarme do CloudWatch na taxa de 5xx (US
 
 | # | Ação | Quem | Situação |
 |---|---|---|---|
-| 1 | Rodar a auditoria no CloudShell (`bash auditar.sh`, §1.2), enviar o `auditoria.md` e corrigir as **falhas** | titular | executada em 26/10; as falhas S07, K01, K02 (§1.3) e C08 (§1.4) eram do auditor. Rodar de novo para confirmar que não sobra nenhuma falha |
+| 1 | Rodar a auditoria no CloudShell (`bash auditar.sh`, §1.2), enviar o `auditoria.md` e corrigir as **falhas** | titular | **Concluído**: as falhas S07, K01, K02 (§1.3) e C08 (§1.4) eram do auditor; auditoria final com 26 ok, 0 pendente, 0 falha (informado em 27/10) |
 | 2 | Validar o certificado: CNAMEs na Cloudflare, DNS only | titular | **Concluído**: `ISSUED`, associado à distribuição `E3TZD2P6FOEWWR` (auditoria de 26/10, §1.3) |
-| 3 | Criar a Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json`. Console, ou `aws cloudfront create-response-headers-policy --response-headers-policy-config file://deploy/aws/politica-cabecalhos.json` | titular | pendente |
-| 4 | Criar e publicar a função `nekkora-commercial-viewer-request` (cloudfront-js-2.0) com `deploy/aws/funcao-viewer-request.js` e associá-la ao viewer request | titular | pendente |
-| 5 | Ajustar o comportamento padrão: CachingOptimized, compressão, GET/HEAD, redirect to HTTPS, política do passo 3. Páginas de erro 403/404 → `/404.html` (404) | titular | pendente |
-| 6 | Política do bucket (`gerar-config.mjs` → `politica-bucket.json`) | titular | pendente |
-| 7 | Provedor OIDC e roles de deploy e auditoria (§2) | titular | pendente |
-| 8 | Environments `production` e `auditoria-aws` com as proteções e variáveis do §2.3 | titular | pendente |
-| 9 | Rodar a auditoria de novo, também pelo workflow, até ficar sem falhas | titular/agente | pendente |
+| 3 | Criar a Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json`. Console, ou `aws cloudfront create-response-headers-policy --response-headers-policy-config file://deploy/aws/politica-cabecalhos.json` | titular | **Concluído** (informado em 27/10; auditoria: 26 ok, 0 pendente, 0 falha) |
+| 4 | Criar e publicar a função `nekkora-commercial-viewer-request` (cloudfront-js-2.0) com `deploy/aws/funcao-viewer-request.js` e associá-la ao viewer request | titular | **Concluído** (informado em 27/10; auditoria: 26 ok, 0 pendente, 0 falha) |
+| 5 | Ajustar o comportamento padrão: CachingOptimized, compressão, GET/HEAD, redirect to HTTPS, política do passo 3. Páginas de erro 403/404 → `/404.html` (404) | titular | **Concluído** (informado em 27/10; auditoria: 26 ok, 0 pendente, 0 falha) |
+| 6 | Política do bucket (`gerar-config.mjs` → `politica-bucket.json`) | titular | **Concluído** (informado em 27/10; auditoria: 26 ok, 0 pendente, 0 falha) |
+| 7 | Provedor OIDC e roles de deploy e auditoria (§2) | titular | **Concluído** (informado em 27/10). Confiança com a identidade imutável e `ref` (§2.2), validada pelo IAM Access Analyzer |
+| 8 | Environments `production` e `auditoria-aws` com as proteções e variáveis do §2.3 | titular | **Concluído** (informado em 27/10), com as variáveis AWS dos dois environments |
+| 9 | Rodar a auditoria de novo, também pelo workflow, até ficar sem falhas | titular/agente | Auditoria pelo CloudShell sem falhas. Pelo workflow: depois do merge, primeiro teste OIDC (§2.4) |
 | 10 | Preencher o que falta em `publicacao.json` (PENDENCIAS) e fazer o merge dos PRs (lib #6, depois Commercial) | titular | pendente |
 | 11 | Actions → "Deploy de produção", ref = tag/commit da `main`, `PUBLICAR`; aprovar no environment | titular | pendente |
 | 12 | Conferir no domínio do CloudFront (o workflow faz). DNS do site (§7) com **autorização**; preencher `DOMINIO_PUBLICO` | titular | pendente |

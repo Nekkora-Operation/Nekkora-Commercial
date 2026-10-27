@@ -35,14 +35,14 @@ credenciais da AWS, então **nenhum identificador real foi lido**.
 
 | ID | Ação | Onde |
 |---|---|---|
-| INF-01 | **Próximo passo.** Auditoria executada no CloudShell em 26/10/2026; as falhas S07, K01, K02 (COM-RELEASE-003-aws §1.3) e C08 (§1.4, `XSSProtection: {}` devolvido pela AWS) eram falsos positivos do auditor, corrigidos sem mexer na AWS. Rodar `bash auditar.sh` de novo e enviar o `auditoria.md`: o esperado é nenhuma falha | AWS CloudShell (usuário administrativo com MFA, nunca root) |
+| INF-01 | **Resolvido (27/10/2026).** Auditoria no CloudShell com 26 ok, 0 pendente, 0 falha. As falhas anteriores S07, K01, K02 (COM-RELEASE-003-aws §1.3) e C08 (§1.4) eram falsos positivos do auditor | AWS CloudShell |
 | INF-02 | **Resolvido (26/10/2026).** Certificado ACM (us-east-1, `nekkora.com` + `www.nekkora.com`) `ISSUED` e associado à distribuição `E3TZD2P6FOEWWR`. Um pedido anterior ficou `VALIDATION_TIMED_OUT` e pode ser excluído no ACM quando a titular quiser (não afeta nada) | ACM |
-| INF-03 | Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json` | CloudFront → Policies |
-| INF-04 | CloudFront Function `deploy/aws/funcao-viewer-request.js` (viewer request) | CloudFront → Functions |
-| INF-05 | Comportamento padrão: CachingOptimized, compressão, GET/HEAD, redirect to HTTPS, política INF-03; páginas de erro 403/404 → `/404.html` (404) | CloudFront → distribuição |
-| INF-06 | Política do bucket `deploy/aws/iam/politica-bucket.json` (gerada com os IDs reais) | S3 → Permissions |
-| INF-07 | Provedor OIDC `token.actions.githubusercontent.com` e as roles `nekkora-commercial-deploy` e `nekkora-commercial-auditoria` | IAM |
-| INF-08 | Environment `production` (revisor obrigatório, só `main`) e `auditoria-aws`, com as variáveis do §2.3 | GitHub → Settings → Environments |
+| INF-03 | **Resolvido (27/10/2026, auditoria sem pendências).** Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json` | CloudFront → Policies |
+| INF-04 | **Resolvido (27/10/2026, auditoria sem pendências).** CloudFront Function `deploy/aws/funcao-viewer-request.js` (viewer request) | CloudFront → Functions |
+| INF-05 | **Resolvido (27/10/2026, auditoria sem pendências).** Comportamento padrão: CachingOptimized, compressão, GET/HEAD, redirect to HTTPS, política INF-03; páginas de erro 403/404 → `/404.html` (404) | CloudFront → distribuição |
+| INF-06 | **Resolvido (27/10/2026, auditoria sem pendências).** Política do bucket `deploy/aws/iam/politica-bucket.json` (gerada com os IDs reais) | S3 → Permissions |
+| INF-07 | **Resolvido (27/10/2026).** Provedor OIDC `token.actions.githubusercontent.com` e as roles `nekkora-commercial-deploy` e `nekkora-commercial-auditoria`. Confiança com a identidade imutável do repositório e `ref` = `refs/heads/main` (COM-RELEASE-003-aws §2.2). Falta o primeiro teste OIDC pelo workflow "Auditoria AWS", depois do merge (§2.4) | IAM |
+| INF-08 | **Resolvido (27/10/2026).** Environment `production` (revisor obrigatório, só `main`) e `auditoria-aws`, com as variáveis do §2.3 | GitHub → Settings → Environments |
 | INF-09 | **Autorização para alterar DNS do site**: `nekkora.com` e `www` como CNAME para o CloudFront, **DNS only**, sem tocar nos registros do Microsoft 365 | Cloudflare (após autorização) |
 | INF-10 | Proteção da `main` (PR obrigatório + CI verde) | GitHub → Branches |
 
