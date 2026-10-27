@@ -30,20 +30,18 @@ concurrency:
 
 jobs:
   protecao:
-    name: Environment "production" exige revisor e restringe branches
+    name: Environment "production" exige revisor e só aceita a branch main
     if: github.ref == 'refs/heads/main' && inputs.confirmacao == 'REVERTER'
     runs-on: ubuntu-24.04
     steps:
-      - env:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Environment "production" exige revisor e só aceita a branch main
+        env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          curl -sf -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/${GITHUB_REPOSITORY}/environments/production" > env.json \
-            || { echo "::error::environment production não existe"; exit 1; }
-          node -e '
-            const e = JSON.parse(require("fs").readFileSync("env.json", "utf8"));
-            const reviewers = (e.protection_rules ?? []).filter((r) => r.type === "required_reviewers").flatMap((r) => r.reviewers ?? []);
-            if (!reviewers.length || !e.deployment_branch_policy) { console.log("::error::environment production sem revisor obrigatório ou sem restrição de branches"); process.exit(1); }
-          '
+        run: node scripts/verificar-environment.mjs --environment production
 
   rollback:
     needs: protecao
