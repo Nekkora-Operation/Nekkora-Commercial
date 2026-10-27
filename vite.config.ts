@@ -19,6 +19,18 @@ const git = (...args: string[]) => {
 };
 
 /**
+ * Origens externas da CSP derivadas de publicacao.json (COM-RELEASE-005): o backend de solicitações (connect-src) e o
+ * Turnstile (script-src e frame-src), só quando configurados. Validação final em deploy/aws/cabecalhos.mjs.
+ */
+function cspOrigins() {
+  const pub = JSON.parse(readFileSync(publicacao, 'utf8'));
+  const endpoint = pub.envioAutomatico?.endpoint;
+  if (!endpoint) return undefined;
+  const turnstile = pub.envioAutomatico?.chaveDoSiteTurnstile ? ['https://challenges.cloudflare.com'] : [];
+  return { connect: [new URL(endpoint).origin], script: turnstile, frame: turnstile };
+}
+
+/**
  * Gera, junto com o build, o `release.json`: identificação do artefato (commit, árvore limpa, versão e integridade da
  * nekkora-lib, origem dos dados de publicação) e o hash SHA-256 de cada <script> inline do index.html final. A CSP do
  * CloudFront (deploy/aws/politica-cabecalhos.json, gerada por scripts/aws/gerar-config.mjs) autoriza exatamente esses
@@ -61,6 +73,7 @@ function releaseFiles(): Plugin {
           publicacao: relative(root, publicacao).replace(/\\/g, '/'),
           homologacao,
           cspScriptHashes: hashes,
+          ...(cspOrigins() ? { cspOrigens: cspOrigins() } : {}),
         };
         this.emitFile({ type: 'asset', fileName: 'release.json', source: `${JSON.stringify(release, null, 2)}\n` });
       },
@@ -68,12 +81,17 @@ function releaseFiles(): Plugin {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react(), releaseFiles()],
+  // Identificação do build no aviso de homologação do rodapé (COM-RELEASE-005 §3.3): quem revisa vê qual commit está
+  // na tela — e se é um servidor de desenvolvimento ou um build com alterações não commitadas.
+  define: {
+    __NEKKORA_BUILD__: JSON.stringify({ commit: git('rev-parse', 'HEAD'), arvoreLimpa: git('status', '--porcelain') === '', servidor: command === 'serve' ? 'desenvolvimento' : 'build' }),
+  },
   base: '/',
   resolve: {
     alias: { '@publicacao': publicacao },
     // Garante uma única cópia do React mesmo se a nekkora-lib for instalada de uma pasta local.
     dedupe: ['react', 'react-dom'],
   },
-});
+}));

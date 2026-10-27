@@ -361,6 +361,13 @@ async function runEmail(engine) {
     !links.some((l) => /wa\.me/.test(l.href)) && !/WhatsApp/.test(bodyText) && (await page.locator('.nk-fab, [class*="floating"]').count()) === 0,
     'nenhum link, botão flutuante ou menção ao WhatsApp',
   );
+  // COM-RELEASE-005 §4.5: a fixture aponta o Bookings para OUTRA organização — a URL é recusada e nada é oferecido
+  check(
+    engine,
+    'agendamento-de-outra-organizacao-recusado',
+    !links.some((l) => /outlook\.office/.test(l.href)) && !/Agendar conversa/.test(bodyText) && (await page.getAttribute('[data-agendamento]', 'data-agendamento')) === 'pendente',
+    'nenhum botão "Agendar conversa" nem link para o Bookings',
+  );
   const privacy = await page.locator('#privacidade').innerText();
   check(engine, 'privacidade-descreve-o-email', /O que vai para o e-mail/.test(privacy) && privacy.includes(EMAIL), privacy.split('\n').find((l) => /aplicativo de e-mail/.test(l))?.slice(0, 120));
 

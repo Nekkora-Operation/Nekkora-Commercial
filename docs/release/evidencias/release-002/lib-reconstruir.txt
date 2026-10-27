@@ -1,0 +1,3 @@
+npm notice total files: 88
+npm notice
+OK  build reproduzível a partir do commit registrado — nekkora-lib-0.2.0.tgz sha256 1a2e614576f7c33ec98bbaf1dfe9f0eb6098637ca1075113c666aea6662526a6

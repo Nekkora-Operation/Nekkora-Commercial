@@ -9,8 +9,8 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "test": "node --test scripts/testes/precos.test.mjs scripts/testes/verificar-publicacao.test.mjs scripts/testes/aws-publicacao.test.mjs scripts/testes/aws-auditoria.test.mjs scripts/testes/aws-iam.test.mjs scripts/testes/verificar-environment.test.mjs scripts/testes/cloudfront-local.test.mjs",
-    "check": "npm run typecheck && npm test && npm run build && npm run aws:config:verificar",
+    "test": "node --test scripts/testes/precos.test.mjs scripts/testes/verificar-publicacao.test.mjs scripts/testes/aws-publicacao.test.mjs scripts/testes/aws-auditoria.test.mjs scripts/testes/aws-iam.test.mjs scripts/testes/verificar-environment.test.mjs scripts/testes/cloudfront-local.test.mjs scripts/testes/api-solicitacoes.test.mjs",
+    "check": "npm run typecheck && npm test && npm run build && npm run verificar:precos && npm run aws:config:verificar",
     "homologacao": "node scripts/homologacao.mjs",
     "homologacao:canais": "node scripts/homologacao-canais.mjs",
     "verificar:publicacao": "node scripts/verificar-publicacao.mjs",
@@ -19,7 +19,9 @@
     "cloudfront:local": "node scripts/servidor-cloudfront-local.mjs --dist dist --porta 4173",
     "aws:config": "node scripts/aws/gerar-config.mjs",
     "aws:config:verificar": "node scripts/aws/gerar-config.mjs --verificar",
-    "aws:auditar": "node scripts/aws/auditar.mjs"
+    "aws:auditar": "node scripts/aws/auditar.mjs",
+    "api:local": "node scripts/api-local.mjs --porta 4178 --origem http://127.0.0.1:4177",
+    "verificar:precos": "node scripts/verificar-precos-artefato.mjs --dist dist"
   },
   "dependencies": {
     "nekkora-lib": "file:vendor/nekkora-lib-0.2.0.tgz",
@@ -29,7 +31,10 @@
   "devDependencies": {
     "@aws-sdk/client-acm": "3.1147.0",
     "@aws-sdk/client-cloudfront": "3.1147.0",
+    "@aws-sdk/client-dynamodb": "3.1147.0",
     "@aws-sdk/client-s3": "3.1147.0",
+    "@aws-sdk/client-sesv2": "3.1147.0",
+    "@aws-sdk/client-ssm": "3.1147.0",
     "@aws-sdk/client-sts": "3.1147.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

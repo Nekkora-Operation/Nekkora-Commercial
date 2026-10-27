@@ -11,19 +11,42 @@
  * a aplica até em http://127.0.0.1).
  */
 
+/** Origem externa aceita na CSP: https sem caminho; http só para 127.0.0.1/localhost (homologação local). */
+const ORIGIN = /^(https:\/\/[a-z0-9.-]+(:\d+)?|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?)$/;
+/** Origem do Cloudflare Turnstile (desafio antiautomação do recebimento de solicitações, COM-RELEASE-005 §5.5). */
+export const TURNSTILE_ORIGIN = 'https://challenges.cloudflare.com';
+
+/**
+ * Origens externas que a página precisa (dist/release.json → cspOrigens), derivadas de publicacao.json no build:
+ *   connect: o backend de solicitações (COM-RELEASE-005), quando houver endpoint;
+ *   script/frame: o Turnstile, quando houver chave do desafio.
+ * Sem recebimento automático (a publicação atual), nada muda: tudo continua 'self'.
+ */
+function origins(cspOrigens = {}) {
+  const out = {};
+  for (const k of ['connect', 'script', 'frame']) {
+    const list = cspOrigens[k] ?? [];
+    if (!Array.isArray(list) || list.some((o) => !ORIGIN.test(o))) throw new Error(`origens de CSP inválidas (${k}): ${JSON.stringify(list)}`);
+    out[k] = list.length ? ` ${list.join(' ')}` : '';
+  }
+  return out;
+}
+
 /** CSP com o SHA-256 de cada <script> inline do index.html (dist/release.json → cspScriptHashes), sem 'unsafe-inline'. */
-export function csp(scriptHashes) {
+export function csp(scriptHashes, cspOrigens) {
   if (!Array.isArray(scriptHashes) || scriptHashes.some((h) => !/^'sha256-[A-Za-z0-9+/]{43}='$/.test(h))) {
     throw new Error(`hashes de script inválidos: ${JSON.stringify(scriptHashes)}`);
   }
+  const o = origins(cspOrigens);
   return [
     "default-src 'self'",
-    `script-src 'self'${scriptHashes.length ? ` ${scriptHashes.join(' ')}` : ''}`,
+    `script-src 'self'${scriptHashes.length ? ` ${scriptHashes.join(' ')}` : ''}${o.script}`,
     // React aplica style="" em alguns componentes da nekkora-lib; scripts continuam restritos por hash.
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "font-src 'self'",
-    "connect-src 'self'",
+    `connect-src 'self'${o.connect}`,
+    ...(o.frame ? [`frame-src${o.frame}`] : []),
     "manifest-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
@@ -40,9 +63,9 @@ export const COOP = 'same-origin';
 export const REMOVED_HEADERS = ['x-amz-server-side-encryption', 'x-amz-version-id'];
 
 /** Os cabeçalhos de segurança como o navegador os recebe (nome em minúsculas → valor). */
-export function securityHeaders(scriptHashes) {
+export function securityHeaders(scriptHashes, cspOrigens) {
   return {
-    'content-security-policy': csp(scriptHashes),
+    'content-security-policy': csp(scriptHashes, cspOrigens),
     'strict-transport-security': `max-age=${HSTS.maxAge}${HSTS.includeSubdomains ? '; includeSubDomains' : ''}${HSTS.preload ? '; preload' : ''}`,
     'x-content-type-options': 'nosniff',
     'x-frame-options': 'DENY',
@@ -53,7 +76,7 @@ export function securityHeaders(scriptHashes) {
 }
 
 /** ResponseHeadersPolicyConfig do CloudFront (API CreateResponseHeadersPolicy / UpdateResponseHeadersPolicy). */
-export function responseHeadersPolicy(scriptHashes) {
+export function responseHeadersPolicy(scriptHashes, cspOrigens) {
   const custom = [
     { Header: 'Permissions-Policy', Value: PERMISSIONS_POLICY, Override: true },
     { Header: 'Cross-Origin-Opener-Policy', Value: COOP, Override: true },
@@ -62,7 +85,7 @@ export function responseHeadersPolicy(scriptHashes) {
     Name: 'nekkora-commercial-seguranca',
     Comment: 'Cabecalhos de seguranca do Nekkora Commercial (gerado por scripts/aws/gerar-config.mjs)',
     SecurityHeadersConfig: {
-      ContentSecurityPolicy: { Override: true, ContentSecurityPolicy: csp(scriptHashes) },
+      ContentSecurityPolicy: { Override: true, ContentSecurityPolicy: csp(scriptHashes, cspOrigens) },
       StrictTransportSecurity: { Override: true, AccessControlMaxAgeSec: HSTS.maxAge, IncludeSubdomains: HSTS.includeSubdomains, Preload: HSTS.preload },
       ContentTypeOptions: { Override: true },
       FrameOptions: { Override: true, FrameOption: 'DENY' },

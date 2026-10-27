@@ -25,6 +25,9 @@ L.push(
   '',
   '> Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere',
   '> o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.',
+  ...(process.env.NEKKORA_PUBLICACAO
+    ? ['>', `> **Gerado com dados SINTÉTICOS** (\`${process.env.NEKKORA_PUBLICACAO}\`): e-mail, controlador, provedor e URLs são fictícios — vale o texto, não os valores.`]
+    : []),
 );
 
 h('1. Hero');
@@ -88,6 +91,18 @@ for (const [label, f] of [['Pelo e-mail (publicação atual)', K.email], ['Pelo 
 }
 L.push('', `Canais diretos (sem formulário): "${K.directTitle}"`);
 
+h('7b. Envio automático e agendamento (COM-RELEASE-005 — só com endpoint e URL do Bookings confirmados)');
+const A = K.api;
+L.push(`Precedência: envio automático (se houver endpoint) → WhatsApp → e-mail. Um único mecanismo de envio por vez.`);
+L.push('', `Formulário: E-mail obrigatório — "${A.emailHint}" (erro: "${A.emailRequired}"). Nota: "${A.note}"`);
+L.push('', `Confirmação: **${K.review.title}** — ${A.intro}`, '', `> **Antes de enviar** — ${A.transfer}`, '', `Desafio: "${A.challenge}" · aguardando: "${A.challengeWaiting}" · indisponível: "${A.challengeUnavailable}"`);
+L.push('', `Botões: "${K.review.back}" · "${A.send}" (durante o envio: "${A.sending}"; leitor de tela: "${A.sendingStatus}")`);
+L.push('', `- Recebida (só com a confirmação do servidor): **${A.received.title}** — ${A.received.text('NK-XXXXXXXX')}`);
+L.push(`- Falha: **${A.failed.title}**`);
+list(Object.entries(A.failed).filter(([k]) => k !== 'title').map(([k, v]) => `_${k}_: ${v}`));
+L.push('', `Ações na falha: "${A.retry}" (não aparece quando a solicitação é recusada) · "${A.alternative} <e-mail>" · "${A.openEmail}" · "${K.review.copy}"`);
+L.push('', `**Agendamento** — botão "${c.SCHEDULE.cta}" (nome acessível: "${c.SCHEDULE.cta} ${c.SCHEDULE.srExternal}") no topo e no contato; no diálogo: "${c.SCHEDULE.dialogPrompt} ${c.SCHEDULE.cta}". Nota no contato: "${c.SCHEDULE.note}"`);
+
 h('7a. Privacidade');
 header(c.PRIVACY);
 L.push('');
@@ -99,6 +114,7 @@ L.push(`Links: Soluções · Preços · Como funciona · Hosting · Transparênc
 h('9. Rodapé');
 list(['© Nekkora. Todos os direitos reservados.', `Link "${c.FOOTER.privacy}"`, `${c.FOOTER.preview} (enquanto publicacao.json mantiver avisoHomologacao)`, c.FOOTER.signature]);
 
-const out = path.join(root, 'docs/com-001/05-texto-comercial.md');
+// NEKKORA_TEXTO_SAIDA: outro destino (ex.: o texto com envio automático e Bookings, gerado com a fixture da COM-RELEASE-005)
+const out = path.resolve(root, process.env.NEKKORA_TEXTO_SAIDA ?? 'docs/com-001/05-texto-comercial.md');
 writeFileSync(out, L.join('\n').replace(/\n{3,}/g, '\n\n') + '\n');
 console.log(`Gerado: ${path.relative(root, out)}`);

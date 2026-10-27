@@ -1,0 +1,112 @@
+OK   [chromium] status-configurado
+OK   [chromium] whatsapp-links-isolados — 2 link(s) wa.me, todos com target=_blank e rel noopener noreferrer
+OK   [chromium] email-exibido
+OK   [chromium] linkedin-perfil-exibido
+OK   [chromium] instagram-pagina-inicial-rejeitado — URL sem caminho de perfil não vira link
+OK   [chromium] botao-flutuante-presente
+OK   [chromium] aviso-canais-pendentes-ausente
+OK   [chromium] contato-direto-sem-formulario
+OK   [chromium] condicoes-com-vigencia — datas sintéticas da fixture exibidas por extenso
+OK   [chromium] dialogo-whatsapp-direto
+OK   [chromium] botao-revisar-mensagem
+OK   [chromium] validacao-campos-obrigatorios — nome e descrição
+OK   [chromium] validacao-email-opcional-mas-valido
+OK   [chromium] confirmacao-mensagem-exata — Olá! Sou Pessoa de Teste, da Empresa Sintética.
+OK   [chromium] confirmacao-avisa-transferencia
+OK   [chromium] confirmacao-sem-abrir-nada — 0 requisição(ões) ao wa.me antes da confirmação
+OK   [chromium] confirmacao-foco-no-conteudo
+OK   [chromium] confirmacao-numero-manual — +55 11 91234-5678
+OK   [chromium] voltar-preserva-dados
+OK   [chromium] copiar-mensagem-informa-resultado — Mensagem copiada. · área de transferência = mensagem: true
+OK   [chromium] whatsapp-com-mensagem-exata — texto do parâmetro = mensagem confirmada
+OK   [chromium] aba-sem-opener — {"opener":true,"referrer":""}
+OK   [chromium] aba-sem-referer — Referer=ausente; document.referrer=""
+OK   [chromium] sem-window-open — aberto por link, não por pop-up
+OK   [chromium] mensagem-neutra-sem-afirmar-envio — Pedimos ao navegador para abrir o WhatsApp
+OK   [chromium] link-manual-depois-da-abertura
+OK   [chromium] alternativas-manuais
+OK   [chromium] whatsapp-falhou-alternativas-visiveis
+OK   [chromium] celular-confirmacao-cabe — página: excesso=0px; diálogo 0–375px, rolagem interna=0px, filhos fora=0; botão x=19 w=338
+OK   [chromium] celular-botao-flutuante-recolhido-com-dialogo
+OK   [chromium] axe-etapa-de-confirmacao — sem violações
+OK   [chromium] vigencia-durante-campanha — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [chromium] vigencia-antes-do-inicio — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [chromium] vigencia-depois-do-fim — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [chromium] vigencia-ultimo-dia-no-fuso-de-brasilia — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [chromium] sem-requisicao-externa-real — wa.me respondido localmente; nenhuma outra requisição externa
+OK   [chromium] console-sem-erros — limpo
+OK   [firefox] status-configurado
+OK   [firefox] whatsapp-links-isolados — 2 link(s) wa.me, todos com target=_blank e rel noopener noreferrer
+OK   [firefox] email-exibido
+OK   [firefox] linkedin-perfil-exibido
+OK   [firefox] instagram-pagina-inicial-rejeitado — URL sem caminho de perfil não vira link
+OK   [firefox] botao-flutuante-presente
+OK   [firefox] aviso-canais-pendentes-ausente
+OK   [firefox] contato-direto-sem-formulario
+OK   [firefox] condicoes-com-vigencia — datas sintéticas da fixture exibidas por extenso
+OK   [firefox] dialogo-whatsapp-direto
+OK   [firefox] botao-revisar-mensagem
+OK   [firefox] validacao-campos-obrigatorios — nome e descrição
+OK   [firefox] validacao-email-opcional-mas-valido
+OK   [firefox] confirmacao-mensagem-exata — Olá! Sou Pessoa de Teste, da Empresa Sintética.
+OK   [firefox] confirmacao-avisa-transferencia
+OK   [firefox] confirmacao-sem-abrir-nada — 0 requisição(ões) ao wa.me antes da confirmação
+OK   [firefox] confirmacao-foco-no-conteudo
+OK   [firefox] confirmacao-numero-manual — +55 11 91234-5678
+OK   [firefox] voltar-preserva-dados
+OK   [firefox] copiar-mensagem-informa-resultado — Mensagem copiada.
+OK   [firefox] whatsapp-com-mensagem-exata — texto do parâmetro = mensagem confirmada
+OK   [firefox] aba-sem-opener — {"opener":true,"referrer":""}
+OK   [firefox] aba-sem-referer — Referer=ausente; document.referrer=""
+OK   [firefox] sem-window-open — aberto por link, não por pop-up
+OK   [firefox] mensagem-neutra-sem-afirmar-envio — Pedimos ao navegador para abrir o WhatsApp
+OK   [firefox] link-manual-depois-da-abertura
+OK   [firefox] alternativas-manuais
+OK   [firefox] whatsapp-falhou-alternativas-visiveis
+OK   [firefox] celular-confirmacao-cabe — página: excesso=0px; diálogo 0–375px, rolagem interna=0px, filhos fora=0; botão x=19 w=338
+OK   [firefox] celular-botao-flutuante-recolhido-com-dialogo
+OK   [firefox] axe-etapa-de-confirmacao — sem violações
+OK   [firefox] vigencia-durante-campanha — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [firefox] vigencia-antes-do-inicio — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [firefox] vigencia-depois-do-fim — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [firefox] vigencia-ultimo-dia-no-fuso-de-brasilia — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [firefox] sem-requisicao-externa-real — wa.me respondido localmente; nenhuma outra requisição externa
+OK   [firefox] console-sem-erros — limpo
+OK   [webkit] status-configurado
+OK   [webkit] whatsapp-links-isolados — 2 link(s) wa.me, todos com target=_blank e rel noopener noreferrer
+OK   [webkit] email-exibido
+OK   [webkit] linkedin-perfil-exibido
+OK   [webkit] instagram-pagina-inicial-rejeitado — URL sem caminho de perfil não vira link
+OK   [webkit] botao-flutuante-presente
+OK   [webkit] aviso-canais-pendentes-ausente
+OK   [webkit] contato-direto-sem-formulario
+OK   [webkit] condicoes-com-vigencia — datas sintéticas da fixture exibidas por extenso
+OK   [webkit] dialogo-whatsapp-direto
+OK   [webkit] botao-revisar-mensagem
+OK   [webkit] validacao-campos-obrigatorios — nome e descrição
+OK   [webkit] validacao-email-opcional-mas-valido
+OK   [webkit] confirmacao-mensagem-exata — Olá! Sou Pessoa de Teste, da Empresa Sintética.
+OK   [webkit] confirmacao-avisa-transferencia
+OK   [webkit] confirmacao-sem-abrir-nada — 0 requisição(ões) ao wa.me antes da confirmação
+OK   [webkit] confirmacao-foco-no-conteudo
+OK   [webkit] confirmacao-numero-manual — +55 11 91234-5678
+OK   [webkit] voltar-preserva-dados
+OK   [webkit] copiar-mensagem-informa-resultado — Mensagem copiada.
+OK   [webkit] whatsapp-com-mensagem-exata — texto do parâmetro = mensagem confirmada
+OK   [webkit] aba-sem-opener — {"opener":true,"referrer":""}
+OK   [webkit] aba-sem-referer — Referer=ausente; document.referrer=""
+OK   [webkit] sem-window-open — aberto por link, não por pop-up
+OK   [webkit] mensagem-neutra-sem-afirmar-envio — Pedimos ao navegador para abrir o WhatsApp
+OK   [webkit] link-manual-depois-da-abertura
+OK   [webkit] alternativas-manuais
+OK   [webkit] whatsapp-falhou-alternativas-visiveis
+OK   [webkit] celular-confirmacao-cabe — página: excesso=0px; diálogo 0–375px, rolagem interna=0px, filhos fora=0; botão x=19 w=338
+OK   [webkit] celular-botao-flutuante-recolhido-com-dialogo
+OK   [webkit] axe-etapa-de-confirmacao — sem violações
+OK   [webkit] vigencia-durante-campanha — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [webkit] vigencia-antes-do-inicio — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [webkit] vigencia-depois-do-fim — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [webkit] vigencia-ultimo-dia-no-fuso-de-brasilia — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [webkit] sem-requisicao-externa-real — wa.me respondido localmente; nenhuma outra requisição externa
+OK   [webkit] console-sem-erros — limpo
+111 verificações, 0 falha(s).

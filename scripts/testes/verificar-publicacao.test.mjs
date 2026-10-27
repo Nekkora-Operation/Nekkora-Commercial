@@ -17,14 +17,16 @@ after(() => rmSync(dir, { recursive: true, force: true }));
 cpSync(join(root, 'vendor'), join(dir, 'vendor'), { recursive: true });
 const lib = JSON.parse(readFileSync(join(root, 'vendor/nekkora-lib.json'), 'utf8'));
 const HASHES = ["'sha256-JDd2nuaninfZZDJOM3fEvC7cCoIy0w7m1A5JfhKL6tE='"];
-const policy = (hashes = HASHES) => `${JSON.stringify(responseHeadersPolicy(hashes), null, 2)}\n`;
+const policy = (hashes = HASHES, origens) => `${JSON.stringify(responseHeadersPolicy(hashes, origens), null, 2)}\n`;
 
 const complete = () => ({
   canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
+  agendamento: { url: 'https://outlook.office365.com/book/AvaliacaoInicial@empresa-ficticia.com.br/', obrigatorio: true },
+  envioAutomatico: { endpoint: null, chaveDoSiteTurnstile: null },
   campanhaLancamento: { inicio: '2026-11-01', fim: '2026-12-31' },
   controlador: { nome: 'Empresa Fictícia Ltda.', documento: '11.222.333/0001-81' },
   hospedagem: { provedor: 'Provedor Fictício' },
-  aprovacoes: { precos: true, condicoesComerciais: true, textosComerciais: true, avisoDePrivacidade: true, publicacao: true },
+  aprovacoes: { precos: true, condicoesComerciais: true, textosComerciais: true, avisoDePrivacidade: true, agendamento: true, envioAutomatico: true, publicacao: true },
   avisoHomologacao: false,
 });
 const release = () => ({ homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES });
@@ -63,7 +65,10 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   setup(JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8')));
   const r = await gate();
   assert.equal(r.code, 1, r.stdout);
-  for (const id of ['PUB-13', 'PUB-19', 'PUB-17', 'PUB-18', 'PUB-10']) assert.match(r.stdout, new RegExp(id));
+  // PUB-20: o agendamento faz parte do lançamento (COM-RELEASE-005) e a URL oficial do Bookings ainda não foi informada
+  for (const id of ['PUB-13', 'PUB-19', 'PUB-17', 'PUB-18', 'PUB-10', 'PUB-20']) assert.match(r.stdout, new RegExp(id));
+  // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21
+  assert.doesNotMatch(r.stdout, /PUB-21/);
   // os dados já informados pela titular passam: e-mail, LinkedIn, CNPJ, provedor e preços
   for (const id of ['PUB-02', 'PUB-03', 'PUB-11', 'PUB-14']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
   assert.doesNotMatch(r.stdout, /CNPJ ou CPF válido/);
@@ -90,6 +95,24 @@ const cases = [
   ['publicação não autorizada', (p) => (p.aprovacoes.publicacao = false), /PUB-18/],
   ['aprovação como texto "true" (não é aprovação)', (p) => (p.aprovacoes.publicacao = 'true'), /PUB-18/],
   ['aviso de homologação ligado', (p) => (p.avisoHomologacao = true), /PUB-10/],
+  // Agendamento (COM-RELEASE-005 §4.5)
+  ['agendamento obrigatório sem URL', (p) => (p.agendamento.url = null), /PUB-20 — URL oficial/],
+  ['Bookings de outra organização', (p) => (p.agendamento.url = 'https://outlook.office365.com/book/Vendas@outra-empresa.com.br/'), /PUB-20 — URL oficial/],
+  ['Bookings fictício (.example)', (p) => ((p.canais.email = 'a@b.example'), (p.agendamento.url = 'https://outlook.office365.com/book/X@b.example/')), /PUB-20 — URL oficial/],
+  ['Bookings na página inicial', (p) => (p.agendamento.url = 'https://outlook.office365.com/'), /PUB-20 — URL oficial/],
+  ['Bookings fora da Microsoft', (p) => (p.agendamento.url = 'https://bookings.exemplo.com.br/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['Bookings em http', (p) => (p.agendamento.url = 'http://outlook.office365.com/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['Bookings sem confirmação da titular', (p) => (p.aprovacoes.agendamento = false), /PUB-20 — confirmação da titular/],
+  // Recebimento automático (COM-RELEASE-005 §5)
+  ['endpoint em http', (p) => (p.envioAutomatico = { endpoint: 'http://api.empresa-ficticia.com.br/v1/commercial/requests', chaveDoSiteTurnstile: '0x4AAAAAAAAbcdefghijklmn' }), /PUB-21 — endpoint/],
+  ['endpoint com outro caminho', (p) => (p.envioAutomatico = { endpoint: 'https://api.empresa-ficticia.com.br/enviar', chaveDoSiteTurnstile: '0x4AAAAAAAAbcdefghijklmn' }), /PUB-21 — endpoint/],
+  ['endpoint sem desafio', (p) => (p.envioAutomatico = { endpoint: 'https://api.empresa-ficticia.com.br/v1/commercial/requests', chaveDoSiteTurnstile: null }), /PUB-21 — chave do site/],
+  ['chave de teste do Turnstile', (p) => (p.envioAutomatico = { endpoint: 'https://api.empresa-ficticia.com.br/v1/commercial/requests', chaveDoSiteTurnstile: '1x00000000000000000000AA' }), /PUB-21 — chave do site/],
+  [
+    'envio automático sem autorização',
+    (p) => ((p.envioAutomatico = { endpoint: 'https://api.empresa-ficticia.com.br/v1/commercial/requests', chaveDoSiteTurnstile: '0x4AAAAAAAAbcdefghijklmn' }), (p.aprovacoes.envioAutomatico = false)),
+    /PUB-21 — autorização/,
+  ],
 ];
 for (const [name, mutate, expected] of cases) {
   test(`bloqueia: ${name}`, async () => {
@@ -101,6 +124,35 @@ for (const [name, mutate, expected] of cases) {
     assert.match(r.stdout, expected);
   });
 }
+
+test('agendamento fora do lançamento: sem URL, libera (o botão não aparece)', async () => {
+  const p = complete();
+  p.agendamento = { url: null, obrigatorio: false };
+  p.aprovacoes.agendamento = false;
+  setup(p);
+  assert.equal((await gate()).code, 0);
+});
+
+test('Bookings com a caixa do tenant (*.onmicrosoft.com) também é aceito', async () => {
+  const p = complete();
+  p.agendamento.url = 'https://outlook.office365.com/book/AvaliacaoInicial@empresaficticia.onmicrosoft.com/';
+  setup(p);
+  assert.equal((await gate()).code, 0);
+});
+
+test('envio automático completo: libera só com a CSP do build incluindo a origem da API e o Turnstile', async () => {
+  const p = complete();
+  p.envioAutomatico = { endpoint: 'https://api.empresa-ficticia.com.br/v1/commercial/requests', chaveDoSiteTurnstile: '0x4AAAAAAAAbcdefghijklmn' };
+  const origens = { connect: ['https://api.empresa-ficticia.com.br'], script: ['https://challenges.cloudflare.com'], frame: ['https://challenges.cloudflare.com'] };
+  setup(p, { ...release(), cspOrigens: origens }, { versionedPolicy: policy(HASHES, origens) });
+  const ok = await gate();
+  assert.equal(ok.code, 0, ok.stdout);
+  // política versionada sem as origens novas: no CloudFront, a página não conseguiria falar com a API
+  setup(p, { ...release(), cspOrigens: origens }, { versionedPolicy: policy(HASHES) });
+  const r = await gate();
+  assert.equal(r.code, 1);
+  assert.match(r.stdout, /politica-cabecalhos\.json não corresponde/);
+});
 
 test('aceita CPF válido no lugar do CNPJ', async () => {
   const p = complete();

@@ -52,12 +52,84 @@ export const hasAnyChannel = Object.values(CHANNELS).some((c) => c != null);
 export const whatsappUrl = (message: string = WHATSAPP_MESSAGE) =>
   CHANNELS.whatsapp ? `https://wa.me/${CHANNELS.whatsapp}?text=${encodeURIComponent(message)}` : null;
 
+/** Hosts da página pública do Microsoft Bookings. */
+const BOOKINGS_HOSTS = ['outlook.office365.com', 'outlook.office.com'];
+
 /**
- * Canal da jornada "Solicitar avaliação": o WhatsApp, quando confirmado; senão o e-mail comercial (a mensagem é aberta
- * no aplicativo de e-mail do visitante por um link mailto). Sem nenhum dos dois, o formulário fica em modo de
- * demonstração. Decisão da titular em 22/10/2026: por enquanto só e-mail e LinkedIn (sem WhatsApp).
+ * Página pública oficial do Microsoft Bookings (COM-RELEASE-005 §4.5): https, host da Microsoft, caminho de uma página
+ * de reservas (/book/… ou /owa/calendar/…/bookings) e caixa de reservas do próprio domínio da Nekkora — o do e-mail
+ * comercial — ou do tenant (*.onmicrosoft.com). Recusa a página inicial, URLs de outras organizações e domínios de
+ * exemplo. Mesma regra em scripts/verificar-publicacao.mjs.
  */
-export const REQUEST_CHANNEL: 'whatsapp' | 'email' | null = CHANNELS.whatsapp ? 'whatsapp' : CHANNELS.email ? 'email' : null;
+export function isBookingsUrl(u: string | null, emailDomain: string | null): u is string {
+  if (u == null || emailDomain == null) return false;
+  try {
+    const url = new URL(u);
+    const path = decodeURIComponent(url.pathname).toLowerCase();
+    const mailbox = /^\/(?:book|owa\/calendar)\/[^/@]+@([^/]+)\//.exec(path.endsWith('/') ? path : `${path}/`);
+    const okPath = path.startsWith('/book/') || (path.startsWith('/owa/calendar/') && path.includes('/bookings'));
+    const domain = mailbox?.[1] ?? '';
+    return (
+      url.protocol === 'https:' &&
+      BOOKINGS_HOSTS.includes(url.hostname.toLowerCase()) &&
+      url.username === '' &&
+      okPath &&
+      (domain === emailDomain.toLowerCase() || /^[a-z0-9-]+\.onmicrosoft\.com$/.test(domain))
+    );
+  } catch {
+    return false;
+  }
+}
+
+const EMAIL_DOMAIN = CHANNELS.email ? CHANNELS.email.split('@')[1] : null;
+
+/**
+ * "Agendar conversa" (COM-RELEASE-005 §4): só com a URL oficial e válida do Bookings em publicacao.json. Sem ela, o
+ * botão não aparece — a página não apresenta o agendamento como disponível nem aponta para um endereço inexistente.
+ * O Bookings é quem confirma a reserva: a página nunca afirma que uma reunião foi agendada.
+ */
+export const BOOKINGS_URL: string | null = isBookingsUrl(publicacao.agendamento.url, EMAIL_DOMAIN) ? publicacao.agendamento.url : null;
+
+/** Caminho do contrato da API de solicitações (COM-RELEASE-005 §5.4). */
+export const LEAD_API_PATH = '/v1/commercial/requests';
+
+/**
+ * Endpoint do recebimento automático (COM-RELEASE-005 §5): https e o caminho do contrato. http só para o servidor
+ * local da homologação (127.0.0.1/localhost) — o portão de publicação exige https.
+ */
+export function isLeadApiEndpoint(u: string | null): u is string {
+  if (u == null) return false;
+  try {
+    const url = new URL(u);
+    const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname);
+    return (url.protocol === 'https:' || local) && url.username === '' && url.search === '' && url.hash === '' && url.pathname === LEAD_API_PATH;
+  } catch {
+    return false;
+  }
+}
+
+/** Chave pública do Cloudflare Turnstile (desafio antiautomação, §5.5). Não é segredo: a chave secreta fica no backend. */
+const isTurnstileSiteKey = (k: string | null): k is string => k != null && /^[0-9a-zA-Z_-]{10,64}$/.test(k);
+
+/**
+ * Recebimento automático: ativo só com endpoint válido. A chave do desafio é opcional no código (homologação local) e
+ * obrigatória no portão de publicação.
+ */
+export const LEAD_API = isLeadApiEndpoint(publicacao.envioAutomatico.endpoint)
+  ? { endpoint: publicacao.envioAutomatico.endpoint, turnstileSiteKey: isTurnstileSiteKey(publicacao.envioAutomatico.chaveDoSiteTurnstile) ? publicacao.envioAutomatico.chaveDoSiteTurnstile : null }
+  : null;
+
+/**
+ * Canal da jornada "Solicitar avaliação", em ordem de precedência — um único mecanismo de envio ativo por vez
+ * (COM-RELEASE-005 §5.8):
+ *   1. 'api': recebimento automático (a página envia ao backend e só confirma o recebimento com a resposta dele);
+ *   2. 'whatsapp': mensagem aberta no WhatsApp, quando houver número confirmado;
+ *   3. 'email': mensagem aberta no aplicativo de e-mail do visitante (mailto) — o canal atual;
+ *   null: modo de demonstração.
+ * Com a API ativa, o e-mail continua só como alternativa de contato na falha do envio, nunca como segundo envio.
+ * Decisão da titular em 22/10/2026: por enquanto só e-mail e LinkedIn (sem WhatsApp).
+ */
+export const REQUEST_CHANNEL: 'api' | 'whatsapp' | 'email' | null = LEAD_API ? 'api' : CHANNELS.whatsapp ? 'whatsapp' : CHANNELS.email ? 'email' : null;
 
 export const EMAIL_SUBJECT = 'Solicitação de avaliação — Nekkora';
 

@@ -6,7 +6,7 @@
  * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
  */
 import type { IconName } from 'nekkora-lib';
-import { CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, REQUEST_CHANNEL } from './config';
+import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL } from './config';
 import { priceFacts } from './precos';
 
 /* ------------------------------------------------------------------ */
@@ -311,10 +311,59 @@ export const CONTACT_COPY = {
     again: 'Abrir no e-mail novamente',
     manual: 'Se o aplicativo de e-mail não abrir, copie a mensagem e envie para',
   },
+  /**
+   * Recebimento automático (COM-RELEASE-005 §5.7) — só com o endpoint do backend em publicacao.json. "Recebida" só
+   * com a confirmação do servidor; na falha, os dados ficam no formulário e o e-mail aparece como alternativa.
+   */
+  api: {
+    note: 'Na próxima etapa você confere os dados antes de enviar.',
+    emailHint: 'Obrigatório — é por ele que respondemos.',
+    emailRequired: 'Informe um e-mail para recebermos e respondermos a sua solicitação, como nome@empresa.com.',
+    intro: 'Confira os dados abaixo. Eles serão enviados à Nekkora quando você tocar em "Enviar solicitação".',
+    transfer:
+      'Ao enviar, nome, empresa, e-mail e descrição vão para a Nekkora por um serviço da AWS, que entrega a solicitação na caixa de e-mail comercial. Só usamos os dados para responder e preparar a avaliação.',
+    challenge: 'Verificação de segurança automática (Cloudflare Turnstile) para evitar envios por robôs.',
+    challengeWaiting: 'Aguardando a verificação de segurança…',
+    challengeUnavailable: 'A verificação de segurança não carregou. Você pode tentar de novo ou usar o e-mail abaixo.',
+    send: 'Enviar solicitação',
+    sending: 'Enviando…',
+    sendingStatus: 'Enviando a solicitação. Aguarde a confirmação.',
+    received: {
+      title: 'Solicitação recebida',
+      text: (protocolo: string) => `Protocolo ${protocolo}. Vamos responder pelo e-mail informado. A solicitação inicia uma avaliação — não é uma contratação.`,
+    },
+    failed: {
+      title: 'A solicitação não foi enviada',
+      rede: 'Não conseguimos falar com o servidor. Confira a sua conexão e tente de novo — os dados continuam aqui.',
+      limite: 'Recebemos muitas solicitações em pouco tempo. Tente de novo mais tarde ou use o e-mail abaixo.',
+      desafio: 'Não foi possível confirmar a verificação de segurança. Faça a verificação de novo e tente enviar.',
+      indisponivel: 'O envio não foi concluído por uma falha temporária. Os dados continuam aqui: tente de novo em instantes ou use o e-mail abaixo.',
+      recusada: 'Não foi possível enviar esta solicitação. Revise os dados ou escreva diretamente para o e-mail abaixo.',
+    },
+    retry: 'Tentar novamente',
+    alternative: 'Se preferir, envie a mesma mensagem pelo seu e-mail para',
+    openEmail: 'Abrir no e-mail',
+  },
   demoResult: {
     title: 'Solicitação validada — envio desativado nesta versão',
     text: 'Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.',
   },
+};
+
+/* ------------------------------------------------------------------ */
+/* Agendamento — Microsoft Bookings (COM-RELEASE-005 §4)              */
+/* ------------------------------------------------------------------ */
+/**
+ * Só aparece com a URL oficial do Bookings em publicacao.json. Duração, plataforma e antecedência são configuradas no
+ * Bookings e não são prometidas aqui antes de confirmadas. A página nunca diz que a reunião foi marcada: quem confirma
+ * é o Bookings.
+ */
+export const SCHEDULE = {
+  cta: 'Agendar conversa',
+  /** Completa o nome acessível do botão (o destino abre em outra aba). */
+  srExternal: '(abre o Microsoft Bookings em outra aba)',
+  note: 'Escolha um horário na agenda da Nekkora, no Microsoft Bookings. A conversa só fica marcada quando o Bookings confirmar.',
+  dialogPrompt: 'Prefere conversar antes?',
 };
 
 /* ------------------------------------------------------------------ */
@@ -342,43 +391,78 @@ export const LOGIN = {
  * bloqueado (aprovação "avisoDePrivacidade").
  */
 const controller = DATA_CONTROLLER.name ? `${DATA_CONTROLLER.name}${DATA_CONTROLLER.document ? ` (${DATA_CONTROLLER.document})` : ''}` : 'a Nekkora';
+const viaApi = REQUEST_CHANNEL === 'api';
+/**
+ * Minuta revisada na COM-RELEASE-005 §6 (envio automático e Microsoft Bookings). Cada item descreve o que acontece DE
+ * FATO na configuração publicada: sem endpoint, o formulário não envia nada; sem a URL do Bookings, o item do
+ * agendamento não aparece. Bases legais por finalidade (LGPD, art. 7º) documentadas em
+ * docs/release/COM-RELEASE-005-privacidade.md — submetida à titular para aprovação (PUB-09).
+ */
 export const PRIVACY = {
   eyebrow: 'Privacidade',
   title: 'Como tratamos seus dados',
   description: `Responsável pelos dados pessoais desta página: ${controller}.`,
   items: [
-    {
-      icon: 'shield' as IconName,
-      title: 'O formulário não envia nada',
-      text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
-    },
-    // [PV-02] — o item descreve o canal que a jornada usa de fato (WhatsApp ou e-mail; REQUEST_CHANNEL em config.ts)
-    REQUEST_CHANNEL === 'email'
+    viaApi
       ? {
-          icon: 'mail' as IconName,
-          title: 'O que vai para o e-mail',
-          text: `Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a ${CHANNELS.email}. Ela só é enviada se você a enviar pelo aplicativo.`,
+          icon: 'send' as IconName,
+          title: 'O que o formulário envia',
+          // [PV-05] — envio automático: só depois da confirmação; o que é guardado e por quanto tempo
+          text: `Só quando você toca em "Enviar solicitação": nome, e-mail, empresa (se informada) e a descrição do processo vão para um serviço da Nekkora na ${HOSTING_PROVIDER ?? 'nuvem'}, que entrega a solicitação na caixa comercial ${CHANNELS.email ?? 'da Nekkora'} (Microsoft 365). O serviço não guarda o conteúdo: mantém por 24 horas só um código técnico do pedido, para não receber a mesma solicitação duas vezes.`,
         }
       : {
-          icon: 'whatsapp' as IconName,
-          title: 'O que vai para o WhatsApp',
-          text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
+          icon: 'shield' as IconName,
+          title: 'O formulário não envia nada',
+          text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
         },
+    // [PV-02] — o item descreve o canal que a jornada usa de fato (WhatsApp ou e-mail; REQUEST_CHANNEL em config.ts)
+    ...(viaApi
+      ? []
+      : [
+          REQUEST_CHANNEL === 'email'
+            ? {
+                icon: 'mail' as IconName,
+                title: 'O que vai para o e-mail',
+                text: `Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a ${CHANNELS.email}. Ela só é enviada se você a enviar pelo aplicativo.`,
+              }
+            : {
+                icon: 'whatsapp' as IconName,
+                title: 'O que vai para o WhatsApp',
+                text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
+              },
+        ]),
+    // [PV-06] — agendamento: só com a URL oficial do Bookings; o Bookings armazena a reserva
+    ...(BOOKINGS_URL
+      ? [
+          {
+            icon: 'calendar' as IconName,
+            title: 'Agendamento pelo Microsoft Bookings',
+            text: 'Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para realizar a conversa. Não informe senhas, credenciais nem documentos sigilosos.',
+          },
+        ]
+      : []),
     {
       icon: 'eye' as IconName,
       title: 'Sem cookies nem rastreamento',
-      text: 'Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.',
+      text:
+        'Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.' +
+        // [PV-07] — o desafio antiautomação é de terceiro e só carrega na confirmação do envio
+        (LEAD_API?.turnstileSiteKey
+          ? ' Na confirmação do envio, uma verificação de segurança da Cloudflare (Turnstile) analisa sinais técnicos do navegador para impedir envios por robôs.'
+          : ''),
     },
     {
       icon: 'server' as IconName,
       title: 'Registros de acesso',
       // [PV-04] — o provedor processa esses dados para entregar as páginas; a página não grava nada além disso
-      text: `${HOSTING_PROVIDER ? `A ${HOSTING_PROVIDER}, que hospeda este site,` : 'O provedor de hospedagem'} processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.`,
+      text:
+        `${HOSTING_PROVIDER ? `A ${HOSTING_PROVIDER}, que hospeda este site,` : 'O provedor de hospedagem'} processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.` +
+        (viaApi ? ' Para limitar abusos, o serviço de solicitações conta envios por endereço IP sem guardar o endereço (só um código derivado dele), por até 2 dias.' : ''),
     },
     {
       icon: 'user' as IconName,
       title: 'Uso e seus direitos',
-      text: 'Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.',
+      text: `Usamos os dados que você nos envia só para responder à solicitação${BOOKINGS_URL ? ', realizar a conversa agendada' : ''} e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir confirmação, acesso, correção, exclusão ou informações sobre o compartilhamento dos seus dados (LGPD, art. 18)${CHANNELS.email ? ` pelo e-mail ${CHANNELS.email}` : ' pelos canais de contato desta página'}.`,
     },
   ],
 };
@@ -386,5 +470,8 @@ export const PRIVACY = {
 export const FOOTER = {
   privacy: 'Privacidade',
   preview: 'Versão para homologação',
+  build: 'build',
+  dirty: 'com alterações locais',
+  devServer: 'servidor de desenvolvimento',
   signature: 'Neko (猫) observa os detalhes.',
 };
