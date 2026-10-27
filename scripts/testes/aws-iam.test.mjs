@@ -19,7 +19,7 @@ const REPO = 'repo:Nekkora-Operation@333915842/Nekkora-Commercial@1389833224';
 const PROVIDER = 'token.actions.githubusercontent.com';
 const ROLES = {
   'confianca-deploy.json': { environment: 'production', roleVar: 'AWS_ROLE_ARN', workflows: ['deploy-producao.yml', 'rollback-producao.yml'] },
-  'confianca-auditoria.json': { environment: 'auditoria-aws', roleVar: 'AWS_AUDIT_ROLE_ARN', workflows: ['auditoria-aws.yml'] },
+  'confianca-auditoria.json': { environment: 'auditoria-aws', roleVar: 'AWS_AUDIT_ROLE_ARN', workflows: ['auditoria-aws.yml', 'teste-oidc-auditoria.yml'] },
 };
 // Identificadores FICTÍCIOS
 const VALUES = { AWS_ACCOUNT_ID: '111122223333', AWS_S3_BUCKET: 'nekkora-commercial-teste', AWS_CLOUDFRONT_DISTRIBUTION_ID: 'E2EXEMPLO12345', AWS_RESPONSE_HEADERS_POLICY_ID: '00000000-0000-0000-0000-000000000000' };
@@ -97,6 +97,14 @@ test('gerador: recusa identificador fora do formato e marcador sem valor', () =>
   assert.throws(() => renderTemplate(read('confianca-deploy.json'), { AWS_S3_BUCKET: VALUES.AWS_S3_BUCKET }), /AWS_ACCOUNT_ID\} sem valor/);
 });
 
+test('smoke test OIDC (PR #8): só manual, só a role de auditoria e só GetCallerIdentity', () => {
+  const text = workflow('teste-oidc-auditoria.yml');
+  assert.match(text, /\non:\n {2}workflow_dispatch:\n\n/);
+  assert.doesNotMatch(text, /secrets\.|AWS_ROLE_ARN|actions\/checkout/);
+  // comentários e nome do passo também citam o comando; o que importa é não haver nenhum outro
+  assert.deepEqual([...new Set(text.match(/\baws [a-z0-9-]+ [a-z0-9-]+/g))], ['aws sts get-caller-identity']);
+});
+
 test('workflows: só jobs do environment certo, disparados da main, recebem token OIDC e assumem a role', () => {
   const all = readdirSync(resolve('.github/workflows')).filter((f) => f.endsWith('.yml'));
   for (const f of all) {
@@ -115,6 +123,7 @@ test('workflows: só jobs do environment certo, disparados da main, recebem toke
   }
   // A condição ref = refs/heads/main exige que os workflows com OIDC só rodem a partir da main
   assert.match(workflow('auditoria-aws.yml'), /if: github\.ref == 'refs\/heads\/main'/);
+  assert.match(workflow('teste-oidc-auditoria.yml'), /if: github\.ref == 'refs\/heads\/main'/);
   assert.match(workflow('rollback-producao.yml'), /if: github\.ref == 'refs\/heads\/main'/);
   assert.match(workflow('deploy-producao.yml'), /test "\$GITHUB_REF" = "refs\/heads\/main"/);
 });
