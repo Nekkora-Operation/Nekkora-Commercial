@@ -1,0 +1,6 @@
+$ npm run check
+ℹ tests 83
+ℹ pass 83
+ℹ fail 0
+✓ built
+deploy/aws/politica-cabecalhos.json corresponde ao build

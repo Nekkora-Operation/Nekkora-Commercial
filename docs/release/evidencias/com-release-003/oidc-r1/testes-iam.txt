@@ -1,0 +1,16 @@
+$ node --test scripts/testes/aws-iam.test.mjs
+✔ confianca-deploy.json: só GitHub Actions do environment production, pela main, com a identidade imutável do repositório
+✔ confianca-auditoria.json: só GitHub Actions do environment auditoria-aws, pela main, com a identidade imutável do repositório
+✔ confiança: cada role aceita só o próprio environment
+✔ permissões da auditoria: só leitura (Get/List/Describe), sem curinga de ação
+✔ permissões do deploy: só o necessário, sem exclusão, IAM, ACM, DNS nem alteração da distribuição
+✔ gerador: preenche todos os modelos com os identificadores e não altera a confiança OIDC
+✔ gerador: recusa identificador fora do formato e marcador sem valor
+✔ workflows: só jobs do environment certo, disparados da main, recebem token OIDC e assumem a role
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
