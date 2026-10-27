@@ -1,0 +1,164 @@
+Pular para o conteúdo
+Soluções
+Preços
+Como funciona
+Hosting
+Transparência
+Entrar
+Delivery · Hosting
+Automação sob medida, da necessidade à execução.
+
+Automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. Infraestrutura para executá-las, sujeita a avaliação. Cada serviço contratado de forma independente.
+
+Solicitar avaliação
+Ver como funciona
+Proposta por automação
+Homologação e aceite
+Sem pacote obrigatório
+SOLUÇÕES
+Duas ofertas. Você escolhe o arranjo.
+01
+Nekkora Delivery
+Sob proposta
+
+Desenvolvimento de automações por demanda.
+
+Escopo, prazo e preço definidos em proposta para cada automação
+Entrega considerada pronta só com documentação, desenvolvimento, testes e homologação com você — cada etapa mediante a sua aprovação
+Entrega e transferência conforme contratado
+Conhecer o Delivery
+02
+Nekkora Hosting
+Em avaliação de viabilidade
+
+Infraestrutura e serviços associados à execução de automações.
+
+Componentes escolhidos conforme a necessidade, nenhum obrigatório
+Responsabilidades de cada parte delimitadas por escrito
+Disponibilidade confirmada em avaliação de viabilidade
+Entender o Hosting
+
+Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.
+
+PREÇOS · NEKKORA DELIVERY
+Quanto custa uma automação
+
+Valores por automação. A faixa é confirmada na avaliação e fica registrada na proposta, junto com escopo e condições.
+
+Lançamento
+50% de desconto em todas as automações nos próximos 2 meses.
+Vale para propostas aprovadas no período.
+
+SIMPLES
+Automação simples
+
+Um sistema ou planilha, regras diretas, poucas exceções.
+
+Valor sem desconto:
+R$ 1.000
+Valor com desconto de lançamento:
+R$ 500
+−50%
+por automação · lançamento
+MÉDIA
+Automação média
+
+Mais de um sistema, validações, tratamento de exceções e relatórios.
+
+Valor sem desconto:
+R$ 2.800
+Valor com desconto de lançamento:
+R$ 1.400
+−50%
+por automação · lançamento
+COMPLETA · PACOTES
+Automações completas e pacotes
+
+Processos ponta a ponta, integrações por API ou várias automações contratadas em conjunto.
+
+Negociação à parte
+dimensionada na avaliação · desconto de lançamento aplicável
+Solicitar avaliação
+Por que os valores são baixos
+
+Usamos uma ferramenta própria que agiliza a documentação e o desenvolvimento de cada automação. Menos horas de levantamento e retrabalho, preço menor para você — sem cortar etapas: documentação, testes e homologação continuam no escopo.
+
+Licenças ficam por conta do cliente
+
+Qualquer licença de software ou serviço de terceiros (UiPath, Power Automate, APIs, servidores) é responsabilidade do cliente. Indicamos o que é necessário na proposta; a contratação e o custo não estão incluídos nos valores acima.
+
+Hosting tem avaliação e proposta próprias.
+
+COMO FUNCIONA
+Seis etapas. Nenhuma sem a sua aprovação.
+1
+Entendimento da necessidade
+
+Você descreve o processo, as regras e o resultado esperado.
+
+2
+Viabilidade e dimensionamento
+
+Analisamos sistemas, acessos e complexidade para dimensionar a automação.
+
+3
+Proposta
+
+Escopo, preço e condições por escrito. O desenvolvimento começa após a sua aprovação.
+
+4
+Desenvolvimento e testes
+
+Construímos e testamos a automação conforme o escopo aprovado.
+
+5
+Homologação e aceite
+
+Você valida a automação no seu cenário e formaliza o aceite.
+
+6
+Entrega e transferência
+
+Entregamos e transferimos o que foi previsto na proposta.
+
+NEKKORA HOSTING
+Infraestrutura para executar automações, com responsabilidades delimitadas.
+
+Hosting reúne serviços distintos — infraestrutura, configuração, administração, monitoramento, operação assistida, correção de incidentes, sustentação. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta.
+
+Disponibilidade em avaliação. Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.
+
+Solicitar avaliação de viabilidade
+TRANSPARÊNCIA
+Letras grandes, não miúdas
+
+O que é definido em proposta, o que não está incluído sem acordo explícito e do que o andamento depende.
+
+Definido em proposta
+Escopo de cada automação
+Preço e condições de pagamento
+Prazo estimado
+Tecnologias e licenças necessárias
+Responsabilidades de cada parte
+Critérios de homologação e aceite
+Não incluído automaticamente
+Alterações futuras e novas funcionalidades
+Sustentação e evolução das automações
+Garantia após a entrega, salvo se prevista
+Infraestrutura e serviços de Hosting
+Licenças e serviços de terceiros — responsabilidade do cliente
+Monitoramento, 24 horas, alta disponibilidade ou SLA
+Depende de você e de terceiros
+Liberação de acessos e credenciais
+Estabilidade de sistemas externos
+Disponibilidade da sua equipe para homologação
+Fila operacional da Nekkora
+Vamos olhar o seu processo de perto?
+
+A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.
+
+Solicitar avaliação
+Canais oficiais em definição · formulário em modo de demonstração
+© 2026 Nekkora. Todos os direitos reservados.
+Versão para homologação
+Neko (猫) observa os detalhes.

@@ -1,0 +1,675 @@
+{
+  "baseUrl": "http://127.0.0.1:4175/",
+  "at": "2026-10-22T23:04:03.469Z",
+  "runs": [
+    {
+      "engine": "chromium",
+      "version": "153.0.8010.12",
+      "waRequests": [
+        {
+          "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20…",
+          "referer": null
+        },
+        {
+          "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20…",
+          "referer": null
+        }
+      ],
+      "aborted": []
+    },
+    {
+      "engine": "firefox",
+      "version": "155.0",
+      "waRequests": [
+        {
+          "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20…",
+          "referer": null
+        },
+        {
+          "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20…",
+          "referer": null
+        }
+      ],
+      "aborted": []
+    },
+    {
+      "engine": "webkit",
+      "version": "26.6",
+      "waRequests": [
+        {
+          "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20…",
+          "referer": null
+        },
+        {
+          "url": "https://wa.me/5511912345678?text=Ol%C3%A1!%20Sou%20Pessoa%20…",
+          "referer": null
+        }
+      ],
+      "aborted": []
+    }
+  ],
+  "checks": [
+    {
+      "engine": "chromium",
+      "id": "status-configurado",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "whatsapp-links-isolados",
+      "ok": true,
+      "detail": "2 link(s) wa.me, todos com target=_blank e rel noopener noreferrer"
+    },
+    {
+      "engine": "chromium",
+      "id": "email-exibido",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "linkedin-perfil-exibido",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "instagram-pagina-inicial-rejeitado",
+      "ok": true,
+      "detail": "URL sem caminho de perfil não vira link"
+    },
+    {
+      "engine": "chromium",
+      "id": "botao-flutuante-presente",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "aviso-canais-pendentes-ausente",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "contato-direto-sem-formulario",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "condicoes-com-vigencia",
+      "ok": true,
+      "detail": "datas sintéticas da fixture exibidas por extenso"
+    },
+    {
+      "engine": "chromium",
+      "id": "dialogo-whatsapp-direto",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "botao-revisar-mensagem",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "validacao-campos-obrigatorios",
+      "ok": true,
+      "detail": "nome e descrição"
+    },
+    {
+      "engine": "chromium",
+      "id": "validacao-email-opcional-mas-valido",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-mensagem-exata",
+      "ok": true,
+      "detail": "Olá! Sou Pessoa de Teste, da Empresa Sintética."
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-avisa-transferencia",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-sem-abrir-nada",
+      "ok": true,
+      "detail": "0 requisição(ões) ao wa.me antes da confirmação"
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-foco-no-conteudo",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "confirmacao-numero-manual",
+      "ok": true,
+      "detail": "+55 11 91234-5678"
+    },
+    {
+      "engine": "chromium",
+      "id": "voltar-preserva-dados",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "copiar-mensagem-informa-resultado",
+      "ok": true,
+      "detail": "Mensagem copiada. · área de transferência = mensagem: true"
+    },
+    {
+      "engine": "chromium",
+      "id": "whatsapp-com-mensagem-exata",
+      "ok": true,
+      "detail": "texto do parâmetro = mensagem confirmada"
+    },
+    {
+      "engine": "chromium",
+      "id": "aba-sem-opener",
+      "ok": true,
+      "detail": "{\"opener\":true,\"referrer\":\"\"}"
+    },
+    {
+      "engine": "chromium",
+      "id": "aba-sem-referer",
+      "ok": true,
+      "detail": "Referer=ausente; document.referrer=\"\""
+    },
+    {
+      "engine": "chromium",
+      "id": "sem-window-open",
+      "ok": true,
+      "detail": "aberto por link, não por pop-up"
+    },
+    {
+      "engine": "chromium",
+      "id": "mensagem-neutra-sem-afirmar-envio",
+      "ok": true,
+      "detail": "Pedimos ao navegador para abrir o WhatsApp"
+    },
+    {
+      "engine": "chromium",
+      "id": "link-manual-depois-da-abertura",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "alternativas-manuais",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "whatsapp-falhou-alternativas-visiveis",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "celular-confirmacao-cabe",
+      "ok": true,
+      "detail": "página: excesso=0px; diálogo 0–375px, rolagem interna=0px, filhos fora=0; botão x=19 w=338"
+    },
+    {
+      "engine": "chromium",
+      "id": "celular-botao-flutuante-recolhido-com-dialogo",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "id": "axe-etapa-de-confirmacao",
+      "ok": true,
+      "detail": "sem violações"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-durante-campanha",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-antes-do-inicio",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-depois-do-fim",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "chromium",
+      "id": "vigencia-ultimo-dia-no-fuso-de-brasilia",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "chromium",
+      "id": "sem-requisicao-externa-real",
+      "ok": true,
+      "detail": "wa.me respondido localmente; nenhuma outra requisição externa"
+    },
+    {
+      "engine": "chromium",
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    },
+    {
+      "engine": "firefox",
+      "id": "status-configurado",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "whatsapp-links-isolados",
+      "ok": true,
+      "detail": "2 link(s) wa.me, todos com target=_blank e rel noopener noreferrer"
+    },
+    {
+      "engine": "firefox",
+      "id": "email-exibido",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "linkedin-perfil-exibido",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "instagram-pagina-inicial-rejeitado",
+      "ok": true,
+      "detail": "URL sem caminho de perfil não vira link"
+    },
+    {
+      "engine": "firefox",
+      "id": "botao-flutuante-presente",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "aviso-canais-pendentes-ausente",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "contato-direto-sem-formulario",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "condicoes-com-vigencia",
+      "ok": true,
+      "detail": "datas sintéticas da fixture exibidas por extenso"
+    },
+    {
+      "engine": "firefox",
+      "id": "dialogo-whatsapp-direto",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "botao-revisar-mensagem",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "validacao-campos-obrigatorios",
+      "ok": true,
+      "detail": "nome e descrição"
+    },
+    {
+      "engine": "firefox",
+      "id": "validacao-email-opcional-mas-valido",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-mensagem-exata",
+      "ok": true,
+      "detail": "Olá! Sou Pessoa de Teste, da Empresa Sintética."
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-avisa-transferencia",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-sem-abrir-nada",
+      "ok": true,
+      "detail": "0 requisição(ões) ao wa.me antes da confirmação"
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-foco-no-conteudo",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "confirmacao-numero-manual",
+      "ok": true,
+      "detail": "+55 11 91234-5678"
+    },
+    {
+      "engine": "firefox",
+      "id": "voltar-preserva-dados",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "copiar-mensagem-informa-resultado",
+      "ok": true,
+      "detail": "Mensagem copiada."
+    },
+    {
+      "engine": "firefox",
+      "id": "whatsapp-com-mensagem-exata",
+      "ok": true,
+      "detail": "texto do parâmetro = mensagem confirmada"
+    },
+    {
+      "engine": "firefox",
+      "id": "aba-sem-opener",
+      "ok": true,
+      "detail": "{\"opener\":true,\"referrer\":\"\"}"
+    },
+    {
+      "engine": "firefox",
+      "id": "aba-sem-referer",
+      "ok": true,
+      "detail": "Referer=ausente; document.referrer=\"\""
+    },
+    {
+      "engine": "firefox",
+      "id": "sem-window-open",
+      "ok": true,
+      "detail": "aberto por link, não por pop-up"
+    },
+    {
+      "engine": "firefox",
+      "id": "mensagem-neutra-sem-afirmar-envio",
+      "ok": true,
+      "detail": "Pedimos ao navegador para abrir o WhatsApp"
+    },
+    {
+      "engine": "firefox",
+      "id": "link-manual-depois-da-abertura",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "alternativas-manuais",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "whatsapp-falhou-alternativas-visiveis",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "celular-confirmacao-cabe",
+      "ok": true,
+      "detail": "página: excesso=0px; diálogo 0–375px, rolagem interna=0px, filhos fora=0; botão x=19 w=338"
+    },
+    {
+      "engine": "firefox",
+      "id": "celular-botao-flutuante-recolhido-com-dialogo",
+      "ok": true
+    },
+    {
+      "engine": "firefox",
+      "id": "axe-etapa-de-confirmacao",
+      "ok": true,
+      "detail": "sem violações"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-durante-campanha",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-antes-do-inicio",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-depois-do-fim",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "firefox",
+      "id": "vigencia-ultimo-dia-no-fuso-de-brasilia",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "firefox",
+      "id": "sem-requisicao-externa-real",
+      "ok": true,
+      "detail": "wa.me respondido localmente; nenhuma outra requisição externa"
+    },
+    {
+      "engine": "firefox",
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    },
+    {
+      "engine": "webkit",
+      "id": "status-configurado",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "whatsapp-links-isolados",
+      "ok": true,
+      "detail": "2 link(s) wa.me, todos com target=_blank e rel noopener noreferrer"
+    },
+    {
+      "engine": "webkit",
+      "id": "email-exibido",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "linkedin-perfil-exibido",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "instagram-pagina-inicial-rejeitado",
+      "ok": true,
+      "detail": "URL sem caminho de perfil não vira link"
+    },
+    {
+      "engine": "webkit",
+      "id": "botao-flutuante-presente",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "aviso-canais-pendentes-ausente",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "contato-direto-sem-formulario",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "condicoes-com-vigencia",
+      "ok": true,
+      "detail": "datas sintéticas da fixture exibidas por extenso"
+    },
+    {
+      "engine": "webkit",
+      "id": "dialogo-whatsapp-direto",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "botao-revisar-mensagem",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "validacao-campos-obrigatorios",
+      "ok": true,
+      "detail": "nome e descrição"
+    },
+    {
+      "engine": "webkit",
+      "id": "validacao-email-opcional-mas-valido",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-mensagem-exata",
+      "ok": true,
+      "detail": "Olá! Sou Pessoa de Teste, da Empresa Sintética."
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-avisa-transferencia",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-sem-abrir-nada",
+      "ok": true,
+      "detail": "0 requisição(ões) ao wa.me antes da confirmação"
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-foco-no-conteudo",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "confirmacao-numero-manual",
+      "ok": true,
+      "detail": "+55 11 91234-5678"
+    },
+    {
+      "engine": "webkit",
+      "id": "voltar-preserva-dados",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "copiar-mensagem-informa-resultado",
+      "ok": true,
+      "detail": "Mensagem copiada."
+    },
+    {
+      "engine": "webkit",
+      "id": "whatsapp-com-mensagem-exata",
+      "ok": true,
+      "detail": "texto do parâmetro = mensagem confirmada"
+    },
+    {
+      "engine": "webkit",
+      "id": "aba-sem-opener",
+      "ok": true,
+      "detail": "{\"opener\":true,\"referrer\":\"\"}"
+    },
+    {
+      "engine": "webkit",
+      "id": "aba-sem-referer",
+      "ok": true,
+      "detail": "Referer=ausente; document.referrer=\"\""
+    },
+    {
+      "engine": "webkit",
+      "id": "sem-window-open",
+      "ok": true,
+      "detail": "aberto por link, não por pop-up"
+    },
+    {
+      "engine": "webkit",
+      "id": "mensagem-neutra-sem-afirmar-envio",
+      "ok": true,
+      "detail": "Pedimos ao navegador para abrir o WhatsApp"
+    },
+    {
+      "engine": "webkit",
+      "id": "link-manual-depois-da-abertura",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "alternativas-manuais",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "whatsapp-falhou-alternativas-visiveis",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "celular-confirmacao-cabe",
+      "ok": true,
+      "detail": "página: excesso=0px; diálogo 0–375px, rolagem interna=0px, filhos fora=0; botão x=19 w=338"
+    },
+    {
+      "engine": "webkit",
+      "id": "celular-botao-flutuante-recolhido-com-dialogo",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "id": "axe-etapa-de-confirmacao",
+      "ok": true,
+      "detail": "sem violações"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-durante-campanha",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-antes-do-inicio",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-depois-do-fim",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · media:padrao=R$ 3.500"
+    },
+    {
+      "engine": "webkit",
+      "id": "vigencia-ultimo-dia-no-fuso-de-brasilia",
+      "ok": true,
+      "detail": "simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700"
+    },
+    {
+      "engine": "webkit",
+      "id": "sem-requisicao-externa-real",
+      "ok": true,
+      "detail": "wa.me respondido localmente; nenhuma outra requisição externa"
+    },
+    {
+      "engine": "webkit",
+      "id": "console-sem-erros",
+      "ok": true,
+      "detail": "limpo"
+    }
+  ],
+  "summary": {
+    "total": 111,
+    "failed": 0
+  }
+}

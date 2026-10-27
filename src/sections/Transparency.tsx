@@ -1,40 +1,36 @@
-import { Card, CardHeader, Icon, SectionHeader, type IconName } from 'nekkora-lib';
+import { Icon, IconBox, SectionHeader, type IconName } from 'nekkora-lib';
 import { TRANSPARENCY } from '../content';
 
-function ListCard({ icon, iconTone, title, items, marker, exclusion }: { icon: IconName; iconTone: string; title: string; items: string[]; marker: IconName; exclusion?: boolean }) {
+type Tone = 'success' | 'danger' | 'info';
+
+function ListTile({ icon, tone, title, items, marker, markerColor, exclusion }: { icon: IconName; tone: Tone; title: string; items: string[]; marker: IconName; markerColor: string; exclusion?: boolean }) {
   return (
-    <Card className="terms-card" variant="surface" padding="none" data-exclusion={exclusion ? 'transparencia' : undefined}>
-      <CardHeader icon={icon} iconVariant="soft" title={title} divider />
-      <ul className="terms-card__list">
+    <div className="poster-tile" data-exclusion={exclusion ? 'transparencia' : undefined}>
+      <IconBox icon={icon} tone={tone} variant="solid" size="lg" />
+      <h3 className="poster-tile__title poster-tile__title--lg">{title}</h3>
+      <ul className="checklist checklist--sm">
         {items.map((item) => (
           <li key={item}>
-            <Icon name={marker} size="sm" color={iconTone} />
+            <Icon name={marker} size="sm" color={markerColor} />
             {item}
           </li>
         ))}
       </ul>
-    </Card>
+    </div>
   );
 }
 
 export function Transparency() {
-  const { defined, excluded, dependencies, products } = TRANSPARENCY;
+  const { defined, excluded, dependencies } = TRANSPARENCY;
   return (
-    <section id="transparencia" className="section section--band" aria-labelledby="transparencia-title">
+    <section id="transparencia" className="section" aria-labelledby="transparencia-title">
       <div className="wrap stack">
-        <SectionHeader titleId="transparencia-title" eyebrow={TRANSPARENCY.eyebrow} title={TRANSPARENCY.title} description={TRANSPARENCY.description} />
-        <div className="cards cards--3">
-          <ListCard icon="file" iconTone="var(--nk-color-success)" title={defined.title} items={defined.items} marker="check" />
-          <ListCard icon="close" iconTone="var(--nk-color-danger-text)" title={excluded.title} items={excluded.items} marker="minus" exclusion />
-          <ListCard icon="link" iconTone="var(--nk-color-info-text)" title={dependencies.title} items={dependencies.items} marker="arrow-right" />
+        <SectionHeader titleId="transparencia-title" align="center" eyebrow={TRANSPARENCY.eyebrow} title={TRANSPARENCY.title} description={TRANSPARENCY.description} />
+        <div className="cards cards--3 cards--poster">
+          <ListTile icon="file" tone="success" title={defined.title} items={defined.items} marker="check" markerColor="var(--nk-color-success)" />
+          <ListTile icon="close" tone="danger" title={excluded.title} items={excluded.items} marker="minus" markerColor="var(--nk-color-danger-text)" exclusion />
+          <ListTile icon="link" tone="info" title={dependencies.title} items={dependencies.items} marker="arrow-right" markerColor="var(--nk-color-info-text)" />
         </div>
-        <aside className="products-note" data-internal-products aria-labelledby="produtos-title">
-          <Icon name="info" size="md" />
-          <div>
-            <h3 id="produtos-title">{products.title}</h3>
-            <p>{products.text}</p>
-          </div>
-        </aside>
       </div>
     </section>
   );

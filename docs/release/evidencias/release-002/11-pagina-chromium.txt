@@ -1,0 +1,91 @@
+OK   tema-aplicado:sakura-dark:mobile — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:mobile — excesso=0px
+OK   precos-renderizados:sakura-dark:mobile — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sakura-dark:mobile — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   tema-aplicado:sakura-dark:tablet — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:tablet — excesso=0px
+OK   precos-renderizados:sakura-dark:tablet — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sakura-dark:tablet — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   tema-aplicado:sakura-dark:desktop — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:desktop — excesso=0px
+OK   precos-renderizados:sakura-dark:desktop — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sakura-dark:desktop — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   tema-aplicado:sakura-dark:wide — data-nk-theme=sakura-dark
+OK   sem-rolagem-horizontal:sakura-dark:wide — excesso=0px
+OK   precos-renderizados:sakura-dark:wide — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sakura-dark:wide — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   tema-aplicado:sage-light:mobile — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:mobile — excesso=0px
+OK   precos-renderizados:sage-light:mobile — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sage-light:mobile — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   tema-aplicado:sage-light:tablet — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:tablet — excesso=0px
+OK   precos-renderizados:sage-light:tablet — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sage-light:tablet — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   tema-aplicado:sage-light:desktop — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:desktop — excesso=0px
+OK   precos-renderizados:sage-light:desktop — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sage-light:desktop — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   tema-aplicado:sage-light:wide — data-nk-theme=sage-light
+OK   sem-rolagem-horizontal:sage-light:wide — excesso=0px
+OK   precos-renderizados:sage-light:wide — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-padrao-riscado:sage-light:wide — [{"text":"R$ 1.500","lineThrough":true,"visible":true},{"text":"R$ 3.500","lineThrough":true,"visible":true}]
+OK   axe:sakura-dark:mobile — 24 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sakura-dark:mobile — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sakura-dark:mobile — 39 nós; pior folga: .nk-badge--info 5.23:1 (mín. 4.5)
+OK   axe:sakura-dark:desktop — 24 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sakura-dark:desktop — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sakura-dark:desktop — 39 nós; pior folga: .nk-badge--info 5.21:1 (mín. 4.5)
+OK   axe:sage-light:mobile — 24 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sage-light:mobile — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sage-light:mobile — 39 nós; pior folga: .nk-badge--soft.nk-badge--accent.nk-badge--sm 4.63:1 (mín. 4.5)
+OK   axe:sage-light:desktop — 24 regras aprovadas
+OK   axe-sem-pendencias-de-revisao:sage-light:desktop — só color-contrast (medido por pixels)
+OK   contraste-por-pixels:sage-light:desktop — 39 nós; pior folga: .nk-badge--soft.nk-badge--accent.nk-badge--sm 4.67:1 (mín. 4.5)
+OK   tema-padrao-sage-light — data-nk-theme=sage-light
+OK   ordem-das-secoes — inicio > solucoes > precos > como-funciona > hosting > transparencia > contato > privacidade
+OK   um-unico-h1 — 1 h1
+OK   ancoras-validas — 20 âncoras, quebradas: nenhuma
+OK   sem-destinos-provisorios — links externos: mailto:contato@nekkora.com | https://www.linkedin.com/company/nekkora; status contato=configurado
+OK   sem-whatsapp-flutuante-provisorio — ausente
+OK   sem-alegacoes-proibidas — 13 ocorrência(s): 3 em exclusões, 10 no bloco de preços
+OK   precos-so-no-bloco-de-precos — 1 bloco(s) data-pricing
+OK   precos-com-condicoes-visiveis — {"blocks":1,"condition":true,"confirmedInProposal":true,"licenses":true,"table":{"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}},"complexa":true,"criteria":true,"conditions":true}
+OK   precos-tabela-oficial — {"simples":{"padrao":"R$ 1.500","lancamento":"R$ 1.000","percentual":"−33,33%","economia":"Economia de R$ 500"},"media":{"padrao":"R$ 3.500","lancamento":"R$ 2.800","percentual":"−20%","economia":"Economia de R$ 700"},"complexa":{}}
+OK   precos-sem-percentual-inconsistente — Desconto de −33,33% | Desconto de −20%
+OK   artefato-corresponde-ao-codigo — release.json=c94f33c; HEAD=c94f33c; rodapé=c94f33c
+OK   agendamento-conforme-configuracao — URL do Bookings não configurada: 0 botão(ões), 0 link(s)
+OK   precos-descontos-coerentes — economia = padrão − lançamento; percentual = economia ÷ padrão
+OK   precos-criterios-de-categoria
+OK   condicoes-comerciais-visiveis
+OK   delivery-tecnologias-com-ressalva
+OK   privacidade-visivel — PRIVACIDADE · Como tratamos seus dados
+OK   precos-leitura-do-valor-riscado — Preço padrão: | Preço especial de lançamento: | Desconto de | Preço padrão: | Preço especial de lançamento: | Desconto de
+OK   produtos-internos-so-em-bloco-informativo — 0 menção(ões)
+OK   demonstrativos-identificados — nenhum bloco demonstrativo na página
+OK   primeiro-tab-pular-conteudo — {"text":"Pular para o conteúdo","href":"#conteudo"}
+OK   pular-conteudo-visivel-no-foco
+OK   foco-visivel-nos-40-primeiros-tabs — 0 sem indicador de foco
+OK   alternancia-de-tema-persiste — sakura-dark → recarregado: sakura-dark
+OK   entrar-sem-destino-e-indisponivel — url inalterada=true; aria-disabled=true; nome acessível="Entrar — Acesso de clientes ainda não disponível."
+OK   dialogo-aberto-pelos-ctas — inicio: Solicitar avaliação | : Solicitar avaliação | hosting: Solicitar avaliação de viabilidade | contato: Solicitar avaliação
+OK   dialogo-abre-com-foco-dentro — {"focusInside":true,"hash":""}
+OK   dialogo-canal-da-publicacao — atalho de e-mail: 1; WhatsApp ausente
+OK   dialogo-esc-fecha-e-devolve-foco
+OK   dialogo-ctas-de-precos-hosting-contato — precos=true; hosting=true; contato=true (fechado por "Cancelar")
+OK   formulario-erros-obrigatorios — 2 campos inválidos; foco no primeiro inválido=true
+OK   formulario-foco-no-primeiro-erro
+OK   formulario-vai-para-confirmacao — Confirme a sua solicitação Esta é a mensagem que será aberta no seu aplicativo de e-mail, endereçada à Nekkora. Confira antes de continuar. Olá! Sou Pessoa de Teste. Quero solicitar uma avaliação de automação. Teste auto
+OK   formulario-sem-envio-real — popup=false; url inalterada=true
+OK   formulario-resultado-visivel-e-focado — {"doneTop":185.3125,"viewport":800,"focused":true}
+OK   menu-mobile-abre-e-fecha-com-esc — aberto=true depois do Esc=false
+OK   hosting-condicoes-visiveis:mobile — aviso visível=true; altura da página=9600px
+OK   hosting-condicoes-visiveis:desktop — aviso visível=true
+OK   dialogo-axe:sakura-dark:mobile — sem violações; excesso horizontal=0px
+OK   dialogo-axe:sakura-dark:desktop — sem violações; excesso horizontal=0px
+OK   dialogo-axe:sage-light:mobile — sem violações; excesso horizontal=0px
+OK   dialogo-axe:sage-light:desktop — sem violações; excesso horizontal=0px
+OK   sem-requisicoes-externas — nenhuma
+OK   fonte-servida-pelo-proprio-site — /assets/inter-latin-wght-normal.woff2
+OK   console-sem-erros — limpo
+90 verificações, 0 falha(s). Resultados em evidencias/pagina-chromium

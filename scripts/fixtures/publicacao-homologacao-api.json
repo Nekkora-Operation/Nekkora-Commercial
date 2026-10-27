@@ -1,0 +1,38 @@
+{
+  "$comentario": "SINTÉTICO — só para builds de homologação (NEKKORA_PUBLICACAO). Recebimento automático (COM-RELEASE-005): o endpoint é o backend LOCAL (scripts/api-local.mjs, entrega de e-mail simulada) e a chave do Turnstile é a chave pública de TESTE documentada pela Cloudflare (sempre aprova); o script do desafio é servido por uma página local nos testes. O Bookings usa a caixa de reservas do domínio .invalid da fixture e é respondido localmente. Nenhum dado sai da máquina. O build feito com este arquivo é marcado em dist/release.json e recusado por scripts/verificar-publicacao.mjs.",
+  "canais": {
+    "whatsapp": null,
+    "email": "contato@exemplo.invalid",
+    "linkedin": "https://www.linkedin.com/company/exemplo-homologacao/",
+    "instagram": null
+  },
+  "agendamento": {
+    "url": "https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/",
+    "obrigatorio": true
+  },
+  "envioAutomatico": {
+    "endpoint": "http://127.0.0.1:4178/v1/commercial/requests",
+    "chaveDoSiteTurnstile": "1x00000000000000000000AA"
+  },
+  "campanhaLancamento": {
+    "inicio": "2026-11-01",
+    "fim": "2026-12-31"
+  },
+  "controlador": {
+    "nome": "Empresa de Teste (dado sintético)",
+    "documento": "00.000.000/0000-00"
+  },
+  "hospedagem": {
+    "provedor": "Provedor de teste (dado sintético)"
+  },
+  "aprovacoes": {
+    "precos": true,
+    "condicoesComerciais": true,
+    "textosComerciais": true,
+    "avisoDePrivacidade": true,
+    "agendamento": true,
+    "envioAutomatico": true,
+    "publicacao": true
+  },
+  "avisoHomologacao": true
+}

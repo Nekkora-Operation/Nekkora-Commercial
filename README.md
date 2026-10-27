@@ -8,9 +8,10 @@ Página comercial da Nekkora (**COM-001 — posicionamento comercial**). Apresen
 Feita com **Vite + React + TypeScript** e a **[nekkora-lib](../Nekkora-lib)** (design system da Nekkora).
 Tema padrão **Sakura Dark**, com alternância para **Sage Light**.
 
-> **Versão para homologação.** Os canais de contato ainda não foram confirmados: a página não mostra WhatsApp,
-> e-mail nem redes sociais, e o formulário funciona em modo de demonstração (valida, mas não envia nada).
-> Veja [docs/com-001/08-pendencias-publicacao.md](docs/com-001/08-pendencias-publicacao.md).
+> **Versão para homologação.** Canais confirmados: e-mail `contato@nekkora.com` e LinkedIn (sem WhatsApp por
+> enquanto). A solicitação de avaliação abre a mensagem confirmada no aplicativo de e-mail do visitante. A publicação
+> continua bloqueada até as aprovações da titular: veja
+> [docs/release/COM-RELEASE-PENDENCIAS.md](docs/release/COM-RELEASE-PENDENCIAS.md).
 
 ## Rodando localmente
 
@@ -36,8 +37,8 @@ npm run dev        # http://localhost:5173
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run build` | Build estático em `dist/` |
 | `npm run preview` | Serve o build para conferir |
-| `npm run check` | Tipos + build (rodar antes de juntar uma branch) |
-| `npm run homologacao -- <url> <pasta>` | Verificação em navegador real: capturas, axe-core, teclado, formulário, links e alegações proibidas. Precisa de Playwright e axe-core (`NEKKORA_PW_MODULES=<node_modules que os contenha>`) |
+| `npm run check` | Tipos + testes + build + política do CloudFront conferida (rodar antes de juntar uma branch) |
+| `npm run homologacao -- <url> <pasta>` | Verificação em navegador real: capturas, axe-core, teclado, formulário, links, preços e alegações proibidas (Playwright e axe-core são devDependencies) |
 | `npm run texto` | Gera `docs/com-001/05-texto-comercial.md` a partir de `src/content.ts` |
 
 ## Onde mudar o quê
@@ -68,3 +69,27 @@ docs/com-001/            auditoria, contrato, matriz, arquitetura, texto, roteir
                          relatório e evidências
 public/                  favicons da marca (idênticos aos da nekkora-lib)
 ```
+
+## Release, homologação e publicação (NEKKORA-RELEASE-001)
+
+- Dados que só a titular confirma (canais, campanha, controlador, aprovações): [`publicacao.json`](publicacao.json).
+  `npm run verificar:publicacao` lista o que falta e **bloqueia o deploy de produção**.
+- Preços: [`src/precos.ts`](src/precos.ts) é a fonte única. Economia e percentual são calculados, e a campanha só
+  vale dentro das datas aprovadas.
+- nekkora-lib: tarball do CI em [`vendor/`](vendor/). `npm run verificar:lib -- --reconstruir` refaz e confere o hash.
+- Hospedagem: **AWS S3 + CloudFront** (DNS na Cloudflare). Cabeçalhos, cache, função e políticas IAM estão em
+  [`deploy/aws/`](deploy/aws/), e os scripts de publicação, rollback, verificação e auditoria em
+  [`scripts/aws/`](scripts/aws/).
+- `npm test`: preços, portão, publicação/rollback simulados, auditoria, CloudFront local e backend de solicitações.
+- `npm run cloudfront:local`: serve o `dist/` como o CloudFront (CSP, erros, cache, função).
+- `npm run homologacao` (página) e `npm run homologacao:canais` (jornadas; `NEKKORA_CANAL=email` para o e-mail).
+- `npm run aws:auditar -- --bucket <nome>`: auditoria somente leitura da conta AWS.
+- `npm run verificar:precos`: confere que o bundle tem a tabela de `src/precos.ts` e nenhum percentual digitado.
+- **Contato (COM-RELEASE-005)**:
+  - "Agendar conversa" abre o Microsoft Bookings e só aparece com `agendamento.url`;
+  - o envio automático do formulário vai para o backend serverless em [`api/solicitacoes/`](api/solicitacoes/), que
+    ainda não foi publicado. Localmente: `npm run api:local` e `scripts/homologacao-leads.mjs`;
+  - arquitetura, Graph × SES, Bookings e custos: [`COM-RELEASE-005-leads.md`](docs/release/COM-RELEASE-005-leads.md).
+- CI, deploy manual com aprovação, rollback, OIDC, DNS e custos:
+  [`docs/release/COM-RELEASE-003-aws.md`](docs/release/COM-RELEASE-003-aws.md).
+- Relatórios: [`docs/release/`](docs/release/) · pendências: [`COM-RELEASE-PENDENCIAS.md`](docs/release/COM-RELEASE-PENDENCIAS.md).

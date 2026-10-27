@@ -1,0 +1,160 @@
+✔ contrato: corpo válido é normalizado (CRLF → LF, espaços nas pontas)
+✔ contrato: aceita corpo em base64 (como o API Gateway entrega) e empresa ausente
+✔ contrato recusa: Content-Type text/plain → 415
+✔ contrato recusa: Content-Type de formulário → 415
+✔ contrato recusa: corpo vazio → 400
+✔ contrato recusa: corpo acima de 8 KiB → 413
+✔ contrato recusa: JSON inválido → 400
+✔ contrato recusa: JSON que não é objeto → 400
+✔ contrato recusa: UTF-8 inválido → 400
+✔ contrato recusa: campo desconhecido (destinatário) → 400
+✔ contrato recusa: campo desconhecido (cc) → 400
+✔ contrato recusa: id que não é UUID v4 → 400
+✔ contrato recusa: nome curto → 400
+✔ contrato recusa: nome longo → 400
+✔ contrato recusa: nome com quebra de linha (injeção de cabeçalho) → 400
+✔ contrato recusa: e-mail ausente → 400
+✔ contrato recusa: e-mail inválido → 400
+✔ contrato recusa: e-mail com quebra de linha → 400
+✔ contrato recusa: e-mail com vários destinatários → 400
+✔ contrato recusa: empresa longa → 400
+✔ contrato recusa: descrição curta → 400
+✔ contrato recusa: descrição com 1.001 caracteres → 400
+✔ contrato recusa: descrição com caractere de controle → 400
+✔ contrato recusa: tempo de preenchimento negativo → 400
+✔ contrato recusa: tempo de preenchimento como texto → 400
+✔ contrato recusa: armadilha que não é texto → 400
+✔ contrato: descrição com exatamente 1.000 caracteres (limite) é aceita
+✔ CORS: sem Origin ou de outra origem → 403 sem Access-Control-Allow-Origin; nada é entregue
+✔ CORS: preflight da origem do site → 204 só com POST e content-type
+✔ rota e método: outro caminho → 404, GET → 405 com Allow
+✔ 202: entrega à caixa fixa, Reply-To do visitante, protocolo estável, sem cache
+✔ respostas de erro não ecoam os dados enviados
+✔ idempotência: a mesma solicitação reenviada não gera segundo e-mail e recebe o mesmo protocolo
+✔ idempotência: mesmo id com outro conteúdo → 409 conflito; em andamento → 409 recuperável
+✔ falha temporária do provedor → 502 recuperável, nenhum e-mail; nova tentativa com o mesmo id entrega uma vez
+✔ falha permanente do provedor também libera nova tentativa (502), sem afirmar recebimento
+✔ erro inesperado (armazenamento fora do ar) → 500 sem detalhes internos
+✔ armadilha preenchida e envio rápido demais → 400 recusada, nada entregue
+✔ limite por origem de rede: a 6ª na mesma hora → 429 com Retry-After; outra origem continua
+✔ teto diário global: acima dele, 429 e alerta operacional no log
+✔ desafio recusado → 403; serviço do desafio indisponível → 503 recuperável; nada entregue
+✔ Turnstile: segredo e token no corpo (nunca na URL), idempotency_key = id do pedido, hostname conferido
+✔ logs operacionais sem dados pessoais, IP, token ou segredo — em todos os cenários
+✔ SES: remetente e destinatário fixos, Reply-To do visitante; limitação → erro temporário
+✔ DynamoDB: claim condicional, entregue, liberação após falha, contador e item vencido
+✔ Lambda montado com clientes simulados: segredos do SSM, 202 de ponta a ponta, nada da configuração no log
+✔ configuração do Lambda: recusa origem http, curinga, e-mail inválido e variável ausente
+✔ IAM da função: permissões mínimas — sem curingas, sem administração, e-mail só do remetente fixo para a caixa fixa
+✔ conta bem configurada: nenhuma falha e inventário com os identificadores reais
+✔ somente leitura: só operações Get/List/Describe
+✔ certificado aguardando validação DNS: pendente, com os registros a criar
+✔ erros comuns de configuração manual viram falha, com o motivo
+✔ IP dedicado (vip) é apontado como custo de US$ 600/mês
+✔ erro convertido em 200 (fallback de SPA) não é aceito
+✔ descobre a distribuição pela origem quando o ID não é informado
+✔ regressão S07: StringEquals, ArnEquals e ArnLike com o ARN exato da distribuição são aceitos
+✔ S07: condições ARN que ampliam o acesso ou não restringem viram falha
+✔ regressão K01/K02: certificado antigo VALIDATION_TIMED_OUT não esconde o emitido e associado
+✔ K01/K02: prioriza o certificado associado à distribuição, mesmo fora da listagem
+✔ K01/K02: emitido mas não associado — K01 ok, K02 pendente
+✔ K01/K02: só o certificado VALIDATION_TIMED_OUT — falha, pede um novo
+✔ K01/K02: certificado associado vencido ou sem www não é adequado
+✔ K02: certificado da distribuição inexistente no ACM vira falha, sem derrubar a auditoria
+✔ cenário reconstruído da auditoria de 26/10/2026 (S07/K01/K02): 21 ok, 5 pendentes, nenhuma falha, 3 informativos
+✔ regressão C08 (auditoria real): XSSProtection: {} e outra ordem de propriedades não são diferença
+✔ C08: XSSProtection com valor efetivo, propriedade inesperada ou cabeçalho diferente vira falha
+✔ C08: diferença apontada pelo caminho da propriedade
+✔ confianca-deploy.json: só GitHub Actions do environment production, pela main, com a identidade imutável do repositório
+✔ confianca-auditoria.json: só GitHub Actions do environment auditoria-aws, pela main, com a identidade imutável do repositório
+✔ confiança: cada role aceita só o próprio environment
+✔ permissões da auditoria: só leitura (Get/List/Describe), sem curinga de ação
+✔ permissões do deploy: só o necessário, sem exclusão, IAM, ACM, DNS nem alteração da distribuição
+✔ gerador: preenche todos os modelos com os identificadores e não altera a confiança OIDC
+✔ gerador: recusa identificador fora do formato e marcador sem valor
+✔ smoke test OIDC (PR #8): só manual, só a role de auditoria e só GetCallerIdentity
+✔ workflows: só jobs do environment certo, disparados da main, recebem token OIDC e assumem a role
+✔ primeira publicação: raiz completa, metadados, cópia da release, manifesto e registro
+✔ ordem: assets e manifesto antes de qualquer arquivo de entrada; index.html e release.json por último
+✔ republicar o mesmo commit é idempotente: nada trocado, nada invalidado
+✔ segunda release: assets anteriores continuam no bucket (cache e rollback) e só o que mudou é invalidado
+✔ bloqueia: asset com o mesmo nome e outro conteúdo — e a raiz não muda
+✔ bloqueia antes de gravar: CSP da distribuição não aceita os scripts do artefato
+✔ bloqueia: sem o ID da política de cabeçalhos não há publicação
+✔ bloqueia: artefato de homologação e mesmo commit com artefato diferente
+✔ falha no meio da troca: o site continua íntegro (index antigo + seus assets), estado não avança
+✔ concorrência: outra operação alterou atual.json → interrompe antes de trocar a raiz
+✔ o bucket recusa gravar asset sem If-None-Match (política de escrita única)
+✔ rollback sem destino: volta para a release anterior aprovada, confere a raiz e registra
+✔ rollback para commit informado; recusa commit nunca publicado, destino igual ao atual e motivo vazio
+✔ rollback recusa destino corrompido ou incompleto — e não toca na raiz
+✔ rollback --simular valida e não grava nada
+✔ rollback sem release anterior ou sem publicação: erro claro
+✔ publicar depois de um rollback: a release nova entra normalmente e o histórico guarda tudo
+✔ função viewer-request: www → https://nekkora.com com caminho e query; apex segue
+✔ função viewer-request: _releases/ nunca chega ao bucket (inclusive com escape e maiúsculas)
+✔ política versionada = cabeçalhos esperados, com a CSP exata dos scripts inline do build (T12)
+✔ servidor local + verificação pós-publicação: o build real passa em tudo (T13, T20)
+✔ erros: inexistente → 404 com a página de erro (nunca 200); só "/" usa o objeto raiz; 304 na revalidação
+✔ verificação negativa: cabeçalho de segurança ausente na política → falha
+✔ verificação negativa: site servindo outro artefato → release.json e arquivos divergem
+✔ verificação negativa: bucket que responde publicamente → falha
+✔ tabela oficial de 22/10/2026 (itens 1 a 4)
+✔ descontos matematicamente corretos (item 5): R$ 500 = 33,33% e R$ 700 = 20%
+✔ vigência controlada pelas datas aprovadas (item 10)
+✔ nenhuma alegação de 50% de desconto nem desconto universal (item 6)
+✔ valores antigos (R$ 500 e R$ 1.400 como preço; R$ 1.000 e R$ 2.800 como preço padrão) não existem mais
+✔ nenhum percentual de desconto digitado no código (COM-RELEASE-005 §3.4): o selo vem de priceFacts
+✔ condição 50/50 preservada e separada do desconto (item 7); complexa sob orçamento, sem desconto (item 8)
+✔ configuração real (revisor Nekkolly, só main): liberado
+✔ bloqueia sem revisor, sem restrição de branches, por protected branches e com política além de main
+✔ consulta environment e políticas com o token e libera a configuração real
+✔ fecha em caso de dúvida: environment ausente, token sem acesso ou políticas inacessíveis
+✔ tudo confirmado: libera (só e-mail e LinkedIn, sem WhatsApp)
+✔ WhatsApp válido também é aceito
+✔ o publicacao.json versionado continua bloqueado (nenhuma aprovação presumida)
+✔ bloqueia: WhatsApp marcador (zeros)
+✔ bloqueia: sem e-mail
+✔ bloqueia: e-mail de domínio reservado (.invalid)
+✔ bloqueia: sem LinkedIn
+✔ bloqueia: LinkedIn na página inicial
+✔ bloqueia: LinkedIn de outro domínio
+✔ bloqueia: campanha sem datas
+✔ bloqueia: campanha encerrada
+✔ bloqueia: sem razão social
+✔ bloqueia: sem documento
+✔ bloqueia: CNPJ com dígito errado
+✔ bloqueia: CNPJ marcador (zeros)
+✔ bloqueia: sem provedor
+✔ bloqueia: preços não aprovados
+✔ bloqueia: condições não aprovadas
+✔ bloqueia: textos não aprovados
+✔ bloqueia: privacidade não aprovada
+✔ bloqueia: publicação não autorizada
+✔ bloqueia: aprovação como texto "true" (não é aprovação)
+✔ bloqueia: aviso de homologação ligado
+✔ bloqueia: agendamento obrigatório sem URL
+✔ bloqueia: Bookings de outra organização
+✔ bloqueia: Bookings fictício (.example)
+✔ bloqueia: Bookings na página inicial
+✔ bloqueia: Bookings fora da Microsoft
+✔ bloqueia: Bookings em http
+✔ bloqueia: Bookings sem confirmação da titular
+✔ bloqueia: endpoint em http
+✔ bloqueia: endpoint com outro caminho
+✔ bloqueia: endpoint sem desafio
+✔ bloqueia: chave de teste do Turnstile
+✔ bloqueia: envio automático sem autorização
+✔ agendamento fora do lançamento: sem URL, libera (o botão não aparece)
+✔ Bookings com a caixa do tenant (*.onmicrosoft.com) também é aceito
+✔ envio automático completo: libera só com a CSP do build incluindo a origem da API e o Turnstile
+✔ aceita CPF válido no lugar do CNPJ
+✔ bloqueia artefato de homologação, árvore suja, outra lib, CSP divergente e _headers
+ℹ tests 152
+ℹ suites 0
+ℹ pass 152
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6424.7493

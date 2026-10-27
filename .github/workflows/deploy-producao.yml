@@ -1,0 +1,137 @@
+# Deploy de produção na AWS (COM-RELEASE-003-B/C) — manual, com aprovação humana e portão de publicação.
+#
+#   autorização → pipeline completo (ci.yml) para o commit escolhido → APROVAÇÃO HUMANA (environment "production")
+#   → portão de publicação (bloqueante) → credenciais temporárias por OIDC → S3 + CloudFront → verificação pública
+#
+# Pré-requisitos (titular — docs/release/COM-RELEASE-003-aws.md): provedor OIDC e role de deploy na AWS; environment
+# "production" com revisor obrigatório e só a branch main; variáveis do environment: AWS_ROLE_ARN, AWS_REGION,
+# AWS_S3_BUCKET, AWS_CLOUDFRONT_DISTRIBUTION_ID, AWS_CLOUDFRONT_DOMAIN, AWS_RESPONSE_HEADERS_POLICY_ID e, depois do DNS,
+# DOMINIO_PUBLICO (https://nekkora.com). Nenhuma chave de acesso fica no GitHub: só identificadores.
+name: Deploy de produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag ou commit homologado, já integrado à main (ex.: v1.0.0)'
+        required: true
+      confirmacao:
+        description: 'Digite PUBLICAR para confirmar a publicação em nekkora.com'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: producao
+  cancel-in-progress: false
+
+jobs:
+  autorizacao:
+    name: Autorização (main, confirmação, commit integrado, environment protegido)
+    runs-on: ubuntu-24.04
+    outputs:
+      commit: ${{ steps.ref.outputs.commit }}
+    steps:
+      - name: Disparado da main e confirmado
+        run: |
+          test "$GITHUB_REF" = "refs/heads/main" || { echo "::error::dispare o deploy a partir da branch main"; exit 1; }
+          test "${{ inputs.confirmacao }}" = "PUBLICAR" || { echo "::error::confirmação ausente (digite PUBLICAR)"; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: ref
+        name: Commit do ref informado e integrado à main
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          commit=$(git rev-parse --verify "${REF}^{commit}") || { echo "::error::ref não encontrado: $REF"; exit 1; }
+          git merge-base --is-ancestor "$commit" origin/main || { echo "::error::$commit não está na main — só código revisado e integrado é publicado"; exit 1; }
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "Release candidata: $REF → $commit" >> "$GITHUB_STEP_SUMMARY"
+      - name: Environment "production" exige revisor e só aceita a branch main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verificar-environment.mjs --environment production
+
+  ci:
+    name: Pipeline completo do commit
+    needs: autorizacao
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.autorizacao.outputs.commit }}
+
+  deploy:
+    name: Publicar na AWS
+    needs: [autorizacao, ci]
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: ${{ vars.DOMINIO_PUBLICO || format('https://{0}', vars.AWS_CLOUDFRONT_DOMAIN) }}
+    permissions:
+      contents: read
+      id-token: write # OIDC: credenciais temporárias do STS, só neste job e só neste environment
+    timeout-minutes: 20
+    env:
+      COMMIT: ${{ needs.autorizacao.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.autorizacao.outputs.commit }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: commercial-dist-${{ needs.autorizacao.outputs.commit }}
+          path: dist
+      - name: Artefato é o do commit aprovado
+        run: |
+          publicado=$(node -p 'require("./dist/release.json").commit')
+          test "$publicado" = "$COMMIT" || { echo "::error::artefato do commit $publicado, esperado $COMMIT"; exit 1; }
+      - name: nekkora-lib versionada e íntegra
+        run: node scripts/verificar-lib.mjs
+      - name: Portão de publicação (bloqueante)
+        run: node scripts/verificar-publicacao.mjs --dist dist
+      - name: Variáveis do environment
+        run: |
+          for v in AWS_ROLE_ARN AWS_REGION AWS_S3_BUCKET AWS_CLOUDFRONT_DISTRIBUTION_ID AWS_CLOUDFRONT_DOMAIN AWS_RESPONSE_HEADERS_POLICY_ID; do
+            test -n "${!v}" || { echo "::error::variável $v ausente no environment production"; exit 1; }
+          done
+        env:
+          AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+          AWS_CLOUDFRONT_DOMAIN: ${{ vars.AWS_CLOUDFRONT_DOMAIN }}
+          AWS_RESPONSE_HEADERS_POLICY_ID: ${{ vars.AWS_RESPONSE_HEADERS_POLICY_ID }}
+      - name: Credenciais temporárias (OIDC → STS)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: nekkora-commercial-deploy-${{ github.run_id }}
+          role-duration-seconds: 1800
+      - name: Publicar no S3 e invalidar o CloudFront
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+          AWS_RESPONSE_HEADERS_POLICY_ID: ${{ vars.AWS_RESPONSE_HEADERS_POLICY_ID }}
+          ATOR: ${{ github.actor }}
+          EXECUCAO: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          VERIFICACOES: '{"ci":"${{ needs.ci.result }}","portao":"liberado","lib":"reconstruida-e-integra"}'
+        run: node scripts/aws/publicar.mjs --dist dist
+      - name: Verificação pública (CloudFront)
+        run: |
+          node scripts/aws/verificar-site.mjs --base "https://${{ vars.AWS_CLOUDFRONT_DOMAIN }}/" --dist dist --tentativas 30 \
+            --bucket-url "https://${{ vars.AWS_S3_BUCKET }}.s3.${{ vars.AWS_REGION }}.amazonaws.com/"
+      - name: Verificação pública (domínio, depois do DNS)
+        if: vars.DOMINIO_PUBLICO != ''
+        run: |
+          node scripts/aws/verificar-site.mjs --base "${{ vars.DOMINIO_PUBLICO }}/" --dist dist --tentativas 30 \
+            --http "http://nekkora.com/" --www "https://www.nekkora.com/"
+      - name: Registro
+        run: |
+          echo "Publicado: commit $COMMIT · ${{ vars.DOMINIO_PUBLICO || vars.AWS_CLOUDFRONT_DOMAIN }}" >> "$GITHUB_STEP_SUMMARY"

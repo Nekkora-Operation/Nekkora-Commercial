@@ -1,0 +1,142 @@
+OK   [chromium] agendamento-configurado
+OK   [chromium] agendamento-botoes-nas-areas-de-conversao — inicio, contato
+OK   [chromium] agendamento-url-oficial-configurada — https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/
+OK   [chromium] agendamento-nova-aba-isolada
+OK   [chromium] agendamento-nome-acessivel — 2 link(s) com o nome completo
+OK   [chromium] agendamento-aviso-de-confirmacao
+OK   [chromium] agendamento-foco-visivel
+OK   [chromium] agendamento-teclado-abre-bookings — https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/
+OK   [chromium] agendamento-sem-opener-e-sem-referer — {"opener":true,"referrer":"","url":"https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/","refererHeader":null}
+OK   [chromium] agendamento-pagina-de-origem-intacta — nenhuma afirmação de reunião marcada
+OK   [chromium] agendamento-sem-window-open
+OK   [chromium] agendamento-atalho-no-dialogo
+OK   [chromium] agendamento-servico-indisponivel — página de origem intacta; botão continua disponível para nova tentativa
+OK   [chromium] agendamento-celular — {"overflow":0,"inside":true,"n":4}
+OK   [chromium] pagina-axe-com-agendamento:sage-light — sem violações
+OK   [chromium] pagina-axe-com-agendamento:sakura-dark — sem violações
+OK   [chromium] envio-sem-atalho-de-canal — o envio automático é o único mecanismo do formulário
+OK   [chromium] envio-validacao-email-obrigatorio — nome, e-mail e descrição
+OK   [chromium] envio-armadilha-inacessivel-a-pessoas — {"tabIndex":-1,"hidden":true,"offscreen":true}
+OK   [chromium] envio-revisao-mostra-dados-e-destino
+OK   [chromium] envio-aguarda-desafio — botão desabilitado até o token do desafio
+OK   [chromium] envio-nada-enviado-antes-de-confirmar — 0 requisição(ões) à API
+OK   [chromium] axe-revisao — sem violações
+OK   [chromium] envio-estado-enviando — {"busy":true,"status":"Enviando a solicitação. Aguarde a confirmação."}
+OK   [chromium] envio-recebida-so-com-confirmacao-do-servidor — protocolo NK-40E66FC6; 1 mensagem(ns) na caixa simulada
+OK   [chromium] envio-sem-duplicidade — 1 POST
+OK   [chromium] envio-dados-so-no-corpo — POST http://127.0.0.1:4178/v1/commercial/requests
+OK   [chromium] envio-conteudo-entregue — Reply-To=pessoa@exemplo.invalid; preenchimento=4508 ms
+OK   [chromium] axe-recebida — sem violações
+OK   [chromium] envio-novo-atendimento-com-formulario-vazio
+OK   [chromium] falha-entrega-mensagem-clara
+OK   [chromium] falha-alternativa-por-email
+OK   [chromium] falha-dados-preservados-no-resumo
+OK   [chromium] axe-falha — sem violações
+OK   [chromium] falha-nova-tentativa-mesmo-id-uma-entrega — ids: c9b9a404, c9b9a404; 1 entrega(s)
+OK   [chromium] falha-rede-mensagem-clara
+OK   [chromium] falha-voltar-e-editar-preserva-dados
+OK   [chromium] falha-limite-429
+OK   [chromium] falha-desafio-mensagem — "Tentar novamente" desabilitado até novo token: true
+OK   [chromium] falha-desafio-refeito-e-enviado — desafio feito 3 vez(es); 1 entrega
+OK   [chromium] envio-rapido-demais-recusado — robô simples: recusado sem e-mail; sem "tentar novamente"
+OK   [chromium] desafio-indisponivel-sem-envio-com-alternativa
+OK   [chromium] celular-envio-cabe — {"review":{"page":0,"left":0,"right":375},"done":{"page":0,"left":0,"right":375}}
+OK   [chromium] celular-axe-recebida — sem violações
+OK   [chromium] logs-sem-dados-pessoais — 1 linha(s); com dado pessoal: 0
+OK   [chromium] sem-requisicao-externa-real — Turnstile e Bookings respondidos localmente; nada mais saiu
+OK   [chromium] console-sem-erros — limpo (falhas de rede provocadas pelos testes desconsideradas)
+OK   [firefox] agendamento-configurado
+OK   [firefox] agendamento-botoes-nas-areas-de-conversao — inicio, contato
+OK   [firefox] agendamento-url-oficial-configurada — https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/
+OK   [firefox] agendamento-nova-aba-isolada
+OK   [firefox] agendamento-nome-acessivel — 2 link(s) com o nome completo
+OK   [firefox] agendamento-aviso-de-confirmacao
+OK   [firefox] agendamento-foco-visivel
+OK   [firefox] agendamento-teclado-abre-bookings — https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/
+OK   [firefox] agendamento-sem-opener-e-sem-referer — {"opener":true,"referrer":"","url":"https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/","refererHeader":null}
+OK   [firefox] agendamento-pagina-de-origem-intacta — nenhuma afirmação de reunião marcada
+OK   [firefox] agendamento-sem-window-open
+OK   [firefox] agendamento-atalho-no-dialogo
+OK   [firefox] agendamento-servico-indisponivel — página de origem intacta; botão continua disponível para nova tentativa
+OK   [firefox] agendamento-celular — {"overflow":0,"inside":true,"n":4}
+OK   [firefox] pagina-axe-com-agendamento:sage-light — sem violações
+OK   [firefox] pagina-axe-com-agendamento:sakura-dark — sem violações
+OK   [firefox] envio-sem-atalho-de-canal — o envio automático é o único mecanismo do formulário
+OK   [firefox] envio-validacao-email-obrigatorio — nome, e-mail e descrição
+OK   [firefox] envio-armadilha-inacessivel-a-pessoas — {"tabIndex":-1,"hidden":true,"offscreen":true}
+OK   [firefox] envio-revisao-mostra-dados-e-destino
+OK   [firefox] envio-aguarda-desafio — botão desabilitado até o token do desafio
+OK   [firefox] envio-nada-enviado-antes-de-confirmar — 0 requisição(ões) à API
+OK   [firefox] axe-revisao — sem violações
+OK   [firefox] envio-estado-enviando — {"busy":true,"status":"Enviando a solicitação. Aguarde a confirmação."}
+OK   [firefox] envio-recebida-so-com-confirmacao-do-servidor — protocolo NK-F536CD5F; 1 mensagem(ns) na caixa simulada
+OK   [firefox] envio-sem-duplicidade — 1 POST
+OK   [firefox] envio-dados-so-no-corpo — POST http://127.0.0.1:4178/v1/commercial/requests
+OK   [firefox] envio-conteudo-entregue — Reply-To=pessoa@exemplo.invalid; preenchimento=4878 ms
+OK   [firefox] axe-recebida — sem violações
+OK   [firefox] envio-novo-atendimento-com-formulario-vazio
+OK   [firefox] falha-entrega-mensagem-clara
+OK   [firefox] falha-alternativa-por-email
+OK   [firefox] falha-dados-preservados-no-resumo
+OK   [firefox] axe-falha — sem violações
+OK   [firefox] falha-nova-tentativa-mesmo-id-uma-entrega — ids: 3eff8f61, 3eff8f61; 1 entrega(s)
+OK   [firefox] falha-rede-mensagem-clara
+OK   [firefox] falha-voltar-e-editar-preserva-dados
+OK   [firefox] falha-limite-429
+OK   [firefox] falha-desafio-mensagem — "Tentar novamente" desabilitado até novo token: true
+OK   [firefox] falha-desafio-refeito-e-enviado — desafio feito 3 vez(es); 1 entrega
+OK   [firefox] envio-rapido-demais-recusado — robô simples: recusado sem e-mail; sem "tentar novamente"
+OK   [firefox] desafio-indisponivel-sem-envio-com-alternativa
+OK   [firefox] celular-envio-cabe — {"review":{"page":0,"left":0,"right":375},"done":{"page":0,"left":0,"right":375}}
+OK   [firefox] celular-axe-recebida — sem violações
+OK   [firefox] logs-sem-dados-pessoais — 2 linha(s); com dado pessoal: 0
+OK   [firefox] sem-requisicao-externa-real — Turnstile e Bookings respondidos localmente; nada mais saiu
+OK   [firefox] console-sem-erros — limpo (falhas de rede provocadas pelos testes desconsideradas)
+OK   [webkit] agendamento-configurado
+OK   [webkit] agendamento-botoes-nas-areas-de-conversao — inicio, contato
+OK   [webkit] agendamento-url-oficial-configurada — https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/
+OK   [webkit] agendamento-nova-aba-isolada
+OK   [webkit] agendamento-nome-acessivel — 2 link(s) com o nome completo
+OK   [webkit] agendamento-aviso-de-confirmacao
+OK   [webkit] agendamento-foco-visivel
+OK   [webkit] agendamento-teclado-abre-bookings — https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/
+OK   [webkit] agendamento-sem-opener-e-sem-referer — {"opener":true,"referrer":"","url":"https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/","refererHeader":null}
+OK   [webkit] agendamento-pagina-de-origem-intacta — nenhuma afirmação de reunião marcada
+OK   [webkit] agendamento-sem-window-open
+OK   [webkit] agendamento-atalho-no-dialogo
+OK   [webkit] agendamento-servico-indisponivel — página de origem intacta; botão continua disponível para nova tentativa
+OK   [webkit] agendamento-celular — {"overflow":0,"inside":true,"n":4}
+OK   [webkit] pagina-axe-com-agendamento:sage-light — sem violações
+OK   [webkit] pagina-axe-com-agendamento:sakura-dark — sem violações
+OK   [webkit] envio-sem-atalho-de-canal — o envio automático é o único mecanismo do formulário
+OK   [webkit] envio-validacao-email-obrigatorio — nome, e-mail e descrição
+OK   [webkit] envio-armadilha-inacessivel-a-pessoas — {"tabIndex":-1,"hidden":true,"offscreen":true}
+OK   [webkit] envio-revisao-mostra-dados-e-destino
+OK   [webkit] envio-aguarda-desafio — botão desabilitado até o token do desafio
+OK   [webkit] envio-nada-enviado-antes-de-confirmar — 0 requisição(ões) à API
+OK   [webkit] axe-revisao — sem violações
+OK   [webkit] envio-estado-enviando — {"busy":true,"status":"Enviando a solicitação. Aguarde a confirmação."}
+OK   [webkit] envio-recebida-so-com-confirmacao-do-servidor — protocolo NK-85AC869A; 1 mensagem(ns) na caixa simulada
+OK   [webkit] envio-sem-duplicidade — 1 POST
+OK   [webkit] envio-dados-so-no-corpo — POST http://127.0.0.1:4178/v1/commercial/requests
+OK   [webkit] envio-conteudo-entregue — Reply-To=pessoa@exemplo.invalid; preenchimento=5876 ms
+OK   [webkit] axe-recebida — sem violações
+OK   [webkit] envio-novo-atendimento-com-formulario-vazio
+OK   [webkit] falha-entrega-mensagem-clara
+OK   [webkit] falha-alternativa-por-email
+OK   [webkit] falha-dados-preservados-no-resumo
+OK   [webkit] axe-falha — sem violações
+OK   [webkit] falha-nova-tentativa-mesmo-id-uma-entrega — ids: 8f29a5b0, 8f29a5b0; 1 entrega(s)
+OK   [webkit] falha-rede-mensagem-clara
+OK   [webkit] falha-voltar-e-editar-preserva-dados
+OK   [webkit] falha-limite-429
+OK   [webkit] falha-desafio-mensagem — "Tentar novamente" desabilitado até novo token: true
+OK   [webkit] falha-desafio-refeito-e-enviado — desafio feito 3 vez(es); 1 entrega
+OK   [webkit] envio-rapido-demais-recusado — robô simples: recusado sem e-mail; sem "tentar novamente"
+OK   [webkit] desafio-indisponivel-sem-envio-com-alternativa
+OK   [webkit] celular-envio-cabe — {"review":{"page":0,"left":0,"right":375},"done":{"page":0,"left":0,"right":375}}
+OK   [webkit] celular-axe-recebida — sem violações
+OK   [webkit] logs-sem-dados-pessoais — 2 linha(s); com dado pessoal: 0
+OK   [webkit] sem-requisicao-externa-real — Turnstile e Bookings respondidos localmente; nada mais saiu
+OK   [webkit] console-sem-erros — limpo (falhas de rede provocadas pelos testes desconsideradas)
+141 verificações, 0 falha(s).

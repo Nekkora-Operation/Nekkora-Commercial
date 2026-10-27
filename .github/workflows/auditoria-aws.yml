@@ -1,0 +1,45 @@
+# Auditoria SOMENTE LEITURA da infraestrutura AWS (COM-RELEASE-003-A): bucket, OAC, distribuição, política de
+# cabeçalhos, função, erros e certificado. Usa uma role própria, só com permissões Get/List/Describe
+# (deploy/aws/iam/permissoes-auditoria.json), que confia apenas no environment "auditoria-aws" (restrito à main).
+# A titular também pode rodar localmente, com as próprias credenciais: npm run aws:auditar -- --bucket <nome>.
+name: Auditoria AWS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  auditoria:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: auditoria-aws
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Credenciais temporárias (OIDC → STS, role somente leitura)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_AUDIT_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: nekkora-commercial-auditoria-${{ github.run_id }}
+      - name: Auditar
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+        run: node scripts/aws/auditar.mjs --saida auditoria
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: auditoria-aws-${{ github.run_id }}
+          path: auditoria/
+          retention-days: 90

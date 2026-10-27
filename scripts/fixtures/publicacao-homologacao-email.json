@@ -1,0 +1,38 @@
+{
+  "$comentario": "SINTÉTICO — só para builds de homologação (NEKKORA_PUBLICACAO). Mesmos canais da publicação atual (e-mail e LinkedIn, sem WhatsApp — decisão da titular de 22/10/2026), com valores fictícios: o e-mail usa o domínio reservado .invalid e o mailto nunca chega a um aplicativo nos testes. O build feito com este arquivo é marcado em dist/release.json e recusado por scripts/verificar-publicacao.mjs. O agendamento aponta para a página de OUTRA organização (domínio diferente do e-mail): precisa ser recusado — nenhum botão \"Agendar conversa\".",
+  "canais": {
+    "whatsapp": null,
+    "email": "contato@exemplo.invalid",
+    "linkedin": "https://www.linkedin.com/company/exemplo-homologacao/",
+    "instagram": null
+  },
+  "agendamento": {
+    "url": "https://outlook.office365.com/book/OutraEmpresa@outra-organizacao.example/",
+    "obrigatorio": false
+  },
+  "envioAutomatico": {
+    "endpoint": null,
+    "chaveDoSiteTurnstile": null
+  },
+  "campanhaLancamento": {
+    "inicio": "2026-11-01",
+    "fim": "2026-12-31"
+  },
+  "controlador": {
+    "nome": "Empresa de Teste (dado sintético)",
+    "documento": "00.000.000/0000-00"
+  },
+  "hospedagem": {
+    "provedor": "Provedor de teste (dado sintético)"
+  },
+  "aprovacoes": {
+    "precos": true,
+    "condicoesComerciais": true,
+    "textosComerciais": true,
+    "avisoDePrivacidade": true,
+    "agendamento": true,
+    "envioAutomatico": true,
+    "publicacao": true
+  },
+  "avisoHomologacao": true
+}

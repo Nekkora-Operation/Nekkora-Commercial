@@ -1,0 +1,7 @@
+# Fim de linha LF em qualquer sistema: build idêntico ao do CI (inclusive o hash da CSP do script inline).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.tgz binary
+*.woff2 binary

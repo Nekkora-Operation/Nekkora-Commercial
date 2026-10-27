@@ -1,0 +1,83 @@
+# Rollback de produção na AWS (COM-RELEASE-003-E): restaura uma release JÁ PUBLICADA e aprovada a partir da cópia
+# guardada no bucket (_releases/<commit>/), sem rebuild e sem apagar nada. Sem destino, volta para a release publicada
+# antes da atual. Exige a mesma aprovação humana do environment "production". Com "simular", só valida o destino e
+# mostra o que faria. Procedimento e alternativa manual: docs/release/COM-RELEASE-003-aws.md.
+name: Rollback de produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      destino:
+        description: 'Commit (40 caracteres) da release a restaurar — vazio = a anterior à atual'
+        required: false
+      motivo:
+        description: 'Motivo do rollback (fica no histórico)'
+        required: true
+      simular:
+        description: 'Só validar o destino, sem alterar nada'
+        type: boolean
+        default: false
+      confirmacao:
+        description: 'Digite REVERTER para confirmar'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: producao
+  cancel-in-progress: false
+
+jobs:
+  protecao:
+    name: Environment "production" exige revisor e só aceita a branch main
+    if: github.ref == 'refs/heads/main' && inputs.confirmacao == 'REVERTER'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Environment "production" exige revisor e só aceita a branch main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verificar-environment.mjs --environment production
+
+  rollback:
+    needs: protecao
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: ${{ vars.DOMINIO_PUBLICO || format('https://{0}', vars.AWS_CLOUDFRONT_DOMAIN) }}
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Credenciais temporárias (OIDC → STS)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: nekkora-commercial-rollback-${{ github.run_id }}
+          role-duration-seconds: 1800
+      - name: Validar o destino e restaurar
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+          DESTINO: ${{ inputs.destino }}
+          MOTIVO: ${{ inputs.motivo }}
+          ATOR: ${{ github.actor }}
+          EXECUCAO: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/aws/rollback.mjs --manifesto restaurado.json ${{ inputs.simular && '--simular' || '' }}
+      - name: Verificação pública da release restaurada
+        if: ${{ !inputs.simular }}
+        run: |
+          node scripts/aws/verificar-site.mjs --base "${{ vars.DOMINIO_PUBLICO || format('https://{0}', vars.AWS_CLOUDFRONT_DOMAIN) }}/" \
+            --manifesto restaurado.json --tentativas 30

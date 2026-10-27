@@ -1,0 +1,97 @@
+OK   [chromium] status-configurado
+OK   [chromium] email-exibido
+OK   [chromium] linkedin-perfil-exibido
+OK   [chromium] sem-whatsapp-na-pagina — nenhum link, botão flutuante ou menção ao WhatsApp
+OK   [chromium] agendamento-de-outra-organizacao-recusado — nenhum botão "Agendar conversa" nem link para o Bookings
+OK   [chromium] privacidade-descreve-o-email — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta n
+OK   [chromium] dialogo-email-direto — mailto:contato@exemplo.invalid?subject=Solicita%C3%A7%C3%A3o%20de%20avalia%C3%A7%C3%A3o%20%E2%80%94%20Nekkora
+OK   [chromium] botao-revisar-mensagem
+OK   [chromium] nota-do-formulario-cita-o-email
+OK   [chromium] validacao-campos-obrigatorios — nome e descrição
+OK   [chromium] confirmacao-mensagem-exata — Olá! Sou Pessoa de Teste, da Empresa Sintética.
+OK   [chromium] confirmacao-avisa-transferencia
+OK   [chromium] confirmacao-sem-abrir-nada
+OK   [chromium] confirmacao-foco-no-conteudo
+OK   [chromium] confirmacao-endereco-manual
+OK   [chromium] voltar-preserva-dados
+OK   [chromium] botao-email-sem-nova-aba
+OK   [chromium] email-com-mensagem-exata — para=contato@exemplo.invalid; assunto="Solicitação de avaliação — Nekkora"; corpo = mensagem confirmada: true
+OK   [chromium] sem-window-open
+OK   [chromium] pagina-continua-no-ar — http://127.0.0.1:4176/
+OK   [chromium] mensagem-neutra-sem-afirmar-envio
+OK   [chromium] link-manual-depois-da-abertura
+OK   [chromium] alternativas-manuais
+OK   [chromium] copiar-mensagem-informa-resultado — Mensagem copiada.
+OK   [chromium] celular-confirmacao-cabe — {"page":0,"left":0,"right":375}
+OK   [chromium] axe-etapa-de-confirmacao — sem violações
+OK   [chromium] vigencia-durante-campanha — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [chromium] vigencia-antes-do-inicio — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [chromium] vigencia-depois-do-fim — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [chromium] vigencia-ultimo-dia-no-fuso-de-brasilia — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [chromium] sem-requisicao-externa-real — nenhuma requisição externa
+OK   [chromium] console-sem-erros — limpo
+OK   [firefox] status-configurado
+OK   [firefox] email-exibido
+OK   [firefox] linkedin-perfil-exibido
+OK   [firefox] sem-whatsapp-na-pagina — nenhum link, botão flutuante ou menção ao WhatsApp
+OK   [firefox] agendamento-de-outra-organizacao-recusado — nenhum botão "Agendar conversa" nem link para o Bookings
+OK   [firefox] privacidade-descreve-o-email — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta n
+OK   [firefox] dialogo-email-direto — mailto:contato@exemplo.invalid?subject=Solicita%C3%A7%C3%A3o%20de%20avalia%C3%A7%C3%A3o%20%E2%80%94%20Nekkora
+OK   [firefox] botao-revisar-mensagem
+OK   [firefox] nota-do-formulario-cita-o-email
+OK   [firefox] validacao-campos-obrigatorios — nome e descrição
+OK   [firefox] confirmacao-mensagem-exata — Olá! Sou Pessoa de Teste, da Empresa Sintética.
+OK   [firefox] confirmacao-avisa-transferencia
+OK   [firefox] confirmacao-sem-abrir-nada
+OK   [firefox] confirmacao-foco-no-conteudo
+OK   [firefox] confirmacao-endereco-manual
+OK   [firefox] voltar-preserva-dados
+OK   [firefox] botao-email-sem-nova-aba
+OK   [firefox] email-com-mensagem-exata — para=contato@exemplo.invalid; assunto="Solicitação de avaliação — Nekkora"; corpo = mensagem confirmada: true
+OK   [firefox] sem-window-open
+OK   [firefox] pagina-continua-no-ar — http://127.0.0.1:4176/
+OK   [firefox] mensagem-neutra-sem-afirmar-envio
+OK   [firefox] link-manual-depois-da-abertura
+OK   [firefox] alternativas-manuais
+OK   [firefox] copiar-mensagem-informa-resultado — Mensagem copiada.
+OK   [firefox] celular-confirmacao-cabe — {"page":0,"left":0,"right":375}
+OK   [firefox] axe-etapa-de-confirmacao — sem violações
+OK   [firefox] vigencia-durante-campanha — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [firefox] vigencia-antes-do-inicio — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [firefox] vigencia-depois-do-fim — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [firefox] vigencia-ultimo-dia-no-fuso-de-brasilia — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [firefox] sem-requisicao-externa-real — nenhuma requisição externa
+OK   [firefox] console-sem-erros — limpo
+OK   [webkit] status-configurado
+OK   [webkit] email-exibido
+OK   [webkit] linkedin-perfil-exibido
+OK   [webkit] sem-whatsapp-na-pagina — nenhum link, botão flutuante ou menção ao WhatsApp
+OK   [webkit] agendamento-de-outra-organizacao-recusado — nenhum botão "Agendar conversa" nem link para o Bookings
+OK   [webkit] privacidade-descreve-o-email — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta n
+OK   [webkit] dialogo-email-direto — mailto:contato@exemplo.invalid?subject=Solicita%C3%A7%C3%A3o%20de%20avalia%C3%A7%C3%A3o%20%E2%80%94%20Nekkora
+OK   [webkit] botao-revisar-mensagem
+OK   [webkit] nota-do-formulario-cita-o-email
+OK   [webkit] validacao-campos-obrigatorios — nome e descrição
+OK   [webkit] confirmacao-mensagem-exata — Olá! Sou Pessoa de Teste, da Empresa Sintética.
+OK   [webkit] confirmacao-avisa-transferencia
+OK   [webkit] confirmacao-sem-abrir-nada
+OK   [webkit] confirmacao-foco-no-conteudo
+OK   [webkit] confirmacao-endereco-manual
+OK   [webkit] voltar-preserva-dados
+OK   [webkit] botao-email-sem-nova-aba
+OK   [webkit] email-com-mensagem-exata — para=contato@exemplo.invalid; assunto="Solicitação de avaliação — Nekkora"; corpo = mensagem confirmada: true
+OK   [webkit] sem-window-open
+OK   [webkit] pagina-continua-no-ar — http://127.0.0.1:4176/
+OK   [webkit] mensagem-neutra-sem-afirmar-envio
+OK   [webkit] link-manual-depois-da-abertura
+OK   [webkit] alternativas-manuais
+OK   [webkit] copiar-mensagem-informa-resultado — Mensagem copiada.
+OK   [webkit] celular-confirmacao-cabe — {"page":0,"left":0,"right":375}
+OK   [webkit] axe-etapa-de-confirmacao — sem violações
+OK   [webkit] vigencia-durante-campanha — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [webkit] vigencia-antes-do-inicio — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [webkit] vigencia-depois-do-fim — simples:padrao=R$ 1.500 · media:padrao=R$ 3.500
+OK   [webkit] vigencia-ultimo-dia-no-fuso-de-brasilia — simples:padrao=R$ 1.500 · simples:lancamento=R$ 1.000 · simples:percentual=−33,33% · simples:economia=Economia de R$ 500 · media:padrao=R$ 3.500 · media:lancamento=R$ 2.800 · media:percentual=−20% · media:economia=Economia de R$ 700
+OK   [webkit] sem-requisicao-externa-real — nenhuma requisição externa
+OK   [webkit] console-sem-erros — limpo
+96 verificações, 0 falha(s).

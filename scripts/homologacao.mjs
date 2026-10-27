@@ -1,26 +1,30 @@
 #!/usr/bin/env node
 /**
- * Homologação automatizada da página comercial (COM-001) num navegador real (Chromium via Playwright).
+ * Homologação automatizada da página comercial num navegador real (Playwright: Chromium, Firefox ou WebKit).
  *
  * Uso:
- *   npm run build && npx vite preview --port 4173 --strictPort      # em outro terminal
- *   node scripts/homologacao.mjs http://localhost:4173/ docs/com-001/evidencias/depois
+ *   npm run build && npm run preview -- --port 4173 --strictPort      # em outro terminal
+ *   node scripts/homologacao.mjs http://127.0.0.1:4173/ docs/release/evidencias/<pasta>
+ *   NEKKORA_NAVEGADOR=firefox node scripts/homologacao.mjs ...        # chromium (padrão), firefox ou webkit
  *
- * Playwright e axe-core NÃO são dependências deste projeto (fora do escopo da missão). O script os resolve a partir
- * de NEKKORA_PW_MODULES (pasta node_modules que os contenha) ou do próprio projeto, se instalados:
- *   NEKKORA_PW_MODULES=../Nekkora-Platform-Web/node_modules node scripts/homologacao.mjs ...
+ * Playwright e axe-core são devDependencies desde a COM-RELEASE-001 (versões fixas). NEKKORA_PW_MODULES continua
+ * aceito para usar outra pasta node_modules que os contenha.
  *
  * Saída: capturas (JPEG), resultados.json e resumo.md na pasta indicada. Código de saída 1 se alguma verificação
  * falhar. Nenhuma requisição sai do localhost: tudo que tentar sair é bloqueado e registrado.
  */
 import { createRequire } from 'node:module';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { priceFacts } from '../src/precos.ts';
 
 const [, , baseUrl = 'http://localhost:4173/', outDir = 'docs/com-001/evidencias/depois'] = process.argv;
 const modules = process.env.NEKKORA_PW_MODULES;
 const require = createRequire(modules ? path.resolve(modules, 'noop.js') : import.meta.url);
-const { chromium } = require('playwright');
+const ENGINE = process.env.NEKKORA_NAVEGADOR ?? 'chromium';
+const playwright = require('playwright');
+if (!['chromium', 'firefox', 'webkit'].includes(ENGINE)) throw new Error(`NEKKORA_NAVEGADOR inválido: ${ENGINE}`);
 const axeSource = require('node:fs').readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 mkdirSync(outDir, { recursive: true });
@@ -34,10 +38,13 @@ const WIDTHS = [
 ];
 const THEME_KEY = 'nekkora-commercial-tema';
 
-/** Alegações proibidas fora de listas marcadas como exclusão (data-exclusion). */
+/**
+ * Alegações proibidas fora de listas marcadas como exclusão (data-exclusion). Preços e percentuais (`pricing: true`)
+ * são aceitos também no bloco de preços autorizado pela responsável (data-pricing, modelo C — PR-01..PR-05).
+ */
 const FORBIDDEN = [
-  { id: 'percentual', re: /\d+(?:[.,]\d+)?\s?%/g },
-  { id: 'preco', re: /R\$\s?\d/g },
+  { id: 'percentual', re: /\d+(?:[.,]\d+)?\s?%/g, pricing: true },
+  { id: 'preco', re: /R\$\s?\d/g, pricing: true },
   { id: '24h', re: /\b24\s?(?:h\b|horas)|24\s?\/\s?7|24x7/gi },
   { id: 'sla', re: /\bSLA\b/g },
   { id: 'roi', re: /\bROI\b/g },
@@ -45,15 +52,56 @@ const FORBIDDEN = [
   { id: 'economia', re: /econom(?:ia|ize)\s+de\s+\d/gi },
   { id: 'alta-disponibilidade', re: /alta disponibilidade/gi },
   { id: 'monitoramento-continuo', re: /monitoramento cont[ií]nuo|monitoramento 24/gi },
+  // COM-RELEASE-003-R1 §3.3: nenhum desconto único de 50% — nem no bloco de preços (a condição 50/50 é pagamento)
+  { id: 'desconto-50', re: /50\s?%\s*de\s+desconto|desconto\s+(?:universal\s+)?de\s+50|promo[cç][aã]o\s+de\s+50|metade\s+do\s+pre[cç]o|pela\s+metade|[−-]\s?50\s?%|todas\s+as\s+automa[cç][oõ]es/gi },
 ];
 
-const results = { baseUrl, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
+/**
+ * Tabela oficial (COM-RELEASE-003-R1 §3.1, COM-RELEASE-005 §3.2), digitada aqui de propósito — independente do código —
+ * e conferida contra src/precos.ts (a fonte da página) antes de qualquer navegador abrir: se o código mudar, a
+ * homologação falha em vez de aceitar o novo valor.
+ */
+const OFFICIAL_PRICES = {
+  simples: { padrao: 'R$ 1.500', lancamento: 'R$ 1.000', percentual: '−33,33%', economia: 'Economia de R$ 500' },
+  media: { padrao: 'R$ 3.500', lancamento: 'R$ 2.800', percentual: '−20%', economia: 'Economia de R$ 700' },
+  complexa: {},
+};
+const fromSource = Object.fromEntries(
+  ['simples', 'media'].map((t) => {
+    const f = priceFacts(t);
+    return [t, { padrao: f.standardLabel, lancamento: f.launchLabel, percentual: `−${f.percentLabel}`, economia: `Economia de ${f.savingsLabel}` }];
+  }),
+);
+if (JSON.stringify({ ...fromSource, complexa: {} }) !== JSON.stringify(OFFICIAL_PRICES)) {
+  throw new Error(`src/precos.ts diverge da tabela oficial: ${JSON.stringify(fromSource)}`);
+}
+
+/** Valores do bloco de preços como aparecem na tela (data-price) e o estilo do preço padrão riscado. */
+const readRenderedPrices = (page) =>
+  page.evaluate(() => {
+    const block = document.querySelector('[data-pricing]');
+    return {
+      table: Object.fromEntries(
+        [...(block?.querySelectorAll('[data-price-tier]') ?? [])].map((el) => [
+          el.getAttribute('data-price-tier'),
+          Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.getAttribute('data-price'), v.textContent.trim()])),
+        ]),
+      ),
+      struck: [...(block?.querySelectorAll('s[data-price="padrao"]') ?? [])].map((s) => {
+        const r = s.getBoundingClientRect();
+        return { text: s.textContent.trim(), lineThrough: getComputedStyle(s).textDecorationLine.includes('line-through'), visible: r.width > 0 && r.height > 0 };
+      }),
+    };
+  });
+
+const results = { baseUrl, navegador: ENGINE, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
 const check = (id, ok, detail) => {
   results.checks.push({ id, ok: !!ok, detail });
   console.log(`${ok ? 'OK  ' : 'FALHA'} ${id}${detail ? ` — ${typeof detail === 'string' ? detail : JSON.stringify(detail)}` : ''}`);
 };
 
-const browser = await chromium.launch();
+const browser = await playwright[ENGINE].launch();
+results.versaoNavegador = browser.version();
 const local = new URL(baseUrl).origin;
 
 async function newPage(viewport, theme) {
@@ -72,12 +120,10 @@ async function newPage(viewport, theme) {
   // Nada sai do localhost: requisições externas são abortadas e registradas.
   await context.route('**/*', (route) => {
     const url = route.request().url();
+    // Fonte Inter: vem da nekkora-lib 0.2.0 (dist/fonts) e é servida pelo próprio site — registrada à parte.
+    if (url.startsWith(local) && /\.woff2(\?|$)/.test(url)) results.fonts.add(new URL(url).pathname.replace(/-[\w-]{8}\.woff2$/, '.woff2'));
     if (url.startsWith(local) || url.startsWith('data:') || url.startsWith('blob:')) return route.continue();
-    // Fonte Inter: importada pela própria nekkora-lib (foundation.css). Permitida e registrada à parte.
-    if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(url)) {
-      results.fonts.add(new URL(url).origin);
-      return route.continue();
-    }
+    // Qualquer outra origem (inclusive Google Fonts, que a lib usava antes da 0.2.0) é bloqueada e reprova a homologação.
     results.blocked.push(url);
     return route.abort();
   });
@@ -100,6 +146,19 @@ for (const theme of THEMES) {
     const file = `pagina-${theme}-${vp.name}-${vp.width}.jpg`;
     await page.screenshot({ path: path.join(outDir, file), fullPage: true, type: 'jpeg', quality: 72 });
     results.screenshots.push(file);
+    // Preços efetivamente renderizados em cada tema e largura (COM-RELEASE-005 §3.5): valores, percentuais e economia
+    // lidos da tela e comparados com a tabela oficial; o preço padrão precisa aparecer riscado.
+    const shown = await readRenderedPrices(page);
+    check(`precos-renderizados:${theme}:${vp.name}`, JSON.stringify(shown.table) === JSON.stringify(OFFICIAL_PRICES), JSON.stringify(shown.table));
+    check(`precos-padrao-riscado:${theme}:${vp.name}`, shown.struck.length === 2 && shown.struck.every((s) => s.lineThrough && s.visible), JSON.stringify(shown.struck));
+    // Conferência visual dos preços (COM-RELEASE-003 §11.2, COM-RELEASE-005 §3.5): os três cartões, em cada tema, no
+    // celular, no tablet e no desktop
+    if (vp.name !== 'wide') {
+      const cards = `precos-${theme}-${vp.name}.png`;
+      // a barra fixa do topo cobriria o primeiro cartão no recorte: escondida só nesta captura
+      await page.locator('#precos .cards--3').screenshot({ path: path.join(outDir, cards), style: 'header, nav { visibility: hidden !important; }' });
+      results.screenshots.push(cards);
+    }
     if (vp.name === 'desktop') {
       const hero = `hero-${theme}-desktop.png`;
       await page.screenshot({ path: path.join(outDir, hero) });
@@ -175,7 +234,7 @@ async function measureContrastByPixels(page, selectors) {
 for (const theme of THEMES) {
   for (const vp of [WIDTHS[0], WIDTHS[2]]) {
     const { context, page } = await newPage({ width: vp.width, height: vp.height }, theme);
-    await page.addScriptTag({ content: axeSource });
+    await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
     const axe = await page.evaluate(async () => {
       // eslint-disable-next-line no-undef
       const r = await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
@@ -219,14 +278,14 @@ async function block(id, fn) {
 await block('funcionais', async () => {
   const { context, page } = await newPage({ width: 1280, height: 800 }, null);
   const theme = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
-  check('tema-padrao-sakura-dark', theme === 'sakura-dark', `data-nk-theme=${theme}`);
+  check('tema-padrao-sage-light', theme === 'sage-light', `data-nk-theme=${theme}`);
 
   writeFileSync(path.join(outDir, 'texto-renderizado.txt'), await page.locator('body').innerText());
 
   // Ordem e hierarquia das seções
   const sections = await page.$$eval('main > section[id]', (els) => els.map((e) => e.id));
   results.sections = sections;
-  const expected = ['inicio', 'solucoes', 'delivery', 'como-funciona', 'hosting', 'combinado', 'diferenciais', 'transparencia', 'contato'];
+  const expected = ['inicio', 'solucoes', 'precos', 'como-funciona', 'hosting', 'transparencia', 'contato', 'privacidade'];
   check('ordem-das-secoes', JSON.stringify(sections) === JSON.stringify(expected), sections.join(' > '));
   const h1 = await page.$$eval('h1', (els) => els.length);
   check('um-unico-h1', h1 === 1, `${h1} h1`);
@@ -239,8 +298,10 @@ await block('funcionais', async () => {
   // Links externos e destinos provisórios
   const external = await page.$$eval('a[href]', (els) => els.map((a) => a.getAttribute('href')).filter((h) => !h.startsWith('#')));
   results.externalLinks = external;
-  const fake = external.filter((h) => /wa\.me\/0*$|wa\.me\/55?0{8,}|instagram\.com\/?$|linkedin\.com\/?$|^mailto:/.test(h));
   const contactsConfigured = await page.evaluate(() => document.querySelector('[data-contact-status]')?.getAttribute('data-contact-status'));
+  // mailto só com canal confirmado e domínio real (nada de .invalid/.example/.test)
+  const fakeMail = (h) => /^mailto:/.test(h) && (contactsConfigured !== 'configurado' || /@[^?]+\.(invalid|example|test)(\?|$)/i.test(h));
+  const fake = external.filter((h) => /wa\.me\/0*$|wa\.me\/55?0{8,}|instagram\.com\/?$|linkedin\.com\/?$/.test(h) || fakeMail(h));
   results.contactStatus = contactsConfigured;
   check('sem-destinos-provisorios', fake.length === 0, `links externos: ${external.length ? external.join(' | ') : 'nenhum'}; status contato=${contactsConfigured}`);
   const fab = await page.$('.nk-fab, [class*="floating"]');
@@ -256,15 +317,105 @@ await block('funcionais', async () => {
       if (!el || el.closest('script,style,[aria-hidden="true"]')) continue;
       for (const p of patterns) {
         for (const m of text.matchAll(new RegExp(p.source, p.flags))) {
-          out.push({ id: p.id, match: m[0], text: text.trim().slice(0, 140), exclusion: !!el.closest('[data-exclusion]') });
+          out.push({ id: p.id, match: m[0], text: text.trim().slice(0, 140), exclusion: !!el.closest('[data-exclusion]'), pricing: p.pricing && !!el.closest('[data-pricing]') });
         }
       }
     }
     return out;
-  }, FORBIDDEN.map((f) => ({ id: f.id, source: f.re.source, flags: f.re.flags })));
+  }, FORBIDDEN.map((f) => ({ id: f.id, source: f.re.source, flags: f.re.flags, pricing: !!f.pricing })));
   results.claimHits = hits;
-  const bad = hits.filter((h) => !h.exclusion);
-  check('sem-alegacoes-proibidas', bad.length === 0, bad.length ? bad.map((b) => `${b.id}: "${b.text}"`).join(' | ') : `${hits.length} ocorrência(s), todas em listas de exclusão`);
+  const bad = hits.filter((h) => !h.exclusion && !h.pricing);
+  check('sem-alegacoes-proibidas', bad.length === 0, bad.length ? bad.map((b) => `${b.id}: "${b.text}"`).join(' | ') : `${hits.length} ocorrência(s): ${hits.filter((h) => h.exclusion).length} em exclusões, ${hits.filter((h) => h.pricing).length} no bloco de preços`);
+  // Preços: só no bloco data-pricing, com condição da campanha visível e leitura correta do valor riscado
+  const pricing = await page.evaluate(() => {
+    const block = document.querySelector('[data-pricing]');
+    const text = block?.innerText ?? '';
+    return {
+      blocks: document.querySelectorAll('[data-pricing]').length,
+      condition: /Valem para automações simples e médias com proposta aprovada durante a campanha/.test(text) && /A automação complexa tem orçamento individual/.test(text),
+      confirmedInProposal: /fica registrada na proposta/.test(text),
+      licenses: /não estão incluídos nos valores acima/.test(text),
+      // Tabela oficial da COM-RELEASE-003-R1 §3.1, lida do que está NA TELA (data-price de cada valor)
+      table: Object.fromEntries(
+        [...(block?.querySelectorAll('[data-price-tier]') ?? [])].map((el) => [
+          el.getAttribute('data-price-tier'),
+          Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.getAttribute('data-price'), v.textContent.trim()])),
+        ]),
+      ),
+      complexa: /Automação complexa[\s\S]*?Sob orçamento[\s\S]*?orçamento individual/.test(text),
+      criteria: ['Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
+      conditions: /50% na contratação e 50% na entrega/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
+      srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
+    };
+  });
+  results.pricing = pricing;
+  check('precos-so-no-bloco-de-precos', pricing.blocks === 1 && hits.filter((h) => h.pricing).length > 0, `${pricing.blocks} bloco(s) data-pricing`);
+  check('precos-com-condicoes-visiveis', pricing.condition && pricing.confirmedInProposal && pricing.licenses, JSON.stringify({ ...pricing, srLabels: undefined }));
+  check('precos-tabela-oficial', JSON.stringify(pricing.table) === JSON.stringify(OFFICIAL_PRICES) && pricing.complexa, JSON.stringify(pricing.table));
+  // Nenhum percentual de desconto fora da tabela (ex.: o "−50%" de um build antigo — COM-RELEASE-005 §3.1)
+  const badges = await page.$$eval('[data-pricing] .nk-badge', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim()).filter((t) => /%/.test(t)));
+  check('precos-sem-percentual-inconsistente', badges.length === 2 && badges.every((b) => /−(33,33|20)%$/.test(b)), badges.join(' | '));
+  // O artefato servido é o do código em disco (COM-RELEASE-005 §3.3): commit do release.json = HEAD do repositório
+  {
+    const served = await page.evaluate(async () => {
+      const r = await fetch('/release.json', { cache: 'no-store' });
+      return r.ok ? r.json() : null;
+    });
+    let head = null;
+    try {
+      head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+    } catch {}
+    const footer = await page.locator('footer [data-build-commit]').getAttribute('data-build-commit').catch(() => null);
+    results.artefato = { servido: served?.commit ?? null, head, rodape: footer };
+    check(
+      'artefato-corresponde-ao-codigo',
+      served?.commit != null && (head == null || served.commit === head) && (footer == null || served.commit.startsWith(footer)),
+      `release.json=${served?.commit?.slice(0, 7) ?? 'ausente'}; HEAD=${head?.slice(0, 7) ?? 'git indisponível'}; rodapé=${footer ?? 'sem aviso de homologação'}`,
+    );
+  }
+  // Agendamento (COM-RELEASE-005 §4.5): sem URL oficial do Bookings, nenhum botão nem link de agendamento
+  {
+    const scheduling = await page.evaluate(() => ({
+      buttons: [...document.querySelectorAll('a, button')].filter((e) => /Agendar conversa/i.test(e.textContent ?? '')).length,
+      links: [...document.querySelectorAll('a[href]')].filter((a) => /outlook\.office(365)?\.com|bookings/i.test(a.getAttribute('href'))).length,
+      status: document.querySelector('[data-agendamento]')?.getAttribute('data-agendamento') ?? null,
+    }));
+    results.agendamento = scheduling;
+    const configured = scheduling.status === 'configurado';
+    check(
+      'agendamento-conforme-configuracao',
+      configured ? scheduling.buttons >= 2 && scheduling.links === scheduling.buttons : scheduling.buttons === 0 && scheduling.links === 0,
+      configured ? `${scheduling.buttons} botão(ões) para o Bookings` : `URL do Bookings não configurada: ${scheduling.buttons} botão(ões), ${scheduling.links} link(s)`,
+    );
+  }
+  // Coerência matemática do que é exibido: economia = padrão − lançamento; percentual = economia / padrão (2 casas, truncado)
+  const num = (s) => Number(String(s).replace(/[^\d,]/g, '').replace(',', '.'));
+  const coherent = ['simples', 'media'].every((t) => {
+    const v = pricing.table[t] ?? {};
+    const saved = num(v.padrao) - num(v.lancamento);
+    return saved === num(v.economia) && Math.floor((saved / num(v.padrao)) * 10000) / 100 === num(v.percentual);
+  });
+  check('precos-descontos-coerentes', coherent, 'economia = padrão − lançamento; percentual = economia ÷ padrão');
+  check('precos-criterios-de-categoria', pricing.criteria);
+  check('condicoes-comerciais-visiveis', pricing.conditions);
+  // Delivery: tecnologias citadas sem promessa de compatibilidade universal
+  const delivery = await page.locator('#solucoes').innerText();
+  check(
+    'delivery-tecnologias-com-ressalva',
+    ['Python', 'UiPath', 'Power Automate', 'Integrações via API'].every((t) => delivery.includes(t)) && /viabilidade com cada sistema é confirmada na avaliação/.test(delivery),
+  );
+  // Privacidade: seção própria, link no rodapé e no formulário
+  const privacy = await page.locator('#privacidade').innerText();
+  check(
+    'privacidade-visivel',
+    /O que vai para o (WhatsApp|e-mail)/.test(privacy) && /Sem cookies nem rastreamento/.test(privacy) && (await page.locator('footer a[href="#privacidade"]').count()) === 1,
+    privacy.split('\n').slice(0, 2).join(' · '),
+  );
+  check(
+    'precos-leitura-do-valor-riscado',
+    JSON.stringify(pricing.srLabels) === JSON.stringify(['Preço padrão:', 'Preço especial de lançamento:', 'Desconto de', 'Preço padrão:', 'Preço especial de lançamento:', 'Desconto de']),
+    pricing.srLabels.join(' | '),
+  );
 
   // Produtos internos não aparecem como obrigatórios/disponíveis: cada menção fica em bloco marcado
   const products = await page.evaluate(() => {
@@ -282,12 +433,19 @@ await block('funcionais', async () => {
 
   // Conteúdo demonstrativo identificado
   const demos = await page.$$eval('[data-demo]', (els) => els.map((e) => ({ label: e.getAttribute('data-demo'), visible: e.innerText.toLowerCase().includes('ilustra') })));
-  check('demonstrativos-identificados', demos.length > 0 && demos.every((d) => d.visible), JSON.stringify(demos));
+  // Modelo C não tem ilustração de jornada; se algum bloco demonstrativo voltar, precisa estar rotulado.
+  check('demonstrativos-identificados', demos.every((d) => d.visible), demos.length ? JSON.stringify(demos) : 'nenhum bloco demonstrativo na página');
 
   // Teclado: link de pular conteúdo, foco visível e sequência inicial
-  await page.keyboard.press('Tab');
+  if (ENGINE === 'webkit') {
+    // WebKit/Safari: por padrão o Tab não percorre links (só controles; links exigem Option+Tab, que o Playwright não
+    // reproduz). Vale para qualquer site — o link é verificado por foco programático: precisa ser focável e aparecer.
+    await page.locator('a.skip-link').focus();
+  } else {
+    await page.keyboard.press('Tab');
+  }
   const first = await page.evaluate(() => ({ text: document.activeElement?.textContent?.trim(), href: document.activeElement?.getAttribute('href') }));
-  check('primeiro-tab-pular-conteudo', first.href === '#conteudo', JSON.stringify(first));
+  check(ENGINE === 'webkit' ? 'pular-conteudo-focavel' : 'primeiro-tab-pular-conteudo', first.href === '#conteudo', JSON.stringify(first));
   const skipVisible = await page.evaluate(() => {
     const r = document.activeElement.getBoundingClientRect();
     return r.width > 1 && r.height > 1 && r.top >= 0;
@@ -321,50 +479,101 @@ await block('funcionais', async () => {
   const afterToggle = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
   await page.reload({ waitUntil: 'networkidle' });
   const afterReload = await page.evaluate(() => document.documentElement.getAttribute('data-nk-theme'));
-  check('alternancia-de-tema-persiste', afterToggle === 'sage-light' && afterReload === 'sage-light', `${afterToggle} → recarregado: ${afterReload}`);
+  check('alternancia-de-tema-persiste', afterToggle === 'sakura-dark' && afterReload === 'sakura-dark', `${afterToggle} → recarregado: ${afterReload}`);
   await toggle.click();
 
-  // Formulário: erros, foco no primeiro erro e envio desativado sem destino real
-  const form = page.locator('#contato form');
-  await form.locator('button[type="submit"]').click();
+  // Botão "Entrar" (etapa 2): sem destino por decisão da responsável — não navega, não abre nada e se declara indisponível
+  {
+    const login = page.getByRole('button', { name: /^Entrar/ }).first();
+    const urlBefore = page.url();
+    // force: o Playwright não clica em aria-disabled, mas o navegador entrega o clique — é ele que precisa ficar sem efeito
+    await login.click({ force: true });
+    await page.waitForTimeout(200);
+    const info = await login.evaluate((el) => ({ disabled: el.getAttribute('aria-disabled'), desc: el.getAttribute('aria-label') }));
+    check('entrar-sem-destino-e-indisponivel', page.url() === urlBefore && info.disabled === 'true' && /ainda não disponível/.test(info.desc ?? ''), `url inalterada=${page.url() === urlBefore}; aria-disabled=${info.disabled}; nome acessível="${info.desc}"`);
+  }
+
+  // Diálogo "Solicitar avaliação": aberto pelos CTAs, foco dentro, Esc fecha e devolve o foco ao botão que abriu
+  const triggers = await page.$$eval('[aria-haspopup="dialog"]', (els) => els.map((e) => `${e.closest('section')?.id}: ${e.textContent.trim()}`));
+  results.dialogTriggers = triggers;
+  check('dialogo-aberto-pelos-ctas', triggers.length === 4, triggers.join(' | '));
+  const dialog = page.getByRole('dialog');
+  const heroCta = page.locator('#inicio [aria-haspopup="dialog"]');
+  await heroCta.focus();
+  await page.keyboard.press('Enter');
+  await dialog.waitFor();
+  const opened = await page.evaluate(() => ({ focusInside: !!document.activeElement?.closest('[role="dialog"]'), hash: location.hash }));
+  check('dialogo-abre-com-foco-dentro', opened.focusInside && opened.hash === '', JSON.stringify(opened));
+  const dialogText = await dialog.innerText();
+  // Publicação atual: só e-mail e LinkedIn (decisão da titular, 22/10/2026) — nenhum WhatsApp, atalho de e-mail presente
+  const mailDirect = await dialog.locator('a[href^="mailto:"]').count();
+  check(
+    'dialogo-canal-da-publicacao',
+    (await dialog.locator('a[href*="wa.me"]').count()) === 0 &&
+      !/Falar diretamente pelo WhatsApp/.test(dialogText) &&
+      (contactsConfigured === 'configurado' ? mailDirect === 1 && /Escrever diretamente por e-mail/.test(dialogText) : /Canais oficiais em definição/.test(dialogText)),
+    contactsConfigured === 'configurado' ? `atalho de e-mail: ${mailDirect}; WhatsApp ausente` : 'sem canal confirmado: aviso de canais em definição presente',
+  );
+  await page.screenshot({ path: path.join(outDir, 'dialogo-solicitacao.png') });
+  results.screenshots.push('dialogo-solicitacao.png');
+  await page.keyboard.press('Escape');
+  await dialog.waitFor({ state: 'detached' });
+  const returned = await page.evaluate(() => !!document.activeElement?.closest('#inicio') && document.activeElement?.getAttribute('aria-haspopup') === 'dialog');
+  check('dialogo-esc-fecha-e-devolve-foco', returned);
+  const others = [];
+  for (const sec of ['precos', 'hosting', 'contato']) {
+    await page.locator(`#${sec} [aria-haspopup="dialog"]`).click();
+    const ok = await dialog.isVisible();
+    await dialog.getByRole('button', { name: 'Cancelar' }).click();
+    await dialog.waitFor({ state: 'detached' });
+    others.push(`${sec}=${ok}`);
+  }
+  check('dialogo-ctas-de-precos-hosting-contato', others.every((o) => o.endsWith('true')), `${others.join('; ')} (fechado por "Cancelar")`);
+
+  // Formulário (no diálogo): erros, foco no primeiro erro e envio desativado sem destino real
+  await page.locator('#contato [aria-haspopup="dialog"]').click();
+  await dialog.waitFor();
+  const form = dialog.locator('form');
+  const submit = dialog.locator('button[type="submit"]');
+  await submit.click();
   const invalid = await form.locator('[aria-invalid="true"]').count();
+  // O foco vai ao primeiro erro no quadro seguinte (requestAnimationFrame): espera até 1 s em vez de ler na hora.
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-invalid') === 'true', null, { timeout: 1000 }).catch(() => {});
   const focused = await page.evaluate(() => document.activeElement?.getAttribute('aria-invalid'));
-  check('formulario-erros-obrigatorios', invalid >= 4, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
+  // Obrigatórios: nome e descrição (e-mail é opcional desde a COM-RELEASE-002 — só o necessário para o contato)
+  check('formulario-erros-obrigatorios', invalid === 2, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
   check('formulario-foco-no-primeiro-erro', focused === 'true');
-  await page.screenshot({ path: path.join(outDir, 'formulario-erros.png'), clip: await form.boundingBox() });
+  await page.screenshot({ path: path.join(outDir, 'formulario-erros.png') });
   results.screenshots.push('formulario-erros.png');
   await form.getByLabel(/^Nome/).fill('Pessoa de Teste');
   await form.getByLabel(/^E-mail/).fill('teste@exemplo.invalid');
   await form.getByLabel(/Descreva o processo/).fill('Teste automatizado de homologação: processo de conciliação manual.');
-  // Interesse marcado pelo teclado: foco na primeira opção do grupo e Espaço.
-  await form.getByRole('radio').first().focus();
-  await page.keyboard.press('Space');
-  check('formulario-radio-por-teclado', await form.getByRole('radio').first().isChecked());
   let popup = false;
   page.on('popup', () => (popup = true));
   const urlBefore = page.url();
   const blockedBefore = results.blocked.length;
-  await form.locator('button[type="submit"]').click();
+  await submit.click();
   await page.waitForTimeout(400);
-  const done = page.locator('#contato .contact__done');
+  const done = dialog.locator('.contact__done');
   const doneText = (await done.count()) ? await done.innerText() : '';
   results.formStatus = doneText;
   const contactStatus = await page.evaluate(() => document.querySelector('[data-contact-status]')?.getAttribute('data-contact-status'));
   if (contactStatus === 'pendente') {
     check('formulario-modo-demonstracao', /envio desativado/i.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
+  } else {
+    // Com canal: a etapa seguinte é a confirmação da mensagem — nada é aberto antes do clique do visitante
+    check('formulario-vai-para-confirmacao', /Confirme a sua solicitação/.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
   }
   check('formulario-sem-envio-real', !popup && page.url() === urlBefore && results.blocked.length === blockedBefore, `popup=${popup}; url inalterada=${page.url() === urlBefore}`);
-  // O resumo precisa ficar visível abaixo da barra fixa, sem rolagem manual.
+  // O resumo precisa ficar visível na janela e receber o foco.
   const placement = await page.evaluate(() => {
-    const d = document.querySelector('#contato .contact__done')?.getBoundingClientRect();
-    const nav = document.querySelector('header, nav')?.getBoundingClientRect();
-    return { doneTop: d?.top, navBottom: nav?.bottom, focused: document.activeElement?.classList.contains('contact__done') };
+    const d = document.querySelector('[role="dialog"] .contact__done')?.getBoundingClientRect();
+    return { doneTop: d?.top, viewport: innerHeight, focused: document.activeElement?.classList.contains('contact__done') };
   });
-  check('formulario-resultado-visivel-e-focado', placement.focused && placement.doneTop >= placement.navBottom && placement.doneTop < 800, JSON.stringify(placement));
+  check('formulario-resultado-visivel-e-focado', placement.focused && placement.doneTop >= 0 && placement.doneTop < placement.viewport, JSON.stringify(placement));
   await page.screenshot({ path: path.join(outDir, 'formulario-resultado-tela.png') });
   results.screenshots.push('formulario-resultado-tela.png');
-  await done.screenshot({ path: path.join(outDir, 'formulario-resultado.png') });
-  results.screenshots.push('formulario-resultado.png');
+  await page.keyboard.press('Escape');
 
   // Texto renderizado (para revisão do conteúdo)
   writeFileSync(path.join(outDir, 'texto-renderizado.txt'), await page.locator('body').innerText());
@@ -386,42 +595,55 @@ await block('menu-mobile', async () => {
   await context.close();
 });
 
-// 5. Catálogo do Hosting: acordeão no celular, expandido no desktop
-await block('hosting-acordeao', async () => {
-  const mobile = await newPage({ width: 375, height: 812 }, null);
-  const mp = mobile.page;
-  results.mobilePageHeight = await mp.evaluate(() => document.documentElement.scrollHeight);
-  const mode = await mp.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
-  const items = mp.locator('[data-hosting-catalog] details');
-  const count = await items.count();
-  const summaries = await mp.locator('[data-hosting-catalog] summary').allInnerTexts();
-  const termsVisible = summaries.every((t) => t.includes('Como é contratado:'));
-  const closed = await items.evaluateAll((els) => els.every((d) => !d.open));
-  check('hosting-acordeao-no-celular', mode === 'acordeao' && count === 8 && closed, `modo=${mode}; itens=${count}; todos recolhidos=${closed}; altura da página=${results.mobilePageHeight}px`);
-  check('hosting-condicoes-visiveis-recolhido', termsVisible, `${summaries.filter((t) => t.includes('Como é contratado:')).length}/8 resumos mostram "Como é contratado"`);
-  const first = mp.locator('[data-hosting-catalog] summary').first();
-  await first.focus();
-  const ring = await first.evaluate((el) => getComputedStyle(el).boxShadow !== 'none');
-  await mp.keyboard.press('Enter');
-  const openedEnter = await items.first().evaluate((d) => d.open);
-  const defVisible = await mp.locator('[data-hosting-catalog] .service-item__definition').first().isVisible();
-  await mp.keyboard.press('Space');
-  const closedSpace = await items.first().evaluate((d) => !d.open);
-  check('hosting-acordeao-teclado', ring && openedEnter && defVisible && closedSpace, `foco visível=${ring}; Enter abre=${openedEnter}; definição visível=${defVisible}; Espaço fecha=${closedSpace}`);
-  await items.first().evaluate((d) => (d.open = true));
-  await mp.locator('[data-hosting-catalog]').screenshot({ path: path.join(outDir, 'hosting-acordeao-mobile.png') });
-  results.screenshots.push('hosting-acordeao-mobile.png');
-  await mobile.context.close();
+// 5. Hosting em faixa pôster: aviso de disponibilidade e condição de contratação visíveis em todas as larguras
+await block('hosting-faixa', async () => {
+  for (const vp of [WIDTHS[0], WIDTHS[2]]) {
+    const { context, page } = await newPage({ width: vp.width, height: vp.height }, null);
+    if (vp.name === 'mobile') results.mobilePageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    const band = page.locator('#hosting');
+    const text = await band.innerText();
+    const notice = await band.locator('.hosting-band__notice').isVisible();
+    check(
+      `hosting-condicoes-visiveis:${vp.name}`,
+      notice && /Disponibilidade em avaliação/.test(text) && /só faz parte do contrato quando consta na proposta/.test(text) && /não representa contratação/.test(text),
+      `aviso visível=${notice}${vp.name === 'mobile' ? `; altura da página=${results.mobilePageHeight}px` : ''}`,
+    );
+    await band.screenshot({ path: path.join(outDir, `hosting-faixa-${vp.name}.png`) });
+    results.screenshots.push(`hosting-faixa-${vp.name}.png`);
+    await context.close();
+  }
+});
 
-  const desktop = await newPage({ width: 1280, height: 800 }, null);
-  const dmode = await desktop.page.getAttribute('[data-hosting-catalog]', 'data-hosting-catalog');
-  const defs = await desktop.page.locator('[data-hosting-catalog] > li > p:first-of-type').evaluateAll((els) => els.filter((e) => e.offsetParent !== null).length);
-  check('hosting-expandido-no-desktop', dmode === 'expandido' && defs === 8, `modo=${dmode}; definições visíveis=${defs}/8`);
-  await desktop.context.close();
+// 6. Diálogo aberto: axe e rolagem horizontal nos dois temas, celular e desktop
+await block('dialogo-acessibilidade', async () => {
+  for (const theme of THEMES) {
+    for (const vp of [WIDTHS[0], WIDTHS[2]]) {
+      const { context, page } = await newPage({ width: vp.width, height: vp.height }, theme);
+      await page.locator('#inicio [aria-haspopup="dialog"]').click();
+      await page.getByRole('dialog').waitFor();
+      await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
+      const r = await page.evaluate(async () => {
+        // eslint-disable-next-line no-undef
+        const res = await axe.run(document.querySelector('[role="dialog"]'), { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
+        return res.violations.map((v) => `${v.id}(${v.nodes.length})`);
+      });
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      check(`dialogo-axe:${theme}:${vp.name}`, r.length === 0 && overflow <= 0, r.join(', ') || `sem violações; excesso horizontal=${overflow}px`);
+      const file = `dialogo-${theme}-${vp.name}.png`;
+      await page.screenshot({ path: path.join(outDir, file) });
+      results.screenshots.push(file);
+      await context.close();
+    }
+  }
 });
 
 check('sem-requisicoes-externas', results.blocked.length === 0, results.blocked.join(' | ') || 'nenhuma');
-const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c));
+check('fonte-servida-pelo-proprio-site', results.fonts.size > 0, [...results.fonts].join(', ') || 'nenhuma fonte carregada');
+// Aviso de otimização do WebKit quando a fonte pré-carregada demora a ser usada (a página é desenhada pelo JS; em
+// máquina lenta passa de "alguns segundos"): registrado em resultados.json, não reprova — a fonte é usada.
+const PRELOAD_ADVISORY = /was preloaded using link preload but not used within a few seconds/;
+results.consoleInformativo = results.console.filter((c) => PRELOAD_ADVISORY.test(c));
+const realErrors = results.console.filter((c) => !/Download the React DevTools/.test(c) && !PRELOAD_ADVISORY.test(c));
 check('console-sem-erros', realErrors.length === 0, realErrors.join(' | ') || 'limpo');
 
 await browser.close();
@@ -432,7 +654,7 @@ writeFileSync(path.join(outDir, 'resultados.json'), JSON.stringify(results, null
 const md = [
   `# Homologação automatizada — ${results.finishedAt}`,
   '',
-  `URL: ${baseUrl} · Chromium (Playwright) · ${results.summary.total} verificações · ${results.summary.failed} falha(s)`,
+  `URL: ${baseUrl} · ${ENGINE} ${results.versaoNavegador} (Playwright) · ${results.summary.total} verificações · ${results.summary.failed} falha(s)`,
   '',
   '| Verificação | Resultado | Detalhe |',
   '|---|---|---|',

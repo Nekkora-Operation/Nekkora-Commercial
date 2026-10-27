@@ -1,0 +1,25 @@
+$ node --test (mesmos testes contra o auditor anterior, 5298bbc; o teste unitário de structuralDiff não se aplica)
+✔ conta bem configurada: nenhuma falha e inventário com os identificadores reais
+✔ somente leitura: só operações Get/List/Describe
+✔ certificado aguardando validação DNS: pendente, com os registros a criar
+✔ erros comuns de configuração manual viram falha, com o motivo
+✔ IP dedicado (vip) é apontado como custo de US$ 600/mês
+✔ erro convertido em 200 (fallback de SPA) não é aceito
+✔ descobre a distribuição pela origem quando o ID não é informado
+✔ regressão S07: StringEquals, ArnEquals e ArnLike com o ARN exato da distribuição são aceitos
+✔ S07: condições ARN que ampliam o acesso ou não restringem viram falha
+✔ regressão K01/K02: certificado antigo VALIDATION_TIMED_OUT não esconde o emitido e associado
+✔ K01/K02: prioriza o certificado associado à distribuição, mesmo fora da listagem
+✔ K01/K02: emitido mas não associado — K01 ok, K02 pendente
+✔ K01/K02: só o certificado VALIDATION_TIMED_OUT — falha, pede um novo
+✔ K01/K02: certificado associado vencido ou sem www não é adequado
+✔ K02: certificado da distribuição inexistente no ACM vira falha, sem derrubar a auditoria
+✔ cenário reconstruído da auditoria de 26/10/2026 (S07/K01/K02): 21 ok, 5 pendentes, nenhuma falha, 3 informativos
+✖ regressão C08 (auditoria real): XSSProtection: {} e outra ordem de propriedades não são diferença
+✖ C08: XSSProtection com valor efetivo, propriedade inesperada ou cabeçalho diferente vira falha
+﹣ C08: diferença apontada pelo caminho da propriedade # SKIP
+ℹ tests 19
+ℹ pass 16
+ℹ fail 2
+ℹ skipped 1
+✖ failing tests:
