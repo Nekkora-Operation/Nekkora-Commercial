@@ -12,7 +12,7 @@ import * as S3 from '@aws-sdk/client-s3';
 import * as CF from '@aws-sdk/client-cloudfront';
 import * as ACM from '@aws-sdk/client-acm';
 import * as STS from '@aws-sdk/client-sts';
-import { audit, CACHING_OPTIMIZED, report } from '../aws/auditar.mjs';
+import { audit, CACHING_OPTIMIZED, normalizeHeadersPolicy, report, structuralDiff } from '../aws/auditar.mjs';
 
 const versionedPolicy = JSON.parse(readFileSync(resolve('deploy/aws/politica-cabecalhos.json'), 'utf8'));
 const versionedFunction = readFileSync(resolve('deploy/aws/funcao-viewer-request.js'), 'utf8');
@@ -303,8 +303,9 @@ test('K02: certificado da distribuição inexistente no ACM vira falha, sem derr
   assert.match(r.checks.find((c) => c.id === 'K02').detail, /não encontrado/);
 });
 
-test('regressão da auditoria real (26/10/2026): 21 ok, 5 pendentes, nenhuma falha, 3 informativos', async () => {
-  // Estado reconstruído: ArnLike com o ARN exato, certificado antigo VALIDATION_TIMED_OUT + novo ISSUED associado,
+test('cenário reconstruído da auditoria de 26/10/2026 (S07/K01/K02): 21 ok, 5 pendentes, nenhuma falha, 3 informativos', async () => {
+  // Reconstruído só do relato da S07/K01/K02 (a auditoria real mostrou depois que a política de cabeçalhos já estava
+  // associada — ver o teste de regressão C08):ArnLike com o ARN exato, certificado antigo VALIDATION_TIMED_OUT + novo ISSUED associado,
   // política do bucket sem as declarações versionadas, e cabeçalhos/função/páginas de erro ainda por configurar.
   const a = account();
   a.policy.Statement = [{ ...cfAllow(a), Condition: { ArnLike: { 'AWS:SourceArn': DIST_ARN } } }];
@@ -320,4 +321,81 @@ test('regressão da auditoria real (26/10/2026): 21 ok, 5 pendentes, nenhuma fal
   assert.deepEqual(by('info'), ['S06', 'C11', 'C12']);
   assert.equal(by('ok').length, 21);
   for (const id of ['S07', 'K01', 'K02']) assert.equal(statusOf(r, id), 'ok');
+});
+
+/** Como a AWS devolve a política real: mesmas configurações, outra ordem de propriedades e XSSProtection: {}. */
+function asReturnedByAws(p) {
+  const s = p.SecurityHeadersConfig;
+  return {
+    RemoveHeadersConfig: p.RemoveHeadersConfig,
+    Name: p.Name,
+    CustomHeadersConfig: { Items: [...p.CustomHeadersConfig.Items].reverse().map((i) => ({ Override: i.Override, Value: i.Value, Header: i.Header })), Quantity: p.CustomHeadersConfig.Quantity },
+    Comment: p.Comment,
+    SecurityHeadersConfig: {
+      XSSProtection: {},
+      ReferrerPolicy: s.ReferrerPolicy,
+      FrameOptions: { FrameOption: s.FrameOptions.FrameOption, Override: s.FrameOptions.Override },
+      ContentTypeOptions: s.ContentTypeOptions,
+      StrictTransportSecurity: { Preload: s.StrictTransportSecurity.Preload, IncludeSubdomains: s.StrictTransportSecurity.IncludeSubdomains, AccessControlMaxAgeSec: s.StrictTransportSecurity.AccessControlMaxAgeSec, Override: s.StrictTransportSecurity.Override },
+      ContentSecurityPolicy: s.ContentSecurityPolicy,
+    },
+  };
+}
+const withLivePolicy = (live) => {
+  const a = account();
+  a.distribution.DistributionConfig.DefaultCacheBehavior.ResponseHeadersPolicyId = 'dc2d71f5-a25d-4718-82b0-fe57ad674e13';
+  a.livePolicy = live;
+  return a;
+};
+const c08 = (r) => r.checks.find((c) => c.id === 'C08');
+
+test('regressão C08 (auditoria real): XSSProtection: {} e outra ordem de propriedades não são diferença', async () => {
+  const r = await run(withLivePolicy(asReturnedByAws(versionedPolicy)));
+  assert.equal(c08(r).status, 'ok', JSON.stringify(c08(r)));
+  assert.match(c08(r).detail, /nekkora-commercial-seguranca \(dc2d71f5-a25d-4718-82b0-fe57ad674e13\)/);
+  // Name e Comment só descrevem a política
+  const relabeled = asReturnedByAws(versionedPolicy);
+  relabeled.Comment = 'editado no console';
+  assert.equal(c08(await run(withLivePolicy(relabeled))).status, 'ok');
+  // a mesma política no formato antigo do auditor (JSON.stringify) dava diferença
+  assert.notEqual(JSON.stringify(asReturnedByAws(versionedPolicy).SecurityHeadersConfig), JSON.stringify(versionedPolicy.SecurityHeadersConfig));
+});
+
+test('C08: XSSProtection com valor efetivo, propriedade inesperada ou cabeçalho diferente vira falha', async () => {
+  const cases = {
+    'XSSProtection ligado': (p) => (p.SecurityHeadersConfig.XSSProtection = { Override: true, Protection: true, ModeBlock: true }),
+    'XSSProtection desligado explicitamente': (p) => (p.SecurityHeadersConfig.XSSProtection = { Override: true, Protection: false }),
+    'propriedade inesperada em SecurityHeadersConfig': (p) => (p.SecurityHeadersConfig.Novidade = { Override: true }),
+    'propriedade inesperada em um cabeçalho': (p) => (p.SecurityHeadersConfig.FrameOptions.Extra = false),
+    'CSP diferente': (p) => (p.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy += "; script-src *"),
+    'HSTS sem subdomínios': (p) => (p.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains = false),
+    'HSTS com max-age em texto': (p) => (p.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec = '31536000'),
+    'FrameOptions SAMEORIGIN': (p) => (p.SecurityHeadersConfig.FrameOptions.FrameOption = 'SAMEORIGIN'),
+    'ContentTypeOptions ausente': (p) => delete p.SecurityHeadersConfig.ContentTypeOptions,
+    'cabeçalho personalizado a mais': (p) => (p.CustomHeadersConfig = { Quantity: 3, Items: [...p.CustomHeadersConfig.Items, { Header: 'X-Extra', Value: '1', Override: true }] }),
+    'valor de cabeçalho personalizado': (p) => (p.CustomHeadersConfig.Items[0].Value = 'camera=*'),
+    'RemoveHeadersConfig vazio': (p) => (p.RemoveHeadersConfig = { Quantity: 0, Items: [] }),
+    'RemoveHeadersConfig ausente': (p) => delete p.RemoveHeadersConfig,
+    'RemoveHeadersConfig com outro cabeçalho': (p) => (p.RemoveHeadersConfig.Items[1] = { Header: 'server' }),
+    'RemoveHeadersConfig com propriedade inesperada': (p) => (p.RemoveHeadersConfig.Items[0].Extra = 'x'),
+    'seção CorsConfig fora do arquivo versionado': (p) => (p.CorsConfig = { AccessControlAllowOrigins: { Quantity: 1, Items: ['*'] } }),
+    'seção ServerTimingHeadersConfig fora do arquivo versionado': (p) => (p.ServerTimingHeadersConfig = { Enabled: true, SamplingRate: 100 }),
+  };
+  for (const [name, mutate] of Object.entries(cases)) {
+    const live = asReturnedByAws(structuredClone(versionedPolicy));
+    mutate(live);
+    const r = await run(withLivePolicy(live));
+    assert.equal(c08(r).status, 'falha', `${name}: ${JSON.stringify(c08(r))}`);
+    assert.match(c08(r).detail, /difere em: /, name);
+  }
+});
+
+test('C08: diferença apontada pelo caminho da propriedade', () => {
+  const live = asReturnedByAws(structuredClone(versionedPolicy));
+  live.SecurityHeadersConfig.XSSProtection = { Override: true, Protection: true };
+  live.RemoveHeadersConfig = { Quantity: 0, Items: [] };
+  assert.deepEqual(structuralDiff(normalizeHeadersPolicy(live), normalizeHeadersPolicy(versionedPolicy)), ['RemoveHeadersConfig.Items', 'RemoveHeadersConfig.Quantity', 'SecurityHeadersConfig.XSSProtection']);
+  // o arquivo versionado não é alterado pela normalização
+  assert.equal(versionedPolicy.SecurityHeadersConfig.XSSProtection, undefined);
+  assert.equal(versionedPolicy.CustomHeadersConfig.Items[0].Header, 'Permissions-Policy');
 });

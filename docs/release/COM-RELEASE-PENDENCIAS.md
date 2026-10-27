@@ -35,7 +35,7 @@ credenciais da AWS, então **nenhum identificador real foi lido**.
 
 | ID | Ação | Onde |
 |---|---|---|
-| INF-01 | **Próximo passo.** Auditoria executada no CloudShell em 26/10/2026; as três falhas (S07, K01, K02) eram falsos positivos do auditor, corrigidos sem mexer na AWS (COM-RELEASE-003-aws §1.3). Rodar `bash auditar.sh` de novo e enviar o `auditoria.md`: o esperado é 21 ok, 5 pendentes, 0 falha, 3 info | AWS CloudShell (usuário administrativo com MFA, nunca root) |
+| INF-01 | **Próximo passo.** Auditoria executada no CloudShell em 26/10/2026; as falhas S07, K01, K02 (COM-RELEASE-003-aws §1.3) e C08 (§1.4, `XSSProtection: {}` devolvido pela AWS) eram falsos positivos do auditor, corrigidos sem mexer na AWS. Rodar `bash auditar.sh` de novo e enviar o `auditoria.md`: o esperado é nenhuma falha | AWS CloudShell (usuário administrativo com MFA, nunca root) |
 | INF-02 | **Resolvido (26/10/2026).** Certificado ACM (us-east-1, `nekkora.com` + `www.nekkora.com`) `ISSUED` e associado à distribuição `E3TZD2P6FOEWWR`. Um pedido anterior ficou `VALIDATION_TIMED_OUT` e pode ser excluído no ACM quando a titular quiser (não afeta nada) | ACM |
 | INF-03 | Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json` | CloudFront → Policies |
 | INF-04 | CloudFront Function `deploy/aws/funcao-viewer-request.js` (viewer request) | CloudFront → Functions |

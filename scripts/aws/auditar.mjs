@@ -43,6 +43,40 @@ export function sourceArnRestriction(statement, expectedArn) {
   return { ok, detail: found.map((f) => `${f.op} ${f.values.join(', ')}`).join(' · ') };
 }
 
+/** Campos descritivos da Response Headers Policy, fora da comparação do C08; todo o resto define os cabeçalhos. */
+export const HEADERS_POLICY_LABELS = ['Name', 'Comment'];
+
+const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const isEmpty = (v) => isObject(v) && Object.values(v).every((x) => x === undefined);
+
+/**
+ * Forma comparável da política (Security, Custom, RemoveHeaders e qualquer outra seção, como CORS). A AWS devolve
+ * XSSProtection: {} quando o cabeçalho não está configurado — só esse objeto vazio equivale a ausente; com qualquer
+ * valor ele é comparado. Itens de cabeçalhos ordenados pelo nome.
+ */
+export function normalizeHeadersPolicy(config) {
+  const out = {};
+  for (const [k, v] of Object.entries(config ?? {})) if (!HEADERS_POLICY_LABELS.includes(k) && v !== undefined) out[k] = structuredClone(v);
+  if (isEmpty(out.SecurityHeadersConfig?.XSSProtection)) delete out.SecurityHeadersConfig.XSSProtection;
+  for (const k of ['CustomHeadersConfig', 'RemoveHeadersConfig']) {
+    if (Array.isArray(out[k]?.Items)) out[k].Items.sort((x, y) => String(x.Header).localeCompare(String(y.Header)));
+  }
+  return out;
+}
+
+/** Caminhos em que a e b diferem, sem depender da ordem das propriedades (undefined = ausente, como no JSON). */
+export function structuralDiff(a, b, path = '') {
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return [path];
+    return a.flatMap((x, i) => structuralDiff(x, b[i], `${path}[${i}]`));
+  }
+  if (isObject(a) && isObject(b)) {
+    const keys = [...new Set([...Object.keys(a), ...Object.keys(b)])].filter((k) => a[k] !== undefined || b[k] !== undefined);
+    return keys.sort().flatMap((k) => structuralDiff(a[k], b[k], path ? `${path}.${k}` : k));
+  }
+  return Object.is(a, b) ? [] : [path];
+}
+
 async function call(client, Command, input, { missing = [] } = {}) {
   try {
     return await client.send(new Command(input));
@@ -141,8 +175,8 @@ export async function audit({ clients, sdk, bucket, distributionId = null, versi
   inventory.distribuicao.responseHeadersPolicyId = rhp;
   if (rhp) {
     const live = (await call(clients.cloudfront, CF.GetResponseHeadersPolicyCommand, { Id: rhp })).ResponseHeadersPolicy.ResponseHeadersPolicyConfig;
-    const same = JSON.stringify(live.SecurityHeadersConfig) === JSON.stringify(versionedPolicy.SecurityHeadersConfig) && JSON.stringify(live.CustomHeadersConfig) === JSON.stringify(versionedPolicy.CustomHeadersConfig);
-    add('C08', same ? 'ok' : 'falha', 'Response Headers Policy igual à versionada (deploy/aws/politica-cabecalhos.json)', live.Name, 'Atualize a política com o conteúdo do arquivo versionado.');
+    const diff = structuralDiff(normalizeHeadersPolicy(live), normalizeHeadersPolicy(versionedPolicy));
+    add('C08', diff.length ? 'falha' : 'ok', 'Response Headers Policy igual à versionada (deploy/aws/politica-cabecalhos.json)', `${live.Name} (${rhp})${diff.length ? ` — difere em: ${diff.join(', ')}` : ''}`, diff.length ? 'Atualize a política com o conteúdo do arquivo versionado.' : '');
   } else {
     add('C08', 'pendente', 'Response Headers Policy associada ao comportamento padrão', 'nenhuma', 'Criar a política a partir de deploy/aws/politica-cabecalhos.json e associá-la (runbook, passo 3).');
   }
