@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LerEGravarObjetosDoSite",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::${AWS_S3_BUCKET}/*"
+    },
+    {
+      "Sid": "DistinguirObjetoInexistente",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::${AWS_S3_BUCKET}"
+    },
+    {
+      "Sid": "InvalidarEConsultarADistribuicao",
+      "Effect": "Allow",
+      "Action": ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation", "cloudfront:GetDistribution"],
+      "Resource": "arn:aws:cloudfront::${AWS_ACCOUNT_ID}:distribution/${AWS_CLOUDFRONT_DISTRIBUTION_ID}"
+    },
+    {
+      "Sid": "ConferirACspDaDistribuicao",
+      "Effect": "Allow",
+      "Action": "cloudfront:GetResponseHeadersPolicy",
+      "Resource": "arn:aws:cloudfront::${AWS_ACCOUNT_ID}:response-headers-policy/${AWS_RESPONSE_HEADERS_POLICY_ID}"
+    }
+  ]
+}

@@ -5,5 +5,9 @@ dist
 .env
 .env.*
 dist-homologacao
+dist-homologacao-email
 /.wrangler
 /evidencias
+/aws-sdk-auditoria
+/auditoria
+dist-homologacao-api

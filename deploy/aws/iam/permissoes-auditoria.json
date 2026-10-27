@@ -1,0 +1,49 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SomenteLeituraDoBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:GetBucketPublicAccessBlock",
+        "s3:GetBucketOwnershipControls",
+        "s3:GetEncryptionConfiguration",
+        "s3:GetBucketPolicy",
+        "s3:GetBucketPolicyStatus",
+        "s3:GetBucketWebsite",
+        "s3:GetBucketVersioning",
+        "s3:GetBucketAcl",
+        "s3:GetLifecycleConfiguration"
+      ],
+      "Resource": "arn:aws:s3:::${AWS_S3_BUCKET}"
+    },
+    {
+      "Sid": "LerEstadoDasReleases",
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::${AWS_S3_BUCKET}/_releases/*"
+    },
+    {
+      "Sid": "SomenteLeituraDoCloudFront",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:GetDistribution",
+        "cloudfront:GetOriginAccessControl",
+        "cloudfront:GetResponseHeadersPolicy",
+        "cloudfront:DescribeFunction",
+        "cloudfront:GetFunction"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "SomenteLeituraDoCertificado",
+      "Effect": "Allow",
+      "Action": [
+        "acm:DescribeCertificate",
+        "acm:ListCertificates"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

@@ -6,6 +6,14 @@
     "linkedin": "https://www.linkedin.com/company/exemplo-homologacao/",
     "instagram": "https://www.instagram.com/"
   },
+  "agendamento": {
+    "url": null,
+    "obrigatorio": false
+  },
+  "envioAutomatico": {
+    "endpoint": null,
+    "chaveDoSiteTurnstile": null
+  },
   "campanhaLancamento": {
     "inicio": "2026-11-01",
     "fim": "2026-12-31"
@@ -18,9 +26,12 @@
     "provedor": "Provedor de teste (dado sintético)"
   },
   "aprovacoes": {
-    "precosECondicoes": true,
+    "precos": true,
+    "condicoesComerciais": true,
     "textosComerciais": true,
     "avisoDePrivacidade": true,
+    "agendamento": true,
+    "envioAutomatico": true,
     "publicacao": true
   },
   "avisoHomologacao": true

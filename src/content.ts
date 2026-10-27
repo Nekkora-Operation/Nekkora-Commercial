@@ -6,7 +6,8 @@
  * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
  */
 import type { IconName } from 'nekkora-lib';
-import { DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD } from './config';
+import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL } from './config';
+import { priceFacts } from './precos';
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
@@ -83,23 +84,25 @@ export const SOLUTIONS = {
 /* Preços do Delivery — bloco data-pricing                            */
 /* ------------------------------------------------------------------ */
 /**
- * Valores e desconto de lançamento do mockup "modelo C" da responsável [PR-01..PR-05]. Só podem aparecer dentro do
- * bloco `data-pricing` (verificado por scripts/homologacao.mjs). Datas da campanha e confirmação final dos valores
- * antes da publicação: pendências PUB-13 e PUB-14.
+ * Tabela oficial de 22/10/2026 (COM-RELEASE-003-R1) no layout do mockup "modelo C" [PR-01..PR-06]. Valores e
+ * percentuais só podem aparecer dentro do bloco `data-pricing` (verificado por scripts/homologacao.mjs). Datas da
+ * campanha antes da publicação: pendência PUB-13.
  */
 export const PRICING = {
   eyebrow: 'Preços · Nekkora Delivery',
   title: 'Quanto custa uma automação',
   // [PR-01] [PR-06]
   description: 'Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
-  // [PR-02] Com as datas da campanha em publicacao.json (PUB-13), o período aparece por extenso; sem elas, o texto do
-  // mockup continua e o deploy de produção fica bloqueado (scripts/verificar-publicacao.mjs).
+  // [PR-02] Preços especiais de lançamento (COM-RELEASE-003-R1): nunca um percentual único para todas as categorias —
+  // cada preço mostra a própria economia. Com as datas da campanha em publicacao.json (PUB-13), o período aparece por
+  // extenso e a página só mostra os preços de lançamento dentro dele (src/precos.ts, launchActive); sem as datas, o
+  // deploy de produção fica bloqueado (scripts/verificar-publicacao.mjs).
   launch: {
     badge: 'Lançamento',
     text: LAUNCH_PERIOD
-      ? `50% de desconto em todas as automações com proposta aprovada de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
-      : '50% de desconto em todas as automações nos próximos 2 meses.',
-    condition: LAUNCH_PERIOD ? 'Desconto sobre o valor da categoria definida na avaliação.' : 'Vale para propostas aprovadas no período.',
+      ? `Preços especiais de lançamento para propostas aprovadas de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
+      : 'Preços especiais de lançamento.',
+    condition: 'Valem para automações simples e médias com proposta aprovada durante a campanha. A automação complexa tem orçamento individual.',
   },
   // [PR-06] — nenhum processo é enquadrado de antemão como simples ou médio
   criteria: {
@@ -126,35 +129,40 @@ export const PRICING = {
       'Licenças e custos externos tratados à parte, quando aplicáveis',
     ],
   },
-  // [PR-01] [PR-02]
+  // [PR-01] [PR-02] — valores, economia e percentual vêm de src/precos.ts (calculados, nunca digitados)
   tiers: [
     {
       overline: 'Simples',
       title: 'Automação simples',
       fit: 'Um sistema ou planilha, regras diretas, poucas exceções.',
       variant: 'surface' as const,
-      price: { from: 'R$ 1.000', to: 'R$ 500', discount: '−50%', unit: 'por automação · lançamento' },
+      price: { tier: 'simples' as const, ...priceFacts('simples') },
     },
     {
       overline: 'Média',
       title: 'Automação média',
       fit: 'Mais de um sistema, validações, tratamento de exceções e relatórios.',
       variant: 'raised' as const,
-      price: { from: 'R$ 2.800', to: 'R$ 1.400', discount: '−50%', unit: 'por automação · lançamento' },
+      price: { tier: 'media' as const, ...priceFacts('media') },
     },
     {
       overline: 'Complexa · pacotes',
       title: 'Automação complexa',
       fit: 'Processos ponta a ponta, várias integrações por API ou várias automações contratadas em conjunto.',
       variant: 'outlined' as const,
-      // [PR-03]
-      negotiated: { label: 'Sob orçamento', unit: 'dimensionada na avaliação · desconto de lançamento aplicável' },
+      // [PR-03] — sem desconto automático: o valor depende do dimensionamento e da aprovação comercial
+      negotiated: { label: 'Sob orçamento', unit: 'dimensionada na avaliação · orçamento individual' },
       cta: 'Solicitar avaliação',
     },
   ],
-  /** Rótulos lidos por leitor de tela (o valor riscado não é anunciado como riscado). */
-  srFrom: 'Valor sem desconto:',
-  srTo: 'Valor com desconto de lançamento:',
+  unit: 'por automação',
+  launchUnit: 'por automação · preço de lançamento',
+  /** "Economia de <valor>" — o valor economizado (padrão − lançamento), ao lado do percentual. */
+  savings: (label: string) => `Economia de ${label}`,
+  /** Rótulos lidos por leitor de tela: o valor riscado não é anunciado como riscado, então cada valor diz o que é. */
+  srFrom: 'Preço padrão:',
+  srTo: 'Preço especial de lançamento:',
+  srPercent: 'Desconto de',
   notes: [
     {
       icon: 'studio' as IconName,
@@ -253,25 +261,18 @@ export const CONTACT_COPY = {
   // Diálogo "Solicitar avaliação" (modelo C, etapa 2)
   dialogTitle: 'Solicitar avaliação',
   dialogDescription: 'Conte qual processo você quer automatizar. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.',
-  /** Só aparece com WhatsApp confirmado em config.ts (PUB-01). */
-  whatsappDirect: 'Falar diretamente pelo WhatsApp',
-  orForm: 'ou preencha o formulário',
   formTitle: 'Formulário de solicitação',
   processHint: 'Quais sistemas envolve, com que frequência acontece e qual resultado você espera. Até 1.000 caracteres.',
   emailHint: 'Opcional — só se preferir retorno por e-mail.',
   privacyLink: 'Como tratamos seus dados',
+  orForm: 'ou preencha o formulário',
   // [K-05]
   demoNote: 'Modo de demonstração: nenhum dado é enviado ou armazenado.',
   demoSubmit: 'Revisar solicitação',
-  whatsappSubmit: 'Revisar mensagem',
-  whatsappNote: 'Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página.',
-  // Etapa "Confirmar solicitação" (§5.2/§5.3)
+  reviewSubmit: 'Revisar mensagem',
+  // Etapa "Confirmar solicitação" (§5.2/§5.3) — textos comuns aos dois canais
   review: {
     title: 'Confirme a sua solicitação',
-    intro: 'Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.',
-    transfer:
-      'Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.',
-    open: 'Abrir no WhatsApp',
     back: 'Voltar e editar',
     copy: 'Copiar mensagem',
     copied: 'Mensagem copiada.',
@@ -279,16 +280,90 @@ export const CONTACT_COPY = {
     manual: 'Se o WhatsApp não abrir, copie a mensagem e envie para',
     email: 'Prefere e-mail? Escreva para',
   },
-  // Nunca afirmar abertura nem envio: com noopener o navegador não informa se a aba foi criada (D-18).
-  whatsappRequested: {
-    title: 'Pedimos ao navegador para abrir o WhatsApp',
-    text: 'Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.',
+  /** Jornada pelo WhatsApp — só com número confirmado em publicacao.json (PUB-01). */
+  whatsapp: {
+    direct: 'Falar diretamente pelo WhatsApp',
+    note: 'Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página.',
+    intro: 'Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.',
+    transfer:
+      'Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.',
+    open: 'Abrir no WhatsApp',
+    // Nunca afirmar abertura nem envio: com noopener o navegador não informa se a aba foi criada (D-18).
+    requested: {
+      title: 'Pedimos ao navegador para abrir o WhatsApp',
+      text: 'Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.',
+    },
+    again: 'Abrir conversa no WhatsApp',
   },
-  whatsappManual: 'Abrir conversa no WhatsApp',
+  /** Jornada pelo e-mail — canal da publicação enquanto não houver WhatsApp (decisão da titular, 22/10/2026) [K-02]. */
+  email: {
+    direct: 'Escrever diretamente por e-mail',
+    note: 'Na próxima etapa você confere a mensagem antes de abrir o seu aplicativo de e-mail. Nada é armazenado nesta página.',
+    intro: 'Esta é a mensagem que será aberta no seu aplicativo de e-mail, endereçada à Nekkora. Confira antes de continuar.',
+    transfer:
+      'Ao continuar, o seu aplicativo de e-mail é aberto com esta mensagem — nome, empresa, e-mail e descrição, como estão acima. Ela só chega à Nekkora se você a enviar pelo aplicativo. Esta página não guarda o que você digitou.',
+    open: 'Abrir no e-mail',
+    // A página não sabe se algum aplicativo de e-mail abriu: diz só o que pediu ao navegador (mesma regra da D-18).
+    requested: {
+      title: 'Pedimos ao navegador para abrir o seu aplicativo de e-mail',
+      text: 'Se nenhum aplicativo abriu, copie a mensagem e envie para o endereço abaixo. A mensagem só é enviada quando você a enviar pelo seu e-mail.',
+    },
+    again: 'Abrir no e-mail novamente',
+    manual: 'Se o aplicativo de e-mail não abrir, copie a mensagem e envie para',
+  },
+  /**
+   * Recebimento automático (COM-RELEASE-005 §5.7) — só com o endpoint do backend em publicacao.json. "Recebida" só
+   * com a confirmação do servidor; na falha, os dados ficam no formulário e o e-mail aparece como alternativa.
+   */
+  api: {
+    note: 'Na próxima etapa você confere os dados antes de enviar.',
+    emailHint: 'Obrigatório — é por ele que respondemos.',
+    emailRequired: 'Informe um e-mail para recebermos e respondermos a sua solicitação, como nome@empresa.com.',
+    intro: 'Confira os dados abaixo. Eles serão enviados à Nekkora quando você tocar em "Enviar solicitação".',
+    transfer:
+      'Ao enviar, nome, empresa, e-mail e descrição vão para a Nekkora por um serviço da AWS, que entrega a solicitação na caixa de e-mail comercial. Só usamos os dados para responder e preparar a avaliação.',
+    challenge: 'Verificação de segurança automática (Cloudflare Turnstile) para evitar envios por robôs.',
+    challengeWaiting: 'Aguardando a verificação de segurança…',
+    challengeUnavailable: 'A verificação de segurança não carregou. Você pode tentar de novo ou usar o e-mail abaixo.',
+    send: 'Enviar solicitação',
+    sending: 'Enviando…',
+    sendingStatus: 'Enviando a solicitação. Aguarde a confirmação.',
+    received: {
+      title: 'Solicitação recebida',
+      text: (protocolo: string) => `Protocolo ${protocolo}. Vamos responder pelo e-mail informado. A solicitação inicia uma avaliação — não é uma contratação.`,
+    },
+    failed: {
+      title: 'A solicitação não foi enviada',
+      rede: 'Não conseguimos falar com o servidor. Confira a sua conexão e tente de novo — os dados continuam aqui.',
+      limite: 'Recebemos muitas solicitações em pouco tempo. Tente de novo mais tarde ou use o e-mail abaixo.',
+      desafio: 'Não foi possível confirmar a verificação de segurança. Faça a verificação de novo e tente enviar.',
+      indisponivel: 'O envio não foi concluído por uma falha temporária. Os dados continuam aqui: tente de novo em instantes ou use o e-mail abaixo.',
+      recusada: 'Não foi possível enviar esta solicitação. Revise os dados ou escreva diretamente para o e-mail abaixo.',
+    },
+    retry: 'Tentar novamente',
+    alternative: 'Se preferir, envie a mesma mensagem pelo seu e-mail para',
+    openEmail: 'Abrir no e-mail',
+  },
   demoResult: {
     title: 'Solicitação validada — envio desativado nesta versão',
     text: 'Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.',
   },
+};
+
+/* ------------------------------------------------------------------ */
+/* Agendamento — Microsoft Bookings (COM-RELEASE-005 §4)              */
+/* ------------------------------------------------------------------ */
+/**
+ * Só aparece com a URL oficial do Bookings em publicacao.json. Duração, plataforma e antecedência são configuradas no
+ * Bookings e não são prometidas aqui antes de confirmadas. A página nunca diz que a reunião foi marcada: quem confirma
+ * é o Bookings.
+ */
+export const SCHEDULE = {
+  cta: 'Agendar conversa',
+  /** Completa o nome acessível do botão (o destino abre em outra aba). */
+  srExternal: '(abre o Microsoft Bookings em outra aba)',
+  note: 'Escolha um horário na agenda da Nekkora, no Microsoft Bookings. A conversa só fica marcada quando o Bookings confirmar.',
+  dialogPrompt: 'Prefere conversar antes?',
 };
 
 /* ------------------------------------------------------------------ */
@@ -316,35 +391,78 @@ export const LOGIN = {
  * bloqueado (aprovação "avisoDePrivacidade").
  */
 const controller = DATA_CONTROLLER.name ? `${DATA_CONTROLLER.name}${DATA_CONTROLLER.document ? ` (${DATA_CONTROLLER.document})` : ''}` : 'a Nekkora';
+const viaApi = REQUEST_CHANNEL === 'api';
+/**
+ * Minuta revisada na COM-RELEASE-005 §6 (envio automático e Microsoft Bookings). Cada item descreve o que acontece DE
+ * FATO na configuração publicada: sem endpoint, o formulário não envia nada; sem a URL do Bookings, o item do
+ * agendamento não aparece. Bases legais por finalidade (LGPD, art. 7º) documentadas em
+ * docs/release/COM-RELEASE-005-privacidade.md — submetida à titular para aprovação (PUB-09).
+ */
 export const PRIVACY = {
   eyebrow: 'Privacidade',
   title: 'Como tratamos seus dados',
   description: `Responsável pelos dados pessoais desta página: ${controller}.`,
   items: [
-    {
-      icon: 'shield' as IconName,
-      title: 'O formulário não envia nada',
-      text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
-    },
-    {
-      icon: 'whatsapp' as IconName,
-      title: 'O que vai para o WhatsApp',
-      text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
-    },
+    viaApi
+      ? {
+          icon: 'send' as IconName,
+          title: 'O que o formulário envia',
+          // [PV-05] — envio automático: só depois da confirmação; o que é guardado e por quanto tempo
+          text: `Só quando você toca em "Enviar solicitação": nome, e-mail, empresa (se informada) e a descrição do processo vão para um serviço da Nekkora na ${HOSTING_PROVIDER ?? 'nuvem'}, que entrega a solicitação na caixa comercial ${CHANNELS.email ?? 'da Nekkora'} (Microsoft 365). O serviço não guarda o conteúdo: mantém por 24 horas só um código técnico do pedido, para não receber a mesma solicitação duas vezes.`,
+        }
+      : {
+          icon: 'shield' as IconName,
+          title: 'O formulário não envia nada',
+          text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
+        },
+    // [PV-02] — o item descreve o canal que a jornada usa de fato (WhatsApp ou e-mail; REQUEST_CHANNEL em config.ts)
+    ...(viaApi
+      ? []
+      : [
+          REQUEST_CHANNEL === 'email'
+            ? {
+                icon: 'mail' as IconName,
+                title: 'O que vai para o e-mail',
+                text: `Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a ${CHANNELS.email}. Ela só é enviada se você a enviar pelo aplicativo.`,
+              }
+            : {
+                icon: 'whatsapp' as IconName,
+                title: 'O que vai para o WhatsApp',
+                text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
+              },
+        ]),
+    // [PV-06] — agendamento: só com a URL oficial do Bookings; o Bookings armazena a reserva
+    ...(BOOKINGS_URL
+      ? [
+          {
+            icon: 'calendar' as IconName,
+            title: 'Agendamento pelo Microsoft Bookings',
+            text: 'Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para realizar a conversa. Não informe senhas, credenciais nem documentos sigilosos.',
+          },
+        ]
+      : []),
     {
       icon: 'eye' as IconName,
       title: 'Sem cookies nem rastreamento',
-      text: 'Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.',
+      text:
+        'Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.' +
+        // [PV-07] — o desafio antiautomação é de terceiro e só carrega na confirmação do envio
+        (LEAD_API?.turnstileSiteKey
+          ? ' Na confirmação do envio, uma verificação de segurança da Cloudflare (Turnstile) analisa sinais técnicos do navegador para impedir envios por robôs.'
+          : ''),
     },
     {
       icon: 'server' as IconName,
       title: 'Registros de acesso',
-      text: `${HOSTING_PROVIDER ?? 'O provedor de hospedagem'} registra dados técnicos de acesso, como endereço IP e navegador, para segurança e funcionamento do site.`,
+      // [PV-04] — o provedor processa esses dados para entregar as páginas; a página não grava nada além disso
+      text:
+        `${HOSTING_PROVIDER ? `A ${HOSTING_PROVIDER}, que hospeda este site,` : 'O provedor de hospedagem'} processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.` +
+        (viaApi ? ' Para limitar abusos, o serviço de solicitações conta envios por endereço IP sem guardar o endereço (só um código derivado dele), por até 2 dias.' : ''),
     },
     {
       icon: 'user' as IconName,
       title: 'Uso e seus direitos',
-      text: 'Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir acesso, correção ou exclusão pelos canais de contato desta página.',
+      text: `Usamos os dados que você nos envia só para responder à solicitação${BOOKINGS_URL ? ', realizar a conversa agendada' : ''} e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir confirmação, acesso, correção, exclusão ou informações sobre o compartilhamento dos seus dados (LGPD, art. 18)${CHANNELS.email ? ` pelo e-mail ${CHANNELS.email}` : ' pelos canais de contato desta página'}.`,
     },
   ],
 };
@@ -352,5 +470,8 @@ export const PRIVACY = {
 export const FOOTER = {
   privacy: 'Privacidade',
   preview: 'Versão para homologação',
+  build: 'build',
+  dirty: 'com alterações locais',
+  devServer: 'servidor de desenvolvimento',
   signature: 'Neko (猫) observa os detalhes.',
 };

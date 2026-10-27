@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LogsSomenteDaPropriaFuncao",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:${AWS_REGION}:${AWS_ACCOUNT_ID}:log-group:/aws/lambda/nekkora-commercial-solicitacoes:*"
+    },
+    {
+      "Sid": "IdempotenciaEContadoresSemDadosPessoais",
+      "Effect": "Allow",
+      "Action": ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem"],
+      "Resource": "arn:aws:dynamodb:${AWS_REGION}:${AWS_ACCOUNT_ID}:table/${DYNAMODB_TABLE}"
+    },
+    {
+      "Sid": "SegredosSomenteDoRecebimento",
+      "Effect": "Allow",
+      "Action": "ssm:GetParameter",
+      "Resource": [
+        "arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/nekkora-commercial/solicitacoes/turnstile",
+        "arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/nekkora-commercial/solicitacoes/segredo-ip"
+      ]
+    },
+    {
+      "Sid": "EmailSomenteDoRemetenteFixoParaACaixaComercial",
+      "Effect": "Allow",
+      "Action": "ses:SendEmail",
+      "Resource": [
+        "arn:aws:ses:${AWS_REGION}:${AWS_ACCOUNT_ID}:identity/${SES_IDENTITY}",
+        "arn:aws:ses:${AWS_REGION}:${AWS_ACCOUNT_ID}:identity/${SES_TO}"
+      ],
+      "Condition": {
+        "StringEquals": { "ses:FromAddress": "${SES_FROM}" },
+        "ForAllValues:StringEquals": { "ses:Recipients": ["${SES_TO}"] }
+      }
+    }
+  ]
+}

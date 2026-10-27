@@ -1,0 +1,56 @@
+# COM-RELEASE-005-A — origem do "−50%" (22/10/2026). Somente leitura: nada foi alterado na pasta Nekkora-Commercial nem no servidor 5173.
+
+$ Get-NetTCPConnection -State Listen (porta 5173) → processo
+"node"   "C:\Users\nicol\nekkora\Nekkora-Commercial\node_modules\.bin\\..\vite\bin\vite.js" 
+
+$ git -C ../Nekkora-Commercial branch --show-current; rev-parse --short HEAD; status --short
+feat/commercial-modelo-c
+5f089e6
+ M src/content.ts
+
+$ git -C ../Nekkora-Commercial diff src/content.ts   (alteração não commitada que restou do commit local desfeito no REP-03)
+diff --git a/src/content.ts b/src/content.ts
+index c3208fe..9f483de 100644
+--- a/src/content.ts
++++ b/src/content.ts
+@@ -98,14 +98,14 @@ export const PRICING = {
+       title: 'Automação simples',
+       fit: 'Um sistema ou planilha, regras diretas, poucas exceções.',
+       variant: 'surface' as const,
+-      price: { from: 'R$ 1.000', to: 'R$ 500', discount: '−50%', unit: 'por automação · lançamento' },
++      price: { from: 'R$ 1.500', to: 'R$ 1000', discount: '−50%', unit: 'por automação · lançamento' },
+     },
+     {
+       overline: 'Média',
+       title: 'Automação média',
+       fit: 'Mais de um sistema, validações, tratamento de exceções e relatórios.',
+       variant: 'raised' as const,
+-      price: { from: 'R$ 2.800', to: 'R$ 1.400', discount: '−50%', unit: 'por automação · lançamento' },
++      price: { from: 'R$ 3.500', to: 'R$ 2.800', discount: '−50%', unit: 'por automação · lançamento' },
+     },
+     {
+       overline: 'Completa · pacotes',
+
+$ curl -s http://localhost:5173/src/content.ts | grep -n 'discount\|from:'   (o que o servidor de desenvolvimento entrega ao navegador)
+95:				from: "R$ 1.500",
+97:				discount: "−50%",
+107:				from: "R$ 3.500",
+109:				discount: "−50%",
+
+$ node scripts/verificar-precos-artefato.mjs --dist ../Nekkora-Commercial/dist   (build antigo daquela pasta, 15/10/2026)
+FALHA tabela-no-bundle:simples — standard 1500, launch 1000
+FALHA tabela-no-bundle:media — standard 3500, launch 2800
+FALHA sem-percentual-digitado — −50% −50%
+FALHA sem-campo-discount-fixo — campo "discount" com texto fixo no bundle
+FALHA release-do-commit-em-disco — release.json=ausente; HEAD=e937e65
+
+5 verificações, 5 falha(s).
+
+$ npm run build && node scripts/verificar-precos-artefato.mjs --dist dist   (versão candidata, esta branch)
+OK   tabela-no-bundle:simples — standard 1500, launch 1000
+OK   tabela-no-bundle:media — standard 3500, launch 2800
+OK   sem-percentual-digitado — percentuais só calculados a partir da tabela
+OK   sem-campo-discount-fixo — nenhum "discount: '…'" no bundle
+OK   release-do-commit-em-disco — release.json=e937e65; HEAD=e937e65
+
+5 verificações, 0 falha(s).

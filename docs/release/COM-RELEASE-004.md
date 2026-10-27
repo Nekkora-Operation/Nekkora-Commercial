@@ -1,5 +1,11 @@
 # COM-RELEASE-004 — Homologação final (pré-publicação) e critérios da release
 
+> **Atualização COM-RELEASE-003 (22/10/2026):** a hospedagem passou a ser **AWS S3 + CloudFront**. O que segue é o
+> registro da rodada anterior (Cloudflare Pages). A homologação pré-publicação refeita com a nova tabela de preços, a
+> jornada por e-mail e os cabeçalhos do CloudFront está em
+> [COM-RELEASE-003-relatorio.md](COM-RELEASE-003-relatorio.md). A recomendação de análise de acessos com Cloudflare
+> Web Analytics (§5) fica sem efeito: as métricas padrão do CloudFront bastam, sem script na página.
+
 A parte que não depende de publicação foi executada sobre o **build de produção servido pelo runtime do Cloudflare
 Pages** (`wrangler pages dev`, com `_headers`/CSP), em 22/10/2026. A homologação pública (§7.6) não foi feita: não há
 autorização nem infraestrutura de produção.

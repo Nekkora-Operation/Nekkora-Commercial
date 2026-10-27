@@ -1,7 +1,7 @@
 import { IconBox, SectionHeader } from 'nekkora-lib';
 import { PRIVACY } from '../content';
 
-/** Aviso de privacidade (COM-RELEASE-002 §5.4): o que a página coleta, o que vai para o WhatsApp e os direitos. */
+/** Aviso de privacidade (COM-RELEASE-002 §5.4): o que a página coleta, o que vai para o canal (WhatsApp ou e-mail) e os direitos. */
 export function Privacy() {
   return (
     <section id="privacidade" className="section" aria-labelledby="privacidade-title">

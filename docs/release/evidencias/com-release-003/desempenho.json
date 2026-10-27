@@ -1,0 +1,63 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "condicoes": "Chromium, celular 375 px (DPR 2), cache vazio, latência 150 ms, 1,6 Mbps/750 kbps, CPU 4× mais lenta",
+  "execucoes": 5,
+  "mediana": {
+    "fcpMs": 1752,
+    "lcpMs": 1752,
+    "cls": 0,
+    "kbTransferidos": 150,
+    "requisicoes": 4
+  },
+  "referencia": {
+    "lcpBomMs": 2500,
+    "clsBom": 0.1
+  },
+  "runs": [
+    {
+      "fcp": 1744,
+      "lcp": 1744,
+      "cls": 0,
+      "domContentLoaded": 1260.199999999255,
+      "networkIdleMs": 1680,
+      "bytes": 153823,
+      "requests": 4
+    },
+    {
+      "fcp": 1752,
+      "lcp": 1752,
+      "cls": 0,
+      "domContentLoaded": 1247.800000000745,
+      "networkIdleMs": 1665,
+      "bytes": 153823,
+      "requests": 4
+    },
+    {
+      "fcp": 1736,
+      "lcp": 1736,
+      "cls": 0,
+      "domContentLoaded": 1238.300000000745,
+      "networkIdleMs": 1660,
+      "bytes": 153823,
+      "requests": 4
+    },
+    {
+      "fcp": 1756,
+      "lcp": 1756,
+      "cls": 0,
+      "domContentLoaded": 1254.5999999996275,
+      "networkIdleMs": 1665,
+      "bytes": 153823,
+      "requests": 4
+    },
+    {
+      "fcp": 1756,
+      "lcp": 1756,
+      "cls": 0,
+      "domContentLoaded": 1255.300000000745,
+      "networkIdleMs": 1671,
+      "bytes": 153823,
+      "requests": 4
+    }
+  ]
+}

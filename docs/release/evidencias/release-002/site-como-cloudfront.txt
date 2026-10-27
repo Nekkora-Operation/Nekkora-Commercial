@@ -1,0 +1,12 @@
+OK   release-json-do-commit — servido c94f33c9a778d93ab696efe891a731baa7fcbb1e · esperado c94f33c9a778d93ab696efe891a731baa7fcbb1e
+OK   pagina-inicial-200 — HTTP 200 text/html; charset=utf-8
+OK   pagina-inicial-e-o-index-do-artefato
+OK   cabecalhos-de-seguranca — 7 cabeçalhos idênticos
+OK   documento-revalidado — cache-control: no-cache
+OK   arquivos-do-artefato-integros — 13 arquivos com hash, tipo e cache esperados
+OK   inexistente-404-com-pagina-de-erro — HTTP 404
+OK   prefixo-interno-nao-servido — 404, 404, 404, 404
+OK   sem-listagem-do-bucket
+OK   bucket-sem-acesso-publico — GET direto no S3: HTTP 403
+
+site confere com o artefato c94f33c9a778d93ab696efe891a731baa7fcbb1e

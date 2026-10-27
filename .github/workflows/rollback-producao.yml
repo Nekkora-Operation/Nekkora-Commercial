@@ -1,17 +1,24 @@
-# Rollback de produção (COM-RELEASE-003 §6.5): volta nekkora.com para um deploy anterior JÁ PUBLICADO no Cloudflare
-# Pages, sem reconstruir nada (API de rollback do Pages). Sem deployment_id, usa o deploy de produção imediatamente
-# anterior ao atual. Exige a mesma aprovação do environment "production". Procedimento manual equivalente (painel do
-# Cloudflare) em docs/release/COM-RELEASE-003-operacao.md.
+# Rollback de produção na AWS (COM-RELEASE-003-E): restaura uma release JÁ PUBLICADA e aprovada a partir da cópia
+# guardada no bucket (_releases/<commit>/), sem rebuild e sem apagar nada. Sem destino, volta para a release publicada
+# antes da atual. Exige a mesma aprovação humana do environment "production". Com "simular", só valida o destino e
+# mostra o que faria. Procedimento e alternativa manual: docs/release/COM-RELEASE-003-aws.md.
 name: Rollback de produção
 
 on:
   workflow_dispatch:
     inputs:
-      deployment_id:
-        description: 'ID do deploy de destino (vazio = o anterior ao atual)'
+      destino:
+        description: 'Commit (40 caracteres) da release a restaurar — vazio = a anterior à atual'
         required: false
       motivo:
-        description: 'Motivo do rollback (registro)'
+        description: 'Motivo do rollback (fica no histórico)'
+        required: true
+      simular:
+        description: 'Só validar o destino, sem alterar nada'
+        type: boolean
+        default: false
+      confirmacao:
+        description: 'Digite REVERTER para confirmar'
         required: true
 
 permissions:
@@ -22,22 +29,55 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  rollback:
+  protecao:
+    name: Environment "production" exige revisor e só aceita a branch main
+    if: github.ref == 'refs/heads/main' && inputs.confirmacao == 'REVERTER'
     runs-on: ubuntu-24.04
-    environment:
-      name: production
-      url: https://nekkora.com
-    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - name: Rollback via API do Cloudflare Pages
+      - name: Environment "production" exige revisor e só aceita a branch main
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
-          DESTINO: ${{ inputs.deployment_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verificar-environment.mjs --environment production
+
+  rollback:
+    needs: protecao
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: ${{ vars.DOMINIO_PUBLICO || format('https://{0}', vars.AWS_CLOUDFRONT_DOMAIN) }}
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Credenciais temporárias (OIDC → STS)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: nekkora-commercial-rollback-${{ github.run_id }}
+          role-duration-seconds: 1800
+      - name: Validar o destino e restaurar
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+          DESTINO: ${{ inputs.destino }}
           MOTIVO: ${{ inputs.motivo }}
-        run: node scripts/rollback-pages.mjs
+          ATOR: ${{ github.actor }}
+          EXECUCAO: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/aws/rollback.mjs --manifesto restaurado.json ${{ inputs.simular && '--simular' || '' }}
+      - name: Verificação pública da release restaurada
+        if: ${{ !inputs.simular }}
+        run: |
+          node scripts/aws/verificar-site.mjs --base "${{ vars.DOMINIO_PUBLICO || format('https://{0}', vars.AWS_CLOUDFRONT_DOMAIN) }}/" \
+            --manifesto restaurado.json --tentativas 30

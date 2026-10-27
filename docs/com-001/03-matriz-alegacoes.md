@@ -70,9 +70,9 @@ final é a PUB-13/PUB-14. Só aparecem no bloco `data-pricing` (verificado: `pre
 
 | ID | Alegação | Status | Onde aparece | Condição / restrição |
 |---|---|---|---|---|
-| PR-01 | Automação simples R$ 1.000 e média R$ 2.800, por automação | autorizada no mockup | Preços | "A faixa é confirmada na avaliação e fica registrada na proposta" no mesmo bloco |
-| PR-02 | Lançamento: 50% de desconto em todas as automações nos próximos 2 meses (R$ 500 / R$ 1.400) | autorizada no mockup | Preços | "Vale para propostas aprovadas no período". **Datas de início e fim não definidas** (PUB-13) |
-| PR-03 | Automação complexa (e pacotes): **sob orçamento**, desconto de lançamento aplicável | autorizada (mockup + tabela da NEKKORA-RELEASE-001 §4.4) | Preços | Dimensionada na avaliação. "Desconto de lançamento aplicável" vem do mockup — confirmar (PUB-14) |
+| PR-01 | Preço padrão por automação: simples **R$ 1.500**, média **R$ 3.500** | **aprovada** (COM-RELEASE-003-R1 §3.1, 22/10/2026; substitui R$ 1.000 / R$ 2.800 do mockup) | Preços | "A categoria é definida na avaliação e fica registrada na proposta" no mesmo bloco. Valores em `src/precos.ts` |
+| PR-02 | Preços especiais de lançamento: simples **R$ 1.000** (economia de R$ 500, −33,33%), média **R$ 2.800** (economia de R$ 700, −20%) | **aprovada** (COM-RELEASE-003-R1 §3.1–3.3) | Preços | Cada preço mostra a própria economia, **calculada**, nunca digitada. Percentual truncado em 2 casas, para nunca anunciar mais do que o real. Só dentro do período aprovado (PUB-13); fora dele, só o preço padrão. **Proibido**: "50% de desconto", "metade do preço" ou qualquer desconto único para todas as automações (verificado pela homologação e por `precos.test.mjs`). Datas não definidas (PUB-13) |
+| PR-03 | Automação complexa (e pacotes): **sob orçamento**, orçamento individual | **aprovada** (COM-RELEASE-003-R1 §3.4) | Preços | Dimensionada na avaliação. **Sem desconto automático**: "desconto de lançamento aplicável" (do mockup) foi removido |
 | PR-06 | A categoria (simples, média, complexa) é definida na avaliação por: sistemas, integrações, regras de negócio, volume, infraestrutura e licenciamento | comprovada (§4.4) | Preços | "Nem todo processo é simples ou médio" no mesmo bloco |
 | PR-04 | Valores baixos porque uma ferramenta própria agiliza documentação e desenvolvimento, sem cortar etapas | autorizada no mockup | Preços | Sem nome de produto; não é oferecida nem exigida do cliente (P-02 continua proibida) |
 | PR-05 | Licenças e serviços de terceiros são responsabilidade do cliente, fora dos valores | autorizada no mockup | Preços, Transparência | Indicadas na proposta |
@@ -95,10 +95,12 @@ Exibidas no bloco `data-pricing` ("Condições comerciais"). Nenhuma vira promes
 | ID | Alegação | Status | Base |
 |---|---|---|---|
 | PV-01 | O formulário não envia dados a servidores da Nekkora | comprovada | Código: sem back-end; homologação `sem-requisicoes-externas` |
-| PV-02 | Só com confirmação do visitante, os dados seguem no texto da mensagem para o WhatsApp (Meta) | comprovada | Etapa "Confirme a sua solicitação"; jornada `confirmacao-sem-abrir-nada` |
+| PV-02 | Só com confirmação do visitante, os dados seguem no texto da mensagem para o canal: o aplicativo de e-mail do visitante, endereçado a `contato@nekkora.com` (publicação atual), ou o WhatsApp (Meta), quando houver número | comprovada | Etapa "Confirme a sua solicitação"; jornadas `confirmacao-sem-abrir-nada` e `email-com-mensagem-exata`. O item do aviso descreve o canal em uso |
 | PV-03 | Sem cookies, análise ou publicidade; só a preferência de tema no navegador | comprovada | Código (localStorage `nekkora-commercial-tema`); fonte e imagens do próprio site |
-| PV-04 | O provedor de hospedagem registra dados técnicos de acesso | condicional | Nome do provedor em `publicacao.json` (PUB-11) |
-| PV-05 | Uso dos dados só para responder e preparar avaliação/proposta (LGPD art. 7º, V); retenção pelo tempo necessário ou exigido por lei; direitos de acesso, correção e exclusão | pendente de aprovação | Texto jurídico: aprovação `avisoDePrivacidade` (PUB-09) |
+| PV-04 | A Amazon Web Services (AWS), que hospeda o site, processa dados técnicos de acesso (IP, navegador) para entregar as páginas e proteger o serviço | comprovada (PUB-11) | Não afirma "registra": os logs do CloudFront estão desligados (COM-RELEASE-003-aws §4); a AWS processa esses dados para entregar as páginas |
+| PV-05 | Uso dos dados só para responder, realizar a conversa agendada (com Bookings) e preparar avaliação/proposta, a pedido do titular (LGPD art. 7º, V); retenção pelo tempo necessário ou exigido por lei; direitos do art. 18 pelo e-mail comercial | pendente de aprovação | Texto jurídico: aprovação `avisoDePrivacidade` (PUB-09). Bases legais por finalidade em [COM-RELEASE-005-privacidade](../release/COM-RELEASE-005-privacidade.md) |
+| PV-06 | Com envio automático: o formulário envia os dados à Nekkora por um serviço na AWS, que os entrega na caixa comercial (Microsoft 365); o serviço guarda só um código técnico por 24 h e contadores por HMAC do IP por até 2 dias | **condicional** — só com endpoint (PUB-21) | Código: `api/solicitacoes/` (sem conteúdo no armazenamento; logs sem dados pessoais — testes `api-solicitacoes`, `logs-sem-dados-pessoais`). Substitui PV-01/K-05 quando ativo |
+| PV-07 | Com Bookings: nome, e-mail, respostas e horário ficam na agenda da Nekkora no Microsoft 365; o Turnstile (Cloudflare) analisa sinais técnicos do navegador na confirmação do envio | **condicional** — só com URL do Bookings (PUB-20) / chave do desafio (PUB-21) | Depende da configuração real do Bookings (perguntas) — conferir antes da aprovação |
 
 ## Proibidas (só como exclusão)
 
@@ -121,10 +123,12 @@ Exibidas no bloco `data-pricing` ("Condições comerciais"). Nenhuma vira promes
 
 | ID | Alegação | Status | Tratamento |
 |---|---|---|---|
-| K-01 | Número de WhatsApp | pendente | Não exibido; sem botão flutuante |
-| K-02 | E-mail comercial | pendente | Não exibido (antes: `contato@nekkora.com`, não confirmado) |
-| K-03 | Perfis Instagram / LinkedIn | pendente | Não exibidos (antes: páginas iniciais das redes) |
+| K-01 | Número de WhatsApp | fora do lançamento (decisão da titular, 22/10/2026) | Não exibido: sem botão flutuante, sem menção na página nem no aviso de privacidade. O código continua pronto para quando houver número |
+| K-02 | E-mail comercial `contato@nekkora.com` | **confirmada** (titular, 22/10/2026) | Link no contato e canal da jornada "Solicitar avaliação": a mensagem confirmada abre no aplicativo de e-mail do visitante (mailto), sem afirmar envio |
+| K-03 | LinkedIn `https://www.linkedin.com/company/nekkora` | **confirmada** (titular, 22/10/2026) | Link no contato (nova aba, isolada). Instagram fora (`null`) |
 | K-04 | Prazo de resposta / horário de atendimento | pendente | Removido ("Atendimento em horário comercial") |
-| K-05 | O formulário não envia nem armazena dados nesta versão | comprovada | Fato do código (sem backend, sem rede) — exibido no formulário |
-| K-06 | Canais (WhatsApp, e-mail, LinkedIn, Instagram) | pendente | Desde a COM-RELEASE-001 vêm de `publicacao.json`; o portão `verificar-publicacao` bloqueia a produção sem WhatsApp, e-mail e LinkedIn válidos |
+| K-05 | O formulário não envia nem armazena dados | comprovada | Fato do código (sem backend, sem rede). Com canal confirmado, a página só abre o WhatsApp ou o aplicativo de e-mail com a mensagem que o visitante confirmou |
+| K-06 | Canais (WhatsApp, e-mail, LinkedIn, Instagram) | e-mail e LinkedIn confirmados | Vêm de `publicacao.json`. O portão exige e-mail e LinkedIn válidos; WhatsApp e Instagram são opcionais (se informados, precisam ser válidos) |
+| K-07 | "Agendar conversa" pelo Microsoft Bookings | **pendente** (PUB-20): URL oficial não informada | Sem a URL, o botão não aparece. A página não promete duração, plataforma nem antecedência (configuração do Bookings ainda não confirmada) e nunca afirma que a reunião foi marcada |
+| K-08 | "Solicitação recebida" (envio automático) | **condicional** (PUB-21) | Só com a confirmação do backend (202, mesmo `idSolicitacao`). Sem endpoint publicado, a jornada continua pelo e-mail |
 | B-01 | Tagline oficial "AUTOMATE · OBSERVE · EVOLVE" | condicional | Não exibida nesta página: "OBSERVE" pode ser lido como monitoramento incluído. A tagline não foi alterada na lib. |
