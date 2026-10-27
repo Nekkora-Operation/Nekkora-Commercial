@@ -1,0 +1,11 @@
+
+> nekkora-commercial@1.0.0-rc.1 verificar:precos
+> node scripts/verificar-precos-artefato.mjs --dist dist
+
+OK   tabela-no-bundle:simples — standard 1500, launch 1000
+OK   tabela-no-bundle:media — standard 3500, launch 2800
+OK   sem-percentual-digitado — percentuais só calculados a partir da tabela
+OK   sem-campo-discount-fixo — nenhum "discount: '…'" no bundle
+OK   release-do-commit-em-disco — release.json=c94f33c; HEAD=c94f33c
+
+5 verificações, 0 falha(s).

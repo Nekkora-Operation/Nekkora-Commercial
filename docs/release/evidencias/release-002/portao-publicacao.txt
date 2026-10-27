@@ -1,0 +1,9 @@
+PUBLICAÇÃO BLOQUEADA — 8 pendência(s):
+  - PUB-20 — URL oficial da página do Microsoft Bookings (https://outlook.office365.com/book/<caixa>@<domínio da Nekkora>/)
+  - PUB-13 — datas de início e fim da campanha de lançamento
+  - PUB-09 — controlador dos dados: razão social (ou nome) para o aviso de privacidade
+  - PUB-19 — aprovação das condições comerciais (50/50, fila, reuniões, licenças, garantia e aceite)
+  - PUB-17 — aprovação dos textos comerciais
+  - PUB-09 — aprovação do aviso de privacidade
+  - PUB-18 — autorização expressa de publicação em produção
+  - PUB-10 — desligar o aviso "Versão para homologação"
