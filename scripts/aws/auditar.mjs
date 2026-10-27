@@ -21,6 +21,28 @@ export const DOMAINS = ['nekkora.com', 'www.nekkora.com'];
 /** Política gerenciada "CachingOptimized": respeita o Cache-Control da origem, comprime gzip/brotli. */
 export const CACHING_OPTIMIZED = '658327ea-f89d-4fab-a63d-7e88639e58f6';
 
+/**
+ * Operadores aceitos para restringir a leitura à distribuição. ArnLike só passa porque o valor precisa ser o ARN exato
+ * (sem * nem ?); variantes IfExists e ForAnyValue/ForAllValues não restringem quando a chave falta e são recusadas.
+ */
+export const SOURCE_ARN_OPERATORS = ['StringEquals', 'ArnEquals', 'ArnLike'];
+
+/**
+ * Valores de AWS:SourceArn nos operadores aceitos. Ok só se houver ao menos um e todos forem exatamente o ARN esperado,
+ * com um único valor por operador (lista = OU, ampliaria o acesso). Chaves de condição não diferenciam maiúsculas.
+ */
+export function sourceArnRestriction(statement, expectedArn) {
+  const found = [];
+  for (const [op, keys] of Object.entries(statement?.Condition ?? {})) {
+    if (!SOURCE_ARN_OPERATORS.includes(op)) continue;
+    for (const [key, value] of Object.entries(keys ?? {})) {
+      if (key.toLowerCase() === 'aws:sourcearn') found.push({ op, values: [value].flat() });
+    }
+  }
+  const ok = found.length > 0 && found.every((f) => f.values.length === 1 && f.values[0] === expectedArn);
+  return { ok, detail: found.map((f) => `${f.op} ${f.values.join(', ')}`).join(' · ') };
+}
+
 async function call(client, Command, input, { missing = [] } = {}) {
   try {
     return await client.send(new Command(input));
@@ -100,8 +122,8 @@ export async function audit({ clients, sdk, bucket, distributionId = null, versi
   }
   const allow = (policy.Statement ?? []).filter((s) => s.Effect === 'Allow');
   const cfAllow = allow.find((s) => s.Principal?.Service === 'cloudfront.amazonaws.com' && [s.Action].flat().includes('s3:GetObject'));
-  const sourceArn = cfAllow?.Condition?.StringEquals?.['AWS:SourceArn'];
-  add('S07', sourceArn === d.ARN ? 'ok' : 'falha', 'Política do bucket libera leitura só para esta distribuição (AWS:SourceArn)', sourceArn ?? 'sem a declaração do CloudFront');
+  const sourceArn = cfAllow ? sourceArnRestriction(cfAllow, d.ARN) : { ok: false, detail: 'sem a declaração do CloudFront' };
+  add('S07', sourceArn.ok ? 'ok' : 'falha', 'Política do bucket libera leitura só para esta distribuição (AWS:SourceArn)', sourceArn.detail || 'sem condição AWS:SourceArn (StringEquals, ArnEquals ou ArnLike)', `Condição AWS:SourceArn igual a ${d.ARN}, sem curingas nem lista de valores.`);
   const extra = allow.filter((s) => s !== cfAllow);
   add('S08', extra.length === 0 ? 'ok' : 'falha', 'Nenhuma outra permissão concedida pela política do bucket', extra.map((s) => s.Sid ?? JSON.stringify(s.Principal)).join(', ') || 'nenhuma');
   const denyReleases = (policy.Statement ?? []).some((s) => s.Effect === 'Deny' && [s.Resource].flat().some((r) => r.endsWith('/_releases/*')));
@@ -152,24 +174,51 @@ export async function audit({ clients, sdk, bucket, distributionId = null, versi
       Includes: { keyTypes: ['RSA_2048', 'RSA_3072', 'RSA_4096', 'EC_prime256v1', 'EC_secp384r1', 'EC_secp521r1'] },
     }))?.CertificateSummaryList ?? [];
   const candidates = certs.filter((c) => c.DomainName === 'nekkora.com' || c.SubjectAlternativeNameSummaries?.includes('nekkora.com'));
+  // O certificado da distribuição entra mesmo que a listagem não o traga (SANs truncados na listagem)
+  const arns = [...new Set([vc.ACMCertificateArn, ...candidates.map((c) => c.CertificateArn)].filter(Boolean))];
   inventory.certificados = [];
-  for (const c of candidates) {
-    const cert = (await call(clients.acm, ACM.DescribeCertificateCommand, { CertificateArn: c.CertificateArn })).Certificate;
+  for (const arn of arns) {
+    const cert = (await call(clients.acm, ACM.DescribeCertificateCommand, { CertificateArn: arn }, { missing: ['ResourceNotFoundException'] }))?.Certificate;
+    if (!cert) continue;
     inventory.certificados.push({
       arn: cert.CertificateArn,
       estado: cert.Status,
-      nomes: cert.SubjectAlternativeNames,
+      nomes: cert.SubjectAlternativeNames ?? [],
+      validoAte: cert.NotAfter ? new Date(cert.NotAfter).toISOString() : null,
       emUsoPor: cert.InUseBy ?? [],
       validacao: (cert.DomainValidationOptions ?? []).map((v) => ({ dominio: v.DomainName, metodo: v.ValidationMethod, estado: v.ValidationStatus, registro: v.ResourceRecord ?? null })),
     });
   }
-  const cert = inventory.certificados.find((c) => DOMAINS.every((x) => c.nomes.includes(x)));
+  const covers = (c) => DOMAINS.every((x) => c.nomes.includes(x));
+  const adequate = (c) => c.estado === 'ISSUED' && covers(c) && (!c.validoAte || new Date(c.validoAte) > now());
+  const attached = inventory.certificados.find((c) => c.arn === vc.ACMCertificateArn) ?? null;
+  // Prioridade: o associado à distribuição, outro emitido e adequado, um aguardando validação, qualquer outro
+  const ranked = inventory.certificados.filter(covers);
+  const cert =
+    (attached && adequate(attached) ? attached : null) ??
+    ranked.find(adequate) ??
+    ranked.find((c) => c.estado === 'PENDING_VALIDATION') ??
+    (attached && covers(attached) ? attached : null) ??
+    ranked[0];
+  inventory.certificadoSelecionado = cert?.arn ?? null;
+  const certTitle = 'Certificado ACM (us-east-1) emitido e válido para nekkora.com e www.nekkora.com';
   if (!cert) {
-    add('K01', 'falha', 'Certificado ACM (us-east-1) para nekkora.com e www.nekkora.com', `${candidates.length} certificado(s) encontrado(s) para nekkora.com`, 'Solicitar no ACM, região us-east-1, com os dois nomes e validação por DNS.');
-  } else {
+    add('K01', 'falha', certTitle, `${candidates.length} certificado(s) encontrado(s) para nekkora.com`, 'Solicitar no ACM, região us-east-1, com os dois nomes e validação por DNS.');
+  } else if (adequate(cert)) {
+    add('K01', 'ok', certTitle, `${cert.arn} — ${cert.estado}${cert.validoAte ? `, válido até ${cert.validoAte}` : ''}`);
+  } else if (cert.estado === 'PENDING_VALIDATION') {
     const records = cert.validacao.filter((v) => v.registro).map((v) => `${v.registro.Name} CNAME ${v.registro.Value} (${v.dominio}: ${v.estado})`);
-    add('K01', cert.estado === 'ISSUED' ? 'ok' : 'pendente', 'Certificado ACM emitido para nekkora.com e www.nekkora.com', `${cert.arn} — ${cert.estado}`, cert.estado === 'ISSUED' ? '' : `Validação por DNS pendente. Registros a criar na Cloudflare (DNS only), após autorização: ${records.join(' · ')}`);
-    add('K02', cert.emUsoPor.includes(d.ARN) || vc.ACMCertificateArn === cert.arn ? 'ok' : 'pendente', 'Certificado associado à distribuição', vc.ACMCertificateArn ?? 'nenhum');
+    add('K01', 'pendente', certTitle, `${cert.arn} — ${cert.estado}`, `Validação por DNS pendente. Registros a criar na Cloudflare (DNS only), após autorização: ${records.join(' · ')}`);
+  } else {
+    add('K01', 'falha', certTitle, `${cert.arn} — ${cert.estado}`, 'Nenhum certificado emitido: solicitar um novo no ACM (us-east-1) com os dois nomes e validação por DNS.');
+  }
+  const k02Title = 'Certificado emitido associado à distribuição do CloudFront';
+  if (vc.CloudFrontDefaultCertificate || !vc.ACMCertificateArn) {
+    add('K02', 'pendente', k02Title, 'certificado padrão *.cloudfront.net', 'Associar o certificado emitido à distribuição (Settings → Custom SSL certificate).');
+  } else if (attached && adequate(attached)) {
+    add('K02', 'ok', k02Title, `${attached.arn}${attached.emUsoPor.includes(d.ARN) ? ' (ACM confirma o uso pela distribuição)' : ''}`);
+  } else {
+    add('K02', 'falha', k02Title, `${vc.ACMCertificateArn} — ${attached ? `${attached.estado}, ${attached.nomes.join(', ')}` : 'não encontrado no ACM (us-east-1)'}`, 'Associar à distribuição um certificado emitido para nekkora.com e www.nekkora.com.');
   }
   return { inventory, checks };
 }

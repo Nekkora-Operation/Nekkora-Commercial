@@ -35,8 +35,8 @@ credenciais da AWS, então **nenhum identificador real foi lido**.
 
 | ID | Ação | Onde |
 |---|---|---|
-| INF-01 | **Próximo passo.** Rodar a auditoria somente leitura no CloudShell (`bash auditar.sh`, ver COM-RELEASE-003-aws §1.2) e enviar o `auditoria.md`. Bucket, CloudFront, OAC e política foram configurados manualmente (informado em 22/10) e falta confirmar o estado real | AWS CloudShell (usuário administrativo com MFA, nunca root) |
-| INF-02 | Certificado ACM (us-east-1, `nekkora.com` + `www.nekkora.com`): CNAMEs de validação **já criados** na Cloudflare (informado em 22/10). Os logs públicos de CT ainda não mostram emissão: confirmar `ISSUED` pela auditoria (K01); se seguir pendente, conferir proxy desligado, nome sem domínio repetido e valor terminando em `.acm-validations.aws.` | ACM |
+| INF-01 | **Próximo passo.** Auditoria executada no CloudShell em 26/10/2026; as três falhas (S07, K01, K02) eram falsos positivos do auditor, corrigidos sem mexer na AWS (COM-RELEASE-003-aws §1.3). Rodar `bash auditar.sh` de novo e enviar o `auditoria.md`: o esperado é 21 ok, 5 pendentes, 0 falha, 3 info | AWS CloudShell (usuário administrativo com MFA, nunca root) |
+| INF-02 | **Resolvido (26/10/2026).** Certificado ACM (us-east-1, `nekkora.com` + `www.nekkora.com`) `ISSUED` e associado à distribuição `E3TZD2P6FOEWWR`. Um pedido anterior ficou `VALIDATION_TIMED_OUT` e pode ser excluído no ACM quando a titular quiser (não afeta nada) | ACM |
 | INF-03 | Response Headers Policy a partir de `deploy/aws/politica-cabecalhos.json` | CloudFront → Policies |
 | INF-04 | CloudFront Function `deploy/aws/funcao-viewer-request.js` (viewer request) | CloudFront → Functions |
 | INF-05 | Comportamento padrão: CachingOptimized, compressão, GET/HEAD, redirect to HTTPS, política INF-03; páginas de erro 403/404 → `/404.html` (404) | CloudFront → distribuição |
