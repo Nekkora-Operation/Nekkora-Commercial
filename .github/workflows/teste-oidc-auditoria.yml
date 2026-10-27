@@ -1,0 +1,69 @@
+# Smoke test do GitHub OIDC → AWS, SOMENTE com a role de auditoria (nekkora-commercial-auditoria, só Get/List/Describe).
+# Pede um token OIDC, troca-o no STS por credenciais temporárias e confere com `aws sts get-caller-identity` que a conta
+# e a role assumida são as esperadas. Não usa a role de deploy nem chaves permanentes, não lê nem grava objetos do S3,
+# não cria invalidações e não faz deploy, rollback ou alteração de DNS: a única chamada à AWS é o GetCallerIdentity.
+#
+# Só roda a partir da main, em três barreiras: o `if` do job, a restrição de branches do environment "auditoria-aws" e
+# a condição `ref` = refs/heads/main da confiança da role (deploy/aws/iam/confianca-auditoria.json, PR #6).
+name: Teste OIDC (auditoria)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: teste-oidc-auditoria
+  cancel-in-progress: false
+
+jobs:
+  teste-oidc:
+    name: Assumir a role de auditoria e conferir a identidade
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: auditoria-aws
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 5
+    steps:
+      - name: Credenciais temporárias (OIDC → STS, role de auditoria)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_AUDIT_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: nekkora-commercial-teste-oidc-${{ github.run_id }}
+          role-duration-seconds: 900
+
+      - name: Conferir conta e role (aws sts get-caller-identity)
+        env:
+          CONTA_ESPERADA: '055408888315'
+          ROLE_ESPERADA: nekkora-commercial-auditoria
+        run: |
+          set -euo pipefail
+          identidade=$(aws sts get-caller-identity --query '[Account, Arn]' --output text)
+          read -r conta arn <<< "${identidade}"
+          echo "Conta: ${conta}"
+          echo "ARN:   ${arn}"
+          falhas=0
+          if [[ "${conta}" != "${CONTA_ESPERADA}" ]]; then
+            echo "::error::conta ${conta} ≠ ${CONTA_ESPERADA}"
+            falhas=1
+          fi
+          # Sessão de role assumida: arn:aws:sts::<conta>:assumed-role/<role>/<sessão>
+          if [[ ! "${arn}" =~ ^arn:aws:sts::${CONTA_ESPERADA}:assumed-role/${ROLE_ESPERADA}/[^/]+$ ]]; then
+            echo "::error::ARN ${arn} não é uma sessão da role ${ROLE_ESPERADA} na conta ${CONTA_ESPERADA}"
+            falhas=1
+          fi
+          if (( falhas )); then
+            exit 1
+          fi
+          {
+            echo "### Teste OIDC (auditoria): aprovado"
+            echo
+            echo "| Verificação | Resultado |"
+            echo "|---|---|"
+            echo "| Conta = ${CONTA_ESPERADA} | ok |"
+            echo "| ARN = sessão de ${ROLE_ESPERADA} | ok (\`${arn}\`) |"
+          } >> "${GITHUB_STEP_SUMMARY}"
