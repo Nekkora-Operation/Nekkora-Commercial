@@ -49,21 +49,10 @@ jobs:
           git merge-base --is-ancestor "$commit" origin/main || { echo "::error::$commit não está na main — só código revisado e integrado é publicado"; exit 1; }
           echo "commit=$commit" >> "$GITHUB_OUTPUT"
           echo "Release candidata: $REF → $commit" >> "$GITHUB_STEP_SUMMARY"
-      - name: Environment "production" exige revisor e restringe branches
+      - name: Environment "production" exige revisor e só aceita a branch main
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          curl -sf -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/${GITHUB_REPOSITORY}/environments/production" > env.json \
-            || { echo "::error::environment production não existe — crie-o com revisor obrigatório antes do primeiro deploy"; exit 1; }
-          node -e '
-            const e = JSON.parse(require("fs").readFileSync("env.json", "utf8"));
-            const reviewers = (e.protection_rules ?? []).filter((r) => r.type === "required_reviewers").flatMap((r) => r.reviewers ?? []);
-            const problems = [];
-            if (!reviewers.length) problems.push("sem revisor obrigatório");
-            if (!e.deployment_branch_policy) problems.push("sem restrição de branches (use só main)");
-            if (problems.length) { console.log(`::error::environment production: ${problems.join("; ")}`); process.exit(1); }
-            console.log(`revisores: ${reviewers.map((r) => r.reviewer?.login ?? r.reviewer?.name).join(", ")}`);
-          '
+        run: node scripts/verificar-environment.mjs --environment production
 
   ci:
     name: Pipeline completo do commit

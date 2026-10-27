@@ -135,6 +135,25 @@ jobs:
           path: evidencias/
           retention-days: 30
 
+  environment-producao:
+    # Mesma verificação que o deploy e o rollback fazem antes de pedir a aprovação, com as MESMAS permissões do token
+    # (contents: read): comprova a cada PR que a chamada à API funciona com o GITHUB_TOKEN real e que o environment
+    # "production" continua com revisor obrigatório e só a branch main. Só leitura; nenhuma credencial da AWS.
+    name: Proteções do environment production (API do GitHub)
+    # No deploy (workflow_call) a mesma verificação já roda no job de autorização
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Revisor obrigatório e só main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verificar-environment.mjs --environment production
+
   preview:
     # Ambiente "preview": homologação sem publicação — sem nenhuma credencial (nenhuma role da AWS confia neste
     # environment). Resume no PR o que a produção receberia: commit, hash do artefato e o resultado do portão.

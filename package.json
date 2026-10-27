@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "test": "node --test scripts/testes/precos.test.mjs scripts/testes/verificar-publicacao.test.mjs scripts/testes/aws-publicacao.test.mjs scripts/testes/aws-auditoria.test.mjs scripts/testes/aws-iam.test.mjs scripts/testes/cloudfront-local.test.mjs",
+    "test": "node --test scripts/testes/precos.test.mjs scripts/testes/verificar-publicacao.test.mjs scripts/testes/aws-publicacao.test.mjs scripts/testes/aws-auditoria.test.mjs scripts/testes/aws-iam.test.mjs scripts/testes/verificar-environment.test.mjs scripts/testes/cloudfront-local.test.mjs",
     "check": "npm run typecheck && npm test && npm run build && npm run aws:config:verificar",
     "homologacao": "node scripts/homologacao.mjs",
     "homologacao:canais": "node scripts/homologacao-canais.mjs",
