@@ -23,10 +23,14 @@ Configuração em [`publicacao.json`](../../publicacao.json):
 "aprovacoes": { …, "agendamento": false, "envioAutomatico": false, … }
 ```
 
-- **`agendamento.url`**: a URL só é aceita (em `src/config.ts` e no portão) se for `https`, em
-  `outlook.office365.com` ou `outlook.office.com`, com caminho de página de reservas (`/book/…` ou
-  `/owa/calendar/…/bookings`) e com a caixa de reservas **no domínio do e-mail comercial** (`@nekkora.com`) ou do
-  tenant (`*.onmicrosoft.com`). Ficam de fora a página inicial, URLs de outras organizações e domínios de exemplo.
+- **`agendamento.url`**: a URL só é aceita (pela regra única de `src/agendamento-url.js`, usada pela página e pelo
+  portão) se for `https`, em `bookings.cloud.microsoft` (endereço atual) ou nos legados `outlook.office365.com` e
+  `outlook.office.com`, com caminho de página de reservas (`/book/…` ou, nos legados, `/owa/calendar/…/bookings`) e
+  com a caixa de reservas **no domínio do e-mail comercial** (`@nekkora.com`). Uma caixa `*.onmicrosoft.com` só vale
+  com o tenant declarado em `agendamento.dominioDoTenant`. Ficam de fora a página inicial, URLs de outras organizações,
+  domínios de exemplo, query, credenciais e caracteres codificados no caminho. Detalhes em
+  [NEKKORA-COM-007](NEKKORA-COM-007-bookings.md). **URL registrada em 28/10/2026:**
+  `https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/` (`aprovacoes.agendamento` continua `false`).
   Sem uma URL válida, **o botão não aparece**: a página não aponta para endereço inexistente nem apresenta o
   agendamento como disponível.
 - **`agendamento.obrigatorio: true`**: o agendamento faz parte do lançamento (§4, P0), então o portão **bloqueia** a
@@ -157,8 +161,13 @@ M365**: DKIM do domínio no SES é obrigatório antes de ativar, e o primeiro en
 
 ## 5. Configuração do Microsoft Bookings (D02, ação da titular)
 
-Nada disso foi feito nem verificado: depende da licença e da conta Microsoft 365. Os nomes dos menus podem variar
-conforme a versão do Bookings.
+**Atualização (NEKKORA-COM-007, 28/10/2026):** a titular configurou a página compartilhada "Nekkora" com o serviço
+"Conversa inicial — Nekkora Delivery" (30 min, Teams, seg–sex 09h–18h, 24 h a 30 dias de antecedência, 15 min de
+intervalo) e fez uma reserva real de teste. Evidências e testes pendentes em
+[NEKKORA-COM-007 §3](NEKKORA-COM-007-bookings.md#3-testes). O roteiro abaixo é o original; os valores homologados
+são os da titular.
+
+Os nomes dos menus podem variar conforme a versão do Bookings.
 
 1. **Licença:** confirmar que o plano inclui o Bookings (Microsoft 365 Business Basic, Standard ou Premium, ou E3/E5).
    No centro de administração, o Bookings precisa estar habilitado para a organização.
@@ -178,7 +187,8 @@ conforme a versão do Bookings.
    documentos sigilosos." Não pedir telefone nem documento.
 5. **Privacidade da página:** se existir a opção, desligar a indexação por buscadores. Conferir o texto de privacidade
    que o Bookings mostra.
-6. **Publicar** e copiar a URL pública, no formato `https://outlook.office365.com/book/<caixa>@nekkora.com/`. Abrir em
+6. **Publicar** e copiar a URL pública, no formato `https://bookings.cloud.microsoft/book/<caixa>@nekkora.com/` (o
+   formato legado `https://outlook.office365.com/book/…` também é aceito), sem query (`?…`). Abrir em
    computador e em celular, numa janela anônima, e conferir horários, fuso, duração e perguntas.
 7. Gravar a URL em `publicacao.json → agendamento.url` e, depois do teste, `aprovacoes.agendamento: true`. O portão
    (PUB-20) e a homologação (`agendamento-*`) conferem o restante.

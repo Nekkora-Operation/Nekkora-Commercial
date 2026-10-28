@@ -218,9 +218,10 @@ Responsável pelos dados pessoais desta página: a Nekkora.
 
 - **O formulário não envia nada** — O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.
 - **O que vai para o e-mail** — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a contato@nekkora.com. Ela só é enviada se você a enviar pelo aplicativo.
+- **Agendamento pelo Microsoft Bookings** — Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para realizar a conversa. Não informe senhas, credenciais nem documentos sigilosos.
 - **Sem cookies nem rastreamento** — Não usamos cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site.
 - **Registros de acesso** — A Amazon Web Services (AWS), que hospeda este site, processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.
-- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir confirmação, acesso, correção, exclusão ou informações sobre o compartilhamento dos seus dados (LGPD, art. 18) pelo e-mail contato@nekkora.com.
+- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação, realizar a conversa agendada e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V), pelo tempo necessário a esse atendimento ou exigido por lei. Você pode pedir confirmação, acesso, correção, exclusão ou informações sobre o compartilhamento dos seus dados (LGPD, art. 18) pelo e-mail contato@nekkora.com.
 
 ## 8. Barra de navegação
 
