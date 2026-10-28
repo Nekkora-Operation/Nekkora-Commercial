@@ -18,6 +18,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { priceFacts } from '../src/precos.ts';
+import { BOOKINGS_HOSTS } from '../src/agendamento-url.js';
 
 const [, , baseUrl = 'http://localhost:4173/', outDir = 'docs/com-001/evidencias/depois'] = process.argv;
 const modules = process.env.NEKKORA_PW_MODULES;
@@ -373,19 +374,36 @@ await block('funcionais', async () => {
       `release.json=${served?.commit?.slice(0, 7) ?? 'ausente'}; HEAD=${head?.slice(0, 7) ?? 'git indisponível'}; rodapé=${footer ?? 'sem aviso de homologação'}`,
     );
   }
-  // Agendamento (COM-RELEASE-005 §4.5): sem URL oficial do Bookings, nenhum botão nem link de agendamento
+  // Agendamento (COM-RELEASE-005 §4.5, NEKKORA-COM-007): sem URL oficial do Bookings, nenhum botão nem link de
+  // agendamento; com ela, todos apontam para a mesma página oficial, em nova aba, sem opener e sem Referer
   {
-    const scheduling = await page.evaluate(() => ({
-      buttons: [...document.querySelectorAll('a, button')].filter((e) => /Agendar conversa/i.test(e.textContent ?? '')).length,
-      links: [...document.querySelectorAll('a[href]')].filter((a) => /outlook\.office(365)?\.com|bookings/i.test(a.getAttribute('href'))).length,
-      status: document.querySelector('[data-agendamento]')?.getAttribute('data-agendamento') ?? null,
-    }));
+    const scheduling = await page.evaluate((hosts) => {
+      const isBookings = (href) => {
+        try {
+          return hosts.includes(new URL(href, location.href).hostname);
+        } catch {
+          return false;
+        }
+      };
+      const links = [...document.querySelectorAll('a[href]')].filter((a) => isBookings(a.getAttribute('href')) || /bookings/i.test(a.getAttribute('href')));
+      return {
+        buttons: [...document.querySelectorAll('a, button')].filter((e) => /Agendar conversa/i.test(e.textContent ?? '')).length,
+        links: links.length,
+        hrefs: [...new Set(links.map((a) => a.getAttribute('href')))],
+        isolated: links.every((a) => a.target === '_blank' && /\bnoopener\b/.test(a.rel) && /\bnoreferrer\b/.test(a.rel)),
+        status: document.querySelector('[data-agendamento]')?.getAttribute('data-agendamento') ?? null,
+      };
+    }, BOOKINGS_HOSTS);
     results.agendamento = scheduling;
     const configured = scheduling.status === 'configurado';
     check(
       'agendamento-conforme-configuracao',
-      configured ? scheduling.buttons >= 2 && scheduling.links === scheduling.buttons : scheduling.buttons === 0 && scheduling.links === 0,
-      configured ? `${scheduling.buttons} botão(ões) para o Bookings` : `URL do Bookings não configurada: ${scheduling.buttons} botão(ões), ${scheduling.links} link(s)`,
+      configured
+        ? scheduling.buttons >= 2 && scheduling.links === scheduling.buttons && scheduling.hrefs.length === 1 && scheduling.isolated
+        : scheduling.buttons === 0 && scheduling.links === 0,
+      configured
+        ? `${scheduling.buttons} botão(ões) para ${scheduling.hrefs.join(', ')}; nova aba sem opener e sem Referer: ${scheduling.isolated ? 'sim' : 'NÃO'}`
+        : `URL do Bookings não configurada: ${scheduling.buttons} botão(ões), ${scheduling.links} link(s)`,
     );
   }
   // Coerência matemática do que é exibido: economia = padrão − lançamento; percentual = economia / padrão (2 casas, truncado)

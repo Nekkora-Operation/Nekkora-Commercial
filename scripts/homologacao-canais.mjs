@@ -26,6 +26,7 @@
 import { createRequire } from 'node:module';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { BOOKINGS_HOSTS } from '../src/agendamento-url.js';
 
 const [, , baseUrl = 'http://127.0.0.1:4175/', outDir = 'docs/release/evidencias/conversao', enginesArg = 'chromium,firefox,webkit'] = process.argv;
 const modules = process.env.NEKKORA_PW_MODULES;
@@ -365,7 +366,7 @@ async function runEmail(engine) {
   check(
     engine,
     'agendamento-de-outra-organizacao-recusado',
-    !links.some((l) => /outlook\.office/.test(l.href)) && !/Agendar conversa/.test(bodyText) && (await page.getAttribute('[data-agendamento]', 'data-agendamento')) === 'pendente',
+    !links.some((l) => /^https?:/.test(l.href) && BOOKINGS_HOSTS.includes(new URL(l.href).hostname)) && !/Agendar conversa/.test(bodyText) && (await page.getAttribute('[data-agendamento]', 'data-agendamento')) === 'pendente',
     'nenhum botão "Agendar conversa" nem link para o Bookings',
   );
   const privacy = await page.locator('#privacidade').innerText();
