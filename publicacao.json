@@ -5,7 +5,7 @@
     "controlador.documento": "Titular, 22/10/2026 (COM-RELEASE-003). Dígitos verificadores conferidos. Razão social ainda não informada.",
     "hospedagem.provedor": "COM-RELEASE-003 §1.1: Amazon S3 + Amazon CloudFront.",
     "aprovacoes.precos": "COM-RELEASE-003-R1 §3.1 (decisão interna de 22/10/2026): simples R$ 1.500 → R$ 1.000, média R$ 3.500 → R$ 2.800, complexa sob orçamento. Não inclui as condições comerciais (§3.5).",
-    "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. A URL oficial do Microsoft Bookings ainda não foi informada.",
+    "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. URL da página pública criada pela titular no Microsoft Bookings (página compartilhada \"Nekkora\", serviço \"Conversa inicial — Nekkora Delivery\"), conferida em 28/10/2026 (NEKKORA-COM-007). aprovacoes.agendamento continua false: faltam o lembrete de 2 horas, o cancelamento com liberação do horário e a abertura efetiva do link do Teams.",
     "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail."
   },
   "canais": {
@@ -15,7 +15,7 @@
     "instagram": null
   },
   "agendamento": {
-    "url": null,
+    "url": "https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/",
     "obrigatorio": true
   },
   "envioAutomatico": {

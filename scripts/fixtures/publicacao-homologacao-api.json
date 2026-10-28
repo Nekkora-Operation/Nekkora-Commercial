@@ -7,7 +7,7 @@
     "instagram": null
   },
   "agendamento": {
-    "url": "https://outlook.office365.com/book/AvaliacaoHomologacao@exemplo.invalid/",
+    "url": "https://bookings.cloud.microsoft/book/AvaliacaoHomologacao@exemplo.invalid/",
     "obrigatorio": true
   },
   "envioAutomatico": {

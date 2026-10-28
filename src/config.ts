@@ -11,6 +11,7 @@
  * NEKKORA_PUBLICACAO — veja vite.config.ts.
  */
 import publicacao from '@publicacao';
+import { isBookingsUrl } from './agendamento-url.js';
 import { launchActive, todayInBrazil } from './precos';
 
 /** WhatsApp com DDI + DDD, só dígitos. E-mail. URLs de perfil (não a página inicial da rede). */
@@ -52,43 +53,20 @@ export const hasAnyChannel = Object.values(CHANNELS).some((c) => c != null);
 export const whatsappUrl = (message: string = WHATSAPP_MESSAGE) =>
   CHANNELS.whatsapp ? `https://wa.me/${CHANNELS.whatsapp}?text=${encodeURIComponent(message)}` : null;
 
-/** Hosts da página pública do Microsoft Bookings. */
-const BOOKINGS_HOSTS = ['outlook.office365.com', 'outlook.office.com'];
-
-/**
- * Página pública oficial do Microsoft Bookings (COM-RELEASE-005 §4.5): https, host da Microsoft, caminho de uma página
- * de reservas (/book/… ou /owa/calendar/…/bookings) e caixa de reservas do próprio domínio da Nekkora — o do e-mail
- * comercial — ou do tenant (*.onmicrosoft.com). Recusa a página inicial, URLs de outras organizações e domínios de
- * exemplo. Mesma regra em scripts/verificar-publicacao.mjs.
- */
-export function isBookingsUrl(u: string | null, emailDomain: string | null): u is string {
-  if (u == null || emailDomain == null) return false;
-  try {
-    const url = new URL(u);
-    const path = decodeURIComponent(url.pathname).toLowerCase();
-    const mailbox = /^\/(?:book|owa\/calendar)\/[^/@]+@([^/]+)\//.exec(path.endsWith('/') ? path : `${path}/`);
-    const okPath = path.startsWith('/book/') || (path.startsWith('/owa/calendar/') && path.includes('/bookings'));
-    const domain = mailbox?.[1] ?? '';
-    return (
-      url.protocol === 'https:' &&
-      BOOKINGS_HOSTS.includes(url.hostname.toLowerCase()) &&
-      url.username === '' &&
-      okPath &&
-      (domain === emailDomain.toLowerCase() || /^[a-z0-9-]+\.onmicrosoft\.com$/.test(domain))
-    );
-  } catch {
-    return false;
-  }
-}
-
 const EMAIL_DOMAIN = CHANNELS.email ? CHANNELS.email.split('@')[1] : null;
 
 /**
- * "Agendar conversa" (COM-RELEASE-005 §4): só com a URL oficial e válida do Bookings em publicacao.json. Sem ela, o
+ * "Agendar conversa" (COM-RELEASE-005 §4): só com a URL oficial e válida do Bookings em publicacao.json — regra única em
+ * agendamento-url.js, a mesma do portão de publicação (NEKKORA-COM-007: bookings.cloud.microsoft). Sem ela, o
  * botão não aparece — a página não apresenta o agendamento como disponível nem aponta para um endereço inexistente.
  * O Bookings é quem confirma a reserva: a página nunca afirma que uma reunião foi agendada.
  */
-export const BOOKINGS_URL: string | null = isBookingsUrl(publicacao.agendamento.url, EMAIL_DOMAIN) ? publicacao.agendamento.url : null;
+export const BOOKINGS_URL: string | null = isBookingsUrl(publicacao.agendamento.url, {
+  emailDomain: EMAIL_DOMAIN,
+  tenantDomain: publicacao.agendamento.dominioDoTenant ?? null,
+})
+  ? publicacao.agendamento.url
+  : null;
 
 /** Caminho do contrato da API de solicitações (COM-RELEASE-005 §5.4). */
 export const LEAD_API_PATH = '/v1/commercial/requests';

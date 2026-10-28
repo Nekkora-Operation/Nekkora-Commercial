@@ -21,6 +21,7 @@
 import { createRequire } from 'node:module';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { BOOKINGS_HOSTS } from '../src/agendamento-url.js';
 
 const [, , baseUrl = 'http://127.0.0.1:4177/', apiBase = 'http://127.0.0.1:4178/', outDir = 'docs/release/evidencias/leads', enginesArg = 'chromium,firefox,webkit'] = process.argv;
 const require = createRequire(import.meta.url);
@@ -102,7 +103,7 @@ async function run(engine) {
         if (turnstileDown) return route.abort('internetdisconnected');
         return route.fulfill({ status: 200, contentType: 'text/javascript; charset=utf-8', body: FAKE_TURNSTILE });
       }
-      if (url.startsWith('https://outlook.office365.com/')) {
+      if (url.startsWith('https://') && BOOKINGS_HOSTS.includes(new URL(url).hostname)) {
         bookingRequests.push({ url, referer: req.headers()['referer'] ?? null });
         if (bookingDown) return route.abort('internetdisconnected');
         return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: '<!doctype html><meta charset="utf-8"><title>Bookings (página de teste local)</title><h1>Microsoft Bookings — página de teste local</h1>' });
@@ -157,6 +158,8 @@ async function run(engine) {
   );
   check(engine, 'agendamento-botoes-nas-areas-de-conversao', JSON.stringify(sched.map((s) => s.section)) === JSON.stringify(['inicio', 'contato']), sched.map((s) => s.section).join(', '));
   check(engine, 'agendamento-url-oficial-configurada', sched.every((s) => s.href === BOOKINGS), BOOKINGS);
+  // NEKKORA-COM-007: a fixture usa o endereço atual do Bookings (bookings.cloud.microsoft)
+  check(engine, 'agendamento-dominio-atual-do-bookings', sched.every((s) => new URL(s.href).hostname === 'bookings.cloud.microsoft'), new URL(BOOKINGS).hostname);
   check(engine, 'agendamento-nova-aba-isolada', sched.every((s) => s.target === '_blank' && s.rel.includes('noopener') && s.rel.includes('noreferrer')));
   const accName = await page.getByRole('link', { name: /Agendar conversa \(abre o Microsoft Bookings em outra aba\)/ }).count();
   check(engine, 'agendamento-nome-acessivel', accName === 2, `${accName} link(s) com o nome completo`);

@@ -2,7 +2,8 @@
 declare module '@publicacao' {
   const publicacao: {
     canais: { whatsapp: string | null; email: string | null; linkedin: string | null; instagram: string | null };
-    agendamento: { url: string | null; obrigatorio: boolean };
+    /** dominioDoTenant: opcional; só com ele uma caixa *.onmicrosoft.com é aceita (e só a do próprio tenant). */
+    agendamento: { url: string | null; obrigatorio: boolean; dominioDoTenant?: string | null };
     envioAutomatico: { endpoint: string | null; chaveDoSiteTurnstile: string | null };
     campanhaLancamento: { inicio: string | null; fim: string | null };
     controlador: { nome: string | null; documento: string | null };

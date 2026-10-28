@@ -21,7 +21,7 @@ const policy = (hashes = HASHES, origens) => `${JSON.stringify(responseHeadersPo
 
 const complete = () => ({
   canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
-  agendamento: { url: 'https://outlook.office365.com/book/AvaliacaoInicial@empresa-ficticia.com.br/', obrigatorio: true },
+  agendamento: { url: 'https://bookings.cloud.microsoft/book/AvaliacaoInicial@empresa-ficticia.com.br/', obrigatorio: true },
   envioAutomatico: { endpoint: null, chaveDoSiteTurnstile: null },
   campanhaLancamento: { inicio: '2026-11-01', fim: '2026-12-31' },
   controlador: { nome: 'Empresa Fictícia Ltda.', documento: '11.222.333/0001-81' },
@@ -65,8 +65,11 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   setup(JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8')));
   const r = await gate();
   assert.equal(r.code, 1, r.stdout);
-  // PUB-20: o agendamento faz parte do lançamento (COM-RELEASE-005) e a URL oficial do Bookings ainda não foi informada
+  // PUB-20: a URL oficial do Bookings foi registrada (NEKKORA-COM-007) e passa na validação, mas a confirmação da
+  // titular (aprovacoes.agendamento) continua pendente — o portão segue bloqueando
   for (const id of ['PUB-13', 'PUB-19', 'PUB-17', 'PUB-18', 'PUB-10', 'PUB-20']) assert.match(r.stdout, new RegExp(id));
+  assert.match(r.stdout, /PUB-20 — confirmação da titular/);
+  assert.doesNotMatch(r.stdout, /PUB-20 — URL oficial/);
   // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21
   assert.doesNotMatch(r.stdout, /PUB-21/);
   // os dados já informados pela titular passam: e-mail, LinkedIn, CNPJ, provedor e preços
@@ -102,6 +105,23 @@ const cases = [
   ['Bookings na página inicial', (p) => (p.agendamento.url = 'https://outlook.office365.com/'), /PUB-20 — URL oficial/],
   ['Bookings fora da Microsoft', (p) => (p.agendamento.url = 'https://bookings.exemplo.com.br/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
   ['Bookings em http', (p) => (p.agendamento.url = 'http://outlook.office365.com/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  // NEKKORA-COM-007: domínio atual (bookings.cloud.microsoft) — mesma regra de src/agendamento-url.js
+  ['Bookings novo em http', (p) => (p.agendamento.url = 'http://bookings.cloud.microsoft/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['Bookings novo na página inicial', (p) => (p.agendamento.url = 'https://bookings.cloud.microsoft/'), /PUB-20 — URL oficial/],
+  ['Bookings novo de outra organização', (p) => (p.agendamento.url = 'https://bookings.cloud.microsoft/book/Vendas@outra-empresa.com.br/'), /PUB-20 — URL oficial/],
+  ['host parecido com o da Microsoft', (p) => (p.agendamento.url = 'https://bookings.cloud.microsoft.com/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['subdomínio malicioso', (p) => (p.agendamento.url = 'https://bookings.cloud.microsoft.evil.example/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['credenciais embutidas', (p) => (p.agendamento.url = 'https://u:s@bookings.cloud.microsoft/book/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['caminho inválido', (p) => (p.agendamento.url = 'https://bookings.cloud.microsoft/calendar/AvaliacaoInicial@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['caixa disfarçada com "/" codificado', (p) => (p.agendamento.url = 'https://bookings.cloud.microsoft/book/x%2F@empresa-ficticia.com.br/'), /PUB-20 — URL oficial/],
+  ['URL malformada', (p) => (p.agendamento.url = 'https://'), /PUB-20 — URL oficial/],
+  ['domínio fictício em produção (domínio atual)', (p) => ((p.canais.email = 'a@b.test'), (p.agendamento.url = 'https://bookings.cloud.microsoft/book/X@b.test/')), /PUB-20 — URL oficial/],
+  ['caixa *.onmicrosoft.com sem tenant declarado', (p) => (p.agendamento.url = 'https://bookings.cloud.microsoft/book/AvaliacaoInicial@empresaficticia.onmicrosoft.com/'), /PUB-20 — URL oficial/],
+  [
+    'caixa *.onmicrosoft.com de outro tenant',
+    (p) => ((p.agendamento.dominioDoTenant = 'empresaficticia.onmicrosoft.com'), (p.agendamento.url = 'https://bookings.cloud.microsoft/book/X@outra.onmicrosoft.com/')),
+    /PUB-20 — URL oficial/,
+  ],
   ['Bookings sem confirmação da titular', (p) => (p.aprovacoes.agendamento = false), /PUB-20 — confirmação da titular/],
   // Recebimento automático (COM-RELEASE-005 §5)
   ['endpoint em http', (p) => (p.envioAutomatico = { endpoint: 'http://api.empresa-ficticia.com.br/v1/commercial/requests', chaveDoSiteTurnstile: '0x4AAAAAAAAbcdefghijklmn' }), /PUB-21 — endpoint/],
@@ -133,9 +153,17 @@ test('agendamento fora do lançamento: sem URL, libera (o botão não aparece)',
   assert.equal((await gate()).code, 0);
 });
 
-test('Bookings com a caixa do tenant (*.onmicrosoft.com) também é aceito', async () => {
+test('Bookings no formato legado (outlook.office365.com) continua aceito', async () => {
   const p = complete();
-  p.agendamento.url = 'https://outlook.office365.com/book/AvaliacaoInicial@empresaficticia.onmicrosoft.com/';
+  p.agendamento.url = 'https://outlook.office365.com/book/AvaliacaoInicial@empresa-ficticia.com.br/';
+  setup(p);
+  assert.equal((await gate()).code, 0);
+});
+
+test('Bookings com a caixa do tenant (*.onmicrosoft.com): só a do tenant declarado em agendamento.dominioDoTenant', async () => {
+  const p = complete();
+  p.agendamento.dominioDoTenant = 'empresaficticia.onmicrosoft.com';
+  p.agendamento.url = 'https://bookings.cloud.microsoft/book/AvaliacaoInicial@empresaficticia.onmicrosoft.com/';
   setup(p);
   assert.equal((await gate()).code, 0);
 });
