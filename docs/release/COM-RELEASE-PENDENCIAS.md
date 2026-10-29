@@ -1,6 +1,7 @@
 # NEKKORA-RELEASE-001 — Pendências que dependem da titular
 
-Atualizado na COM-RELEASE-005 (22/10/2026). Nada abaixo foi presumido. Enquanto um item estiver pendente, a página
+Atualizado na COM-RELEASE-005 (22/10/2026) e na **NEKKORA-COM-008-C (28/10/2026)**, com as decisões da COM-008-B.
+Nada abaixo foi presumido; nenhuma aprovação foi marcada. Enquanto um item estiver pendente, a página
 não faz a afirmação correspondente e o portão `npm run verificar:publicacao` **bloqueia o deploy de produção** (ele
 lista os mesmos IDs). Todos os dados entram em um único arquivo: [`publicacao.json`](../../publicacao.json). O campo
 `$origem` registra de onde veio cada valor já preenchido.
@@ -12,7 +13,7 @@ lista os mesmos IDs). Todos os dados entram em um único arquivo: [`publicacao.j
 | PUB-01 | WhatsApp comercial | `canais.whatsapp` | **Fora do lançamento**: a titular decidiu publicar só e-mail e LinkedIn (22/10/2026). O campo fica `null`, a página não mostra WhatsApp e a jornada usa o e-mail. Para incluir depois, basta o número (só dígitos, DDI+DDD) |
 | PUB-02 | E-mail comercial | `canais.email` | **Preenchido**: `contato@nekkora.com`. O domínio tem e-mail no Microsoft 365; confirme que a caixa recebe mensagens antes de publicar |
 | PUB-03 | LinkedIn (obrigatório) e Instagram (opcional) | `canais.linkedin`, `canais.instagram` | **Preenchido**: `https://www.linkedin.com/company/nekkora`. Instagram fora (`null`) |
-| PUB-13 | Início e fim da campanha de lançamento | `campanhaLancamento.inicio/fim` (AAAA-MM-DD) | **Pendente.** Com as datas, a página diz "para propostas aprovadas de DD/MM/AAAA a DD/MM/AAAA" e **só mostra os preços de lançamento dentro do período** (fuso de Brasília); fora dele, só o preço padrão. O portão recusa campanha encerrada |
+| PUB-13 | Início e fim da campanha de lançamento | `campanhaLancamento.inicio/fim` (AAAA-MM-DD) | **Pendente.** Regra aprovada na COM-008-B: **dois meses a partir da publicação oficial** — as datas só existem depois dela e são gravadas pela titular (o código não as calcula). Com as datas, a página diz "para solicitações de avaliação recebidas de DD/MM/AAAA a DD/MM/AAAA" e **só mostra os preços de lançamento dentro do período** (fuso de Brasília), nos cartões e no simulador; fora dele, só o preço padrão. Sem datas, só como prévia na versão de homologação. O portão recusa campanha encerrada. Comprovação da data da solicitação: [`condicoes-comerciais-minuta.md` §8.1](../comercial/condicoes-comerciais-minuta.md) |
 | PUB-09 | Controlador dos dados pessoais | `controlador.nome/documento` | CNPJ **preenchido**: `68.337.624/0001-32`, com dígitos verificadores conferidos. **Falta a razão social**, que aparece no aviso de privacidade |
 | PUB-11 | Provedor de hospedagem | `hospedagem.provedor` | **Preenchido**: "Amazon Web Services (AWS)" (COM-RELEASE-003 §1.1) |
 | PUB-20 | **Agendamento (Microsoft Bookings)**: URL oficial da página de reservas e confirmação de que o serviço foi configurado e testado | `agendamento.url`, `aprovacoes.agendamento` | **Pendente (só a confirmação).** URL registrada em 28/10/2026 (NEKKORA-COM-007): `https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/`, aceita pela validação. Falta `aprovacoes.agendamento: true`, a gravar pela titular depois de: lembrete de 2 h recebido, cancelamento com liberação do horário e abertura efetiva do link do Teams ([NEKKORA-COM-007 §3.2](NEKKORA-COM-007-bookings.md)). Faz parte do lançamento (`obrigatorio: true`). Formatos aceitos: `https://bookings.cloud.microsoft/book/<caixa>@nekkora.com/` e o legado `https://outlook.office365.com/book/…`. Para lançar sem agendamento: `obrigatorio: false` |
@@ -23,12 +24,35 @@ lista os mesmos IDs). Todos os dados entram em um único arquivo: [`publicacao.j
 | ID | Decisão | Campo | Situação |
 |---|---|---|---|
 | PUB-14 | Preços: simples R$ 1.500 → R$ 1.000 (−33,33%, economia de R$ 500); média R$ 3.500 → R$ 2.800 (−20%, economia de R$ 700); complexa sob orçamento, sem desconto automático | `precos` | **Aprovado** na COM-RELEASE-003-R1 §3.1 |
-| PUB-19 | Condições comerciais: sob demanda com escopo em proposta, preço aprovado antes, 50% + 50% conforme a proposta, fila, reuniões, licenças à parte, garantia e aceite conforme a proposta. A aprovação dos preços **não** inclui as condições (§3.5) | `condicoesComerciais` | Pendente |
-| PUB-17 | Textos comerciais — [`docs/com-001/05-texto-comercial.md`](../com-001/05-texto-comercial.md) (gerado do código), inclusive a jornada por e-mail e, na seção 7b, o envio automático e o agendamento. Variante com tudo ligado: [`com-release-005/texto-com-envio-automatico-e-bookings.md`](com-release-005/texto-com-envio-automatico-e-bookings.md) | `textosComerciais` | Pendente |
-| PUB-09 | Aviso de privacidade (seção "Como tratamos seus dados"): o item do canal descreve o e-mail, o do provedor cita a AWS e, com envio automático ou Bookings, entram os itens correspondentes (COM-RELEASE-005). Bases legais, retenção e transferência internacional em [COM-RELEASE-005-privacidade](COM-RELEASE-005-privacidade.md). É uma minuta; revisão jurídica recomendada | `avisoDePrivacidade` | Pendente |
+| PUB-19 | Condições comerciais (COM-008-B): 50% após a aprovação e a formalização + 50% após a homologação e o aceite formal; várias automações com preço e aceite próprios; cancelamento, reembolso e garantia conforme a proposta e o contrato, com os direitos legais. Minuta: [`docs/comercial/condicoes-comerciais-minuta.md`](../comercial/condicoes-comerciais-minuta.md) — **não aprovada juridicamente** | `condicoesComerciais` | Pendente (revisão jurídica: JUR-01 a JUR-05) |
+| PUB-17 | Textos comerciais — [`docs/com-001/05-texto-comercial.md`](../com-001/05-texto-comercial.md) (gerado do código), inclusive o **simulador de investimento**, o formulário com tipo de solicitação, a jornada por e-mail e, na seção 7b, o envio automático e o agendamento. Revisados na COM-008-C (AUD-07, 09, 10, 13, 18, 19, 25). Variante com tudo ligado: [`com-release-005/texto-com-envio-automatico-e-bookings.md`](com-release-005/texto-com-envio-automatico-e-bookings.md) | `textosComerciais` | Pendente |
+| PUB-09 | Aviso de privacidade (seção "Como tratamos seus dados"), revisado na COM-008-C: CNPJ, Teams, retenção (6 meses / 90 dias), transferência internacional, escopo de "sem cookies", sem consentimento para o atendimento. Minuta: [`docs/comercial/privacidade-minuta.md`](../comercial/privacidade-minuta.md). **Falta a razão social**; revisão jurídica **obrigatória** | `avisoDePrivacidade` | Pendente (JUR-06 a JUR-09, OPS-01, OPS-02) |
 | PUB-10 | Desligar o aviso "Versão para homologação" | `avisoHomologacao: false` | Pendente |
 | PUB-18 | Autorização expressa de publicação em produção | `publicacao` | Pendente |
-| PUB-16 | Botão "Entrar" sem destino (não há área do cliente). Recomendação: **ocultar no lançamento**, por ser o único botão sem destino. Mantido por ser decisão anterior da titular (D-24) | — (código) | Decisão pendente |
+| PUB-16 | Botão "Entrar" sem destino (não há área do cliente) | — (código) | **Resolvido na COM-008-C**: oculto por decisão da COM-008-B (AUD-26). Área de clientes: futura Platform ([backlog](../roadmap/NEKKORA-PLATFORM-POLITICAS-BACKLOG.md)) |
+
+## 2a. Revisão jurídica (antes das aprovações PUB-09 e PUB-19) ⚖
+
+| ID | Tema | Documento |
+|---|---|---|
+| JUR-01 | Pagamento 50% + 50%, entrega definitiva após a quitação, atraso e nota fiscal | `condicoes-comerciais-minuta.md` §2 |
+| JUR-02 | Homologação sem aceite tácito: prazo de manifestação e rodadas de correção | §3 |
+| JUR-03 | Cancelamento e reembolso, inclusive o direito de arrependimento (CDC, art. 49) e a retenção após a homologação | §4 |
+| JUR-04 | Garantia contratual adicional de 30 dias e garantias legais (CDC, arts. 24 a 26) | §5 |
+| JUR-05 | Propriedade intelectual (Modelo A) e cláusula de dados do cliente (operadora, LGPD art. 39) | §7 |
+| JUR-06 | Base legal do atendimento (art. 7º, V ou IX) e ciência × consentimento no Bookings | `privacidade-minuta.md` §2, §4 |
+| JUR-07 | Transferência internacional (art. 33) e regiões da AWS e do Microsoft 365 | §5 |
+| JUR-08 | Agente de pequeno porte e encarregado (Res. CD/ANPD nº 2/2022) | `COM-RELEASE-005-privacidade.md` §1 |
+| JUR-09 | Identificação do fornecedor no site (Decreto 7.962/2013) e oferta vinculante com preços publicados (CDC, art. 30) | Relatório COM-008-A, AUD-08/AUD-34 |
+
+## 2b. Operação (titular; fora do código)
+
+| ID | Ação | Situação |
+|---|---|---|
+| OPS-01 | Procedimento de retenção: revisão da caixa `contato@` (6 meses) e das reservas do Bookings (90 dias), manual ou por política do M365 | Pendente — o aviso descreve o prazo, não uma eliminação automática |
+| OPS-02 | Configurar no Bookings o texto proposto ([`privacidade-minuta.md` §4](../comercial/privacidade-minuta.md)): ciência em vez de "concorda", sem "telefone", com Teams, link do aviso depois da publicação; "Empresa" opcional | Pendente (M365 não alterado pelo agente) |
+| OPS-03 | Registrar "Data da solicitação" (canal e referência) em cada proposta da campanha | A partir do lançamento |
+| OPS-04 | Proposta-modelo com campos de categoria, validade de 7 dias na campanha e critérios de aceite | Pendente |
 
 ## 3. Infraestrutura AWS (ações na conta da titular; nada foi feito pelo agente)
 

@@ -1,5 +1,10 @@
 # COM-001 — Decisões pendentes para publicação
 
+> **HISTÓRICO (COM-001).** Mantido como registro; **não é a lista vigente** (AUD-31). Vários itens foram resolvidos
+> ou mudaram (canais confirmados, Bookings configurado, preços aprovados, botão "Entrar" oculto, campanha com regras
+> aprovadas). Pendências atuais: [`docs/release/COM-RELEASE-PENDENCIAS.md`](../release/COM-RELEASE-PENDENCIAS.md) e
+> o relatório [`NEKKORA-COM-008-C-relatorio.md`](../release/NEKKORA-COM-008-C-relatorio.md).
+
 Nenhum item abaixo foi presumido. Enquanto estiver pendente, a página **não faz a afirmação** correspondente.
 
 ## Comerciais e operacionais (responsável pela Nekkora)

@@ -1,5 +1,10 @@
 # COM-RELEASE-005 — Revisão de segurança, privacidade e LGPD (D06)
 
+> **Atualizada pela NEKKORA-COM-008-C:** Teams, retenção, transferência internacional, distinção entre aceite,
+> ciência e consentimento e o texto proposto para o Bookings estão em
+> [`docs/comercial/privacidade-minuta.md`](../comercial/privacidade-minuta.md). O agendamento está **configurado**
+> (URL oficial, NEKKORA-COM-007), mas ainda **não aprovado** (PUB-20); a coluna "Ativo hoje?" abaixo é de 22/10/2026.
+
 **Minuta técnica para a decisão da titular. Não é parecer jurídico.** A revisão jurídica continua recomendada (PUB-09).
 O texto que aparece na página fica em `src/content.ts → PRIVACY` e muda conforme a configuração publicada:
 

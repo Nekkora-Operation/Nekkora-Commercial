@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Alert, Button, DescriptionList, Dialog, Divider, Input, Link, Logo, Textarea } from 'nekkora-lib';
+import { Alert, Button, Checkbox, DescriptionList, Dialog, Divider, Input, Link, Logo, RadioGroup, Textarea } from 'nekkora-lib';
 import { ScheduleButton, ScheduleLink } from '../agendamento';
 import { BOOKINGS_URL, CHANNELS, LEAD_API, REQUEST_CHANNEL, hasAnyChannel, mailtoUrl, whatsappDisplay, whatsappUrl } from '../config';
 import { CONTACT_COPY, SCHEDULE } from '../content';
 import { Challenge } from '../desafio';
 import { newRequestId, sendLeadRequest, type LeadFailure } from '../envio';
-import { useRequestTrigger } from '../request';
+import { useRequestTrigger, type Demand, type RequestOptions } from '../request';
 
 type Field = 'name' | 'email' | 'message';
 type Errors = Partial<Record<Field, string>>;
@@ -21,15 +21,46 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_MESSAGE = 1000;
 const FORM_ID = 'form-solicitacao';
 
-/** Mensagem estruturada enviada ao WhatsApp ou ao e-mail — exatamente o texto exibido na etapa de confirmação. */
-export function buildMessage({ name, company, email, message }: { name: string; company: string; email: string; message: string }) {
+const DEMANDS = CONTACT_COPY.demand.options;
+const demandOf = (d: Demand) => DEMANDS.find((o) => o.value === d) ?? DEMANDS[0];
+
+/** Resumo da simulação na mensagem, só quando o visitante o incluiu (NEKKORA-CALC-001 §3.8). */
+const simulationBlock = (simulation: string | null | undefined) => (simulation ? [`${CONTACT_COPY.simulation.heading}\n${simulation}`] : []);
+
+/**
+ * Mensagem estruturada enviada ao WhatsApp ou ao e-mail — exatamente o texto exibido na etapa de confirmação. A segunda
+ * linha diz o tipo de solicitação (AUD-25); para uma automação nova, é a mesma frase de sempre.
+ */
+export function buildMessage({
+  name,
+  company,
+  email,
+  message,
+  demand = 'automacao',
+  simulation = null,
+}: {
+  name: string;
+  company: string;
+  email: string;
+  message: string;
+  demand?: Demand;
+  simulation?: string | null;
+}) {
   return [
     `Olá! Sou ${name.trim()}${company.trim() ? `, da ${company.trim()}` : ''}.`,
-    'Quero solicitar uma avaliação de automação.',
+    demandOf(demand).line,
     message.trim(),
+    ...simulationBlock(simulation),
     ...(email.trim() ? [`E-mail para retorno: ${email.trim()}`] : []),
   ].join('\n\n');
 }
+
+/**
+ * Descrição enviada ao backend (envio automático): o contrato da API não tem campo de tipo nem de simulação, então
+ * ambos entram no texto — o tipo só quando não é automação nova. Limite do contrato: 1.000 caracteres no total.
+ */
+export const apiDescription = (message: string, demand: Demand, simulation: string | null) =>
+  [...(demand === 'automacao' ? [] : [demandOf(demand).line]), message.trim(), ...simulationBlock(simulation)].join('\n\n');
 
 /**
  * Diálogo "Solicitar avaliação" (modelo C, etapa 2; jornada da COM-RELEASE-002; envio automático da COM-RELEASE-005).
@@ -48,13 +79,17 @@ export function buildMessage({ name, company, email, message }: { name: string; 
  *
  * - null: modo de demonstração (K-05) — valida, mas não envia nada.
  */
-export function RequestDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function RequestDialog({ open, options = {}, onClose }: { open: boolean; options?: RequestOptions; onClose: () => void }) {
   const formRef = useRef<HTMLFormElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
   const [message, setMessage] = useState('');
+  const [demand, setDemand] = useState<Demand>('automacao');
+  // Resumo vindo do simulador e a escolha do visitante de incluí-lo (desmarcada por padrão: é opcional)
+  const [simulation, setSimulation] = useState<string | null>(null);
+  const [includeSimulation, setIncludeSimulation] = useState(false);
   const [trap, setTrap] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [step, setStep] = useState<Step>('form');
@@ -75,7 +110,8 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
   const viaEmail = channel === 'email';
   const flow = viaEmail ? CONTACT_COPY.email : CONTACT_COPY.whatsapp;
   const direct = viaApi ? null : viaEmail ? mailtoUrl() : whatsappUrl();
-  const text = buildMessage({ name, company, email, message });
+  const attached = includeSimulation ? simulation : null;
+  const text = buildMessage({ name, company, email, message, demand, simulation: attached });
   const link = viaEmail ? mailtoUrl(text) : whatsappUrl(text);
   // WhatsApp abre em outra aba, sem opener nem Referer; o mailto entrega ao aplicativo de e-mail, sem aba nova.
   const linkProps = viaEmail ? {} : { target: '_blank', rel: 'noopener noreferrer' };
@@ -86,12 +122,27 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
     if (open && step === 'form' && openedAt.current === 0) openedAt.current = Date.now();
   }, [open, step]);
 
+  // Ao abrir no formulário: o tipo pedido pelo CTA (o Hosting abre com a hospedagem; sem tipo, mantém a escolha
+  // anterior) e o resumo do simulador, se veio de lá — sempre desmarcado: incluí-lo é escolha do visitante. Numa etapa
+  // posterior (mensagem já revisada), nada muda.
+  const { demand: requestedDemand, simulation: offeredSimulation = null } = options;
+  const stepNow = useRef(step);
+  stepNow.current = step;
+  useEffect(() => {
+    if (!open || stepNow.current !== 'form') return;
+    if (requestedDemand) setDemand(requestedDemand);
+    setSimulation(offeredSimulation);
+    setIncludeSimulation(false);
+  }, [open, requestedDemand, offeredSimulation]);
+
   const validate = (): Errors => {
     const e: Errors = {};
     if (name.trim().length < 2) e.name = 'Informe como podemos chamar você.';
     if (viaApi && !EMAIL_RE.test(email.trim())) e.email = CONTACT_COPY.api.emailRequired;
     else if (email.trim() && !EMAIL_RE.test(email.trim())) e.email = 'Confira o e-mail, como nome@empresa.com — ou deixe em branco.';
-    if (message.trim().length < 20) e.message = 'Descreva o processo com pelo menos 20 caracteres.';
+    if (message.trim().length < 20) e.message = 'Descreva o processo ou a necessidade com pelo menos 20 caracteres.';
+    else if (viaApi && apiDescription(message, demand, attached).length > MAX_MESSAGE)
+      e.message = 'Com o tipo de solicitação e o resumo da simulação, a mensagem passa de 1.000 caracteres. Encurte a descrição ou desmarque o resumo.';
     return e;
   };
 
@@ -125,6 +176,9 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
     setEmail('');
     setCompany('');
     setMessage('');
+    setDemand('automacao');
+    setSimulation(null);
+    setIncludeSimulation(false);
     setTrap('');
     setErrors({});
     setStep('form');
@@ -149,7 +203,7 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
       nome: name.trim(),
       email: email.trim(),
       empresa: company.trim(),
-      descricao: message.trim(),
+      descricao: apiDescription(message, demand, attached),
       desafio: token ?? '',
       preenchimentoMs: Math.max(0, Date.now() - openedAt.current),
       site: trap,
@@ -206,10 +260,12 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
   const summary = (
     <DescriptionList
       items={[
+        { term: 'Solicitação', description: demandOf(demand).label },
         { term: 'Nome', description: name.trim() },
         { term: 'Empresa', description: company.trim() || null },
         { term: 'E-mail', description: email.trim() || null },
-        { term: 'Processo', description: message.trim() },
+        { term: 'Processo ou necessidade', description: message.trim() },
+        { term: 'Simulação', description: attached },
       ]}
     />
   );
@@ -277,6 +333,13 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
         )}
         <ScheduleLink />
         <form id={FORM_ID} ref={formRef} className="request__form" onSubmit={submit} noValidate aria-label={CONTACT_COPY.formTitle}>
+          <RadioGroup
+            legend={CONTACT_COPY.demand.legend}
+            name="tipo-solicitacao"
+            value={demand}
+            onChange={(v) => setDemand(v as Demand)}
+            options={DEMANDS.map((o) => ({ value: o.value, label: o.label }))}
+          />
           <div className="contact__form-grid">
             <Input label="Nome" required placeholder="Seu nome" leftIcon="user" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} error={errors.name} fullWidth />
             <Input label="Empresa" placeholder="Nome da empresa" leftIcon="building" autoComplete="organization" maxLength={120} value={company} onChange={(e) => setCompany(e.target.value)} hint="Opcional" fullWidth />
@@ -296,7 +359,7 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
             fullWidth
           />
           <Textarea
-            label="Descreva o processo"
+            label={CONTACT_COPY.messageLabel}
             required
             placeholder="Ex.: conferimos todo dia os pagamentos do banco com o sistema financeiro, manualmente."
             rows={4}
@@ -307,6 +370,12 @@ export function RequestDialog({ open, onClose }: { open: boolean; onClose: () =>
             error={errors.message}
             fullWidth
           />
+          {simulation && (
+            <div className="request__simulation" data-testid="resumo-simulacao">
+              <Checkbox label={CONTACT_COPY.simulation.include} hint={CONTACT_COPY.simulation.hint} checked={includeSimulation} onChange={(e) => setIncludeSimulation(e.target.checked)} />
+              <pre className="request__message">{simulation}</pre>
+            </div>
+          )}
           {viaApi && (
             // Armadilha para robôs (§5.5): fora da tela, fora da ordem de foco e escondida de leitores de tela.
             <div className="request__trap" aria-hidden="true">

@@ -7,11 +7,20 @@ import { SCHEDULE } from './content';
  * link comum — sem window.open, sem iframe, sem opener e sem Referer (rel="noopener noreferrer"). Sem a URL oficial
  * confirmada, não renderiza nada: o agendamento não aparece como disponível.
  */
-export function ScheduleButton({ size = 'lg', variant = 'secondary' }: { size?: 'sm' | 'md' | 'lg'; variant?: 'primary' | 'secondary' | 'outline' }) {
+export function ScheduleButton({
+  size = 'lg',
+  variant = 'secondary',
+  label = SCHEDULE.cta,
+}: {
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'outline';
+  /** Texto do botão (o simulador usa "Agendar uma conversa"); o destino é sempre o mesmo. */
+  label?: string;
+}) {
   if (!BOOKINGS_URL) return null;
   return (
     <Button size={size} pill variant={variant} leftIcon="calendar" href={BOOKINGS_URL} target="_blank" rel="noopener noreferrer" data-agendar="">
-      {SCHEDULE.cta}
+      {label}
       <span className="nk-visually-hidden"> {SCHEDULE.srExternal}</span>
     </Button>
   );

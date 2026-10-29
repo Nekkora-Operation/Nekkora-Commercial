@@ -1,0 +1,19 @@
+commit 6c0566f9612b5563c473e59bed4239c080a5e8c9
+01-lib-reconstruir exit=0
+02-npm-ci exit=0
+03-typecheck exit=0
+04-testes exit=0
+05-build exit=0
+06-precos-artefato exit=0
+07-politica-cabecalhos exit=0
+08-portao-publicacao exit=1
+09-builds-homologacao exit=0
+10-site-como-cloudfront exit=0
+11-pagina-chromium exit=0
+11-pagina-firefox exit=0
+11-pagina-webkit exit=0
+11b-simulador exit=0
+12-conversao-email exit=0
+13-conversao-whatsapp exit=0
+14-leads-bookings-backend exit=0
+FIM

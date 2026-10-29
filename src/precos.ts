@@ -55,3 +55,94 @@ export function launchActive(period: { inicio: string | null; fim: string | null
   if (inicio == null || fim == null) return true;
   return inicio <= today && today <= fim;
 }
+
+/**
+ * Situação da campanha de lançamento (NEKKORA-COM-008-C §3.6), comparando datas AAAA-MM-DD do fuso de Brasília:
+ *   'pendente'  datas não aprovadas (PUB-13): preços de lançamento só como prévia de homologação; o portão bloqueia;
+ *   'futura'    antes do início: só o preço padrão (nenhum desconto ainda disponível);
+ *   'vigente'   do início ao fim, inclusive;
+ *   'encerrada' depois do fim: só o preço padrão.
+ */
+export type CampaignState = 'pendente' | 'futura' | 'vigente' | 'encerrada';
+
+export function campaignState(period: { inicio: string | null; fim: string | null }, today: string): CampaignState {
+  const { inicio, fim } = period;
+  if (inicio == null || fim == null) return 'pendente';
+  if (today < inicio) return 'futura';
+  return today <= fim ? 'vigente' : 'encerrada';
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Simulador de investimento (NEKKORA-CALC-001)                                                                     */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+/** Quantidade máxima por categoria na simulação. Acima disso, a conversa é direta com a Nekkora. */
+export const MAX_QUANTITY = 20;
+
+export type Quantities = { simples: number; media: number; complexa: number };
+export type QuantityTier = keyof Quantities;
+export const EMPTY_QUANTITIES: Quantities = { simples: 0, media: 0, complexa: 0 };
+
+/**
+ * Quantidade válida a partir do que o visitante digitou (ou de qualquer valor): só inteiros de 0 a MAX_QUANTITY.
+ * Texto com algo além de dígitos, número negativo, fracionário, NaN ou infinito vira 0; acima do limite, o limite.
+ */
+export function sanitizeQuantity(value: unknown): number {
+  let n: number;
+  if (typeof value === 'number') n = value;
+  else if (typeof value === 'string' && /^\s*\d{1,6}\s*$/.test(value)) n = Number(value);
+  else return 0;
+  if (!Number.isFinite(n) || n < 0 || !Number.isInteger(n)) return 0;
+  return Math.min(n, MAX_QUANTITY);
+}
+
+export const sanitizeQuantities = (q: Partial<Record<QuantityTier, unknown>>): Quantities => ({
+  simples: sanitizeQuantity(q.simples),
+  media: sanitizeQuantity(q.media),
+  complexa: sanitizeQuantity(q.complexa),
+});
+
+const PRICED_TIERS = Object.keys(PRICE_TABLE) as PricedTier[];
+
+/**
+ * Resultado da simulação. Só as categorias com preço (simples e média) entram nos totais; a complexa fica sob
+ * orçamento, sem valor inventado. Com ela, o total é um SUBTOTAL ESTIMADO (`partial`), nunca o preço completo.
+ *
+ * Com a campanha em vigor (`launch`), o investimento é o de lançamento; a economia é a diferença entre os preços
+ * comerciais (padrão − lançamento), não uma economia operacional, e o percentual equivalente é calculado sobre o
+ * total calculável, truncado em duas casas para não superestimar o benefício. Sem campanha: só o preço padrão.
+ */
+export function simulate(input: Partial<Record<QuantityTier, unknown>>, launch: boolean) {
+  const quantities = sanitizeQuantities(input);
+  const lines = PRICED_TIERS.map((tier) => {
+    const unit = launch ? PRICE_TABLE[tier].launch : PRICE_TABLE[tier].standard;
+    const quantity = quantities[tier];
+    return { tier, quantity, unit, unitLabel: brl(unit), total: quantity * unit, totalLabel: brl(quantity * unit) };
+  });
+  const standardTotal = PRICED_TIERS.reduce((s, t) => s + quantities[t] * PRICE_TABLE[t].standard, 0);
+  const launchTotal = PRICED_TIERS.reduce((s, t) => s + quantities[t] * PRICE_TABLE[t].launch, 0);
+  const pricedCount = quantities.simples + quantities.media;
+  const estimate = launch ? launchTotal : standardTotal;
+  const savings = launch ? standardTotal - launchTotal : 0;
+  const percent = launch && standardTotal > 0 ? discountPercent(standardTotal, launchTotal) : 0;
+  return {
+    quantities,
+    total: pricedCount + quantities.complexa,
+    pricedCount,
+    complexCount: quantities.complexa,
+    /** Há automação complexa: o valor é o subtotal estimado das demais, não o preço completo da contratação. */
+    partial: quantities.complexa > 0,
+    launch,
+    lines,
+    standardTotal,
+    standardTotalLabel: brl(standardTotal),
+    estimate,
+    estimateLabel: brl(estimate),
+    savings,
+    savingsLabel: brl(savings),
+    percent,
+    percentLabel: percentLabel(percent),
+  };
+}
+
+export type Simulation = ReturnType<typeof simulate>;

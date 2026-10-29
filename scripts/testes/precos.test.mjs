@@ -86,7 +86,12 @@ test('nenhum percentual de desconto digitado no código (COM-RELEASE-005 §3.4):
 
 test('condição 50/50 preservada e separada do desconto (item 7); complexa sob orçamento, sem desconto (item 8)', () => {
   const content = readFileSync(join(root, 'src/content.ts'), 'utf8');
-  assert.match(content, /'Pagamento de 50% na contratação e 50% na entrega, conforme a proposta'/);
+  // Gatilhos do pagamento decididos na COM-008-B (AUD-16): aprovação/formalização e homologação/aceite formal
+  assert.match(content, /'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal'/);
+  // a frase do pagamento é única e nunca fala em desconto: 50/50 é condição de pagamento
+  const payment = content.match(/'Pagamento de 50%[^']*'/g) ?? [];
+  assert.equal(payment.length, 1);
+  assert.doesNotMatch(payment[0], /desconto|economia|lançamento/i);
   assert.match(content, /negotiated: \{ label: 'Sob orçamento', unit: 'dimensionada na avaliação · orçamento individual' \}/);
   assert.doesNotMatch(content, /desconto de lançamento aplicável/);
   assert.match(content, /A automação complexa tem orçamento individual\./);

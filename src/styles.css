@@ -89,7 +89,9 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .cards { display: grid; gap: 16px; }
 .cards--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.cards--poster { gap: max(16px, 2%); align-items: stretch; }
+/* Espaço vertical fixo: num grid de altura indefinida, o percentual na vertical fazia o último cartão sair da lista e
+   cobrir o rodapé (aviso de privacidade com 8 itens, NEKKORA-COM-008-C). Na horizontal, o percentual continua. */
+.cards--poster { gap: 20px max(16px, 2%); align-items: stretch; }
 
 /* Número grande dos cards e etapas */
 .poster-num { font-size: 3rem; font-weight: 700; line-height: 1; letter-spacing: -0.04em; color: var(--nk-color-accent); }
@@ -149,6 +151,60 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .price__savings { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
 .price__negotiated { font-size: 1.6rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--nk-color-text); }
 .price__unit { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
+
+.launch-strip__preview { flex-basis: 100%; font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
+[data-criteria]:focus { outline: none; }
+[data-criteria]:focus-visible { box-shadow: var(--nk-focus-ring); }
+
+/* ---------- Simulador de investimento (NEKKORA-CALC-001) ---------- */
+.sim { gap: 20px; }
+.sim__head { display: flex; gap: 14px; align-items: flex-start; }
+.sim__head .nk-icon { flex-shrink: 0; margin-top: 4px; }
+.sim__title { margin: 0; font-size: var(--nk-font-size-xl); font-weight: 600; line-height: 1.3; color: var(--nk-color-text); }
+.sim__description { margin: 6px 0 0; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
+.sim__tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.sim__tier {
+  display: flex; flex-direction: column; gap: 6px; padding: 16px;
+  border-radius: var(--nk-radius-lg); background: var(--nk-color-surface); border: 1px solid var(--nk-color-border);
+}
+.sim__tier-label { font-size: var(--nk-font-size-md); font-weight: 600; color: var(--nk-color-text); }
+.sim__tier-unit { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
+.sim__stepper { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.sim__stepper .nk-button { flex-shrink: 0; }
+/* Botão no limite (0 ou máximo): continua focável (aria-disabled), sem efeito e com aparência de inativo */
+.sim__stepper .nk-button[aria-disabled='true'] { opacity: 0.45; cursor: not-allowed; }
+.sim__qty-wrap { flex: 1; min-width: 0; }
+.sim__qty { text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; }
+.sim__note { margin: 0; font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
+.sim__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding-top: 16px; border-top: 1px solid var(--nk-color-border); }
+.sim__total { font-size: var(--nk-font-size-md); color: var(--nk-color-text); }
+.sim__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.sim__warning { margin: 0; font-size: var(--nk-font-size-sm); font-weight: 500; color: var(--nk-color-text); }
+.sim__result {
+  display: flex; flex-direction: column; gap: 14px; padding: 20px;
+  border-radius: var(--nk-radius-lg); background: var(--nk-color-accent-soft); border: 1px solid var(--nk-color-accent-border-soft);
+}
+.sim__result-title { margin: 0; font-size: var(--nk-font-size-lg); font-weight: 600; color: var(--nk-color-text); }
+.sim__campaign { margin: 0; font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
+.sim__lines { display: grid; gap: 6px; }
+.sim__lines li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; font-size: var(--nk-font-size-sm); color: var(--nk-color-text); }
+.sim__line-total { font-variant-numeric: tabular-nums; font-weight: 600; }
+.sim__figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 0; }
+.sim__figure { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: var(--nk-radius-md); background: var(--nk-color-surface); border: 1px solid var(--nk-color-border); }
+.sim__figure dt { font-size: var(--nk-font-size-xs); line-height: 1.4; color: var(--nk-color-text-secondary); }
+.sim__figure dd { margin: 0; font-size: var(--nk-font-size-lg); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--nk-color-text); }
+.sim__figure--main { grid-column: 1 / -1; }
+.sim__figure--main dd { font-size: clamp(1.8rem, 1.2rem + 1.4vw, 2.4rem); line-height: 1.1; letter-spacing: -0.03em; }
+.sim__partial { margin: 0; font-size: var(--nk-font-size-sm); font-weight: 500; line-height: 1.55; color: var(--nk-color-text); }
+.sim__disclaimer { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.55; color: var(--nk-color-text); }
+.sim__disclaimer .nk-icon { flex-shrink: 0; margin-top: 3px; }
+.sim__next { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-top: 14px; border-top: 1px solid var(--nk-color-accent-border-soft); }
+.sim__next-label { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
+.sim__help { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
+.sim__help strong { color: var(--nk-color-text); }
+/* Cor do texto, sublinhado: o acento sobre o cartão elevado ficava abaixo de 4,5:1 (contraste-por-pixels) */
+.sim__help a { color: var(--nk-color-text); text-decoration: underline; text-underline-offset: 2px; }
+.request__simulation { display: flex; flex-direction: column; gap: 8px; }
 
 /* ---------- Hosting: faixa pôster ---------- */
 .hosting-band { padding-block: clamp(56px, 8vw, 96px); background: var(--poster-band); color: #fff; scroll-margin-top: 72px; }
@@ -235,6 +291,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 @media (max-width: 900px) {
   .split, .cards--2, .cards--3 { grid-template-columns: minmax(0, 1fr); }
   .split__visual { order: -1; }
+  .sim__tiers { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
   .wrap { padding-inline: 16px; }
@@ -243,6 +300,8 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
   .request__actions { grid-template-columns: minmax(0, 1fr); }
   .request__actions > :last-child { order: -1; }
   .hero__ctas > *, .contact__ctas > * { flex: 1 1 100%; }
+  .sim__actions, .sim__actions > * { flex: 1 1 100%; }
+  .sim__result { padding: 16px; }
   .hosting-band__visual { display: none; }
   /* espaço para o botão flutuante (só existe com WhatsApp confirmado) não cobrir o fim da página */
   .page--fab .footer { padding-bottom: 96px; }

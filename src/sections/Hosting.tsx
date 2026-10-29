@@ -4,7 +4,8 @@ import { useRequestTrigger } from '../request';
 
 /** Faixa pôster em acento sólido (modelo C). Texto branco sobre --nk-solid-accent; no Sakura Dark, tom mais fechado. */
 export function Hosting() {
-  const trigger = useRequestTrigger();
+  // AUD-25: o diálogo abre com "Hospedar uma automação existente" marcado (o visitante pode trocar)
+  const trigger = useRequestTrigger({ demand: 'hospedagem' });
   return (
     <section id="hosting" className="hosting-band" aria-labelledby="hosting-title">
       <div className="wrap split">

@@ -130,6 +130,9 @@ jobs:
           for b in chromium firefox webkit; do
             NEKKORA_NAVEGADOR=$b node scripts/homologacao.mjs http://127.0.0.1:4173/ evidencias/pagina-$b
           done
+      - name: Simulador de investimento e formulário de avaliação — NEKKORA-CALC-001 (Chromium, Firefox, WebKit)
+        # produção (sem datas: prévia) + fixture com datas sintéticas (relógio antes, durante e depois da campanha)
+        run: node scripts/homologacao-simulador.mjs http://127.0.0.1:4173/ http://127.0.0.1:4175/ evidencias/simulador chromium,firefox,webkit
       - name: Jornada de conversão — e-mail, canal da publicação (Chromium, Firefox, WebKit)
         run: NEKKORA_CANAL=email node scripts/homologacao-canais.mjs http://127.0.0.1:4176/ evidencias/conversao-email chromium,firefox,webkit
       - name: Jornada de conversão — WhatsApp, quando houver número (Chromium, Firefox, WebKit)
