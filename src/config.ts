@@ -12,7 +12,7 @@
  */
 import publicacao from '@publicacao';
 import { isBookingsUrl } from './agendamento-url.js';
-import { launchActive, todayInBrazil } from './precos';
+import { campaignState, todayInBrazil, type CampaignState } from './precos';
 
 /** WhatsApp com DDI + DDD, só dígitos. E-mail. URLs de perfil (não a página inicial da rede). */
 export const CONTACT: { whatsappNumber: string | null; email: string | null; instagram: string | null; linkedin: string | null } = {
@@ -127,7 +127,11 @@ export const whatsappDisplay = (n: string | null = CHANNELS.whatsapp) => {
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const toBr = (iso: string) => iso.split('-').reverse().join('/');
 
-/** Datas da campanha de lançamento (PUB-13) — só quando as duas existem, são AAAA-MM-DD e estão em ordem. */
+/**
+ * Datas da campanha de lançamento (PUB-13) — só quando as duas existem, são AAAA-MM-DD e estão em ordem. Decisão da
+ * titular (COM-008-B): dois meses a partir da publicação oficial. As datas exatas só existem depois dela e são gravadas
+ * pela titular em publicacao.json; o código nunca as calcula nem preenche.
+ */
 export const LAUNCH_DATES = (() => {
   const { inicio, fim } = publicacao.campanhaLancamento;
   if (inicio == null || fim == null || !ISO_DATE.test(inicio) || !ISO_DATE.test(fim) || inicio > fim) return null;
@@ -140,9 +144,19 @@ export const LAUNCH_DATES = (() => {
  */
 export const LAUNCH_PERIOD = LAUNCH_DATES && { start: toBr(LAUNCH_DATES.inicio), end: toBr(LAUNCH_DATES.fim) };
 
-/** Preços de lançamento em vigor hoje (fuso de Brasília)? Sem datas aprovadas: sim, para revisão (o deploy fica bloqueado). */
-export const isLaunchActive = (now: Date = new Date()) =>
-  launchActive(LAUNCH_DATES ?? { inicio: null, fim: null }, todayInBrazil(now));
+/** Situação da campanha hoje, no fuso de Brasília: pendente, futura, vigente ou encerrada (NEKKORA-COM-008-C §3.6). */
+export const launchState = (now: Date = new Date()): CampaignState => campaignState(LAUNCH_DATES ?? { inicio: null, fim: null }, todayInBrazil(now));
+
+/**
+ * Preços de lançamento exibidos hoje? Dentro do período aprovado, sim. Sem datas aprovadas, só como PRÉVIA numa versão
+ * de homologação (avisoHomologacao): a página diz que as datas não foram definidas e que nenhuma solicitação é elegível
+ * ainda, e o portão bloqueia a publicação (PUB-13). Sem o aviso de homologação e sem datas, só o preço padrão — nunca
+ * uma oferta sem prazo. Antes do início e depois do fim, só o preço padrão.
+ */
+export const isLaunchActive = (now: Date = new Date()) => {
+  const state = launchState(now);
+  return state === 'vigente' || (state === 'pendente' && publicacao.avisoHomologacao === true);
+};
 
 /** Quem responde pelos dados pessoais (aviso de privacidade). Sem o dado confirmado, o aviso usa "a Nekkora". */
 export const DATA_CONTROLLER = {
@@ -155,7 +169,7 @@ export const HOSTING_PROVIDER: string | null = publicacao.hospedagem.provedor;
 
 /**
  * Aviso de versão em homologação no rodapé. Desligar só com a autorização de publicação
- * (docs/com-001/08-pendencias-publicacao.md — PUB-10).
+ * (docs/release/COM-RELEASE-PENDENCIAS.md — PUB-10).
  */
 export const PREVIEW_NOTICE: boolean = publicacao.avisoHomologacao;
 

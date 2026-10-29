@@ -1,7 +1,8 @@
 import { Badge, Card, Icon, IconBox, Link, SectionHeader } from 'nekkora-lib';
-import { isLaunchActive } from '../config';
+import { isLaunchActive, launchState } from '../config';
 import { PRICING } from '../content';
 import { useRequestTrigger } from '../request';
+import { Simulator } from './Simulator';
 
 /**
  * Preços do Delivery (tabela oficial de 22/10/2026 no layout do mockup "modelo C"). Único bloco em que valores e
@@ -12,6 +13,8 @@ export function Pricing() {
   const trigger = useRequestTrigger();
   // Avaliado no carregamento da página: fora do período aprovado, só o preço padrão (COM-RELEASE-003-R1 §3.7, item 10).
   const launch = isLaunchActive();
+  // Sem datas aprovadas, os preços de lançamento só aparecem como prévia de homologação — e a faixa diz isso.
+  const preview = launch && launchState() === 'pendente';
   return (
     <section id="precos" className="section" aria-labelledby="precos-title" data-pricing="delivery">
       <div className="wrap stack">
@@ -23,6 +26,11 @@ export function Pricing() {
             </Badge>
             <strong>{PRICING.launch.text}</strong>
             <span className="launch-strip__condition">{PRICING.launch.condition}</span>
+            {preview && (
+              <span className="launch-strip__preview" data-campanha="pendente">
+                {PRICING.launch.pendingDates}
+              </span>
+            )}
           </p>
         )}
         <ul className="cards cards--3 cards--poster plain-list">
@@ -85,6 +93,8 @@ export function Pricing() {
             </li>
           ))}
         </ul>
+        {/* NEKKORA-CALC-001: logo abaixo dos cartões, no mesmo bloco data-pricing (preços só aparecem aqui) */}
+        <Simulator />
         <div className="cards cards--2 cards--poster">
           {PRICING.notes.map((n) => (
             <div key={n.title} className="poster-tile poster-tile--row">
@@ -97,7 +107,7 @@ export function Pricing() {
           ))}
         </div>
         <div className="cards cards--2 cards--poster">
-          <div className="poster-tile" data-criteria>
+          <div className="poster-tile" data-criteria id="criterios-categoria" tabIndex={-1}>
             <h3 className="poster-tile__title">{PRICING.criteria.title}</h3>
             <ul className="checklist checklist--sm">
               {PRICING.criteria.items.map((item) => (

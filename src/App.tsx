@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button, FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
+import { FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
 import { NAV_LINKS, whatsappUrl } from './config';
-import { LOGIN } from './content';
-import { RequestDialogContext } from './request';
+import { RequestDialogContext, type RequestOptions } from './request';
 import { useMediaQuery } from './hooks';
 import { Contact, RequestDialog } from './sections/Contact';
 import { Footer } from './sections/Footer';
@@ -65,9 +64,13 @@ export function App() {
   const contactVisible = useContactVisible();
   const isMobile = useMediaQuery('(max-width: 900px)');
   const [requestOpen, setRequestOpen] = useState(false);
+  const [requestOptions, setRequestOptions] = useState<RequestOptions>({});
   // Também sai de cena com o diálogo aberto: ficaria por cima das ações do diálogo no celular.
   const tucked = (contactVisible && isMobile) || requestOpen;
-  const openRequest = useCallback(() => setRequestOpen(true), []);
+  const openRequest = useCallback((options: RequestOptions = {}) => {
+    setRequestOptions(options);
+    setRequestOpen(true);
+  }, []);
 
   return (
     <RequestDialogContext.Provider value={openRequest}>
@@ -81,14 +84,7 @@ export function App() {
           links={NAV_LINKS}
           activeHref={active}
           tools={<ThemeToggle />}
-          actions={
-            // Sem destino por decisão da responsável (etapa 2) e sem área do cliente disponível: marcado como
-            // indisponível, com a explicação no nome acessível e no title (D-24). Sem id: a Navbar renderiza as ações
-            // duas vezes (barra e menu do celular).
-            <Button size="sm" pill leftIcon="user" aria-disabled="true" aria-label={`${LOGIN.label} — ${LOGIN.unavailable}`} title={LOGIN.unavailable} onClick={(e) => e.preventDefault()}>
-              {LOGIN.label}
-            </Button>
-          }
+          // Sem botão "Entrar": oculto enquanto não houver área de clientes (COM-008-B, AUD-26, PUB-16).
         />
         <main id="conteudo" tabIndex={-1}>
           <Hero />
@@ -113,7 +109,7 @@ export function App() {
             tabIndex={tucked ? -1 : undefined}
           />
         )}
-        <RequestDialog open={requestOpen} onClose={() => setRequestOpen(false)} />
+        <RequestDialog open={requestOpen} options={requestOptions} onClose={() => setRequestOpen(false)} />
       </div>
     </RequestDialogContext.Provider>
   );

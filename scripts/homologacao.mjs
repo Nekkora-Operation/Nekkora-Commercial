@@ -333,7 +333,8 @@ await block('funcionais', async () => {
     const text = block?.innerText ?? '';
     return {
       blocks: document.querySelectorAll('[data-pricing]').length,
-      condition: /Valem para automações simples e médias com proposta aprovada durante a campanha/.test(text) && /A automação complexa tem orçamento individual/.test(text),
+      // Regras da campanha da COM-008-B: vale a solicitação; aceite da proposta em até 7 dias corridos
+      condition: /Valem para automações simples e médias solicitadas durante a campanha/.test(text) && /aceita em até 7 dias corridos da emissão/.test(text) && /A automação complexa tem orçamento individual/.test(text),
       confirmedInProposal: /fica registrada na proposta/.test(text),
       licenses: /não estão incluídos nos valores acima/.test(text),
       // Tabela oficial da COM-RELEASE-003-R1 §3.1, lida do que está NA TELA (data-price de cada valor)
@@ -345,7 +346,7 @@ await block('funcionais', async () => {
       ),
       complexa: /Automação complexa[\s\S]*?Sob orçamento[\s\S]*?orçamento individual/.test(text),
       criteria: ['Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
-      conditions: /50% na contratação e 50% na entrega/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
+      conditions: /50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal/.test(text) && /cada uma tem categoria, escopo, preço e aceite próprios/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
       srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
     };
   });
@@ -500,15 +501,15 @@ await block('funcionais', async () => {
   check('alternancia-de-tema-persiste', afterToggle === 'sakura-dark' && afterReload === 'sakura-dark', `${afterToggle} → recarregado: ${afterReload}`);
   await toggle.click();
 
-  // Botão "Entrar" (etapa 2): sem destino por decisão da responsável — não navega, não abre nada e se declara indisponível
+  // Botão "Entrar": oculto enquanto não houver área de clientes (COM-008-B, AUD-26) — nenhum botão, link nem texto
+  // "Entrar", "Login" ou "Área do cliente" na página (barra e menu do celular)
   {
-    const login = page.getByRole('button', { name: /^Entrar/ }).first();
-    const urlBefore = page.url();
-    // force: o Playwright não clica em aria-disabled, mas o navegador entrega o clique — é ele que precisa ficar sem efeito
-    await login.click({ force: true });
-    await page.waitForTimeout(200);
-    const info = await login.evaluate((el) => ({ disabled: el.getAttribute('aria-disabled'), desc: el.getAttribute('aria-label') }));
-    check('entrar-sem-destino-e-indisponivel', page.url() === urlBefore && info.disabled === 'true' && /ainda não disponível/.test(info.desc ?? ''), `url inalterada=${page.url() === urlBefore}; aria-disabled=${info.disabled}; nome acessível="${info.desc}"`);
+    const login = await page.evaluate(() =>
+      [...document.querySelectorAll('a, button, [role="button"], [role="link"]')]
+        .map((e) => `${e.textContent ?? ''} ${e.getAttribute('aria-label') ?? ''}`.trim())
+        .filter((t) => /^entrar\b|\blogin\b|área do cliente|acesso de clientes/i.test(t)),
+    );
+    check('entrar-oculto-sem-area-de-clientes', login.length === 0, login.length ? login.join(' | ') : 'nenhum controle de acesso de clientes');
   }
 
   // Diálogo "Solicitar avaliação": aberto pelos CTAs, foco dentro, Esc fecha e devolve o foco ao botão que abriu

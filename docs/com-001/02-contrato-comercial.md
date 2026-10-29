@@ -1,5 +1,10 @@
 # COM-001 · Gate 02 — Contrato comercial (fonte de verdade das mensagens)
 
+> **HISTÓRICO (COM-001).** Este contrato descreve as regras da COM-001; partes foram superadas (AUD-31): canais
+> confirmados, preços aprovados (COM-RELEASE-003-R1), condições e campanha da COM-008-B. **Vigentes:** o texto em
+> [`src/content.ts`](../../src/content.ts), a [matriz de alegações](03-matriz-alegacoes.md) (atualizada na
+> NEKKORA-COM-008-C) e as minutas [`docs/comercial/`](../comercial/), ainda **não aprovadas juridicamente**.
+
 Este documento define **o que a página pode dizer** sobre cada oferta. O texto exibido vive em
 [`src/content.ts`](../../src/content.ts) e cada bloco referencia os IDs da
 [matriz de alegações](03-matriz-alegacoes.md). Mudou uma regra aqui? A matriz e o `content.ts` mudam juntos.

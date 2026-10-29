@@ -114,7 +114,7 @@ async function run(engine) {
   // 2. Jornada: conhecer serviços → condições → solicitar avaliação ---------------------------------------------
   await page.locator('#solucoes').scrollIntoViewIfNeeded();
   const pricing = await page.locator('#precos').innerText();
-  check(engine, 'condicoes-com-vigencia', /de 01\/11\/2026 a 31\/12\/2026/.test(pricing) && /50% na contratação e 50% na entrega/.test(pricing), 'datas sintéticas da fixture exibidas por extenso');
+  check(engine, 'condicoes-com-vigencia', /de 01\/11\/2026 a 31\/12\/2026/.test(pricing) && /50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal/.test(pricing), 'datas sintéticas da fixture exibidas por extenso');
   await page.locator('#inicio [aria-haspopup="dialog"]').click();
   const dialog = page.getByRole('dialog');
   await dialog.waitFor();
@@ -278,7 +278,7 @@ async function campaign(engine, newContext) {
   check(
     engine,
     'vigencia-durante-campanha',
-    /Preços especiais de lançamento para propostas aprovadas de 01\/11\/2026 a 31\/12\/2026\./.test(during.text) && during.struck === 2 && during.values.includes('simples:lancamento=R$ 1.000') && during.values.includes('media:lancamento=R$ 2.800'),
+    /Preços especiais de lançamento para solicitações de avaliação recebidas de 01\/11\/2026 a 31\/12\/2026\./.test(during.text) && during.struck === 2 && during.values.includes('simples:lancamento=R$ 1.000') && during.values.includes('media:lancamento=R$ 2.800'),
     during.values.join(' · '),
   );
   const standardOnly = ['simples:padrao=R$ 1.500', 'media:padrao=R$ 3.500'];
