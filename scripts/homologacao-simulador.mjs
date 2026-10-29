@@ -299,6 +299,8 @@ async function run(engine) {
     const dialog = page.getByRole('dialog');
     await dialog.waitFor();
     const offer = dialog.locator('[data-testid="resumo-simulacao"]');
+    // o resumo entra no diálogo logo depois da abertura (efeito do React): espera o bloco antes de ler
+    await offer.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
     const box = offer.getByRole('checkbox');
     const offered = { visible: await offer.isVisible(), checked: await box.isChecked(), text: await offer.locator('pre').innerText() };
     check(

@@ -89,7 +89,9 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .cards { display: grid; gap: 16px; }
 .cards--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.cards--poster { gap: max(16px, 2%); align-items: stretch; }
+/* Espaço vertical fixo: num grid de altura indefinida, o percentual na vertical fazia o último cartão sair da lista e
+   cobrir o rodapé (aviso de privacidade com 8 itens, NEKKORA-COM-008-C). Na horizontal, o percentual continua. */
+.cards--poster { gap: 20px max(16px, 2%); align-items: stretch; }
 
 /* Número grande dos cards e etapas */
 .poster-num { font-size: 3rem; font-weight: 700; line-height: 1; letter-spacing: -0.04em; color: var(--nk-color-accent); }
@@ -200,6 +202,8 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .sim__next-label { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
 .sim__help { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
 .sim__help strong { color: var(--nk-color-text); }
+/* Cor do texto, sublinhado: o acento sobre o cartão elevado ficava abaixo de 4,5:1 (contraste-por-pixels) */
+.sim__help a { color: var(--nk-color-text); text-decoration: underline; text-underline-offset: 2px; }
 .request__simulation { display: flex; flex-direction: column; gap: 8px; }
 
 /* ---------- Hosting: faixa pôster ---------- */
