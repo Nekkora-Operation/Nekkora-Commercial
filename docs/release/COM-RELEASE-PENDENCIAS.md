@@ -112,7 +112,7 @@ Passo a passo e custos (< US$ 0,05/mês no volume de referência) em [COM-RELEAS
 
 | ID | Ação | Onde |
 |---|---|---|
-| EXT-01 | ~~Confirmar a licença; criar a página e o serviço e publicar~~ **Feito pela titular** (NEKKORA-COM-007): página "Nekkora", serviço "Conversa inicial — Nekkora Delivery", 30 min, Teams. Na COM-PRIVACY-001 houve uma reunião real de teste no Teams (pedido de concordância com a gravação exibido). Restam os testes do lembrete, do cancelamento e da abertura do link do Teams a partir da reserva → PUB-20 | Microsoft 365 / Bookings |
+| EXT-01 | ~~Confirmar a licença; criar a página e o serviço e publicar~~ **Feito pela titular** (NEKKORA-COM-007): página "Nekkora", serviço "Conversa inicial — Nekkora Delivery", 30 min, Teams. Na COM-PRIVACY-001 houve uma reunião real de teste no Teams (pedido de concordância com a gravação exibido). Agendamento aprovado pela titular em 05/11/2026 → PUB-20 | Microsoft 365 / Bookings |
 | INF-11 | SES: identidade `nekkora.com` com Easy DKIM. **Exige autorização de DNS** (3 CNAMEs `…._domainkey`, DNS only), sem tocar em MX, SPF, `selector1/2` nem `MS=` | SES + Cloudflare |
 | INF-12 | DynamoDB `nekkora-commercial-solicitacoes` (pk String, sob demanda, TTL `expira`) | DynamoDB |
 | INF-13 | SSM SecureString: `/nekkora-commercial/solicitacoes/turnstile` e `/segredo-ip` | Systems Manager |
