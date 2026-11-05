@@ -513,7 +513,8 @@ export const SCHEDULE = {
  * hospedagem vêm de publicacao.json; enquanto pendentes, o texto usa termos genéricos e o deploy de produção fica
  * bloqueado (aprovação "avisoDePrivacidade").
  */
-// AUD-33: com o CNPJ confirmado, o aviso o mostra mesmo sem a razão social (que continua pendente e não é inventada)
+// AUD-33: razão social e CNPJ vêm de publicacao.json (ambos informados pela titular em 04/11/2026); sem o nome, o
+// aviso usa "a Nekkora" e mostra só o CNPJ
 const controller = `${DATA_CONTROLLER.name ?? 'a Nekkora'}${DATA_CONTROLLER.document ? ` (CNPJ ${DATA_CONTROLLER.document})` : ''}`;
 const viaApi = REQUEST_CHANNEL === 'api';
 /**
@@ -564,6 +565,15 @@ export const PRIVACY = {
             // AUD-38 (F.8): a conversa é pelo Microsoft Teams
             text: 'Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para confirmar e lembrar o horário e realizar a conversa pelo Microsoft Teams. Não informe senhas, credenciais nem documentos sigilosos.',
           },
+          // [PV-11] NEKKORA-COM-PRIVACY-001: gravação possível, só com aviso e concordância específica (pedida pelo
+          // Teams), sem acesso público e com prazo PADRÃO de 30 dias. Não há gravação automática. A expiração padrão foi
+          // verificada no SharePoint; a eliminação definitiva não foi comprovada, por isso o texto não a promete.
+          // Base legal da gravação: revisão jurídica pendente (JUR-10)
+          {
+            icon: 'headset' as IconName,
+            title: 'Gravação da conversa',
+            text: 'A conversa pelo Microsoft Teams pode ser gravada para registrar o que foi conversado e apoiar a avaliação e a proposta. A gravação nunca é automática: só começa com aviso, e o próprio Teams pede a sua concordância específica. Você pode não concordar. A gravação fica no Microsoft 365 da Nekkora, com acesso restrito e sem link de acesso público.',
+          },
         ]
       : []),
     {
@@ -591,7 +601,7 @@ export const PRIVACY = {
     {
       icon: 'clock' as IconName,
       title: 'Por quanto tempo guardamos',
-      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante.${BOOKINGS_URL ? ' Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento.' : ''} Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
+      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante.${BOOKINGS_URL ? ' Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento. Gravações de conversas, quando houver, têm prazo padrão de 30 dias após a reunião.' : ''} Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
     },
     // [PV-10] AUD-40: transferência internacional (regiões dos provedores a confirmar — revisão jurídica)
     {

@@ -14,7 +14,8 @@ O texto que aparece na página fica em `src/content.ts → PRIVACY` e muda confo
 ## 1. Controlador
 
 - **CNPJ:** `68.337.624/0001-32` (informado pela titular; dígitos conferidos).
-- **Razão social:** **pendente** (PUB-09). Enquanto faltar, o aviso diz "a Nekkora".
+- **Razão social:** NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA (informada pela titular em
+  04/11/2026, `publicacao.json → controlador.nome`). O aviso a mostra com o CNPJ.
 - **Canal para os titulares:** `contato@nekkora.com`, citado no aviso (art. 18 da LGPD).
 - **Encarregado (DPO):** a indicação é decisão da titular. Agentes de pequeno porte podem ter dispensa, conforme a
   Resolução CD/ANPD nº 2/2022, mas o canal de atendimento precisa existir: é o e-mail acima.

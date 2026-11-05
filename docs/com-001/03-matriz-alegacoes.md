@@ -1,5 +1,8 @@
 # COM-001 · Gate 02 — Matriz de alegações
 
+> **NEKKORA-COM-PRIVACY-001 (05/11/2026):** PV-09 passa a incluir o prazo padrão das gravações e foi criada a PV-11
+> (gravação da conversa).
+
 > **Atualizada na NEKKORA-COM-008-C (28/10/2026)** com as decisões da titular na COM-008-B e as correções da
 > auditoria COM-008-A (AUD-30): campanha (PR-07), simulador (PR-08), condições (CO-03, CO-07, CO-08), textos de
 > preço (PR-03..PR-05), etapas (A-13, A-14, D-01), privacidade (PV-05..PV-10, numeração igual à dos comentários de
@@ -113,7 +116,8 @@ Exibidas no bloco `data-pricing` ("Condições comerciais"). Nenhuma vira promes
 | PV-06 | Com Bookings: nome, e-mail, respostas e horário ficam na agenda da Nekkora no Microsoft 365 e são usados para confirmar, lembrar e realizar a conversa **pelo Microsoft Teams** | **condicional** — só com a URL do Bookings (configurada na COM-007; aprovação PUB-20 pendente) | AUD-38. Texto do Bookings proposto em `docs/comercial/privacidade-minuta.md` §4 (para a titular configurar no M365) |
 | PV-07 | O Turnstile (Cloudflare) analisa sinais técnicos do navegador na confirmação do envio | **condicional** — só com a chave do desafio (PUB-21) | — |
 | PV-08 | Uso dos dados só para responder, realizar a conversa agendada e preparar avaliação e proposta, a pedido do titular (art. 7º, V), **sem consentimento** (consentimento só para outro uso, pedido à parte); direitos do art. 18 pelo e-mail comercial | pendente de aprovação ⚖ | PUB-09. Distinção aceite × ciência × consentimento em `privacidade-minuta.md` §2 |
-| PV-09 | Retenção: contatos sem contratação até seis meses após o último contato relevante; reservas do Bookings até 90 dias após a reunião ou o cancelamento | **diretriz aprovada** (COM-008-B, AUD-39); pendente de aprovação do aviso | O texto descreve o prazo, **não** uma eliminação automática (que não existe: procedimento manual pendente) |
+| PV-09 | Retenção: contatos sem contratação até seis meses após o último contato relevante; reservas do Bookings até 90 dias após a reunião ou o cancelamento; gravações com prazo **padrão** de 30 dias após a reunião | **diretriz aprovada** (COM-008-B, AUD-39; gravações: COM-PRIVACY-001); pendente de aprovação do aviso | O texto descreve o prazo, **não** uma eliminação automática. Contatos e reservas: revisão manual pela titular. Gravações: expiração padrão de 30 dias **verificada visualmente no SharePoint**; a eliminação definitiva **não** foi comprovada, por isso o texto diz "prazo padrão" |
+| PV-11 | A conversa pelo Teams pode ser gravada para registrar o que foi conversado; nunca automaticamente, só com aviso e concordância específica pedida pelo Teams; o participante pode não concordar; fica no Microsoft 365 da Nekkora com acesso restrito e sem link de acesso público | **condicional** — só com a URL do Bookings; controles homologados (COM-PRIVACY-001), aprovação do aviso pendente ⚖ | Política `Nekkora-Commercial` atribuída à conta responsável; pedido de concordância exibido em reunião real de teste; link público removido. Base legal da gravação e conduta quando alguém não concorda: JUR-10 / OPS-05 |
 | PV-10 | Microsoft e AWS podem processar dados fora do Brasil | comprovada (fato) / ⚖ adequação pendente | AUD-40. Regiões a confirmar |
 
 ## Proibidas (só como exclusão)

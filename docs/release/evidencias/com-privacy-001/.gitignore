@@ -1,0 +1,12 @@
+# NEKKORA-COM-PRIVACY-001: nenhuma gravação, transcrição ou mídia de reunião entra no repositório.
+*.mp4
+*.m4a
+*.mp3
+*.wav
+*.webm
+*.mov
+*.mkv
+*.vtt
+*.srt
+*.docx
+*.url

@@ -157,6 +157,10 @@ PUBLICAÇÃO BLOQUEADA — 8 pendência(s):
   - PUB-10 — desligar o aviso "Versão para homologação"
 ```
 
+> **Atualização (NEKKORA-COM-PRIVACY-001, 05/11/2026):** registro de 28/10/2026. Desde 04/11/2026 a razão social
+> (PUB-09, controlador) e as datas da campanha (PUB-13) estão em `publicacao.json`, e o portão não as acusa mais. A
+> situação atual fica em [`COM-RELEASE-PENDENCIAS.md`](COM-RELEASE-PENDENCIAS.md).
+
 O PUB-20 deixou de acusar a URL (ela é válida) e passou a acusar só a confirmação da titular. Nenhuma regra do portão
 foi afrouxada; o teste "o publicacao.json versionado continua bloqueado" passou a exigir exatamente isso.
 
