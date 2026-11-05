@@ -36,8 +36,8 @@ na AWS, sem gravação automática. Preços, datas da campanha, testes e infraes
 
 > **Gravação da conversa** — A conversa pelo Microsoft Teams pode ser gravada para registrar o que foi conversado e
 > apoiar a avaliação e a proposta. A gravação nunca é automática: só começa com aviso, e o próprio Teams pede a sua
-> concordância específica. Você pode não concordar. A gravação fica no Microsoft 365 da Nekkora, com acesso restrito e
-> sem link de acesso público.
+> concordância específica. Você pode não concordar. As gravações ficam no Microsoft 365, com acesso gerenciado pela
+> Nekkora conforme as permissões de cada arquivo.
 
 Acréscimo em "Por quanto tempo guardamos": *"Gravações de conversas, quando houver, têm prazo padrão de 30 dias após a
 reunião."*

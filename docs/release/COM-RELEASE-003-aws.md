@@ -23,7 +23,7 @@ Deploy (manual, da main) ── autorização → CI do commit → APROVAÇÃO H
 | Identificador | Valor | Como obter |
 |---|---|---|
 | AWS Account ID | **não verificado** | `npm run aws:auditar -- --bucket <nome>` (A01) |
-| Região do bucket | **não verificado** | idem (`inventory.bucket.regiao`) |
+| Região do bucket | **`sa-east-1`** (São Paulo) — auditoria no CloudShell de 27/10/2026 (INF-01), registrada na NEKKORA-COM-PRIVACY-001; saída não versionada | idem (`inventory.bucket.regiao`) |
 | Nome exato do bucket | **não informado** | console S3 → informar no `--bucket` |
 | CloudFront Distribution ID / ARN / domínio | **não verificado** | idem (descobre a distribuição pela origem) |
 | OAC | **não verificado** | idem (`inventory.oac`) |

@@ -19,7 +19,7 @@ automático: [`texto-com-envio-automatico-e-bookings.md` §7a](../release/com-re
 |---|---|---|---|
 | Controlador | "a Nekkora" | "NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA (CNPJ 68.337.624/0001-32)", lidos de `publicacao.json → controlador` (razão social informada pela titular em 04/11/2026) | AUD-33 |
 | Microsoft Bookings | "…usados para realizar a conversa" | "…usados para confirmar e lembrar o horário e realizar a conversa **pelo Microsoft Teams**" | AUD-38 |
-| **Gravação da conversa** (novo, COM-PRIVACY-001) | O aviso não tratava de gravação | Novo item **"Gravação da conversa"** (§4a): pode ser gravada; nunca automaticamente; só com aviso e concordância específica pedida pelo Teams; o participante pode não concordar; acesso restrito e sem link público | AUD-38 |
+| **Gravação da conversa** (novo, COM-PRIVACY-001) | O aviso não tratava de gravação | Novo item **"Gravação da conversa"** (§4a): pode ser gravada; nunca automaticamente; só com aviso e concordância específica pedida pelo Teams; o participante pode não concordar; acesso gerenciado pela Nekkora conforme as permissões de cada arquivo | AUD-38 |
 | Cookies | "Não usamos cookies…" | "**Esta página** não usa cookies…; **o simulador de investimento não guarda nem envia** o que você seleciona… O Microsoft Bookings… segue as regras da Microsoft" | AUD-43 |
 | Retenção | "pelo tempo necessário… ou exigido por lei" | Item **"Por quanto tempo guardamos"** (§3), agora com o **prazo padrão de 30 dias** das gravações | AUD-39 |
 | Transferência internacional | Ausente | Item **"Onde os dados são processados"**: Microsoft (M365, Bookings e Teams) e AWS podem processar dados fora do Brasil | AUD-40 |
@@ -31,8 +31,8 @@ Texto do novo item (só aparece com a URL do Bookings, como os demais itens que 
 
 > **Gravação da conversa** — A conversa pelo Microsoft Teams pode ser gravada para registrar o que foi conversado e
 > apoiar a avaliação e a proposta. A gravação nunca é automática: só começa com aviso, e o próprio Teams pede a sua
-> concordância específica. Você pode não concordar. A gravação fica no Microsoft 365 da Nekkora, com acesso restrito e
-> sem link de acesso público.
+> concordância específica. Você pode não concordar. As gravações ficam no Microsoft 365, com acesso gerenciado pela
+> Nekkora conforme as permissões de cada arquivo.
 
 O que o texto **não** afirma, de propósito:
 
@@ -41,7 +41,8 @@ O que o texto **não** afirma, de propósito:
   câmera e tela), mas a conduta da Nekkora nesse caso (parar a gravação ou seguir sem ela) ainda não foi definida
   (OPS-05). O aviso diz só "você pode não concordar";
 - **quem exatamente tem acesso**: só foram verificados a remoção do link público e a ausência de compartilhamento com
-  grupos no arquivo testado. O aviso diz "acesso restrito";
+  grupos no arquivo testado. Por isso o aviso **não** diz "sem link público" para todas as gravações: diz que o acesso é
+  gerenciado pela Nekkora conforme as permissões de cada arquivo (revisão do PR #12);
 - **base legal da gravação** (JUR-10).
 
 ## 2. Aceite, ciência, consentimento e concordância com a gravação
@@ -85,7 +86,7 @@ Corrige a base legal (AUD-35), retira "telefone" (AUD-36), inclui o Teams (AUD-3
 > quando informados). Esses dados servem para confirmar e lembrar o horário, realizar a reunião pelo Microsoft Teams e
 > responder à sua solicitação, a seu pedido (LGPD, art. 7º, V). A reunião pode ser gravada, mas só com aviso e com a
 > sua concordância específica, pedida pelo Teams no início da gravação; você pode não concordar. Gravações têm acesso
-> restrito e prazo padrão de 30 dias após a reunião. O agendamento e a reunião usam o Microsoft Bookings e o Microsoft
+> gerenciado pela Nekkora conforme as permissões de cada arquivo e prazo padrão de 30 dias após a reunião. O agendamento e a reunião usam o Microsoft Bookings e o Microsoft
 > Teams (Microsoft 365), que podem processar dados fora do Brasil. As reservas ficam guardadas por até 90 dias após a
 > reunião ou o cancelamento. Saiba mais em https://nekkora.com/#privacidade. Dúvidas ou pedidos sobre seus dados:
 > contato@nekkora.com. Não inclua senhas nem informações sigilosas.
@@ -135,7 +136,11 @@ esperado das gravações e **não** deve ser renomeado (renomear o domínio Shar
 
 O aviso diz só o que é fato: os serviços da Microsoft e da AWS **podem** processar dados fora do Brasil. Faltam:
 
-- confirmar a região do bucket S3 e da distribuição (a auditoria AWS não registrou a região do bucket);
+- ~~confirmar a região do bucket S3~~ **`sa-east-1` (São Paulo)**, segundo a auditoria AWS no CloudShell
+  (`inventory.bucket.regiao`; INF-01, 27/10/2026), conforme a revisão do PR #12. A saída da auditoria não está
+  versionada. O armazenamento do site fica no Brasil, mas o **CloudFront** entrega a partir de pontos de presença no
+  mundo todo, e o envio automático (se ativado) e o SES dependem da região escolhida para eles. Por isso o aviso
+  continua dizendo que a AWS **pode** processar dados fora do Brasil;
 - confirmar a região do tenant do Microsoft 365 (inclusive onde ficam as gravações do OneDrive/SharePoint);
 - verificar se os termos da AWS e da Microsoft atendem ao art. 33 (Res. CD/ANPD nº 19/2024).
 

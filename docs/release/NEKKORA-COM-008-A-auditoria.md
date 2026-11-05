@@ -8,7 +8,7 @@ para a COM-008-B: **não substituem** o texto atual.
 > **Atualização (NEKKORA-COM-PRIVACY-001, 05/11/2026):** este relatório é um retrato de 28/10/2026. Desde então:
 > **AUD-33** e **AUD-04** foram resolvidos — a razão social e as datas da campanha (06/11/2026 a 06/01/2027) estão em
 > `publicacao.json` desde 04/11/2026; **AUD-38** — a gravação foi decidida: possível, com aviso e concordância
-> específica, sem acesso público e com prazo padrão de 30 dias
+> específica, acesso gerenciado por arquivo e prazo padrão de 30 dias
 > ([`privacidade-minuta.md` §4a](../comercial/privacidade-minuta.md)). A situação atual fica em
 > [`COM-RELEASE-PENDENCIAS.md`](COM-RELEASE-PENDENCIAS.md).
 
