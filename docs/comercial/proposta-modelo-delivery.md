@@ -17,7 +17,7 @@
 
 | Campo | Conteúdo |
 |---|---|
-| Fornecedor | NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA · CNPJ 68.337.624/0001-32 · `{{endereço comercial definido pela titular — PUB-22}}` · contato@nekkora.com |
+| Fornecedor | NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA · CNPJ 68.337.624/0001-32 · Rua Pais Leme, 215, Conjunto 1713, Pinheiros, São Paulo/SP, CEP 05424-150 · contato@nekkora.com |
 | Cliente | `{{razão social ou nome}}` · `{{CNPJ/CPF}}` · `{{representante e e-mail}}` |
 | **Natureza da relação** (C-01) | ☐ Consumidor (pessoa física, ou pessoa jurídica que contrata como destinatária final) · ☐ Contratação empresarial (o serviço integra a atividade produtiva do cliente). **Na dúvida, marcar "Consumidor".** As cláusulas do Anexo B só valem para contratação empresarial |
 | Número e data de emissão | `{{NK-AAAA-NNN}}` · `{{DD/MM/AAAA}}` |

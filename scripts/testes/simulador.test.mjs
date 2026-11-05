@@ -224,6 +224,6 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
     'NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA'
   );
   assert.equal(pub.envioAutomatico.endpoint, null, 'backend não ativado');
-  // NEKKORA-COM-LEGAL-BASE-001: o endereço comercial (PUB-22) é decisão da titular — nunca presumido pelo agente
-  assert.equal(pub.fornecedor.endereco, null, 'endereço do fornecedor não presumido');
+  // PUB-22: endereço comercial informado pela titular em 05/11/2026, com base no cartão CNPJ
+  assert.equal(pub.fornecedor.endereco, 'Rua Pais Leme, 215, Conjunto 1713, Pinheiros, São Paulo/SP, CEP 05424-150');
 });

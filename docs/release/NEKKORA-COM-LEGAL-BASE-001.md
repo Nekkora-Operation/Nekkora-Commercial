@@ -22,7 +22,7 @@
 
 | Grupo | Itens | Efeito |
 |---|---|---|
-| **Impeditivos da publicação** (o site não deve ir ao ar sem eles) | R-01 endereço do fornecedor (PUB-22) · R-04 transferência internacional sem mecanismo verificado (JUR-07) · R-06 registros de acesso (Marco Civil, art. 15): decidir · R-13 texto real do Bookings (OPS-02) · R-14 teste de recebimento do `contato@` (REP-04) · R-03 **nova aprovação dos textos** alterados nesta missão (PUB-17) · aprovações já pendentes (PUB-09, PUB-19, PUB-18, PUB-10) | O portão bloqueia: PUB-09, PUB-10, PUB-18, PUB-19 e **PUB-22 (novo)** |
+| **Impeditivos da publicação** (o site não deve ir ao ar sem eles) | R-01 endereço do fornecedor (PUB-22) · R-04 transferência internacional sem mecanismo verificado (JUR-07) · R-06 registros de acesso (Marco Civil, art. 15): decidir · R-13 texto real do Bookings (OPS-02) · R-14 teste de recebimento do `contato@` (REP-04) · R-03 **nova aprovação dos textos** alterados nesta missão (PUB-17) · aprovações já pendentes (PUB-09, PUB-19, PUB-18, PUB-10) | O portão bloqueia: PUB-09, PUB-10, PUB-18 e PUB-19. **PUB-22** foi preenchido pela titular em 05/11/2026 (§3.1, item 8) |
 | **Corrigido nesta missão** | R-02 nome empresarial e CNPJ no rodapé (Decreto 7.962/2013, art. 2º, I) · R-03 o aviso dizia que a conversa "pode ser gravada", mas não há gravação nesta fase | Site alterado; homologação no navegador aprovada (§7) |
 | **Antes da primeira contratação** (não impede o site) | Condições comerciais C-01 a C-12: arrependimento, retenção, garantia, propriedade intelectual, prazos | Minuta revisada e [proposta-modelo](../comercial/proposta-modelo-delivery.md) criada; decisão da titular |
 | **Antes de qualquer gravação futura** | JUR-10, OPS-05 a OPS-08, CTL-01 | Fora do lançamento: sem gravação nesta fase |
@@ -70,9 +70,10 @@ Não foi usada jurisprudência nem orientação de autoridade que não esteja ne
 | 1 | [N] | Decreto 7.962/2013, art. 2º: o site usado para **oferta** de contrato de consumo deve exibir, "em local de destaque e de fácil visualização": I nome empresarial e CNPJ; II **endereço físico e eletrônico**; III características essenciais; IV despesas adicionais; V condições integrais da oferta (pagamento, disponibilidade, forma e prazo de execução); VI restrições à fruição |
 | 2 | [I] | O site **oferta** serviços com preço a um público que inclui consumidores (CDC arts. 2º e 29). Mesmo sem contratação online, o art. 2º se aplica, porque menciona "oferta **ou** conclusão" |
 | 3 | [E] | Antes: nome empresarial e CNPJ só na descrição do aviso de privacidade; rodapé "© Nekkora". **Agora:** rodapé com "NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA · CNPJ 68.337.624/0001-32 · contato@nekkora.com" (homologação `rodape-identificacao-do-fornecedor`) |
-| 4 | [!] | **Endereço físico: ausente.** Criado `publicacao.json → fornecedor.endereco: null` e item **PUB-22** no portão. O agente **não** inventou nem pesquisou endereço |
+| 4 | [!] | **Endereço físico: ausente** na primeira versão desta revisão (ver item 8). Criado `publicacao.json → fornecedor.endereco: null` e item **PUB-22** no portão. O agente **não** inventou nem pesquisou endereço |
 | 5 | [N] | CC art. 1.142, §§1º e 2º: o estabelecimento pode ser virtual, e nesse caso o endereço de registro pode ser o de um dos sócios |
 | 6 | [I]/[P] | Alternativas para a titular decidir: (a) publicar o endereço da sede **tal como registrado no CNPJ**, que já é público na Receita Federal; se for residencial, a decisão precisa ser consciente; (b) contratar endereço comercial (escritório virtual ou coworking) e **atualizar o registro**. Antes da atualização, publicar endereço diferente do registrado tem risco de não ser considerado "informação necessária para sua localização"; (c) não publicar e não lançar: o portão bloqueia. Nenhuma alternativa dispensa o requisito |
+| 8 | [D]/[E] | **Atualização (05/11/2026):** a titular informou o endereço com base no cartão CNPJ (alternativa (a)): `Rua Pais Leme, 215, Conjunto 1713, Pinheiros, São Paulo/SP, CEP 05424-150`, endereço de escritório virtual. Preenchido em `fornecedor.endereco`; o rodapé mostra o endereço sem sugerir atendimento presencial (homologação `rodape-sem-atendimento-presencial`). O agente não conferiu o cartão CNPJ: a correspondência é declaração da titular |
 | 7 | [E] | Art. 2º, III a VI: características (cartões, critérios de categoria, Transparência), despesas adicionais ("licenças e custos externos… não incluídos"), pagamento 50% + 50%, restrições ("conforme a categoria definida na avaliação"; a complexa sob orçamento). O **prazo de execução** não é publicado: é definido na proposta |
 | 8 | [I] | Pelo art. 2º, V, "forma e prazo da execução do serviço" integram as condições da oferta. Para serviço sob encomenda, o prazo depende da avaliação. O site já diz que o prazo é "definido em proposta" (Transparência). Risco **baixo**, desde que a proposta o fixe (C-12) |
 | 9 | [N] | Art. 4º: sumário do contrato antes da contratação, confirmação imediata do aceite, contrato em meio conservável, atendimento eletrônico e resposta **em até 5 dias** (parágrafo único). Art. 5º: meios para o arrependimento |
@@ -128,7 +129,7 @@ Severidade: **A** alta · **M** média · **B** baixa. "Impede publicação?" = 
 
 | ID | Risco | Fonte | Sev. | Impede publicação? | Situação | Quem decide |
 |---|---|---|---|---|---|---|
-| R-01 | Endereço físico do fornecedor ausente | Decreto 7.962, art. 2º, II | A | **Sim** | Portão PUB-22 bloqueia | Titular |
+| R-01 | Endereço físico do fornecedor ausente | Decreto 7.962, art. 2º, II | A | ~~Sim~~ | **Resolvido**: endereço informado pela titular em 05/11/2026 (cartão CNPJ); entra na nova aprovação dos textos (R-03) | Titular |
 | R-02 | Nome empresarial e CNPJ fora de local de destaque | Decreto 7.962, art. 2º, I | M | — | **Corrigido** (rodapé) | — |
 | R-03 | Aviso dizia "pode ser gravada" sem gravação nesta fase; textos aprovados alterados | LGPD arts. 6º, VI, e 9º | M | **Sim** (nova aprovação) | **Corrigido no site**; `textosComerciais` **continua `true`** e precisa de nova decisão | Titular |
 | R-04 | Transferência internacional sem mecanismo verificado e sem regiões confirmadas | LGPD art. 33; Res. 19/2024; Res. 32/2026 | A | **Sim** (para o aviso) | Pendente (JUR-07) | Titular + revisão |
@@ -159,14 +160,14 @@ Severidade: **A** alta · **M** média · **B** baixa. "Impede publicação?" = 
 | JUR-06 | Base legal do atendimento; ciência × consentimento | Art. 7º, V, para o contratante; IX para o representante (proposta de texto não aplicada). Ciência no Bookings mantida | Proposta; decisão |
 | JUR-07 | Transferência internacional | Sem CPC verificável da Microsoft ou da AWS; nenhuma equivalência estrangeira; UE adequada; regiões não confirmadas; transparência do art. 17, §2º, se houver CPC | **Pendente, impede a aprovação do aviso** |
 | JUR-08 | Pequeno porte e encarregado | Provável enquadramento; dispensa com canal; prazo em dobro; registro simplificado | Depende de a titular confirmar ME/EPP e a receita |
-| JUR-09 | Identificação do fornecedor; oferta vinculante | Nome e CNPJ no rodapé (feito); **endereço pendente (PUB-22)**; oferta da campanha vincula (C-10) | Parcial; **endereço impede a publicação** |
+| JUR-09 | Identificação do fornecedor; oferta vinculante | Nome, CNPJ e endereço no rodapé (endereço informado pela titular em 05/11/2026, PUB-22); oferta da campanha vincula (C-10) | Atendido no site, sujeito à nova aprovação dos textos |
 | JUR-10 | Gravação de reuniões | **Fora do lançamento:** sem gravação nesta fase. Volta a ser necessária antes de qualquer gravação | Adiada (não se aplica ao lançamento) |
 
 ---
 
 ## 6. Separação pedida na missão
 
-**Impede a publicação do site:** R-01, R-03 (nova aprovação), R-04, R-06 (decisão), R-13, R-14 e as aprovações já
+**Impede a publicação do site:** ~~R-01~~ (resolvido em 05/11/2026), R-03 (nova aprovação), R-04, R-06 (decisão), R-13, R-14 e as aprovações já
 pendentes (PUB-09, PUB-10, PUB-18, PUB-19).
 
 **Específico de futuras contratações (não impede o site, impede a 1ª proposta):** C-01 a C-12, a cláusula de operadora
@@ -183,10 +184,10 @@ aprovação.
 |---|---|---|
 | `src/content.ts` (`FOOTER.supplier`), `src/sections/Footer.tsx`, `src/styles.css` | Linha de identificação no rodapé: nome empresarial, CNPJ, endereço (quando houver) e e-mail, lidos de `publicacao.json` | Decreto 7.962, art. 2º, I e II |
 | `src/content.ts` (`PRIVACY`) | "Gravação da conversa" → **"Conversa sem gravação"**; frase das gravações retirada de "Por quanto tempo guardamos" | LGPD arts. 6º, VI, e 9º; diretriz da titular |
-| `src/config.ts`, `src/publicacao.d.ts`, `publicacao.json` | `fornecedor.endereco: null` (+ `$origem`) e `SUPPLIER_ADDRESS` | Nenhum endereço presumido |
-| `scripts/verificar-publicacao.mjs` | Novo item **PUB-22** (endereço comercial) | Portão continua bloqueado |
-| `scripts/homologacao.mjs` | Verificações `privacidade-sem-gravacao` e `rodape-identificacao-do-fornecedor` | Evidência no navegador |
-| Testes | `verificar-publicacao.test.mjs` (PUB-22 no versionado + 3 casos), `simulador.test.mjs` (endereço não presumido) | — |
+| `src/config.ts`, `src/publicacao.d.ts`, `publicacao.json` | `fornecedor.endereco` (+ `$origem`) e `SUPPLIER_ADDRESS`. Primeiro `null`; depois preenchido com o endereço informado pela titular (05/11/2026, cartão CNPJ) | Nenhum endereço presumido pelo agente |
+| `scripts/verificar-publicacao.mjs` | Novo item **PUB-22** (endereço comercial) | Atendido depois que a titular informou o endereço; o portão continua bloqueado pelos demais itens |
+| `scripts/homologacao.mjs` | Verificações `privacidade-sem-gravacao`, `rodape-identificacao-do-fornecedor` e `rodape-sem-atendimento-presencial` | Evidência no navegador |
+| Testes | `verificar-publicacao.test.mjs` (PUB-22 no versionado + 3 casos), `simulador.test.mjs` (endereço informado pela titular) | — |
 | `docs/com-001/05-texto-comercial.md`, `docs/release/com-release-005/texto-com-envio-automatico-e-bookings.md` | Regenerados com `npm run texto` | Gerados do código |
 | Docs | Este relatório; minutas de condições (§9) e de privacidade; [proposta-modelo](../comercial/proposta-modelo-delivery.md); [procedimento](../comercial/procedimento-retencao-e-direitos.md); pendências | — |
 
@@ -199,8 +200,8 @@ Evidências de execução: ver a descrição do PR (`npm test`, `npm run check`,
 
 ## 8. Decisões que dependem da titular
 
-1. **Endereço comercial** (R-01/PUB-22): qual endereço publicar, entre as alternativas do §3.1, item 6.
-2. **Nova aprovação dos textos** (R-03/PUB-17): rodapé com identificação, item "Conversa sem gravação" e retenção sem
+1. ~~**Endereço comercial** (R-01/PUB-22)~~: **decidido** em 05/11/2026 (endereço do cartão CNPJ, §3.1, item 8).
+2. **Nova aprovação dos textos** (R-03/PUB-17): rodapé com identificação e endereço, item "Conversa sem gravação" e retenção sem
    gravações. Enquanto não houver nova decisão, `textosComerciais: true` corresponde ao texto **anterior**.
 3. **Registros de acesso** (R-06): ativar os logs do CloudFront por 6 meses ou registrar a conclusão contrária.
 4. **Transferência internacional** (R-04): confirmar as regiões e escolher um mecanismo por provedor.

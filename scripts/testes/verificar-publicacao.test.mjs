@@ -69,14 +69,14 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   for (const id of [
     'PUB-19',
     'PUB-18',
-    'PUB-10',
-    // NEKKORA-COM-LEGAL-BASE-001: endereço comercial do fornecedor (Decreto 7.962/2013, art. 2º, II) — decisão da titular
-    'PUB-22'
+    'PUB-10'
   ]) {
     assert.match(r.stdout, new RegExp(id));
   }
   // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
   assert.doesNotMatch(r.stdout, /PUB-20/);
+  // PUB-22: endereço comercial informado pela titular em 05/11/2026 (cartão CNPJ) — o portão não o acusa mais
+  assert.doesNotMatch(r.stdout, /PUB-22/);
   // PUB-17: textos comerciais aprovados pela titular em 05/11/2026 — o portão não os acusa mais
   assert.doesNotMatch(r.stdout, /PUB-17/);
 
