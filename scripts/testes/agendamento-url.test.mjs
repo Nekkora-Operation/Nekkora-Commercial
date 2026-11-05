@@ -94,11 +94,11 @@ test('domínio fictício: aceito na homologação, recusado em produção', () =
   assert.equal(isBookingsUrl(OFICIAL, { ...NEKKORA, producao: true }), true);
 });
 
-test('publicacao.json: a URL registrada é a oficial, válida em produção, e a aprovação NÃO foi presumida', () => {
+test('publicacao.json: a URL registrada é a oficial, válida em produção, e a aprovação foi gravada pela titular (05/11/2026)', () => {
   const pub = JSON.parse(readFileSync('publicacao.json', 'utf8'));
   assert.equal(pub.agendamento.url, OFICIAL);
   assert.equal(pub.agendamento.obrigatorio, true);
-  assert.equal(pub.aprovacoes.agendamento, false);
+  assert.equal(pub.aprovacoes.agendamento, true);
   assert.equal(isBookingsUrl(pub.agendamento.url, { emailDomain: pub.canais.email.split('@')[1], producao: true }), true);
 });
 

@@ -210,7 +210,7 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
     condicoesComerciais: false,
     textosComerciais: false,
     avisoDePrivacidade: false,
-    agendamento: false,
+    agendamento: true, // titular, 05/11/2026 (PUB-20)
     envioAutomatico: false,
     publicacao: false,
   });
