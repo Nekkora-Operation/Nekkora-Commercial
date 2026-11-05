@@ -3,12 +3,21 @@
  * Homologação do Simulador de Investimento (NEKKORA-CALC-001) e do formulário de avaliação (NEKKORA-COM-008-C §8) em
  * navegador real (Playwright: Chromium, Firefox, WebKit).
  *
- * Uso (dois builds servidos como no CloudFront — veja .github/workflows/ci.yml):
+ * Uso (builds servidos como no CloudFront — veja .github/workflows/ci.yml):
  *   node scripts/homologacao-simulador.mjs <url de produção> <url da fixture com datas> <pasta> [chromium,firefox,webkit]
+ *     [<url da fixture pendente> <url da fixture pendente sem aviso>]
  *
- *   - produção (publicacao.json real): campanha SEM datas → prévia de homologação; e-mail e Bookings oficiais;
+ *   - produção (publicacao.json real): campanha aprovada de 06/11/2026 a 06/01/2027 (NEKKORA-COM-RELEASE-FIX-001) →
+ *     relógio do navegador fixado na véspera, no primeiro dia, durante, no último dia e no dia seguinte; e-mail e
+ *     Bookings oficiais;
  *   - fixture (scripts/fixtures/publicacao-homologacao.json): datas sintéticas 01/11 a 31/12/2026 → relógio do navegador
- *     fixado antes, durante e depois da campanha.
+ *     fixado antes, durante e depois da campanha;
+ *   - fixtures pendentes (publicacao-homologacao-pendente*.json): campanha SEM datas → prévia promocional só com o aviso
+ *     de homologação; sem ele, só o preço padrão.
+ *
+ * O relógio de cada contexto é sempre fixado (nada depende do dia em que o runner executa). A situação esperada de cada
+ * data é derivada de campaignState/todayInBrazil (src/precos.ts) sobre o publicacao.json e conferida contra a tabela
+ * explícita da missão.
  *
  * Nada sai do localhost: qualquer outra requisição é abortada e reprova. Nenhum formulário é enviado: a jornada para na
  * etapa de confirmação, antes de abrir o e-mail ou o WhatsApp.
@@ -16,26 +25,64 @@
 import { createRequire } from 'node:module';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { campaignState, todayInBrazil } from '../src/precos.ts';
 
-const [, , prodUrl = 'http://127.0.0.1:4173/', fixtureUrl = 'http://127.0.0.1:4175/', outDir = 'evidencias/simulador', engineList = 'chromium,firefox,webkit'] = process.argv;
+const [
+  ,
+  ,
+  prodUrl = 'http://127.0.0.1:4173/',
+  fixtureUrl = 'http://127.0.0.1:4175/',
+  outDir = 'evidencias/simulador',
+  engineList = 'chromium,firefox,webkit',
+  pendingUrl = 'http://127.0.0.1:4179/',
+  pendingNoNoticeUrl = 'http://127.0.0.1:4180/',
+] = process.argv;
 const require = createRequire(import.meta.url);
 const playwright = require('playwright');
 const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 mkdirSync(outDir, { recursive: true });
 
-const OFFICIAL_BOOKINGS = JSON.parse(readFileSync('publicacao.json', 'utf8')).agendamento.url;
+const PUBLICACAO = JSON.parse(readFileSync('publicacao.json', 'utf8'));
+const OFFICIAL_BOOKINGS = PUBLICACAO.agendamento.url;
 const THEME_KEY = 'nekkora-commercial-tema';
 const DISCLAIMER =
   'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.';
-// Exemplo obrigatório da missão, digitado aqui de propósito (independente do código)
+// Exemplo obrigatório da missão, digitado aqui de propósito (independente do código): 2 simples + 1 média
 const EXAMPLE = { estimativa: 'R$ 4.800', padrao: 'R$ 6.500', economia: 'R$ 1.700', percentual: '26,15%' };
+// O mesmo pedido fora da campanha: só o preço padrão, sem economia nem percentual
+const EXAMPLE_STANDARD = { estimativa: 'R$ 6.500' };
+const CAMPAIGN_TEXT = {
+  vigente: 'Preços de lançamento em vigor para solicitações recebidas durante a campanha.',
+  futura: 'Valores pelo preço padrão. Os preços de lançamento ainda não estão em vigor.',
+  encerrada: 'Valores pelo preço padrão. A campanha de lançamento foi encerrada.',
+  pendente: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
+};
+/** Fixture sintética (01/11 a 31/12/2026): antes, durante e depois. */
 const AT = {
   vigente: new Date('2026-11-15T12:00:00-03:00'),
   futura: new Date('2026-10-31T23:30:00-03:00'),
   encerrada: new Date('2027-01-01T00:30:00-03:00'),
-  // produção sem datas: qualquer dia
+  // fixtures sem datas: qualquer dia
   pendente: new Date('2026-11-15T12:00:00-03:00'),
 };
+/**
+ * Campanha real (publicacao.json), nas bordas do fuso de Brasília: 23h30 de 05/11 já é 06/11 em UTC, e 00h30 de 07/01
+ * ainda é 06/01 em UTC — a página precisa seguir o calendário brasileiro.
+ */
+const PROD_DATES = [
+  { id: '2026-11-05-campanha-futura', at: new Date('2026-11-05T23:30:00-03:00'), state: 'futura' },
+  { id: '2026-11-06-primeiro-dia', at: new Date('2026-11-06T00:30:00-03:00'), state: 'vigente' },
+  { id: '2026-11-15-campanha-vigente', at: new Date('2026-11-15T12:00:00-03:00'), state: 'vigente' },
+  { id: '2027-01-06-ultimo-dia', at: new Date('2027-01-06T23:30:00-03:00'), state: 'vigente' },
+  { id: '2027-01-07-campanha-encerrada', at: new Date('2027-01-07T00:30:00-03:00'), state: 'encerrada' },
+];
+// A tabela explícita acima tem de coincidir com as regras de src/precos.ts aplicadas às datas aprovadas
+for (const d of PROD_DATES) {
+  const derived = campaignState(PUBLICACAO.campanhaLancamento, todayInBrazil(d.at));
+  if (derived !== d.state) throw new Error(`${d.id}: publicacao.json + src/precos.ts dão "${derived}", esperado "${d.state}" (datas ${JSON.stringify(PUBLICACAO.campanhaLancamento)})`);
+}
+const toBr = (iso) => iso.split('-').reverse().join('/');
+const PROD_PERIOD = `de ${toBr(PUBLICACAO.campanhaLancamento.inicio)} a ${toBr(PUBLICACAO.campanhaLancamento.fim)}`;
 
 const checks = [];
 const check = (engine, id, ok, detail) => {
@@ -98,14 +145,13 @@ async function run(engine) {
     }));
     check(engine, 'inicia-com-zero', JSON.stringify(initial.values) === '["0","0","0"]' && initial.total === '0' && !initial.result && initial.minusDisabled, JSON.stringify(initial));
     await shot(sim, 'simulador-inicial-producao');
-    // 12. Datas pendentes (produção): prévia de homologação, sem elegibilidade
+    // Campanha vigente (produção, 15/11/2026): o exemplo obrigatório com os preços de lançamento
     await plus(sim, 'simples', 2);
     await plus(sim, 'media');
     await calc(sim);
     const f = await figures(sim);
     const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
-    check(engine, 'calculo-exemplo-obrigatorio', JSON.stringify(f) === JSON.stringify(EXAMPLE), JSON.stringify(f));
-    check(engine, 'datas-pendentes-previa-sem-elegibilidade', res.state === 'pendente' && res.launch === 'sim' && /Prévia para revisão: as datas da campanha ainda não foram definidas\. Nenhuma solicitação é elegível antes do início oficial\./.test(res.text), res.state);
+    check(engine, 'calculo-exemplo-obrigatorio', JSON.stringify(f) === JSON.stringify(EXAMPLE) && res.state === 'vigente' && res.launch === 'sim', `${res.state}: ${JSON.stringify(f)}`);
     check(engine, 'aviso-de-transparencia', res.text.includes(DISCLAIMER) && /não é uma economia operacional comprovada/.test(res.text), 'texto obrigatório e economia comercial ≠ operacional');
     // 19. Consistência com os cartões: o preço unitário de cada linha é o do cartão
     const cards = await page.evaluate(() => ({
@@ -125,7 +171,109 @@ async function run(engine) {
     check(engine, 'agendar-uma-conversa-bookings-oficial', bookings.href === OFFICIAL_BOOKINGS && bookings.target === '_blank' && /noopener/.test(bookings.rel) && /noreferrer/.test(bookings.rel) && /Agendar uma conversa/.test(bookings.text), JSON.stringify(bookings));
     const status = await page.locator('[data-testid="status-simulador"]').innerText();
     check(engine, 'resultado-anunciado-em-regiao-viva', /Resultado da simulação atualizado\./.test(status) && (await page.locator('[data-testid="status-simulador"]').getAttribute('role')) === 'status', status.slice(0, 120));
-    await shot(sim, 'simulador-pendente-producao');
+    await shot(sim, 'simulador-vigente-producao');
+    await ctx.close();
+  }
+
+  // Campanha real (publicacao.json): véspera, primeiro dia, vigente, último dia e dia seguinte ------------------------
+  for (const d of PROD_DATES) {
+    const promo = d.state === 'vigente';
+    const { ctx, page, sim } = await open(prodUrl, { at: d.at });
+    // Cartões: com a campanha, padrão riscado + lançamento + percentual + economia; fora dela, só o padrão, sem desconto
+    const cards = await page.evaluate(() => {
+      const block = document.querySelector('[data-pricing]');
+      return {
+        table: Object.fromEntries(
+          [...block.querySelectorAll('[data-price-tier]')].map((el) => [el.dataset.priceTier, Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.dataset.price, v.textContent.trim()]))]),
+        ),
+        struck: [...block.querySelectorAll('[data-price-tier] s, [data-price-tier] del')].map((s) => s.textContent.trim()),
+        strip: block.querySelector('.launch-strip')?.innerText.replace(/\s+/g, ' ').trim() ?? null,
+        preview: !!block.querySelector('[data-campanha="pendente"]'),
+      };
+    });
+    const cardsOk = promo
+      ? JSON.stringify(cards.table.simples) === JSON.stringify({ padrao: 'R$ 1.500', lancamento: 'R$ 1.000', percentual: '−33,33%', economia: 'Economia de R$ 500' }) &&
+        JSON.stringify(cards.table.media) === JSON.stringify({ padrao: 'R$ 3.500', lancamento: 'R$ 2.800', percentual: '−20%', economia: 'Economia de R$ 700' }) &&
+        cards.struck.join() === 'R$ 1.500,R$ 3.500' &&
+        !!cards.strip?.includes(PROD_PERIOD) &&
+        !cards.preview
+      : JSON.stringify(cards.table) === JSON.stringify({ simples: { padrao: 'R$ 1.500' }, media: { padrao: 'R$ 3.500' }, complexa: {} }) && cards.struck.length === 0 && cards.strip === null && !cards.preview;
+    check(engine, `producao-${d.id}:cartoes`, cardsOk, `${JSON.stringify(cards.table)} · riscados=${cards.struck.join(',') || 'nenhum'} · faixa=${cards.strip ?? 'ausente'}`);
+    // Simulador: R$ 6.500 → R$ 4.800 só na campanha; fora dela, R$ 6.500 como preço padrão
+    await plus(sim, 'simples', 2);
+    await plus(sim, 'media');
+    await calc(sim);
+    const f = await figures(sim);
+    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
+    const units = (await sim.locator('.sim__tier-unit').allInnerTexts()).slice(0, 2); // simples e média (a complexa é sob orçamento)
+    const label = await sim.locator('.sim__figure--main dt').innerText();
+    const simOk = promo
+      ? res.state === 'vigente' &&
+        res.launch === 'sim' &&
+        JSON.stringify(f) === JSON.stringify(EXAMPLE) &&
+        label === 'Investimento estimado com preços de lançamento' &&
+        units.join() === 'R$ 1.000 cada,R$ 2.800 cada' &&
+        res.text.includes(CAMPAIGN_TEXT.vigente)
+      : res.state === d.state &&
+        res.launch === 'nao' &&
+        JSON.stringify(f) === JSON.stringify(EXAMPLE_STANDARD) &&
+        label === 'Investimento estimado' &&
+        units.join() === 'R$ 1.500 cada,R$ 3.500 cada' &&
+        res.text.includes(CAMPAIGN_TEXT[d.state]) &&
+        !/R\$ 4\.800|R\$ 1\.700|26,15%|R\$ 1\.000|R\$ 2\.800|Economia|Desconto|lançamento em vigor|Prévia/.test(res.text);
+    check(engine, `producao-${d.id}:simulador`, simOk, `${res.state}/${res.launch} · ${label}: ${JSON.stringify(f)} · ${units.join(' · ')}`);
+    // Resumo levado ao formulário: os mesmos valores do estado da campanha
+    await sim.locator('[data-sim-result]').getByRole('link', { name: 'Solicitar avaliação' }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.waitFor();
+    const offer = dialog.locator('[data-testid="resumo-simulacao"] pre');
+    await offer.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+    const summary = (await offer.count()) ? await offer.innerText() : '';
+    const summaryOk = promo
+      ? /2 automações simples \(R\$ 1\.000 cada\)/.test(summary) && /R\$ 4\.800/.test(summary) && /R\$ 6\.500/.test(summary)
+      : /2 automações simples \(R\$ 1\.500 cada\)/.test(summary) && /1 automação média \(R\$ 3\.500 cada\)/.test(summary) && /Investimento estimado: R\$ 6\.500/.test(summary) && summary.includes(CAMPAIGN_TEXT[d.state]) && !/R\$ 4\.800|R\$ 1\.000|R\$ 2\.800|Economia|com preços de lançamento/.test(summary);
+    check(engine, `producao-${d.id}:resumo-do-formulario`, summaryOk, summary.replace(/\n/g, ' / ').slice(0, 200));
+    await page.keyboard.press('Escape');
+    await shot(sim, `simulador-producao-${d.id}`);
+    await ctx.close();
+  }
+
+  // 12. Datas pendentes (fixtures sem datas): prévia só com o aviso de homologação; sem ele, só o preço padrão ------
+  {
+    const { ctx, page, sim } = await open(pendingUrl, { at: AT.pendente });
+    await plus(sim, 'simples', 2);
+    await plus(sim, 'media');
+    await calc(sim);
+    const f = await figures(sim);
+    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
+    const strip = await page.locator('[data-pricing] [data-campanha="pendente"]').count();
+    check(
+      engine,
+      'datas-pendentes-previa-sem-elegibilidade',
+      res.state === 'pendente' && res.launch === 'sim' && JSON.stringify(f) === JSON.stringify(EXAMPLE) && res.text.includes(CAMPAIGN_TEXT.pendente) && strip === 1,
+      `${res.state}/${res.launch} · ${JSON.stringify(f)} · aviso de prévia nos cartões=${strip}`,
+    );
+    await shot(sim, 'simulador-pendente-previa');
+    await ctx.close();
+  }
+  {
+    const { ctx, page, sim } = await open(pendingNoNoticeUrl, { at: AT.pendente });
+    await plus(sim, 'simples', 2);
+    await plus(sim, 'media');
+    await calc(sim);
+    const f = await figures(sim);
+    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
+    const cards = await page.evaluate(() => ({
+      struck: document.querySelectorAll('[data-pricing] [data-price-tier] s').length,
+      launch: document.querySelectorAll('[data-pricing] [data-price="lancamento"], [data-pricing] [data-price="percentual"], [data-pricing] [data-price="economia"]').length,
+      strip: !!document.querySelector('[data-pricing] .launch-strip'),
+    }));
+    check(
+      engine,
+      'datas-pendentes-sem-aviso-so-preco-padrao',
+      res.state === 'pendente' && res.launch === 'nao' && JSON.stringify(f) === JSON.stringify(EXAMPLE_STANDARD) && !/R\$ 4\.800|Economia|Desconto/.test(res.text) && cards.struck === 0 && cards.launch === 0 && !cards.strip,
+      `${res.state}/${res.launch} · ${JSON.stringify(f)} · ${JSON.stringify(cards)}`,
+    );
     await ctx.close();
   }
 

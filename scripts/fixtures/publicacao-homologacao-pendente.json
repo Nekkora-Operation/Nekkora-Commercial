@@ -1,0 +1,38 @@
+{
+  "$comentario": "SINTÉTICO — só para builds de homologação (NEKKORA_PUBLICACAO). Igual a publicacao-homologacao.json, mas SEM as datas da campanha (estado \"pendente\"): com o aviso de homologação, os preços de lançamento aparecem só como prévia. Recusado por scripts/verificar-publicacao.mjs.",
+  "canais": {
+    "whatsapp": "5511912345678",
+    "email": "contato@exemplo.invalid",
+    "linkedin": "https://www.linkedin.com/company/exemplo-homologacao/",
+    "instagram": "https://www.instagram.com/"
+  },
+  "agendamento": {
+    "url": null,
+    "obrigatorio": false
+  },
+  "envioAutomatico": {
+    "endpoint": null,
+    "chaveDoSiteTurnstile": null
+  },
+  "campanhaLancamento": {
+    "inicio": null,
+    "fim": null
+  },
+  "controlador": {
+    "nome": "Empresa de Teste (dado sintético)",
+    "documento": "00.000.000/0000-00"
+  },
+  "hospedagem": {
+    "provedor": "Provedor de teste (dado sintético)"
+  },
+  "aprovacoes": {
+    "precos": true,
+    "condicoesComerciais": true,
+    "textosComerciais": true,
+    "avisoDePrivacidade": true,
+    "agendamento": true,
+    "envioAutomatico": true,
+    "publicacao": true
+  },
+  "avisoHomologacao": true
+}
