@@ -39,14 +39,14 @@ capturas, elas ficam fora do repositório ou são recortadas/anonimizadas antes.
 
 ## Homologação da página (texto do aviso)
 
-Commit `b63b242` (árvore limpa), artefato servido por `scripts/servidor-cloudfront-local.mjs`, relógio do navegador em
+Commit `679d5c3` (árvore limpa, já com a `main` integrada e os ajustes da revisão do PR #12), artefato servido por `scripts/servidor-cloudfront-local.mjs`, relógio do navegador em
 15/11/2026 (campanha vigente). Execução local em 05/11/2026, Windows 11.
 
 | Comando | Resultado |
 |---|---|
 | `npm test` | 233 testes, 0 falhas |
 | `npm run check` | OK |
-| `homologacao.mjs` — Chromium, Firefox, WebKit | 90 + 90 + 90 verificações, 0 falhas (inclui `privacidade-visivel`, `sem-alegacoes-proibidas`, axe e `artefato-corresponde-ao-codigo` = `b63b242`) |
+| `homologacao.mjs` — Chromium, Firefox, WebKit | 90 + 90 + 90 verificações, 0 falhas (inclui `privacidade-visivel`, `sem-alegacoes-proibidas`, axe e `artefato-corresponde-ao-codigo` = `679d5c3`) |
 | `verificar-publicacao.mjs --dist dist` | **Bloqueado** — PUB-20, PUB-19, PUB-17, PUB-09 (aprovação do aviso), PUB-18, PUB-10 |
 
 O item "Gravação da conversa" está no bundle (`dist/assets/index-*.js`). Capturas não foram versionadas.

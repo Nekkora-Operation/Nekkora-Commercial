@@ -54,7 +54,7 @@ confirmada pela titular na aprovação do aviso.
 | `npm test` | 233 testes, 0 falhas |
 | `npm run check` (typecheck, testes, build, preços do artefato, política do CloudFront) | OK |
 | `npm run verificar:publicacao -- --dist dist` | **Bloqueado**, como esperado: PUB-20, PUB-19, PUB-17, PUB-09 (aprovação do aviso), PUB-18, PUB-10. PUB-13 e o PUB-09 do controlador não aparecem mais |
-| Homologação no navegador | Ver [`evidencias/com-privacy-001/README.md`](evidencias/com-privacy-001/README.md) §Homologação da página |
+| Homologação no navegador (`679d5c3`, depois da revisão do PR #12) | 90 + 90 + 90, 0 falhas. Ver [`evidencias/com-privacy-001/README.md`](evidencias/com-privacy-001/README.md) §Homologação da página |
 
 ## 4. Pendências (resumo; detalhe em [`COM-RELEASE-PENDENCIAS.md` §2c](COM-RELEASE-PENDENCIAS.md))
 
