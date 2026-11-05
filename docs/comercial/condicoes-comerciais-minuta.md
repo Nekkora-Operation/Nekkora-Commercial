@@ -127,7 +127,7 @@ credenciais: **pendente de redação jurídica**. Os requisitos técnicos futuro
 
 | Regra **[D]** | Como o site trata |
 |---|---|
-| Duração de **dois meses** a partir da publicação oficial | As datas exatas **não** estão definidas. A titular as grava em `publicacao.json → campanhaLancamento` depois da publicação oficial; o código nunca as calcula nem preenche |
+| Duração de **dois meses** a partir da publicação oficial | Datas **informadas pela titular** em 04/11/2026: `publicacao.json → campanhaLancamento` = **06/11/2026 a 06/01/2027** (fuso de Brasília). O código nunca as calcula nem preenche. Se a publicação oficial ocorrer depois de 06/11/2026, a titular decide se ajusta as datas (o portão recusa campanha encerrada) |
 | Vale a **data da solicitação** recebida durante a campanha | "Preços especiais de lançamento para solicitações de avaliação recebidas de DD/MM/AAAA a DD/MM/AAAA." |
 | Proposta com prazo de aceite de **7 dias corridos** | "A proposta pode ser aceita em até 7 dias corridos da emissão." |
 | Preço individual por automação; complexa sob orçamento | Cartões e simulador; a complexa nunca tem valor |

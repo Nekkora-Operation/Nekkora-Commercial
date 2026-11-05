@@ -54,7 +54,7 @@ Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum de
 
 Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
 
-> **Lançamento** — Preços especiais de lançamento. Valem para automações simples e médias solicitadas durante a campanha, conforme a categoria definida na avaliação. A proposta pode ser aceita em até 7 dias corridos da emissão. A automação complexa tem orçamento individual.
+> **Lançamento** — Preços especiais de lançamento para solicitações de avaliação recebidas de 06/11/2026 a 06/01/2027. Valem para automações simples e médias solicitadas durante a campanha, conforme a categoria definida na avaliação. A proposta pode ser aceita em até 7 dias corridos da emissão. A automação complexa tem orçamento individual.
 
 Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial._
 
@@ -251,14 +251,15 @@ Ações na falha: "Tentar novamente" (não aparece quando a solicitação é rec
 
 **Privacidade** — Como tratamos seus dados
 
-Responsável pelos dados pessoais desta página: a Nekkora (CNPJ 68.337.624/0001-32).
+Responsável pelos dados pessoais desta página: NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA (CNPJ 68.337.624/0001-32).
 
 - **O formulário não envia nada** — O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.
 - **O que vai para o e-mail** — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a contato@nekkora.com. Ela só é enviada se você a enviar pelo aplicativo.
 - **Agendamento pelo Microsoft Bookings** — Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para confirmar e lembrar o horário e realizar a conversa pelo Microsoft Teams. Não informe senhas, credenciais nem documentos sigilosos.
+- **Gravação da conversa** — A conversa pelo Microsoft Teams pode ser gravada para registrar o que foi conversado e apoiar a avaliação e a proposta. A gravação nunca é automática: só começa com aviso, e o próprio Teams pede a sua concordância específica. Você pode não concordar. As gravações ficam no Microsoft 365, com acesso gerenciado pela Nekkora conforme as permissões de cada arquivo.
 - **Sem cookies nem rastreamento** — Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro); o simulador de investimento não guarda nem envia o que você seleciona. Fontes e imagens vêm do próprio site. O Microsoft Bookings, para onde leva o botão "Agendar conversa", segue as regras da Microsoft.
 - **Registros de acesso** — A Amazon Web Services (AWS), que hospeda este site, processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.
-- **Por quanto tempo guardamos** — Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante. Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento. Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.
+- **Por quanto tempo guardamos** — Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante. Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento. Gravações de conversas, quando houver, têm prazo padrão de 30 dias após a reunião. Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.
 - **Onde os dados são processados** — Os serviços da Microsoft (Microsoft 365, Bookings e Teams) e da Amazon Web Services (AWS) usados pela Nekkora podem processar dados em servidores fora do Brasil.
 - **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação, realizar a conversa agendada e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V). Para isso não pedimos consentimento: os dados são necessários para atender ao seu pedido. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados e, quando houver consentimento, revogá-lo (LGPD, art. 18), pelo e-mail contato@nekkora.com.
 
