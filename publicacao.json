@@ -9,6 +9,7 @@
     "aprovacoes.precos": "COM-RELEASE-003-R1 §3.1 (decisão interna de 22/10/2026): simples R$ 1.500 → R$ 1.000, média R$ 3.500 → R$ 2.800, complexa sob orçamento. Não inclui as condições comerciais (§3.5).",
     "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. URL da página pública criada pela titular no Microsoft Bookings (página compartilhada \"Nekkora\", serviço \"Conversa inicial — Nekkora Delivery\"), conferida em 28/10/2026 (NEKKORA-COM-007).",
     "aprovacoes.agendamento": "Titular, 05/11/2026: agendamento pelo Microsoft Bookings aprovado (PUB-20).",
+    "aprovacoes.textosComerciais": "Titular, 05/11/2026: textos comerciais aprovados (PUB-17).",
     "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail."
   },
   "canais": {
@@ -39,7 +40,7 @@
   "aprovacoes": {
     "precos": true,
     "condicoesComerciais": false,
-    "textosComerciais": false,
+    "textosComerciais": true,
     "avisoDePrivacidade": false,
     "agendamento": true,
     "envioAutomatico": false,

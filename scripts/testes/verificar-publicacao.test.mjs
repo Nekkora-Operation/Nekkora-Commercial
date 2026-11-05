@@ -67,7 +67,6 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   assert.equal(r.code, 1, r.stdout);
   for (const id of [
     'PUB-19',
-    'PUB-17',
     'PUB-18',
     'PUB-10'
   ]) {
@@ -75,6 +74,8 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   }
   // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
   assert.doesNotMatch(r.stdout, /PUB-20/);
+  // PUB-17: textos comerciais aprovados pela titular em 05/11/2026 — o portão não os acusa mais
+  assert.doesNotMatch(r.stdout, /PUB-17/);
 
   assert.doesNotMatch(r.stdout, /PUB-13/);
   // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21

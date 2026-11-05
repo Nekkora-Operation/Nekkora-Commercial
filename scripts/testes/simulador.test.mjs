@@ -208,7 +208,7 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
   assert.deepEqual(pub.aprovacoes, {
     precos: true,
     condicoesComerciais: false,
-    textosComerciais: false,
+    textosComerciais: true, // titular, 05/11/2026 (PUB-17)
     avisoDePrivacidade: false,
     agendamento: true, // titular, 05/11/2026 (PUB-20)
     envioAutomatico: false,
