@@ -224,4 +224,6 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
     'NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA'
   );
   assert.equal(pub.envioAutomatico.endpoint, null, 'backend não ativado');
+  // NEKKORA-COM-LEGAL-BASE-001: o endereço comercial (PUB-22) é decisão da titular — nunca presumido pelo agente
+  assert.equal(pub.fornecedor.endereco, null, 'endereço do fornecedor não presumido');
 });

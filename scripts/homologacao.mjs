@@ -519,6 +519,15 @@ await block('funcionais', async () => {
     /O que vai para o (WhatsApp|e-mail)/.test(privacy) && /Sem cookies nem rastreamento/.test(privacy) && (await page.locator('footer a[href="#privacidade"]').count()) === 1,
     privacy.split('\n').slice(0, 2).join(' · '),
   );
+  // NEKKORA-COM-LEGAL-BASE-001: sem gravação comercial nesta fase — o aviso não pode dizer que a conversa é gravada
+  check(
+    'privacidade-sem-gravacao',
+    !/pode ser gravada|Gravações de conversas/.test(privacy) && (!/Microsoft Teams/.test(privacy) || /não grava as conversas comerciais/.test(privacy)),
+    /não grava/.test(privacy) ? 'aviso: sem gravação nesta fase' : 'sem agendamento: nenhum item de reunião',
+  );
+  // Decreto 7.962/2013, art. 2º, I e II: nome empresarial e CNPJ no rodapé (o endereço depende da titular, PUB-22)
+  const supplier = await page.locator('footer [data-supplier]').innerText().catch(() => '');
+  check('rodape-identificacao-do-fornecedor', /CNPJ \d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/.test(supplier), supplier || 'sem identificação no rodapé');
   check(
     'precos-leitura-do-valor-riscado',
     // Sem campanha não há valor riscado: nenhum "Preço padrão:/Preço especial de lançamento:/Desconto de" para o leitor

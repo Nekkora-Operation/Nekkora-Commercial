@@ -7,6 +7,8 @@ declare module '@publicacao' {
     envioAutomatico: { endpoint: string | null; chaveDoSiteTurnstile: string | null };
     campanhaLancamento: { inicio: string | null; fim: string | null };
     controlador: { nome: string | null; documento: string | null };
+    /** Endereço comercial do fornecedor (Decreto 7.962/2013, art. 2º, II). Só a titular preenche (PUB-22). */
+    fornecedor?: { endereco: string | null };
     hospedagem: { provedor: string | null };
     aprovacoes: {
       precos: boolean;

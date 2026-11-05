@@ -10,6 +10,7 @@
     "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. URL da página pública criada pela titular no Microsoft Bookings (página compartilhada \"Nekkora\", serviço \"Conversa inicial — Nekkora Delivery\"), conferida em 28/10/2026 (NEKKORA-COM-007).",
     "aprovacoes.agendamento": "Titular, 05/11/2026: agendamento pelo Microsoft Bookings aprovado (PUB-20).",
     "aprovacoes.textosComerciais": "Titular, 05/11/2026: textos comerciais aprovados (PUB-17).",
+    "fornecedor.endereco": "NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): Decreto 7.962/2013, art. 2º, II. Pendente de decisão da titular (PUB-22); nenhum endereço foi presumido nem preenchido pelo agente.",
     "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail."
   },
   "canais": {
@@ -33,6 +34,9 @@
   "controlador": {
     "nome": "NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA",
     "documento": "68.337.624/0001-32"
+  },
+  "fornecedor": {
+    "endereco": null
   },
   "hospedagem": {
     "provedor": "Amazon Web Services (AWS)"

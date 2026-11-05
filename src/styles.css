@@ -285,6 +285,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 /* ---------- Footer ---------- */
 .footer { padding-block: 28px; background: var(--nk-color-bg); }
 .footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
+.footer__supplier { margin-bottom: 12px; font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); overflow-wrap: anywhere; }
 .footer__preview { color: var(--nk-color-warning); font-weight: 500; }
 
 /* ---------- Responsivo ---------- */

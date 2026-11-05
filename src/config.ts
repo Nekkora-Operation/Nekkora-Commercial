@@ -164,6 +164,12 @@ export const DATA_CONTROLLER = {
   document: publicacao.controlador.documento,
 };
 
+/**
+ * Endereço comercial do fornecedor, no rodapé (Decreto 7.962/2013, art. 2º, II — NEKKORA-COM-LEGAL-BASE-001). Só a
+ * titular preenche; sem ele o rodapé mostra razão social e CNPJ e o portão bloqueia a publicação (PUB-22).
+ */
+export const SUPPLIER_ADDRESS: string | null = publicacao.fornecedor?.endereco?.trim() || null;
+
 /** Provedor de hospedagem citado no aviso de privacidade (registros técnicos de acesso). */
 export const HOSTING_PROVIDER: string | null = publicacao.hospedagem.provedor;
 

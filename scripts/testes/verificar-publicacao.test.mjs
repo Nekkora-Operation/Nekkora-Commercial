@@ -25,6 +25,7 @@ const complete = () => ({
   envioAutomatico: { endpoint: null, chaveDoSiteTurnstile: null },
   campanhaLancamento: { inicio: '2026-11-01', fim: '2026-12-31' },
   controlador: { nome: 'Empresa Fictícia Ltda.', documento: '11.222.333/0001-81' },
+  fornecedor: { endereco: 'Rua Fictícia, 100, Centro, Cidade Fictícia/UF' },
   hospedagem: { provedor: 'Provedor Fictício' },
   aprovacoes: { precos: true, condicoesComerciais: true, textosComerciais: true, avisoDePrivacidade: true, agendamento: true, envioAutomatico: true, publicacao: true },
   avisoHomologacao: false,
@@ -68,7 +69,9 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   for (const id of [
     'PUB-19',
     'PUB-18',
-    'PUB-10'
+    'PUB-10',
+    // NEKKORA-COM-LEGAL-BASE-001: endereço comercial do fornecedor (Decreto 7.962/2013, art. 2º, II) — decisão da titular
+    'PUB-22'
   ]) {
     assert.match(r.stdout, new RegExp(id));
   }
@@ -99,6 +102,10 @@ const cases = [
   ['CNPJ com dígito errado', (p) => (p.controlador.documento = '11.222.333/0001-82'), /CNPJ ou CPF válido/],
   ['CNPJ marcador (zeros)', (p) => (p.controlador.documento = '00.000.000/0000-00'), /CNPJ ou CPF válido/],
   ['sem provedor', (p) => (p.hospedagem.provedor = null), /PUB-11/],
+  // Decreto 7.962/2013, art. 2º, II (NEKKORA-COM-LEGAL-BASE-001)
+  ['sem endereço do fornecedor', (p) => (p.fornecedor.endereco = null), /PUB-22/],
+  ['sem o bloco fornecedor', (p) => delete p.fornecedor, /PUB-22/],
+  ['endereço vazio', (p) => (p.fornecedor.endereco = '   '), /PUB-22/],
   ['preços não aprovados', (p) => (p.aprovacoes.precos = false), /PUB-14/],
   ['condições não aprovadas', (p) => (p.aprovacoes.condicoesComerciais = false), /PUB-19/],
   ['textos não aprovados', (p) => (p.aprovacoes.textosComerciais = false), /PUB-17/],

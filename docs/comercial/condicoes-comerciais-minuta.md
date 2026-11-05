@@ -1,12 +1,19 @@
 # Minuta — condições comerciais do Nekkora Delivery
 
-> **MINUTA NÃO APROVADA JURIDICAMENTE.** Redação preparada na NEKKORA-COM-008-C a partir das diretrizes aprovadas
-> pela titular na COM-008-B. Serve de base para a proposta-modelo e o contrato e **depende de revisão por advogado(a)**
-> antes de qualquer uso. Nada aqui foi publicado como cláusula. No site aparecem só os resumos de `src/content.ts`,
-> também em revisão: `aprovacoes.condicoesComerciais` e `aprovacoes.textosComerciais` continuam `false`.
+> **MINUTA NÃO APROVADA.** Redação preparada na NEKKORA-COM-008-C a partir das diretrizes aprovadas pela titular na
+> COM-008-B e **revisada internamente na NEKKORA-COM-LEGAL-BASE-001 (05/11/2026)** com base no texto vigente do CDC, do
+> Código Civil e da Lei do Software (relatório e fontes:
+> [`NEKKORA-COM-LEGAL-BASE-001.md`](../release/NEKKORA-COM-LEGAL-BASE-001.md)). **A revisão interna não é parecer
+> jurídico e não substitui a revisão por advogado(a)**, que a titular adiou temporariamente — continua pendente. Nada aqui
+> foi publicado como cláusula. No site aparecem só os resumos de `src/content.ts`. `aprovacoes.condicoesComerciais`
+> continua `false` (PUB-19). Os textos do site foram aprovados em 05/11/2026 (PUB-17), mas isso não aprova esta minuta.
 >
 > Marcadores: **[D]** diretriz aprovada pela titular · **[R]** redação proposta pelo agente, a revisar ·
-> **⚖** ponto que exige avaliação jurídica.
+> **[C-nn]** proposta de correção da LEGAL-BASE-001 (§9), a decidir pela titular · **⚖** ponto que exige avaliação
+> jurídica.
+>
+> **Leia primeiro o §9.** Onde uma diretriz **[D]** conflita com norma vigente, o §9 registra a incompatibilidade, a
+> fonte e a alternativa. A diretriz não prevalece sobre a norma.
 
 ## 1. Proposta e contratação
 
@@ -24,7 +31,7 @@
 |---|---|
 | 1ª parcela | **50%** após a aprovação da proposta e a formalização da contratação |
 | 2ª parcela | **50%** após a homologação concluída e o aceite formal |
-| Entrega definitiva | Após a confirmação da quitação, respeitados os direitos aplicáveis |
+| Entrega definitiva | Após a confirmação da quitação, respeitados os direitos aplicáveis — ver **[C-05]** |
 | Meio | Pix empresarial como possibilidade inicial; gateway de pagamento como evolução futura |
 
 - **[R]** A condição 50% + 50% é forma de **pagamento**. Não se confunde com o desconto promocional de lançamento, que
@@ -51,7 +58,7 @@
   escopo** e seguem nova proposta (§6).
 - ⚖ Prazo para o cliente homologar e o que acontece se ele não se manifestar. Como o silêncio não vale como aceite, a
   alternativa é prever lembretes e uma reunião de encerramento, ou a suspensão do projeto, sem aceite tácito.
-- ⚖ Número de rodadas de correção incluídas.
+- ⚖ Número de rodadas de correção incluídas. **[C-06]** Limite de rodadas só para ajustes de preferência; defeito (vício) é sempre corrigido.
 
 ## 4. Cancelamento e reembolso
 
@@ -61,21 +68,21 @@ Diretrizes aprovadas **[D]**:
 |---|---|
 | Antes do início do desenvolvimento | Reembolso **integral** da entrada |
 | Durante o desenvolvimento | **Apuração proporcional** do trabalho realizado e das despesas justificadas; devolução do saldo da entrada, se houver |
-| Após a homologação concluída | Possibilidade de **retenção dos 50% iniciais** em caso de desistência injustificada, conforme o contrato e a legislação aplicável |
+| Após a homologação concluída | Possibilidade de **retenção dos 50% iniciais** em caso de desistência injustificada, conforme o contrato e a legislação aplicável. **Substituir: [C-04]** (sem retenção automática) |
 | Descumprimento da Nekkora | Observar as soluções e restituições legalmente devidas |
 
 - **Não publicar cláusulas absolutas de retenção ou de renúncia de direitos.** O site diz apenas: "Cancelamento,
   reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei."
-- ⚖ Direito de arrependimento (CDC, art. 49) em contratação a distância com cliente consumidor ou equiparado.
+- ⚖ Direito de arrependimento (CDC, art. 49) em contratação a distância com cliente consumidor ou equiparado. **[C-02]**
 - ⚖ Como documentar o "início do desenvolvimento" (sugestão **[R]**: comunicação por escrito da Nekkora com a data de
   início).
-- ⚖ Validade da retenção dos 50% após a homologação e o limite da apuração proporcional.
+- ⚖ Validade da retenção dos 50% após a homologação e o limite da apuração proporcional. **[C-03] [C-04]**
 
 ## 5. Garantia
 
 | Diretriz **[D]** | Redação proposta **[R]** |
 |---|---|
-| Garantia contratual **adicional** proposta de **30 dias** após a entrega definitiva | "Por 30 dias corridos após a entrega definitiva, a Nekkora corrige, sem custo, defeitos atribuíveis à entrega, conforme o escopo aprovado." |
+| Garantia contratual **adicional** proposta de **30 dias** após a entrega definitiva | "Por 30 dias corridos após a entrega definitiva, a Nekkora corrige, sem custo, defeitos atribuíveis à entrega, conforme o escopo aprovado." **Revisar: [C-07]** (o prazo não pode se sobrepor ao legal) |
 | Correção de defeitos atribuíveis à entrega, conforme o escopo | "Não são defeitos da entrega: mudanças em sistemas, APIs, telas ou regras de terceiros ou do cliente após a homologação; uso fora do escopo; alterações feitas por terceiros." ⚖ |
 | Preservação integral das garantias legais | "Esta garantia é adicional e não substitui nem reduz as garantias previstas em lei." |
 | Sustentação, mudanças de escopo e novas funcionalidades avaliadas separadamente | "Suporte, sustentação, evolução e novas funcionalidades dependem de proposta própria." |
@@ -107,7 +114,7 @@ Diretrizes aprovadas **[D]**:
 
 ### 7.2 Propriedade intelectual — Modelo A (aprovado como diretriz)
 
-1. **[D]** **Licenciamento** da automação entregue ao cliente.
+1. **[D]** **Licenciamento** da automação entregue ao cliente. **Afasta a regra supletiva da Lei 9.609/1998, art. 4º (direitos do contratante de serviços): só vale com estipulação expressa. Ver [C-09].**
 2. **[D]** Direito do cliente de **utilizar e modificar o código específico** da automação, conforme o contrato.
 3. **[D]** A Nekkora preserva a titularidade da **arquitetura, das bibliotecas e dos componentes proprietários**.
 4. **[D]** A entrega identifica a documentação e as dependências, inclusive as proprietárias da Nekkora e as de
@@ -152,4 +159,53 @@ registros do canal pelo qual a solicitação chegou:
 Procedimento sugerido: na proposta, um campo **"Data da solicitação"** com a data, o canal e a referência da mensagem,
 por exemplo: "E-mail recebido em 15/11/2026 10:42 (horário de Brasília)". Encaminhar a proposta respondendo à própria
 mensagem original preserva a cadeia. Em caso de dúvida (mensagem perto da virada do último dia), vale o registro do
-servidor no horário de Brasília. ⚖ Confirmar se o regulamento da campanha deve ser publicado por inteiro.
+servidor no horário de Brasília. ⚖ Confirmar se o regulamento da campanha deve ser publicado por inteiro. **[C-10]**
+
+## 9. Propostas de correção — NEKKORA-COM-LEGAL-BASE-001 (05/11/2026)
+
+> **Revisão interna, não é parecer jurídico.** Cada linha diz qual **norma** vigente se aplica (texto conferido no
+> planalto.gov.br em 05/11/2026; URLs e trechos no [relatório §2](../release/NEKKORA-COM-LEGAL-BASE-001.md)), qual
+> **interpretação** o agente adota e qual **proposta** depende de decisão da titular. Nenhuma proposta foi aplicada ao
+> site nem marcada como aprovada. Onde a diretriz **[D]** conflita com a norma, vale a norma até haver decisão
+> fundamentada.
+
+### 9.1 Quadro geral
+
+| ID | Tema | Norma (texto vigente) | Situação da diretriz | Proposta do agente (a decidir) |
+|---|---|---|---|---|
+| **C-01** | Consumidor × contratação empresarial | CDC arts. 2º e 29; CDC art. 51, I, parte final: com **consumidor pessoa jurídica**, a indenização pode ser limitada em situações justificáveis; CC art. 421-A: contratos civis e empresariais presumem-se paritários, ressalvadas as leis especiais | As diretrizes não fazem a distinção | Cada proposta registra a **natureza da relação** com o cliente. **Interpretação:** uma pessoa jurídica pode ser consumidora quando contrata como destinatária final, e só o caso concreto define isso. **Na dúvida, aplica-se o regime do CDC**, e o modelo padrão já é compatível com ele. Cláusulas que só valem fora do CDC ficam num anexo próprio, identificado como tal |
+| **C-02** | Direito de arrependimento | CDC art. 49 e parágrafo único: 7 dias a contar da assinatura; valores pagos "a qualquer título" devolvidos "de imediato, monetariamente atualizados". Decreto 7.962/2013, art. 5º | ⚖ em aberto; **o §4 não o previa** | Com cliente consumidor, a contratação por e-mail ou por assinatura eletrônica ocorre **fora do estabelecimento**. A proposta informa o prazo de 7 dias e o meio de exercício: resposta ao e-mail da proposta ou mensagem para `contato@nekkora.com`. **Interpretação:** o CDC não prevê exceção para serviço já iniciado. A regra mais segura é **iniciar o desenvolvimento só depois do 7º dia**. Se o cliente pedir para começar antes, ele é informado por escrito de que, se desistir dentro do prazo, recebe a devolução **integral** |
+| **C-03** | Cancelamento durante o desenvolvimento | CDC art. 51, II e IV, e §1º; CC arts. 473 e 623 (empreitada: despesas e serviços já feitos); CC arts. 412 e 413 (a cláusula penal não excede a obrigação principal e é reduzida equitativamente) | Compatível se a apuração for objetiva | Trocar a "apuração proporcional" por **marcos definidos na proposta**, cada um com o percentual do preço e a evidência de conclusão (levantamento documentado, desenvolvimento, testes, disponibilização para homologação). No cancelamento, o cliente paga os marcos concluídos e as **despesas de terceiros comprovadas e previstas na proposta**, e recebe o saldo de volta. **Sem multa, sem retenção automática** e, com consumidor, sem cobrança de lucro sobre o que não foi feito. **Interpretação:** aplicar a consumidor a "indenização razoável" do CC art. 623 traz risco de abusividade (CDC art. 51, IV) |
+| **C-04** | "Retenção dos 50% iniciais" após a homologação | CDC art. 51, II e IV; CC art. 476 (exceção do contrato não cumprido) | **O texto [D] fala em "retenção"**, o que pode ser lido como cláusula penal ou perda automática | Texto proposto: depois da homologação concluída, **o serviço contratado foi prestado**. Os valores pagos remuneram o que foi feito e **não são devolvidos**, salvo vício (CDC art. 20) ou arrependimento dentro do prazo legal (C-02). A entrega definitiva e os direitos do C-09 dependem da quitação (CC art. 476). Nada de "retenção" como penalidade |
+| **C-05** | Entrega definitiva após a quitação | CC art. 476; CDC arts. 24, 26, §1º, e 51, I | Compatível, com ressalvas | A proposta fixa a ordem das etapas: homologação → aceite → pagamento da 2ª parcela → entrega definitiva. **Ressalvas:** (a) reter a entrega nunca impede a correção de vícios; (b) **interpretação:** o prazo decadencial do art. 26, §1º, corre do término da execução do serviço, que pode ser a conclusão da homologação, e não da entrega definitiva. A proposta não deve dizer o contrário; (c) o acesso ao ambiente de homologação não serve de pressão para obter o aceite |
+| **C-06** | Homologação sem aceite tácito; rodadas de correção | CDC art. 20 e art. 39, XII (prazo para a obrigação do fornecedor); CC art. 614, §2º (na empreitada, o que foi medido presume-se verificado em 30 dias). **Não adotar por analogia:** a diretriz exige aceite expresso | Compatível | Prazo de manifestação na proposta (sugestão: **10 dias úteis**), com **dois lembretes** por escrito. Sem resposta, o projeto fica **suspenso**: não há aceite tácito, a 2ª parcela não vence e a garantia contratual não começa a correr. O limite de rodadas (sugestão: 2) vale só para **ajustes de preferência** dentro do escopo. **Defeito, ou seja, descumprimento do escopo ou dos critérios aprovados, é sempre corrigido** (CDC art. 20, I), em quantas rodadas forem necessárias |
+| **C-07** | Garantia contratual de 30 dias | CDC art. 50 e parágrafo único: garantia contratual "complementar à legal", em termo escrito com forma, prazo e lugar. Arts. 24 e 25; art. 26, II (90 dias para serviço durável); art. 51, I | **[D] proposta: 30 dias após a entrega definitiva** | **Interpretação:** com cliente consumidor, uma automação feita para uso continuado tende a ser serviço **durável** (90 dias, CDC art. 26, II). Uma garantia de 30 dias contada da entrega **cabe inteira dentro do prazo legal** e, sozinha, não acrescenta nada. Alternativas: (a) **30 dias adicionais, contados depois do fim do prazo legal**; (b) informar o prazo total ("até 120 dias…"); (c) manter 30 dias só para clientes fora do CDC, sem chamar de "adicional" a garantia dada a consumidores. Em qualquer caso, termo escrito com o conteúdo do art. 50, parágrafo único. As exclusões do §5 continuam valendo apenas como **delimitação do que não é vício**, sem exclusão genérica de responsabilidade (CDC arts. 24, 25 e 51, I) |
+| **C-08** | Mudança de escopo, licenças e custos de terceiros | CDC art. 39, VI (serviço só com orçamento prévio e autorização expressa); art. 40 (orçamento discriminado, com datas de início e término; o §2º o torna vinculante; pelo §3º, o consumidor não responde por custos de terceiros não previstos) | Compatível | Toda mudança de escopo depende de **aditivo aprovado antes** da execução. Licenças e serviços de terceiros ficam **listados na proposta**, com custo estimado e indicação de quem os contrata. **Custo de terceiro não previsto não é repassado** sem nova aprovação |
+| **C-09** | Propriedade intelectual | Lei 9.609/1998, art. 4º, caput: "**salvo estipulação em contrário**, pertencerão exclusivamente ao [...] contratante de serviços" os direitos sobre o programa desenvolvido no contrato. §2º: pertence ao contratado o programa gerado sem relação com o contrato e sem recursos do contratante. Arts. 5º e 9º; CDC art. 54, §4º (limitação de direito em destaque) | **O Modelo A afasta a regra supletiva** (licença em vez de titularidade do cliente). É **lícito com estipulação expressa**, mas exige cláusula clara | **Modelo A-R (recomendado):** (a) **código específico** feito para o cliente: titularidade do **contratante** a partir da quitação. Segue a regra legal, e o cliente pode usar, modificar e contratar terceiros para manter; (b) **componentes preexistentes da Nekkora** (bibliotecas, frameworks, Studio, Agent, Platform), criados sem relação com o contrato e sem recursos do cliente (art. 4º, §2º): continuam da Nekkora. O cliente recebe **licença não exclusiva, sem prazo, gratuita e irrevogável após a quitação** para usar e modificar esses componentes **na medida necessária para operar, manter e evoluir a automação entregue**, inclusive por terceiros que contratar, sem exploração comercial separada; (c) a lista de componentes preexistentes e de terceiros vai **anexada à proposta**. Se a titular mantiver o **Modelo A** puro, a cláusula precisa dizer expressamente que afasta o art. 4º e dar ao cliente licença do código específico **perpétua, irrevogável após a quitação e com direito de modificação**, em destaque. Sem isso, prevalece a regra legal, que favorece o contratante |
+| **C-10** | Campanha de 06/11/2026 a 06/01/2027 | CDC art. 30 (a oferta suficientemente precisa obriga), arts. 31 e 35; CDC art. 40, §1º (orçamento vale 10 dias "salvo estipulação em contrário"); Decreto 7.962/2013, art. 2º, VI (condições integrais da oferta) | Compatível | (a) O texto do site **vincula**: solicitação recebida no período e enquadrada como simples ou média **tem direito** ao preço de lançamento. Não usar "pode ser elegível" como reserva discricionária; (b) o prazo de aceite de 7 dias é estipulação expressa e precisa estar na proposta; (c) **publicar a regra completa** (período, critério da data de recebimento, categorias, prazo de aceite, preço individual) numa seção acessível. Hoje ela aparece resumida nos cartões. Sugestão: um item "Regras da campanha" no bloco de preços, que **exige nova aprovação dos textos** (PUB-17); (d) se a publicação oficial ocorrer depois de 06/11/2026, a titular ajusta as datas **antes** de publicar (o portão já recusa campanha encerrada) |
+| **C-11** | Atraso de pagamento | CDC art. 52, §1º: multa de mora de até 2% no fornecimento com **crédito ou financiamento** | ⚖ em aberto | **Interpretação:** o §1º trata de crédito ou financiamento, e não é pacífico que alcance o parcelamento direto. Para clientes consumidores, a escolha conservadora é **multa de 2% e juros de 1% ao mês**. A proposta fixa o prazo de pagamento de cada parcela (sugestão: 5 dias úteis da cobrança) |
+| **C-12** | Prazo e fila | CDC art. 39, XII (proibido deixar o termo inicial "a seu exclusivo critério") e art. 40 (datas de início e término no orçamento) | **Risco**: "o início depende da fila" | O site pode continuar falando da fila, como informação. Mas **cada proposta fixa a data estimada de início e de término**, ou o prazo em dias úteis contado do pagamento da 1ª parcela, além da regra para alterá-los |
+
+### 9.2 Cláusula-modelo de propriedade intelectual (Modelo A-R) — proposta do agente
+
+> **Propriedade intelectual.** (1) Os direitos sobre o código-fonte e a documentação desenvolvidos especificamente para
+> o CONTRATANTE no âmbito desta proposta ("Código Específico") pertencem ao CONTRATANTE a partir da quitação integral do
+> preço, nos termos do art. 4º da Lei nº 9.609/1998. (2) Continuam pertencendo à NEKKORA os programas, as bibliotecas,
+> os frameworks e as ferramentas listados no Anexo de Componentes que tenham sido criados antes desta proposta ou
+> independentemente dela, sem uso de recursos ou informações do CONTRATANTE ("Componentes Preexistentes"), entre eles o
+> Nekkora Studio, Agent, Framework e Platform. (3) A NEKKORA concede ao CONTRATANTE licença não exclusiva, gratuita, sem
+> limite de prazo e irrevogável após a quitação para usar, reproduzir e modificar os Componentes Preexistentes
+> incorporados à entrega, na medida necessária para operar, manter e evoluir a automação entregue, diretamente ou por
+> terceiros que contratar. Fica vedada a exploração comercial separada desses componentes. (4) Componentes de terceiros
+> seguem as licenças de seus titulares, indicadas no Anexo de Componentes. (5) Antes da quitação, o CONTRATANTE pode usar
+> a automação apenas para homologação.
+
+**Por que não reduz direitos do contratante:** o código específico segue a regra legal. A licença dos componentes
+preexistentes cobre tudo o que é preciso para usar e manter a automação, sem prazo e sem depender da Nekkora.
+**Pendente:** a titular escolher entre o Modelo A-R e o Modelo A com cláusula de afastamento; revisão por advogado(a).
+
+### 9.3 O que **não** entra em nenhuma cláusula
+
+Retenção automática de valores; multa por desistência dentro do prazo de arrependimento; renúncia antecipada de
+direitos (CC art. 424; CDC art. 51, I); exclusão genérica de responsabilidade (CDC arts. 24, 25 e 51, I); aceite tácito;
+cancelamento unilateral sem igual direito para o cliente (CDC art. 51, XI).
