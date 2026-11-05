@@ -65,21 +65,18 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   setup(JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8')));
   const r = await gate();
   assert.equal(r.code, 1, r.stdout);
-  // PUB-20: a URL oficial do Bookings foi registrada (NEKKORA-COM-007) e passa na validação, mas a confirmação da
-  // titular (aprovacoes.agendamento) continua pendente — o portão segue bloqueando
   for (const id of [
     'PUB-19',
     'PUB-17',
     'PUB-18',
-    'PUB-10',
-    'PUB-20'
+    'PUB-10'
   ]) {
     assert.match(r.stdout, new RegExp(id));
   }
+  // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
+  assert.doesNotMatch(r.stdout, /PUB-20/);
 
   assert.doesNotMatch(r.stdout, /PUB-13/);
-  assert.match(r.stdout, /PUB-20 — confirmação da titular/);
-  assert.doesNotMatch(r.stdout, /PUB-20 — URL oficial/);
   // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21
   assert.doesNotMatch(r.stdout, /PUB-21/);
   // os dados já informados pela titular passam: e-mail, LinkedIn, CNPJ, provedor e preços
