@@ -119,8 +119,26 @@ test('12. datas pendentes: preço de lançamento só como prévia de homologaç�
   assert.match(content, /pendente: 'Prévia para revisão: as datas da campanha ainda não foram definidas\. Nenhuma solicitação é elegível antes do início oficial\.'/);
   assert.match(content, /futura: 'Valores pelo preço padrão\. Os preços de lançamento ainda não estão em vigor\.'/);
   assert.match(content, /encerrada: 'Valores pelo preço padrão\. A campanha de lançamento foi encerrada\.'/);
-  const pub = JSON.parse(readFileSync('publicacao.json', 'utf8'));
-  assert.deepEqual(pub.campanhaLancamento, { inicio: null, fim: null }, 'as datas não foram preenchidas automaticamente');
+  assert.equal(campaignState({ inicio: null, fim: null }, '2026-11-15'), 'pendente');
+});
+
+test('9–11. campanha aprovada em publicacao.json (06/11/2026 a 06/01/2027): futura, vigente e encerrada', () => {
+  const { campanhaLancamento } = JSON.parse(readFileSync('publicacao.json', 'utf8'));
+  // Mesmas datas e horários homologados em navegador por scripts/homologacao-simulador.mjs (bordas do fuso de Brasília)
+  for (const [at, state] of [
+    ['2026-11-05T23:30:00-03:00', 'futura'],
+    ['2026-11-06T00:30:00-03:00', 'vigente'],
+    ['2026-11-15T12:00:00-03:00', 'vigente'],
+    ['2027-01-06T23:30:00-03:00', 'vigente'],
+    ['2027-01-07T00:30:00-03:00', 'encerrada'],
+  ]) {
+    assert.equal(campaignState(campanhaLancamento, todayInBrazil(new Date(at))), state, at);
+  }
+  // R$ 6.500 → R$ 4.800 só com a campanha; fora dela, R$ 6.500 pelo preço padrão, sem economia nem percentual
+  const promo = simulate({ simples: 2, media: 1 }, true);
+  assert.deepEqual([promo.estimateLabel, promo.standardTotalLabel, promo.savingsLabel, promo.percentLabel], ['R$ 4.800', 'R$ 6.500', 'R$ 1.700', '26,15%']);
+  const standard = simulate({ simples: 2, media: 1 }, false);
+  assert.deepEqual([standard.estimateLabel, standard.savings, standard.percent], ['R$ 6.500', 0, 0]);
 });
 
 test('13. proteção contra valores inválidos, negativos, transbordamento e excesso', () => {
@@ -197,7 +215,13 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
     publicacao: false,
   });
   assert.equal(pub.avisoHomologacao, true);
-  assert.deepEqual(pub.campanhaLancamento, { inicio: null, fim: null });
-  assert.equal(pub.controlador.nome, null, 'razão social não inventada');
+  assert.deepEqual(pub.campanhaLancamento, {
+    inicio: '2026-11-06',
+    fim: '2027-01-06'
+  });
+  assert.equal(
+    pub.controlador.nome,
+    'NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA'
+  );
   assert.equal(pub.envioAutomatico.endpoint, null, 'backend não ativado');
 });
