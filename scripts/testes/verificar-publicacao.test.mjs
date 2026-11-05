@@ -67,7 +67,17 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   assert.equal(r.code, 1, r.stdout);
   // PUB-20: a URL oficial do Bookings foi registrada (NEKKORA-COM-007) e passa na validação, mas a confirmação da
   // titular (aprovacoes.agendamento) continua pendente — o portão segue bloqueando
-  for (const id of ['PUB-13', 'PUB-19', 'PUB-17', 'PUB-18', 'PUB-10', 'PUB-20']) assert.match(r.stdout, new RegExp(id));
+  for (const id of [
+    'PUB-19',
+    'PUB-17',
+    'PUB-18',
+    'PUB-10',
+    'PUB-20'
+  ]) {
+    assert.match(r.stdout, new RegExp(id));
+  }
+
+  assert.doesNotMatch(r.stdout, /PUB-13/);
   assert.match(r.stdout, /PUB-20 — confirmação da titular/);
   assert.doesNotMatch(r.stdout, /PUB-20 — URL oficial/);
   // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21

@@ -120,7 +120,10 @@ test('12. datas pendentes: preço de lançamento só como prévia de homologaç�
   assert.match(content, /futura: 'Valores pelo preço padrão\. Os preços de lançamento ainda não estão em vigor\.'/);
   assert.match(content, /encerrada: 'Valores pelo preço padrão\. A campanha de lançamento foi encerrada\.'/);
   const pub = JSON.parse(readFileSync('publicacao.json', 'utf8'));
-  assert.deepEqual(pub.campanhaLancamento, { inicio: null, fim: null }, 'as datas não foram preenchidas automaticamente');
+    assert.equal(
+    campaignState({ inicio: null, fim: null }, '2026-11-15'),
+    'pendente'
+  );
 });
 
 test('13. proteção contra valores inválidos, negativos, transbordamento e excesso', () => {
@@ -197,7 +200,13 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
     publicacao: false,
   });
   assert.equal(pub.avisoHomologacao, true);
-  assert.deepEqual(pub.campanhaLancamento, { inicio: null, fim: null });
-  assert.equal(pub.controlador.nome, null, 'razão social não inventada');
+  assert.deepEqual(pub.campanhaLancamento, {
+    inicio: '2026-11-06',
+    fim: '2027-01-06'
+  });
+  assert.equal(
+    pub.controlador.nome,
+    'NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA'
+  );
   assert.equal(pub.envioAutomatico.endpoint, null, 'backend não ativado');
 });
