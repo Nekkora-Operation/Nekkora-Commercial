@@ -119,3 +119,46 @@ Os comandos e os critérios para abortar estão no [runbook §6.2 a §6.7](NEKKO
 corrigir com nova PR e novo deploy. Só em emergência: desativar a distribuição no console do CloudFront. O workflow
 "Rollback de produção" só passa a valer a partir da segunda release (`rollback.mjs` recusa quando não há release
 anterior).
+
+## 5. Atualização — decisões da titular (06/11/2026, segunda rodada)
+
+| Tema | Decisão | O que foi preparado | Estado |
+|---|---|---|---|
+| Campanha | mantém a regra de dois meses a partir da publicação; datas quando a janela de deploy estiver definida | [procedimento e lista de arquivos](NEKKORA-COM-GOLIVE-001-campanha-datas.md) | datas atuais **não alteradas** |
+| LOG-01 | standard logging v2, campos mínimos, bucket privado, retenção documentada; AWS só com autorização específica | [`deploy/aws/logs/`](../../deploy/aws/logs/README.md) (política, ciclo de vida de 190 dias, entrega com `date time c-ip c-port x-host-header`), texto [PV-12] do aviso, minuta §6, mensagem da C13 | **preparado, não aplicado** |
+| JUR-07 | verificar regiões e transferências; o Brasil não basta | [análise e solução mínima](NEKKORA-COM-GOLIVE-001-JUR-07.md) | **continua impeditiva** |
+| Bookings | reconferir depois da correção | `node scripts/conferir-bookings.mjs --saida <pasta>` (11 regras, sem reserva) + 3 testes | hoje: **6 falhas** |
+| E-mail | registrar o teste externo | [roteiro e registro](evidencias/golive-001/email-recebimento-externo.md) | **não executado** |
+| PRs #16 e #17 | integrar preservando os dois testes e o portão | PR #18 (rascunho): `main` + #16 + #17, conflito do `package.json` resolvido | ver CI da PR #18 |
+
+## 6. Lista final para publicar a V1
+
+**Evidências (titular executa; Claude registra e confere):**
+
+- [ ] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com 11 de 11.
+- [ ] **E2 — E-mail externo** recebido na Caixa de Entrada e respondido.
+- [ ] **E3 — Local dos dados** do Microsoft 365 (captura do cartão "Local dos dados").
+- [ ] **E4 — Logs v2** ativos e conferidos (README §4) e auditoria AWS com 0 falha.
+- [ ] **E5 — Teams:** gravação desligada na política `Nekkora-Commercial` (CTL-01), coerente com "Conversa sem
+      gravação".
+
+**Decisões escritas (titular):**
+
+- [ ] **D1 — JUR-07:** art. 33, IX, para a V1 com risco aceito, ou parecer antes. O texto do aviso (JUR-07 §3,
+      item 3) entra na PR de texto.
+- [ ] **D2 — Datas da campanha**, quando a janela de deploy estiver definida.
+
+**Autorizações expressas (titular), nesta ordem:**
+
+1. [ ] **A1 — AWS:** aplicar `deploy/aws/logs/README.md` §3.
+2. [ ] **A2 — Merges da integração:** #16, depois #17 (ou a #18).
+3. [ ] **A3 — Merge da PR de texto:** [PV-12] logs + JUR-07 + datas. Só depois de E4 e D1/D2.
+4. [ ] **A4 — Aprovações sobre o mesmo commit:** PUB-17 (textos), PUB-09 (aviso) e PUB-19 (condições exibidas no
+       site).
+5. [ ] **A5 — Merge da PR de liberação** (`publicacao: true`, `avisoHomologacao: false`, aprovações com `$origem`)
+       e tag `v1.0.0`.
+6. [ ] **A6 — Deploy** de produção (aprovação no environment).
+7. [ ] **A7 — DNS:** os 2 CNAMEs na Cloudflare, DNS only.
+8. [ ] **A8 — Variável** `DOMINIO_PUBLICO`.
+
+Sequência técnica, critérios de aborto e rollback: §4 deste checklist e runbook §6 do relatório GOLIVE-001.

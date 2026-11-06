@@ -194,7 +194,10 @@ export async function audit({ clients, sdk, bucket, distributionId = null, versi
   add('C10', errOk && !to200.length ? 'ok' : 'pendente', 'Erros 403/404 → /404.html com status 404 (nenhum vira 200)', errs.map((x) => `${x.ErrorCode}→${x.ResponsePagePath ?? '-'} ${x.ResponseCode ?? ''}`).join(', ') || 'nenhuma resposta de erro', 'Error pages → 403 e 404: /404.html, código 404, TTL 60.');
   add('C11', 'info', 'AWS WAF', cfg.WebACLId ? `associado (${cfg.WebACLId}) — tem custo mensal` : 'desativado (sem custo; decisão da titular)');
   add('C12', 'info', 'Classe de preço', cfg.PriceClass, cfg.PriceClass === 'PriceClass_All' ? '' : 'Visitantes no Brasil só usam pontos da América do Sul com PriceClass_All; com o nível gratuito, a diferença de custo é desprezível.');
-  add('C13', cfg.Logging?.Enabled ? 'info' : 'ok', 'Logs padrão do CloudFront', cfg.Logging?.Enabled ? `habilitados em ${cfg.Logging.Bucket} (custo de armazenamento)` : 'desabilitados');
+  // LOG-01 (Marco Civil, art. 15): a decisão é usar o standard logging v2 (entrega pelo CloudWatch Logs), que não aparece
+  // em DistributionConfig.Logging. Esta verificação vê só o legado; os logs v2 são conferidos por
+  // deploy/aws/logs/README.md §4 até a role de auditoria ganhar as permissões de leitura do CloudWatch Logs.
+  add('C13', cfg.Logging?.Enabled ? 'info' : 'ok', 'Logs padrão (legado) do CloudFront', cfg.Logging?.Enabled ? `legado habilitado em ${cfg.Logging.Bucket} (custo de armazenamento; a LOG-01 prevê o v2)` : 'legado desabilitado. Logs v2 (LOG-01) não verificados por esta auditoria: ver deploy/aws/logs/README.md §4');
 
   // Domínio e certificado
   const aliases = cfg.Aliases?.Items ?? [];

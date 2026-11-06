@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EntregaDosLogsV2DoCloudFront",
+      "Effect": "Allow",
+      "Principal": { "Service": "delivery.logs.amazonaws.com" },
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::${LOGS_BUCKET}/AWSLogs/${AWS_ACCOUNT_ID}/CloudFront/*",
+      "Condition": {
+        "StringEquals": {
+          "s3:x-amz-acl": "bucket-owner-full-control",
+          "aws:SourceAccount": "${AWS_ACCOUNT_ID}"
+        },
+        "ArnLike": {
+          "aws:SourceArn": "arn:aws:logs:us-east-1:${AWS_ACCOUNT_ID}:delivery-source:nekkora-commercial-cloudfront"
+        }
+      }
+    },
+    {
+      "Sid": "SomenteHTTPS",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::${LOGS_BUCKET}", "arn:aws:s3:::${LOGS_BUCKET}/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    }
+  ]
+}
