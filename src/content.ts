@@ -137,6 +137,8 @@ export const PRICING = {
   criteria: {
     title: 'O que define a categoria',
     items: [
+      // CONTRACT-001-R1 (C-10): parâmetro principal aprovado pela titular — texto NOVO (PUB-17). Regulamento §5.
+      'Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas; complexa acima de 16 horas ou com risco excepcional justificado na proposta',
       'Quantidade de sistemas envolvidos',
       'Complexidade das integrações',
       'Regras de negócio e exceções',
@@ -144,7 +146,8 @@ export const PRICING = {
       'Exigências de infraestrutura',
       'Necessidade de licenciamento',
     ],
-    note: 'Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta.',
+    // CONTRACT-001-R1 (C-10): os perfis dos cartões são exemplos; nenhuma contagem isolada define a categoria — texto ALTERADO (PUB-17)
+    note: 'Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta. Os demais critérios fundamentam a estimativa de esforço, e os perfis dos cartões são exemplos típicos.',
   },
   // [CO-01..CO-08] — modelo de atendimento (NEKKORA-RELEASE-001 §5.5) com as condições da COM-008-B; nada aqui promete
   // prazo, resultado ou disponibilidade. Minuta das cláusulas: docs/comercial/condicoes-comerciais-minuta.md (não

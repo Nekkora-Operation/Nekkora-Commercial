@@ -107,6 +107,7 @@ Exemplo de homologação: 2 simples + 1 média → padrão R$ 6.500; lançamento
 
 **O que define a categoria**
 
+- Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas; complexa acima de 16 horas ou com risco excepcional justificado na proposta
 - Quantidade de sistemas envolvidos
 - Complexidade das integrações
 - Regras de negócio e exceções
@@ -114,7 +115,7 @@ Exemplo de homologação: 2 simples + 1 média → padrão R$ 6.500; lançamento
 - Exigências de infraestrutura
 - Necessidade de licenciamento
 
-Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta.
+Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta. Os demais critérios fundamentam a estimativa de esforço, e os perfis dos cartões são exemplos típicos.
 
 **Condições comerciais**
 

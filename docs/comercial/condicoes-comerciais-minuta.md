@@ -247,3 +247,17 @@ cancelamento unilateral sem igual direito para o cliente (CDC art. 51, XI).
 | C-10 | A oferta vincula; publicar a regra completa | Mesma direção; datas **não** autorizadas; proposta após o fim mantém o preço; critérios objetivos | Confirma; **as datas do §8 ficam como histórico** | Regulamento; site (`PRICING.launch.rules`) |
 | C-11 | Multa 2% e juros 1% a.m. | Mesmos encargos, juros simples sem capitalização, lembretes, dispensa, sem cancelamento automático | Confirma, com conflito da Lei de Usura identificado | Contrato-base cl. 15 |
 | C-12 | Datas de início e término na proposta | Datas previstas por automação; 7 dias iniciais no cronograma; sem reuniões diárias, painel nem portal | Confirma | Contrato-base cl. 5 |
+
+## 11. Decisões complementares da titular — NEKKORA-COM-CONTRACT-001-R1 (06/11/2026)
+
+> Aprovações empresariais, **não parecer jurídico**. Atualizam as linhas do §10 indicadas abaixo; o resto do §10 continua
+> valendo. Detalhes: [relatório R1](../release/NEKKORA-COM-CONTRACT-001-R1.md).
+
+| ID | Antes (§10, CONTRACT-001) | Decisão complementar (R1) | Onde está a redação |
+|---|---|---|---|
+| C-03 | Prazo do reembolso a decidir (sugestão: 5 dias úteis) | Até **5 dias úteis** do pedido válido, com confirmação, registro e comprovante; arrependimento legal continua imediato | Contrato-base 9.4; procedimento §2 |
+| C-04 | Alternativas A (até 100%) e B (conservadora) | **Por enquadramento:** consumidor até **90%** com reserva prévia de 10% na proposta; B2B não consumerista até **100%** só com o Anexo B2B; 8 condições cumulativas; 10 dias úteis de contestação; entrega após a quitação do valor apurado | Contrato-base cl. 10; Anexo B2B §2-A; proposta §2 e §5 |
+| C-06 | Intervalo dos lembretes e prazo máximo da suspensão a decidir | Lembretes no **5º e 9º dia útil**; suspensão no dia útil seguinte ao 10º; **reprogramação** após 30 dias corridos, sem cancelamento automático | Contrato-base 8.3 e 8.5; procedimento §3 |
+| C-07 | Prazo estimado de correção a decidir | Confirmação em até **2 dias úteis**, diagnóstico em até **5 dias úteis**, previsão de correção por caso; termo inicial dos 30 dias continua ⚖ | Termo de garantia §3 e §4; contrato-base 13.3 |
+| C-10 | Limites numéricos `[!]` (COM-10) | **Esforço técnico estimado:** simples até 8 h; média acima de 8 até 16 h; complexa acima de 16 h ou risco excepcional justificado e informado antes do aceite; sem enquadramento pela contagem isolada de sistemas ou APIs | Regulamento §5; site ("O que define a categoria") |
+| C-11 | Atualização monetária: aplicar ou dispensar | **Prever** a atualização quando juridicamente devida, sem cumulação indevida; 1% a.m. não presumido permitido para todos | Contrato-base 15.2 e 15.2-A |

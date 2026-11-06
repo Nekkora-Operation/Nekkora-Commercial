@@ -21,7 +21,9 @@ direitos sobre o Framework e os demais componentes preexistentes, ou que tem **a
 ## 2. Cláusula de propriedade intelectual (Modelo A-R) **[R]** sobre **[D]**
 
 > (1) **Código Específico.** Os direitos sobre o código-fonte e a documentação desenvolvidos especificamente para o
-> CONTRATANTE nesta proposta pertencem ao CONTRATANTE **a partir da quitação integral** do preço. **[N]** Lei
+> CONTRATANTE nesta proposta pertencem ao CONTRATANTE **a partir da quitação integral** do preço ou, na desistência
+> após a conclusão, da quitação do **valor validamente apurado** (contrato-base 10.5; R1), sem exigir a reserva das
+> etapas não executadas. **[N]** Lei
 > 9.609/1998, art. 4º (conferida na LEGAL-BASE-001).
 >
 > (2) **Componentes Preexistentes.** Continuam pertencendo aos respectivos titulares os programas, bibliotecas,

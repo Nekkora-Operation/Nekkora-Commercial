@@ -388,7 +388,7 @@ await block('funcionais', async () => {
         ]),
       ),
       complexa: /Automação complexa[\s\S]*?Sob orçamento[\s\S]*?orçamento individual/.test(text),
-      criteria: ['Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
+      criteria: ['Esforço técnico estimado', 'Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
       conditions: /50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal/.test(text) && /cada uma tem categoria, escopo, preço e aceite próprios/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
       srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
       // Elementos da campanha (src/sections/Pricing.tsx): faixa de lançamento, prévia sem datas, economia e percentual

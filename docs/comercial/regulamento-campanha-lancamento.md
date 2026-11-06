@@ -4,7 +4,8 @@
 > (PUB-14) e vêm de `src/precos.ts`, sem alteração. **As datas não foram fixadas nesta missão:** o período em
 > `publicacao.json` (06/11/2026 a 06/01/2027) é **histórico** e não vale como nova autorização (§1). O resumo exibido no
 > site está em `src/content.ts` (`PRICING.launch.rules`) e depende da nova aprovação dos textos (PUB-17).
-> Marcadores como no [contrato-base](contrato-base-delivery.md).
+> Marcadores como no [contrato-base](contrato-base-delivery.md). **R1 (06/11/2026):** critérios de classificação por
+> esforço técnico estimado (§5), aprovados pela titular; as datas continuam pendentes.
 
 ## 1. Período **[!]**
 
@@ -26,7 +27,7 @@ O portão recusa campanha encerrada.
 
 1. Solicitação de avaliação **recebida pela Nekkora** dentro do período, inclusive o primeiro e o último dia, no horário
    de Brasília.
-2. Automação classificada como **simples ou média** pelos critérios do §5, com a classificação e a justificativa
+2. Automação classificada como **simples ou média** pelos critérios do §5 (esforço técnico estimado), com a classificação e a justificativa
    escritas na proposta.
 3. Nesse caso, o preço de lançamento da categoria **é devido** — a oferta vincula (**[N]** CDC art. 30, conferido na
    LEGAL-BASE-001). Não há reserva discricionária.
@@ -49,25 +50,43 @@ O portão recusa campanha encerrada.
 A proposta registra "Data da solicitação" com data, hora, canal e referência (OPS-03). Na dúvida perto da virada do
 último dia, vale o registro do servidor.
 
-## 5. Critérios de classificação **[R]** — proposta objetiva para decisão da titular **[!]**
+## 5. Critérios de classificação **[D]** (R1, 06/11/2026), redação **[R]**
 
-**Regra de enquadramento proposta:** a categoria é a **mais alta** indicada por qualquer critério; a proposta registra,
-para cada critério, o fato observado. Assim a classificação é verificável e não pode ser escolhida para negar o
-desconto. Os limites abaixo derivam das descrições já publicadas nos cartões ("um sistema ou planilha"; "mais de um
-sistema"; "ponta a ponta ou com várias integrações por API"); os marcados **[!]** precisam de número definido pela
-titular.
+**5.1 Parâmetro principal — esforço técnico estimado de uma automação individual.** Parâmetros iniciais aprovados
+pela titular:
 
-| Critério (publicado) | Simples | Média | Complexa |
-|---|---|---|---|
-| Quantidade de sistemas envolvidos | 1 sistema ou planilha | 2 ou mais sistemas | processo ponta a ponta entre `{{[!] N}}`+ sistemas |
-| Complexidade das integrações | nenhuma integração por API | 1 integração por API | 2 ou mais integrações por API |
-| Regras de negócio e exceções | regras diretas, poucas exceções `{{[!] até N}}` | validações e tratamento de exceções | regras que exigem `{{[!] critério}}` |
-| Volume de processamento | `{{[!]}}` | `{{[!]}}` | `{{[!]}}` |
-| Exigências de infraestrutura | máquina do cliente já existente | `{{[!]}}` | `{{[!]}}` |
-| Necessidade de licenciamento | `{{[!]}}` | `{{[!]}}` | `{{[!]}}` |
+| Categoria | Esforço técnico estimado |
+|---|---|
+| Simples | **até 8 horas** |
+| Média | **acima de 8 até 16 horas** |
+| Complexa | **acima de 16 horas**, ou complexidade ou risco excepcional justificado (§5.3) |
 
-**[R]** O cliente pode questionar a classificação por escrito antes do aceite; a Nekkora responde citando o critério e
-o fato. ⚖ Validade de critérios em aberto como base de uma oferta vinculante.
+É o esforço de **desenvolvimento da automação**, não o tempo de espera na fila. A proposta continua informando as
+datas previstas de início e de disponibilização para homologação (contrato-base cláusula 5); não se promete que toda
+automação seja concluída em dois dias.
+
+**5.2 Critérios complementares.** A estimativa de horas é justificada, na proposta, por fatos observáveis sobre:
+quantidade de sistemas; tipo e dificuldade das integrações; regras de negócio e exceções; volume e criticidade dos
+dados; dependências externas; estabilidade dos sistemas; infraestrutura e licenciamento; riscos técnicos,
+operacionais e de segurança; esforço de testes e homologação. **[D]** Não há enquadramento automático pela
+**contagem isolada** de sistemas ou APIs: duas APIs simples, por exemplo, não tornam a automação complexa. Os fatos
+fundamentam a estimativa; não sobem a categoria sozinhos.
+
+**5.3 Exceção — complexa abaixo de 16 horas.** **[D]** Só com justificativa técnica **excepcional**, **verificável** e
+**informada ao cliente antes do aceite**, escrita na proposta com os fatos. A exceção **não pode ser usada para negar o
+preço promocional**: sem os três requisitos, vale a categoria pelo esforço (`classificarAutomacao` recusa a exceção
+incompleta).
+
+**5.4 Questionamento.** **[R]** O cliente pode questionar a classificação por escrito antes do aceite; a Nekkora
+responde citando a estimativa, os critérios e os fatos.
+
+**5.5 Lacunas registradas (COM-10) [!].** **[R]** (a) A estimativa de horas é feita pela própria Nekkora: para torná-la
+verificável, propõe-se registrar na proposta a decomposição da estimativa (atividades e horas). (b) Não há regra para
+elevar de simples a média por critério complementar sem passar pelas horas; esta versão **não** cria essa elevação.
+(c) Os perfis dos cartões de preço ("um sistema ou planilha", "mais de um sistema", "ponta a ponta ou com várias
+integrações por API") passam a ser **exemplos típicos**, e o site informa o critério do esforço (PUB-17). Alternativas
+para (a) e (b), para decisão da titular: manter assim; ou fixar uma tabela de referência de horas por tipo de
+atividade. ⚖ Validade dos critérios como base de uma oferta vinculante (CDC arts. 30 e 31).
 
 ## 6. Exemplos testados (`scripts/testes/condicoes-delivery.test.mjs`)
 

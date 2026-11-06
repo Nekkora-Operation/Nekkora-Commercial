@@ -6,8 +6,17 @@
 > substituem a revisão por advogado(a) (adiada pela titular, **pendente**) e não autorizam marcar
 > `aprovacoes.condicoesComerciais` como `true` (PUB-19).
 >
-> **Hierarquia:** norma obrigatória > este contrato-base > proposta > anexos. Onde uma diretriz conflita com norma, a
-> norma prevalece e o conflito está no [relatório §4](../release/NEKKORA-COM-CONTRACT-001.md).
+> **Atualizado na [R1](../release/NEKKORA-COM-CONTRACT-001-R1.md) (06/11/2026)** com as decisões complementares da
+> titular (C-03 prazo do reembolso, C-04 por enquadramento, C-06 lembretes, C-07 atendimento, C-10 critérios por horas,
+> C-11 atualização monetária). A redação anterior está no histórico do git (commit `43da08f`).
+>
+> **Hierarquia (R1, [R] ⚖):** (1) norma obrigatória; (2) **condição particular da proposta** que indique expressamente
+> a cláusula deste contrato que altera, desde que não reduza direito legal; (3) [Anexo B2B](anexo-b2b-delivery.md),
+> **só quando validamente aplicável** e só nos temas que lista; (4) este contrato-base; (5) termo de garantia e Anexo de
+> Componentes, que **detalham** as cláusulas 13 e 14 e prevalecem sobre o resumo delas no mesmo tema. Contradição não
+> intencional entre documentos interpreta-se da forma mais favorável ao CONTRATANTE (**[N]** CDC art. 47). Assim, uma
+> condição aprovada para uma automação não perde eficácia por divergência documental involuntária. Onde uma diretriz
+> conflita com norma, a norma prevalece e o conflito está no [relatório §4](../release/NEKKORA-COM-CONTRACT-001.md).
 >
 > Marcadores: **[D]** diretriz da titular · **[R]** redação proposta pelo agente · **[N]** norma conferida no texto
 > oficial · **[I]** interpretação do agente · **⚖** exige parecer jurídico · **[!]** decisão ou evidência ainda pendente.
@@ -141,17 +150,28 @@ validar e registrar por escrito defeitos e ajustes.
 rodadas**, enquanto subsistir a obrigação aplicável. **[D]** **Ajuste de preferência** dentro do escopo: até **2
 rodadas**; além disso, aditivo (cláusula 4.2). Nova funcionalidade nunca é ajuste.
 
-8.3 **[D]** Sem manifestação no prazo, a Nekkora envia **dois lembretes escritos**. **[R]** Intervalo proposto: o 1º
-lembrete no dia útil seguinte ao fim do prazo; o 2º, **5 dias úteis** depois; **[!]** intervalo a confirmar pela
-titular. Persistindo o silêncio por 5 dias úteis após o 2º lembrete, o status passa a **"Homologação suspensa —
-aguardando cliente"**, registrado por escrito.
+8.3 **[D]** (R1) Calendário da homologação, contado da disponibilização (dia 0), em dias úteis, descontados fins de
+semana e feriados nacionais e os locais informados na disponibilização:
+
+| Momento | Ação da Nekkora |
+|---|---|
+| Dia 0 | Disponibilização com ambiente, instruções, critérios de aceite e a **data final escrita** |
+| **5º dia útil** | 1º lembrete escrito, se não houver resposta conclusiva |
+| **9º dia útil** | 2º lembrete escrito, se continuar sem resposta conclusiva |
+| Fim do 10º dia útil | Termina o prazo inicial de manifestação |
+| Dia útil seguinte | Se não houver manifestação: status **"Homologação suspensa — aguardando cliente"**, registrado e comunicado por escrito |
+| 30 dias corridos após a suspensão | A Nekkora pede por escrito a **reprogramação formal**; **não há cancelamento automático** |
+
+**[D]** A suspensão não elimina direitos legais nem encerra o contrato.
 
 8.4 **[D]** **Não existe aceite tácito.** O silêncio, isoladamente, **não** conclui a homologação, **não** torna exigível
 a segunda parcela, **não** equivale a desistência e **não** inicia a cobertura contratual.
 
-8.5 **[R]** Durante a suspensão, o CONTRATANTE pode retomar a homologação a qualquer tempo, com novo prazo de 10 dias
-úteis. **[!]** Prazo máximo de suspensão e o que acontece depois dele: **decisão pendente da titular** (sem aceite
-tácito, sem cancelamento automático).
+8.5 **[D]** (R1) A retomada depende de **alinhamento documentado**: a Nekkora redisponibiliza e comunica por escrito a
+**nova data-base**, a partir da qual corre novo prazo de 10 dias úteis com o mesmo calendário do item 8.3. O mesmo vale
+para a redisponibilização após correções. **[R]** Nenhum prazo é reiniciado ou prorrogado em silêncio: sem a
+comunicação escrita da nova data-base, vale a anterior. **[!]** O que acontece se o CONTRATANTE não responder ao pedido
+de reprogramação: sem regra nesta versão (sem aceite tácito, sem desistência presumida, sem cancelamento automático) ⚖.
 
 8.6 **[D]** **Aceite formal** é declaração expressa e escrita do CONTRATANTE de que a automação atende aos critérios de
 aceite.
@@ -168,41 +188,76 @@ que não as controla. **[R]** Ressalva: quando a desistência decorrer de culpa 
 9.3 **[R]** Se houver direito legal de arrependimento em curso, vale a cláusula 3.4, mais ampla (tudo o que foi pago à
 Nekkora, a qualquer título).
 
-9.4 **[R]** Reembolso por Pix, em até `{{prazo — [!] decisão da titular; sugestão: 5 dias úteis}}` do pedido, salvo no
-arrependimento legal, em que é imediato.
+9.4 **[D]** (R1) Reembolso por Pix em até **5 dias úteis** do pedido válido, com confirmação e registro do pedido e
+comprovante da devolução enviado ao CONTRATANTE. **[N]** No exercício válido do direito de arrependimento, a devolução
+é **imediata** e monetariamente atualizada (CDC art. 49, parágrafo único): prevalece sempre o prazo legal mais favorável.
+**[R]** O prazo operacional de 5 dias úteis **não autoriza postergar** uma restituição que a lei exige de imediato.
 
 ## Cláusula 10 — Desistência após a conclusão (C-04) ⚖ ponto crítico
 
-> **Duas redações para decisão da titular.** A diretriz (Alternativa A) tem dúvida jurídica substancial em contrato de
-> consumo; a Alternativa B é a conservadora. Análise: [relatório §4, C-04](../release/NEKKORA-COM-CONTRACT-001.md).
-> Nenhuma delas está aprovada.
+> **R1: decisão da titular de tratar a C-04 de forma diferente conforme o enquadramento** (substitui as Alternativas A
+> e B da CONTRACT-001). Os percentuais são **tetos pretendidos**, não valores exigíveis automaticamente: a redação
+> continua **sujeita a parecer jurídico**, sobretudo quanto à exigibilidade de pagamento sem aceite formal. Análise:
+> [relatório R1 §B e §D](../release/NEKKORA-COM-CONTRACT-001-R1.md).
 
-10.1 **[D]** Condições comuns às duas alternativas. A cláusula só se aplica quando, **cumulativamente**:
-(a) o desenvolvimento está **concluído e comprovado** (cláusula 7.2) e **efetivamente disponibilizado** para homologação;
-(b) o CONTRATANTE **declara por escrito** que desiste (o silêncio nunca é desistência — cláusula 8.4);
-(c) a desistência **não** tem justificativa atribuível à Nekkora (defeito, descumprimento ou atraso — cláusula 11);
-(d) **não** há direito legal de arrependimento em curso (cláusula 3);
-(e) não há defeito conhecido pendente.
-A cobrança **não é multa, retenção do sinal nem penalidade**: é o preço do serviço prestado. **Não** equivale a aceite e
-**não** é registrada como aceite.
+10.1 **Condições cumulativas, comuns aos dois regimes.** **[D]** Nenhuma cobrança relacionada a esta cláusula é feita
+sem que se verifiquem, **todas**:
+(a) conclusão técnica **integral** comprovada por evidências (cláusula 7.2);
+(b) cumprimento dos critérios de aceite verificáveis da proposta, ressalvada a homologação ainda pendente;
+(c) nenhum defeito conhecido nem obrigação técnica pendente atribuível à Nekkora;
+(d) **disponibilização real** de ambiente, instruções e meios de teste;
+(e) desistência **expressa, por escrito** e voluntária, sem motivo atribuível à Nekkora (o silêncio nunca é desistência
+— cláusula 8.4);
+(f) inexistência de direito legal de arrependimento que imponha restituição integral (cláusula 3);
+(g) ausência de contestação fundamentada pendente de análise (item 10.2);
+(h) conformidade com os limites jurídicos aplicáveis ao contrato.
+Faltando qualquer uma, vale a cláusula 9 (reembolso integral) ou a 11. Defeito ou entrega incompleta **nunca** levam a
+esta cláusula. A cobrança **não é multa, retenção do sinal, penalidade nem presunção de aceite**: é o preço do serviço
+efetivamente prestado. **Não** equivale a aceite e **não** é registrada como aceite.
 
-10.2 **Contestação.** **[R]** Antes de cobrar, a Nekkora envia ao CONTRATANTE as evidências da cláusula 7.2. O
-CONTRATANTE pode contestá-las por escrito em **10 dias úteis**, apontando defeitos ou itens não concluídos. Contestação
-fundamentada **suspende a cobrança** até a análise; defeito confirmado leva à cláusula 9 (ainda não concluído) ou à 11.
+10.2 **Contestação.** **[D]** Antes de cobrar, a Nekkora envia por escrito ao CONTRATANTE as evidências do item 10.1.
+O CONTRATANTE tem **10 dias úteis** para contestá-las, apontando defeitos ou itens não concluídos. A contestação
+fundamentada **suspende a exigibilidade** da parcela controvertida até a análise e a resposta escrita. **[R]** O prazo
+não é renúncia a direito legal: a falta de contestação não impede o CONTRATANTE de exercer depois os direitos que a lei
+lhe garante (cláusulas 11 e 13).
 
-10.3 **Alternativa A — diretriz da titular.** **[D]** A Nekkora pode cobrar **até 100% do preço** contratado (abatido o
-que já foi pago). **[D]** Após o pagamento integral, o CONTRATANTE recebe o desenvolvimento e todos os entregáveis
-(cláusula 12), mesmo que não queira usá-los, e as garantias (cláusula 13) se aplicam normalmente.
+10.3 **Regime do consumidor — modelo conservador.** **[D]** Quando a contratação for relação de consumo (padrão deste
+contrato-base):
+(a) a proposta **reserva previamente 10% do preço** de cada automação às etapas de homologação assistida e de entrega
+(proposta, §2, "Reserva das etapas finais"). A reserva **não pode ser fixada depois** da desistência; se ela não
+constar da proposta, esta cláusula não é usada e o caso vai à revisão jurídica;
+(b) a cobrança máxima pretendida é de **90% do preço contratado**, abatidos os pagamentos já feitos;
+(c) não se cobra valor de serviço não realizado nem de entrega incompleta: os 10% reservados **nunca** são cobrados
+nesta hipótese.
 
-10.4 **Alternativa B — conservadora (recomendada pelo agente para cliente consumidor até o parecer).** **[R]** A Nekkora
-pode cobrar o preço **menos** o valor da etapa de homologação assistida, correções e entrega, fixado na proposta em
-`{{R$ ou % — [!] decisão da titular}}`. Após o pagamento, mesmas consequências do item 10.3. A Alternativa A ficaria
-restrita ao [Anexo B2B](anexo-b2b-delivery.md).
+10.4 **Regime B2B efetivamente não consumerista.** **[D]** Só com o [Anexo B2B](anexo-b2b-delivery.md) validamente
+aplicável (os quatro itens do §1, justificados e documentados; ter CNPJ **não** basta): cobrança de **até 100% do
+preço**, abatidos os pagamentos já feitos, com as mesmas condições dos itens 10.1 e 10.2. ⚖ Relação dos 100% com as
+etapas de homologação e entrega não executadas.
 
-10.5 **[N]** Limites que nenhuma alternativa afasta: CDC art. 51, II (opção de reembolso nos casos do Código) e IV
+10.5 **Entrega após a quitação.** **[D]** Quitado o valor **validamente apurado** (depois da contestação, se houver), a
+Nekkora disponibiliza o desenvolvimento concluído e os entregáveis correspondentes, **sem exigir os 10% reservados** no
+regime do consumidor. **[R]** Entregáveis: código-fonte específico concluído; documentação técnica prevista na
+proposta; relatório de testes técnicos por critério de aceite; Anexo de Componentes preenchido, com a licença dos
+componentes preexistentes (cláusula 14). Transferência: no repositório ou arquivo indicado pelo CONTRATANTE, com
+instruções escritas e registro do envio, em prazo **[!]** a definir pela titular. A homologação assistida e a entrega
+acompanhada não executadas não são prestadas nem cobradas. As garantias legais continuam valendo.
+
+10.6 **Exemplos (hipóteses contratuais, não valores exigíveis).** **[R]** Calculados por
+`resultadoDaDesistencia` (relatório R1 §C):
+
+| Caso | Preço | Entrada paga | Reserva (10%) | Teto pretendido | Saldo máximo pretendido |
+|---|---:|---:|---:|---:|---:|
+| Consumidor — simples | R$ 1.000 | R$ 500 | R$ 100 | R$ 900 | R$ 400 |
+| Consumidor — média | R$ 2.800 | R$ 1.400 | R$ 280 | R$ 2.520 | R$ 1.120 |
+| B2B não consumerista — média | R$ 2.800 | R$ 1.400 | — | R$ 2.800 | R$ 1.400 |
+| Qualquer regime, antes da conclusão | R$ 2.800 | R$ 1.400 | — | — | Reembolso de R$ 1.400 (cláusula 9) |
+| Arrependimento legal | R$ 2.800 | R$ 1.400 | — | — | Restituição de tudo o que foi pago, de imediato (cláusula 3.4) |
+
+10.7 **[N]** Limites que nenhum regime afasta: CDC art. 51, II (opção de reembolso nos casos do Código) e IV
 (desvantagem exagerada; §1º, presunções); CDC art. 20 (vícios). **[I]** Fundamento possível da cobrança: o preço
-remunera serviço prestado; em contrato empresarial, CC art. 623 (empreitada) dá base adicional. ⚖ Exigibilidade do
-preço integral sem aceite formal em contrato de consumo.
+remunera serviço prestado; em contrato empresarial, CC art. 623 (empreitada) dá base adicional. ⚖ Exigibilidade antes
+do aceite formal, enquadramento consumerista e percentual cobrável.
 
 ## Cláusula 11 — Defeitos, descumprimento e atraso da Nekkora
 
@@ -217,8 +272,9 @@ exclusão genérica de responsabilidade por sistemas de terceiros (**[D]** C-07;
 
 ## Cláusula 12 — Entrega definitiva (C-05)
 
-12.1 **[D]** Após o aceite formal (ou, na cláusula 10, a desistência após a conclusão) **e** a quitação, a Nekkora
-entrega o código específico, a documentação e o Anexo de Componentes preenchido.
+12.1 **[D]** Após o aceite formal **e** a quitação, a Nekkora entrega o código específico, a documentação, o Anexo de
+Componentes preenchido e o termo de garantia. Na desistência após a conclusão, vale o item 10.5 (quitação do valor
+validamente apurado, sem a reserva das etapas não executadas).
 
 12.2 **[D]** Condicionar a entrega à quitação **não impede** a verificação nem a correção de defeitos: durante a
 homologação o CONTRATANTE tem acesso para testar; defeitos apontados são corrigidos independentemente da quitação. **[R]**
@@ -235,6 +291,11 @@ legal e conferida em termo escrito.
 
 13.2 **[D]** Cobertura: defeitos atribuíveis à implementação da Nekkora. Não inclui manutenção evolutiva, sustentação,
 monitoramento contínuo nem novas funcionalidades. ⚖ Contagem dos 30 dias: termo de garantia, §3.
+
+13.3 **[D]** (R1) Atendimento: a Nekkora confirma o recebimento da solicitação de garantia em até **2 dias úteis**, faz
+o diagnóstico inicial em até **5 dias úteis** e, depois da avaliação técnica, informa a previsão de correção do caso.
+São metas contratuais de atendimento, **não** prazo máximo de correção nem limite dos direitos legais (termo de
+garantia, §4).
 
 ## Cláusula 14 — Propriedade intelectual (C-09)
 
@@ -256,8 +317,17 @@ Nekkora envia **1º e 2º lembretes amigáveis** e oferece negociação. A Nekko
 15.2 **[D]** Encargos: **multa moratória única de 2%** e **juros simples de 1% ao mês, proporcionais aos dias de
 atraso**, **sem capitalização**. **[R]** Redação proposta: "juros de mora de 1% ao mês, *pro rata die*, **limitados ao
 máximo permitido em lei para a relação**". ⚖ **Conflito potencial** para CONTRATANTE que não seja pessoa jurídica:
-relatório §4, C-11 (Lei de Usura × taxa legal da Lei 14.905/2024). **[!]** Atualização monetária (CC arts. 389 e 395,
-IPCA na falta de índice): aplicar ou dispensar — decisão da titular.
+relatório §4, C-11 (Lei de Usura × taxa legal da Lei 14.905/2024). **[R]** O percentual de 1% ao mês **não é
+presumido permitido** para todas as categorias de cliente: se o teto legal for menor, aplica-se o teto, calculado com
+base normativa e período de referência verificáveis.
+
+15.2-A **[D]** (R1) **Atualização monetária**, quando juridicamente devida, pelo índice aplicável (**[N]** CC arts. 389,
+parágrafo único, e 395: IPCA na falta de índice convencionado), **sem cumulação indevida** de encargos: a correção
+incide uma única vez sobre o principal, e a multa e os juros incidem sobre o principal atualizado. **[R]** Não se usa
+como índice de correção uma taxa que já embute juros (ex.: Selic) junto com juros de mora. ⚖ Revisão jurídica
+separada para (1) consumidor, (2) pessoa física fora de relação de consumo e (3) B2B não consumerista: Lei
+14.905/2024, Lei de Usura e exceções, índice, momento de incidência, arredondamento e risco de duplicidade entre taxa
+legal, juros convencionais e correção. A calculadora (`encargosDeAtraso`) devolve sempre resultado **indicativo**.
 
 15.3 **[D]** **Não há cancelamento automático** por atraso.
 

@@ -2,7 +2,8 @@
 
 > **MODELO NÃO APROVADO. Não é parecer jurídico. Não autoriza contratação.** Atualizado na
 > [NEKKORA-COM-CONTRACT-001](../release/NEKKORA-COM-CONTRACT-001.md) (06/11/2026) com as **decisões definitivas da
-> titular C-01 a C-12**, que substituem as propostas de correção da LEGAL-BASE-001 (histórico em
+> titular C-01 a C-12** e, na [R1](../release/NEKKORA-COM-CONTRACT-001-R1.md), com as decisões complementares
+> (C-03, C-04, C-06, C-07, C-10, C-11), que substituem as propostas de correção da LEGAL-BASE-001 (histórico em
 > [`condicoes-comerciais-minuta.md` §10](condicoes-comerciais-minuta.md)). As cláusulas estão no
 > [contrato-base](contrato-base-delivery.md); esta proposta só traz o que muda por cliente e por automação. Uso só após
 > a aprovação das condições (PUB-19), a revisão por advogado(a) (pendente) e as pendências do
@@ -27,7 +28,7 @@
 | Campo | Conteúdo |
 |---|---|
 | Automação | `{{nome}}` |
-| Categoria e justificativa | ☐ Simples ☐ Média ☐ Complexa · fato observado por critério (regulamento §5) `{{…}}` |
+| Categoria e justificativa | ☐ Simples ☐ Média ☐ Complexa · **esforço técnico estimado: `{{N}}` horas** (simples até 8 h; média acima de 8 até 16 h; complexa acima de 16 h) · fatos observados por critério complementar (regulamento §5) `{{…}}` · risco excepcional, se houver: justificativa e fatos verificáveis `{{…}}` |
 | Descrição do processo e resultado esperado | `{{…}}` |
 | Sistemas e integrações | `{{…}}` |
 | Fora do escopo | `{{…}}` · sustentação, monitoramento, hospedagem, novas funcionalidades e alocação de profissionais não estão incluídos |
@@ -36,7 +37,7 @@
 | Preço | `{{R$}}` · ☐ padrão ☐ lançamento (solicitação recebida no período) ☐ orçamento individual |
 | **Início previsto** | `{{DD/MM/AAAA}}` — nunca antes do 8º dia após a assinatura (C-02) |
 | **Disponibilização para homologação prevista** | `{{DD/MM/AAAA}}` |
-| Etapa de homologação assistida e entrega (só se a titular escolher a Alternativa B da cláusula 10) | `{{R$ ou %}}` |
+| **Reserva das etapas finais** (regime do consumidor, obrigatória — contrato-base 10.3) | `{{10% do valor contratado da automação = R$ …}}`: parte do preço que remunera a homologação assistida e a entrega. Fixada **antes do aceite**; nunca cobrada se você desistir depois da conclusão |
 
 Total: `{{R$}}` (soma das automações com preço; complexas sob orçamento à parte). Cada automação continua com preço e
 aceite próprios.
@@ -64,13 +65,15 @@ mês pro rata die, limitados ao máximo legal, sem capitalização; sem cancelam
 | Tema | Regra | Cláusula |
 |---|---|---|
 | Espera e arrependimento | O desenvolvimento só começa depois de 7 dias corridos da assinatura. Seu direito legal de arrependimento é preservado: escreva para contato@nekkora.com ou responda a este e-mail; confirmaremos o recebimento imediatamente | 3 |
-| Desistência antes da conclusão | **Reembolso integral** do que você pagou à Nekkora pelo desenvolvimento, mesmo com o trabalho iniciado. Despesas que você pagou direto a terceiros não passam pela Nekkora | 9 |
-| Desistência após a conclusão | `{{texto da alternativa escolhida pela titular — cláusula 10}}` ⚖ | 10 |
-| Homologação | 10 dias úteis; defeitos corrigidos sem limite de rodadas; até 2 rodadas de ajustes de preferência; dois lembretes e suspensão; **sem aceite tácito** | 8 |
+| Desistência antes da conclusão | **Reembolso integral** do que você pagou à Nekkora pelo desenvolvimento, mesmo com o trabalho iniciado, em até 5 dias úteis do pedido, com comprovante (no arrependimento legal, de imediato). Despesas que você pagou direto a terceiros não passam pela Nekkora | 9 |
+| Desistência após a conclusão ⚖ | Só com a conclusão integral comprovada, a disponibilização real e a sua desistência por escrito; você recebe as evidências e tem 10 dias úteis para contestar. **Consumidor:** até 90% do valor contratado, abatido o que já pagou (ex.: média de R$ 2.800 com entrada de R$ 1.400 → saldo máximo de R$ 1.120); a reserva das etapas finais não é cobrada. **B2B (só com o Anexo B2B):** até 100%. Pago o valor apurado, você recebe o desenvolvimento concluído. Sujeito a revisão jurídica | 10 |
+| Homologação | 10 dias úteis; lembretes no 5º e no 9º dia útil; sem resposta, suspensão no dia útil seguinte e, 30 dias depois, pedido de reprogramação (sem cancelamento automático); defeitos corrigidos sem limite de rodadas; até 2 rodadas de ajustes de preferência; **sem aceite tácito** | 8 |
 | Entrega definitiva | Após o aceite e a quitação: código específico, documentação, Anexo de Componentes e termo de garantia | 12 |
-| Garantia | Garantias legais + **30 dias** de cobertura corretiva adicional, no termo de garantia | 13 |
+| Garantia | Garantias legais + **30 dias** de cobertura corretiva adicional, no termo de garantia; recebimento confirmado em até 2 dias úteis e diagnóstico inicial em até 5 dias úteis | 13 |
 | Propriedade intelectual | Código específico seu após a quitação; componentes da Nekkora licenciados para operar e manter; pode contratar outro desenvolvedor | 14 e Anexo de Componentes |
 | Mudança de prazo | Só com motivo, comunicação e concordância por escrito | 5.4 |
+
+| Ordem dos documentos | Norma obrigatória; condições particulares desta proposta que indiquem a cláusula alterada; Anexo B2B, se aplicável; contrato-base; na dúvida, a interpretação mais favorável a você | Preâmbulo |
 
 ## 6. Anexos
 

@@ -4,6 +4,7 @@
 > Integra o [contrato-base](contrato-base-delivery.md), cláusula 13. **[N]** CDC art. 50: a garantia contratual é
 > **complementar à legal** e conferida em **termo escrito**, padronizado, que esclareça em que consiste, a forma, o
 > prazo e o lugar em que pode ser exercida e os ônus a cargo do consumidor. Marcadores como no contrato-base.
+> **R1 (06/11/2026):** metas de atendimento (§4) e esclarecimento sobre o caráter adicional da cobertura (§3).
 
 ## 1. Garantias legais (não dependem deste termo)
 
@@ -40,11 +41,27 @@ Não são cobertos, por não serem defeito da implementação **[D]**:
 
 **[D]** A cobertura **não começa** enquanto a homologação estiver suspensa (contrato-base cláusula 8.4).
 
+**[D]** (R1) Como a cobertura complementa a lei **[R]** ⚖: os 30 dias são cobertura corretiva **adicional**, e não
+mera sobreposição aos direitos legais. A redação definitiva deve garantir que eles acrescentem tempo de cobertura ao
+prazo legal aplicável, inclusive diante do vício oculto (prazo legal a partir da evidência do defeito). Nenhum termo
+inicial é fixado antes do parecer.
+
 ## 4. Forma e lugar de exercício
 
 **[R]** E-mail para **contato@nekkora.com** com: número da proposta, automação, descrição do defeito, data em que foi
-percebido e, se possível, evidência (sem senhas). A Nekkora confirma o recebimento por escrito e informa o prazo
-estimado de correção `{{[!] a definir pela titular}}`. Atendimento remoto; sem custo de deslocamento.
+percebido e, se possível, evidência (sem senhas). Atendimento remoto; sem custo de deslocamento.
+
+**[D]** (R1) Metas contratuais propostas de atendimento:
+
+| Etapa | Meta |
+|---|---|
+| Confirmação por escrito do recebimento da solicitação | até **2 dias úteis** |
+| Diagnóstico inicial | até **5 dias úteis** da solicitação |
+| Previsão de correção | informada por escrito **depois** da avaliação técnica, específica para o caso |
+| Registro | defeito, evidências, medidas tomadas e resolução |
+
+**[R]** Essas metas **não são prazo máximo de correção** e não limitam os direitos legais (ex.: CDC art. 20). Contagem em
+dias úteis, excluídos fins de semana e feriados (`atendimentoDaGarantia`).
 
 ## 5. Ônus e obrigações do cliente
 
