@@ -69,7 +69,9 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   for (const id of [
     'PUB-19',
     'PUB-18',
-    'PUB-10'
+    'PUB-10',
+    // LEGAL-BASE-001-R1: a PR #15 alterou textos aprovados em 05/11/2026; a nova versão aguarda aprovação da titular
+    'PUB-17'
   ]) {
     assert.match(r.stdout, new RegExp(id));
   }
@@ -77,8 +79,6 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   assert.doesNotMatch(r.stdout, /PUB-20/);
   // PUB-22: endereço comercial informado pela titular em 05/11/2026 (cartão CNPJ) — o portão não o acusa mais
   assert.doesNotMatch(r.stdout, /PUB-22/);
-  // PUB-17: textos comerciais aprovados pela titular em 05/11/2026 — o portão não os acusa mais
-  assert.doesNotMatch(r.stdout, /PUB-17/);
 
   assert.doesNotMatch(r.stdout, /PUB-13/);
   // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21

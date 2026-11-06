@@ -3,8 +3,8 @@
 > **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,
 > condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.
 
-> Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere
-> o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.
+> Gerado por `npm run texto` a partir de [`src/content.ts`](../../../src/content.ts). Não edite este arquivo: altere
+> o `content.ts` (e a [matriz de alegações](../../com-001/03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.
 >
 > **Gerado com dados SINTÉTICOS** (`scripts/fixtures/publicacao-homologacao-api.json`): e-mail, controlador, provedor e URLs são fictícios — vale o texto, não os valores.
 

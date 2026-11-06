@@ -91,7 +91,7 @@ legítimo de responder ao contato (art. 7º, IX)". **Não aplicado ao site.**
 
 | Dados | Prazo aprovado **[D]** | Como é cumprido hoje |
 |---|---|---|
-| Contatos sem contratação (e-mails e mensagens na caixa comercial, LinkedIn) | **Até seis meses** após o último contato relevante | **Manual**, sob responsabilidade da titular. Não há rotina automática. Sugestão: revisão mensal da caixa `contato@`, com registro da data |
+| Contatos sem contratação (e-mails e mensagens na caixa comercial, LinkedIn) | **Até seis meses** após o último contato relevante | **Manual**, sob responsabilidade da titular. Não há rotina automática. Revisão **semanal** ([procedimento](procedimento-retencao-e-direitos.md), R1), com registro da data |
 | Reservas do Microsoft Bookings | **Até 90 dias** após a reunião ou o cancelamento | **Manual**, sob responsabilidade da titular. Nenhuma política de retenção do M365 foi configurada para reservas |
 | ~~Gravações de reuniões do Teams~~ **Sem gravação nesta fase** (LEGAL-BASE-001). Histórico (COM-PRIVACY-001): | **Prazo padrão de 30 dias** após a reunião | **Expiração padrão do Teams/OneDrive**, verificada visualmente no SharePoint no arquivo de teste. A eliminação definitiva **não** foi comprovada (depois de expirar, o arquivo segue o ciclo de lixeira do Microsoft 365, ainda não observado). Quem é dono da gravação pode alterar a data de expiração de um arquivo: a revisão manual da titular deve conferir que nenhuma gravação teve o prazo estendido sem motivo |
 | Dados ligados a uma contratação | Prazos do contrato e os exigidos por lei (fiscais, defesa de direitos) | Conforme o contrato ⚖ |
@@ -101,7 +101,7 @@ legítimo de responder ao contato (art. 7º, IX)". **Não aplicado ao site.**
 **O aviso descreve o prazo, não uma eliminação automática.** O texto diz "ficam guardados por até…" e, para as
 gravações, "prazo padrão". Ele **não** diz que a eliminação é automática ou definitiva. A revisão e a eliminação são,
 inicialmente, **manuais e de responsabilidade da titular** (decisão de 05/11/2026). Falta registrar o procedimento
-(periodicidade e registro de execução) — OPS-01. **Registrado na LEGAL-BASE-001:** [`procedimento-retencao-e-direitos.md`](procedimento-retencao-e-direitos.md) (revisão mensal com corte de 5 meses e 60 dias, registro sem dados pessoais).
+(periodicidade e registro de execução) — OPS-01. **Registrado na LEGAL-BASE-001:** [`procedimento-retencao-e-direitos.md`](procedimento-retencao-e-direitos.md) (revisão semanal desde a R1, com corte de 5 meses e 60 dias e registro sem dados pessoais).
 
 Transcrições e anotações automáticas do Teams (se habilitadas) e o chat da reunião **não** foram verificados nesta
 missão e não estão cobertos pelo prazo de 30 dias acima (OPS-06).
@@ -134,8 +134,8 @@ Corrige a base legal (AUD-35), retira "telefone" (AUD-36), inclui o Teams (AUD-3
 
 **Sem gravação comercial nesta fase.** O que segue nesta seção registra a decisão e a homologação anteriores
 (COM-PRIVACY-001). A configuração continua no tenant: a política `Nekkora-Commercial` **permite** gravar com
-concordância. Desligar a gravação na política ou manter a regra só operacional é decisão da titular (CTL-01 do
-[procedimento](procedimento-retencao-e-direitos.md)). O agente não alterou o Microsoft 365.
+concordância. Na R1 o agente recomendou desligar a gravação, a transcrição e o Copilot nessa política. A titular decide e executa (CTL-01,
+[procedimento do Teams](procedimento-teams-sem-gravacao.md)). O agente não alterou o Microsoft 365.
 
 ### Decisão anterior da titular (COM-PRIVACY-001)
 

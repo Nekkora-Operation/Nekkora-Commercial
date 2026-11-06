@@ -22,7 +22,7 @@
 
 | Grupo | Itens | Efeito |
 |---|---|---|
-| **Impeditivos da publicação** (o site não deve ir ao ar sem eles) | R-01 endereço do fornecedor (PUB-22) · R-04 transferência internacional sem mecanismo verificado (JUR-07) · R-06 registros de acesso (Marco Civil, art. 15): decidir · R-13 texto real do Bookings (OPS-02) · R-14 teste de recebimento do `contato@` (REP-04) · R-03 **nova aprovação dos textos** alterados nesta missão (PUB-17) · aprovações já pendentes (PUB-09, PUB-19, PUB-18, PUB-10) | O portão bloqueia: PUB-09, PUB-10, PUB-18 e PUB-19. **PUB-22** foi preenchido pela titular em 05/11/2026 (§3.1, item 8) |
+| **Impeditivos da publicação** (o site não deve ir ao ar sem eles) | R-01 endereço do fornecedor (PUB-22) · R-04 transferência internacional sem mecanismo verificado (JUR-07) · R-06 registros de acesso (Marco Civil, art. 15): decidir · R-13 texto real do Bookings (OPS-02) · R-14 teste de recebimento do `contato@` (REP-04) · R-03 **nova aprovação dos textos** alterados nesta missão (PUB-17) · aprovações já pendentes (PUB-09, PUB-19, PUB-18, PUB-10) | O portão bloqueia: PUB-09, PUB-10, PUB-17 (desde a R1), PUB-18 e PUB-19. **PUB-22** foi preenchido pela titular em 05/11/2026 (§3.1, item 8) |
 | **Corrigido nesta missão** | R-02 nome empresarial e CNPJ no rodapé (Decreto 7.962/2013, art. 2º, I) · R-03 o aviso dizia que a conversa "pode ser gravada", mas não há gravação nesta fase | Site alterado; homologação no navegador aprovada (§7) |
 | **Antes da primeira contratação** (não impede o site) | Condições comerciais C-01 a C-12: arrependimento, retenção, garantia, propriedade intelectual, prazos | Minuta revisada e [proposta-modelo](../comercial/proposta-modelo-delivery.md) criada; decisão da titular |
 | **Antes de qualquer gravação futura** | JUR-10, OPS-05 a OPS-08, CTL-01 | Fora do lançamento: sem gravação nesta fase |
@@ -106,7 +106,7 @@ Detalhe: [`privacidade-minuta.md`](../comercial/privacidade-minuta.md) §1, §2,
 |---|---|---|
 | 1 | [D] | **Sem gravação comercial nesta fase** (diretriz desta missão). Ela substitui a decisão da COM-PRIVACY-001 ("pode ser gravada") |
 | 2 | [N]/[E] | LGPD art. 6º, VI, e art. 9º: informação clara e precisa sobre o tratamento **realizado**. O aviso dizia "pode ser gravada" e citava o "prazo padrão de 30 dias das gravações". **Corrigido:** item "Conversa sem gravação" e frase das gravações retirada da retenção (homologação `privacidade-sem-gravacao`) |
-| 3 | [!] | A política do Teams `Nekkora-Commercial` **ainda permite** gravar com concordância. Desligar a gravação ou manter a regra só operacional é decisão da titular (CTL-01). O agente não alterou o M365 |
+| 3 | [!] | A política do Teams `Nekkora-Commercial` **ainda permite** gravar com concordância. Desligar a gravação ou manter a regra só operacional é decisão da titular (CTL-01). O agente não alterou o M365. **R1:** recomendação de desligar na política, com [checklist e teste](../comercial/procedimento-teams-sem-gravacao.md) |
 | 4 | [N]/[I] | Art. 7º, V, exige que o titular seja **parte** do contrato. Para representante de empresa, a base candidata é o art. 7º, IX (com art. 10 e registro). Proposta de texto na minuta §2, **não aplicada** (alteraria texto aprovado) |
 | 5 | [N]/[!] | Transferência internacional: art. 33; Res. 19/2024 (CPC adotadas integralmente; transparência do art. 17, §2º); nenhuma equivalência de cláusulas estrangeiras; a UE é adequada (Res. 32/2026). **Microsoft e AWS não publicam adoção das CPC brasileiras para clientes** (§2). **Região do tenant e dos serviços: não verificada.** Ter contrato com provedor estrangeiro **não demonstra**, por si só, cumprimento da Res. 19/2024 |
 | 6 | [N]/[I] | Agente de pequeno porte (Res. 2/2022): provável (LTDA; sem alto risco pelos critérios do art. 4º), mas **a titular precisa confirmar** a receita e o grupo econômico. Dispensa do encarregado (art. 11) **com canal obrigatório** (§1º): `contato@nekkora.com`. Prazo em dobro (art. 14) é limite, não meta |
@@ -131,7 +131,7 @@ Severidade: **A** alta · **M** média · **B** baixa. "Impede publicação?" = 
 |---|---|---|---|---|---|---|
 | R-01 | Endereço físico do fornecedor ausente | Decreto 7.962, art. 2º, II | A | ~~Sim~~ | **Resolvido**: endereço informado pela titular em 05/11/2026 (cartão CNPJ); entra na nova aprovação dos textos (R-03) | Titular |
 | R-02 | Nome empresarial e CNPJ fora de local de destaque | Decreto 7.962, art. 2º, I | M | — | **Corrigido** (rodapé) | — |
-| R-03 | Aviso dizia "pode ser gravada" sem gravação nesta fase; textos aprovados alterados | LGPD arts. 6º, VI, e 9º | M | **Sim** (nova aprovação) | **Corrigido no site**; `textosComerciais` **continua `true`** e precisa de nova decisão | Titular |
+| R-03 | Aviso dizia "pode ser gravada" sem gravação nesta fase; textos aprovados alterados | LGPD arts. 6º, VI, e 9º | M | **Sim** (nova aprovação) | **Corrigido no site**; na R1, `textosComerciais` voltou a `false` (a aprovação de 05/11/2026 vale para a versão anterior) e o portão acusa PUB-17 | Titular |
 | R-04 | Transferência internacional sem mecanismo verificado e sem regiões confirmadas | LGPD art. 33; Res. 19/2024; Res. 32/2026 | A | **Sim** (para o aviso) | Pendente (JUR-07) | Titular + revisão |
 | R-05 | Art. 7º, V, para representante de empresa | LGPD arts. 7º, V e IX, e 10 | M | Não | Proposta de texto; decisão | Titular |
 | R-06 | Sem registros de acesso por 6 meses | Marco Civil art. 15 | A [I] | **Decidir antes** | Logs desativados | Titular: (a) ativar os logs padrão do CloudFront num bucket em `sa-east-1`, com acesso restrito, ciclo de vida de 6 meses e item no aviso (mudança na AWS, **não feita**); ou (b) registrar, com fundamento, por que o art. 15 não se aplicaria |
@@ -202,11 +202,25 @@ Evidências de execução: ver a descrição do PR (`npm test`, `npm run check`,
 
 1. ~~**Endereço comercial** (R-01/PUB-22)~~: **decidido** em 05/11/2026 (endereço do cartão CNPJ, §3.1, item 8).
 2. **Nova aprovação dos textos** (R-03/PUB-17): rodapé com identificação e endereço, item "Conversa sem gravação" e retenção sem
-   gravações. Enquanto não houver nova decisão, `textosComerciais: true` corresponde ao texto **anterior**.
+   gravações. Na R1 o campo voltou a `false`: a aprovação de 05/11/2026 corresponde ao texto **anterior** e não se transfere.
 3. **Registros de acesso** (R-06): ativar os logs do CloudFront por 6 meses ou registrar a conclusão contrária.
 4. **Transferência internacional** (R-04): confirmar as regiões e escolher um mecanismo por provedor.
-5. **Política do Teams** (CTL-01): desligar a gravação ou manter a regra só operacional.
+5. **Política do Teams** (CTL-01): na R1, recomendação de desligar gravação, transcrição e Copilot na política `Nekkora-Commercial`. A titular autoriza, executa e registra a evidência ([procedimento](../comercial/procedimento-teams-sem-gravacao.md)).
 6. **Condições comerciais**: C-01 a C-12, em especial a C-07 (garantia), a C-09 (Modelo A-R ou A) e a C-04 (fim da "retenção").
 7. **Base legal para representantes** (R-05) e **regras da campanha** (C-10): os dois exigem texto novo e nova aprovação.
 8. **Enquadramento como agente de pequeno porte** (JUR-08).
 9. **Quando fazer a revisão por advogado(a)**, que continua pendente.
+
+---
+
+## 9. Revisão corretiva R1 (NEKKORA-COM-LEGAL-BASE-001-R1, 05/11/2026)
+
+Quatro correções pedidas na revisão da PR #15. O histórico das seções anteriores foi mantido, com as atualizações
+marcadas.
+
+| ID | Problema | Correção | Estado |
+|---|---|---|---|
+| R1-01 | `aprovacoes.textosComerciais` continuava `true`, embora a PR #15 tenha mudado textos visíveis (rodapé, "Conversa sem gravação", retenção) | O campo voltou a `false`. O `$origem` guarda o histórico: a versão anterior foi aprovada em 05/11/2026 (merge `e9bb413`), e a nova versão exige nova aprovação. Os textos novos **não** foram desfeitos | O portão acusa **PUB-17** de novo. Só a titular registra `true` |
+| R1-02 | A revisão mensal com corte de 60 dias permitia 91 dias (> 90) | [Procedimento](../comercial/procedimento-retencao-e-direitos.md) **semanal**: maior permanência de 67 dias (reservas) e 5 meses + 7 dias (contatos). Também passou a ter responsável, regra para revisão atrasada (limite de 28 dias; acima disso, registrar "prazo excedido"), registro mínimo, distinção entre exclusão realizada e eliminação definitiva comprovada, e exceções com fundamento | OPS-09 e OPS-10 **continuam pendentes** |
+| R1-03 | Os links do cabeçalho de `com-release-005/texto-com-envio-automatico-e-bookings.md` estavam errados: o gerador escrevia caminhos fixos, válidos só para `docs/com-001/` | `scripts/exportar-texto.mjs` calcula os links em relação ao arquivo de destino (`NEKKORA_TEXTO_SAIDA`). Os dois textos foram gerados de novo; o padrão ficou idêntico. Nenhum link relativo quebrado nos `.md` alterados pela PR | Descrição da PR #15 atualizada |
+| R1-04 | A política `Nekkora-Commercial` ainda permite gravar, embora o aviso diga que não há gravação | [Checklist do Teams](../comercial/procedimento-teams-sem-gravacao.md): configuração-alvo só nessa política, verificações prévias (atribuição, outros usuários, Global intocada, organizador das reuniões do Bookings, mecanismos separados), teste em reunião de homologação e evidências E-1 a E-7. Fontes da Microsoft consultadas em 05/11/2026. Gravação futura no [backlog](../roadmap/NEKKORA-COMMERCIAL-BACKLOG.md) (COMMERCIAL-REC-001) | **CTL-01 pendente.** O agente não alterou o M365 |
