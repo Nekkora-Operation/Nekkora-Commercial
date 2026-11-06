@@ -10,7 +10,7 @@
  * condicoesComerciais e avisoDePrivacidade continuam false, e a revisão jurídica é obrigatória antes da aprovação.
  */
 import type { IconName } from 'nekkora-lib';
-import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL } from './config';
+import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
 import { priceFacts, type CampaignState } from './precos';
 
 /* ------------------------------------------------------------------ */
@@ -565,14 +565,14 @@ export const PRIVACY = {
             // AUD-38 (F.8): a conversa é pelo Microsoft Teams
             text: 'Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para confirmar e lembrar o horário e realizar a conversa pelo Microsoft Teams. Não informe senhas, credenciais nem documentos sigilosos.',
           },
-          // [PV-11] NEKKORA-COM-PRIVACY-001: gravação possível, só com aviso e concordância específica (pedida pelo
-          // Teams), acesso gerenciado por arquivo e prazo PADRÃO de 30 dias. Não há gravação automática. A expiração padrão foi
-          // verificada no SharePoint; a eliminação definitiva não foi comprovada, por isso o texto não a promete.
-          // Base legal da gravação: revisão jurídica pendente (JUR-10)
+          // [PV-11] NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): SEM gravação comercial nesta fase (diretriz da titular na
+          // missão). Substitui o texto da COM-PRIVACY-001 ("pode ser gravada"): o aviso descreve só o tratamento que de
+          // fato ocorre (LGPD, art. 6º, VI, e art. 9º). Gravar no futuro exige base legal definida (JUR-10), novo texto e
+          // nova aprovação da titular.
           {
             icon: 'headset' as IconName,
-            title: 'Gravação da conversa',
-            text: 'A conversa pelo Microsoft Teams pode ser gravada para registrar o que foi conversado e apoiar a avaliação e a proposta. A gravação nunca é automática: só começa com aviso, e o próprio Teams pede a sua concordância específica. Você pode não concordar. As gravações ficam no Microsoft 365, com acesso gerenciado pela Nekkora conforme as permissões de cada arquivo.',
+            title: 'Conversa sem gravação',
+            text: 'Nesta fase, a Nekkora não grava as conversas comerciais pelo Microsoft Teams. Se isso mudar, este aviso será atualizado antes, e a gravação só acontecerá com aviso prévio.',
           },
         ]
       : []),
@@ -601,7 +601,7 @@ export const PRIVACY = {
     {
       icon: 'clock' as IconName,
       title: 'Por quanto tempo guardamos',
-      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante.${BOOKINGS_URL ? ' Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento. Gravações de conversas, quando houver, têm prazo padrão de 30 dias após a reunião.' : ''} Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
+      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante.${BOOKINGS_URL ? ' Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento.' : ''} Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
     },
     // [PV-10] AUD-40: transferência internacional (regiões dos provedores a confirmar — revisão jurídica)
     {
@@ -618,7 +618,21 @@ export const PRIVACY = {
   ],
 };
 
+/**
+ * Identificação do fornecedor no rodapé (Decreto 7.962/2013, art. 2º, I e II — NEKKORA-COM-LEGAL-BASE-001): nome
+ * empresarial e CNPJ em local de fácil visualização, e o endereço comercial quando a titular o definir (PUB-22). Os
+ * dados vêm de publicacao.json; nada é presumido.
+ */
+const supplierParts = [
+  DATA_CONTROLLER.name,
+  DATA_CONTROLLER.document ? `CNPJ ${DATA_CONTROLLER.document}` : null,
+  SUPPLIER_ADDRESS,
+  CHANNELS.email,
+].filter(Boolean);
+
 export const FOOTER = {
+  /** "NOME EMPRESARIAL · CNPJ … · endereço · e-mail" — vazio se nada estiver confirmado. */
+  supplier: DATA_CONTROLLER.name ? supplierParts.join(' · ') : null,
   privacy: 'Privacidade',
   preview: 'Versão para homologação',
   build: 'build',

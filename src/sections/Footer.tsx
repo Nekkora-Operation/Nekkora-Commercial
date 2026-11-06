@@ -17,6 +17,12 @@ export function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="footer">
+      {/* Decreto 7.962/2013, art. 2º, I e II (NEKKORA-COM-LEGAL-BASE-001): identificação do fornecedor */}
+      {FOOTER.supplier && (
+        <div className="wrap footer__supplier" data-supplier>
+          <span>{FOOTER.supplier}</span>
+        </div>
+      )}
       <div className="wrap footer__bottom">
         <span>© {year} Nekkora. Todos os direitos reservados.</span>
         <Link href="#privacidade" variant="subtle" size="sm">

@@ -88,6 +88,9 @@ need(!iso(fim) || fim >= today, 'PUB-13', `campanha já encerrada (fim ${fim} < 
 // Privacidade (§5.4)
 need(Boolean(pub.controlador.nome), 'PUB-09', 'controlador dos dados: razão social (ou nome) para o aviso de privacidade');
 need(isTaxId(pub.controlador.documento), 'PUB-09', 'controlador dos dados: CNPJ ou CPF válido (dígitos verificadores)');
+// Identificação do fornecedor (Decreto 7.962/2013, art. 2º, I e II — NEKKORA-COM-LEGAL-BASE-001): razão social e CNPJ
+// já são exigidos acima (PUB-09); o endereço comercial é decisão da titular e nunca é presumido.
+need(typeof pub.fornecedor?.endereco === 'string' && pub.fornecedor.endereco.trim().length >= 10, 'PUB-22', 'endereço comercial do fornecedor no rodapé (Decreto 7.962/2013, art. 2º, II), definido pela titular');
 need(Boolean(pub.hospedagem.provedor), 'PUB-11', 'provedor de hospedagem citado no aviso de privacidade');
 // Aprovações da titular — preços e condições são decisões separadas (COM-RELEASE-003-R1 §3.5)
 need(pub.aprovacoes.precos === true, 'PUB-14', 'aprovação dos preços');

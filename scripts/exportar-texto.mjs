@@ -9,6 +9,10 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// NEKKORA_TEXTO_SAIDA: outro destino (ex.: o texto com envio automático e Bookings, gerado com a fixture da COM-RELEASE-005).
+// Os links do cabeçalho são relativos ao arquivo gerado, qualquer que seja a pasta de destino.
+const out = path.resolve(root, process.env.NEKKORA_TEXTO_SAIDA ?? 'docs/com-001/05-texto-comercial.md');
+const rel = (alvo) => path.relative(path.dirname(out), path.join(root, alvo)).split(path.sep).join('/');
 const { createServer } = await import('vite');
 const vite = await createServer({ root, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' });
 const c = await vite.ssrLoadModule('/src/content.ts');
@@ -26,8 +30,8 @@ L.push(
   '> **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,',
   '> condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.',
   '',
-  '> Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere',
-  '> o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.',
+  `> Gerado por \`npm run texto\` a partir de [\`src/content.ts\`](${rel('src/content.ts')}). Não edite este arquivo: altere`,
+  `> o \`content.ts\` (e a [matriz de alegações](${rel('docs/com-001/03-matriz-alegacoes.md')}), se a mudança afetar uma promessa) e gere de novo.`,
   ...(process.env.NEKKORA_PUBLICACAO
     ? ['>', `> **Gerado com dados SINTÉTICOS** (\`${process.env.NEKKORA_PUBLICACAO}\`): e-mail, controlador, provedor e URLs são fictícios — vale o texto, não os valores.`]
     : []),
@@ -132,7 +136,5 @@ L.push('Links: Soluções · Preços · Como funciona · Hosting · Transparênc
 h('9. Rodapé');
 list(['© Nekkora. Todos os direitos reservados.', `Link "${c.FOOTER.privacy}"`, `${c.FOOTER.preview} (enquanto publicacao.json mantiver avisoHomologacao)`, c.FOOTER.signature]);
 
-// NEKKORA_TEXTO_SAIDA: outro destino (ex.: o texto com envio automático e Bookings, gerado com a fixture da COM-RELEASE-005)
-const out = path.resolve(root, process.env.NEKKORA_TEXTO_SAIDA ?? 'docs/com-001/05-texto-comercial.md');
 writeFileSync(out, L.join('\n').replace(/\n{3,}/g, '\n\n') + '\n');
 console.log(`Gerado: ${path.relative(root, out)}`);

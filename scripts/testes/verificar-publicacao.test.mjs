@@ -25,6 +25,7 @@ const complete = () => ({
   envioAutomatico: { endpoint: null, chaveDoSiteTurnstile: null },
   campanhaLancamento: { inicio: '2026-11-01', fim: '2026-12-31' },
   controlador: { nome: 'Empresa Fictícia Ltda.', documento: '11.222.333/0001-81' },
+  fornecedor: { endereco: 'Rua Fictícia, 100, Centro, Cidade Fictícia/UF' },
   hospedagem: { provedor: 'Provedor Fictício' },
   aprovacoes: { precos: true, condicoesComerciais: true, textosComerciais: true, avisoDePrivacidade: true, agendamento: true, envioAutomatico: true, publicacao: true },
   avisoHomologacao: false,
@@ -68,14 +69,16 @@ test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presu
   for (const id of [
     'PUB-19',
     'PUB-18',
-    'PUB-10'
+    'PUB-10',
+    // LEGAL-BASE-001-R1: a PR #15 alterou textos aprovados em 05/11/2026; a nova versão aguarda aprovação da titular
+    'PUB-17'
   ]) {
     assert.match(r.stdout, new RegExp(id));
   }
   // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
   assert.doesNotMatch(r.stdout, /PUB-20/);
-  // PUB-17: textos comerciais aprovados pela titular em 05/11/2026 — o portão não os acusa mais
-  assert.doesNotMatch(r.stdout, /PUB-17/);
+  // PUB-22: endereço comercial informado pela titular em 05/11/2026 (cartão CNPJ) — o portão não o acusa mais
+  assert.doesNotMatch(r.stdout, /PUB-22/);
 
   assert.doesNotMatch(r.stdout, /PUB-13/);
   // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21
@@ -99,6 +102,10 @@ const cases = [
   ['CNPJ com dígito errado', (p) => (p.controlador.documento = '11.222.333/0001-82'), /CNPJ ou CPF válido/],
   ['CNPJ marcador (zeros)', (p) => (p.controlador.documento = '00.000.000/0000-00'), /CNPJ ou CPF válido/],
   ['sem provedor', (p) => (p.hospedagem.provedor = null), /PUB-11/],
+  // Decreto 7.962/2013, art. 2º, II (NEKKORA-COM-LEGAL-BASE-001)
+  ['sem endereço do fornecedor', (p) => (p.fornecedor.endereco = null), /PUB-22/],
+  ['sem o bloco fornecedor', (p) => delete p.fornecedor, /PUB-22/],
+  ['endereço vazio', (p) => (p.fornecedor.endereco = '   '), /PUB-22/],
   ['preços não aprovados', (p) => (p.aprovacoes.precos = false), /PUB-14/],
   ['condições não aprovadas', (p) => (p.aprovacoes.condicoesComerciais = false), /PUB-19/],
   ['textos não aprovados', (p) => (p.aprovacoes.textosComerciais = false), /PUB-17/],
