@@ -6,7 +6,15 @@
 > [`NEKKORA-COM-LEGAL-BASE-001.md`](../release/NEKKORA-COM-LEGAL-BASE-001.md)). **A revisão interna não é parecer
 > jurídico e não substitui a revisão por advogado(a)**, que a titular adiou temporariamente — continua pendente. Nada aqui
 > foi publicado como cláusula. No site aparecem só os resumos de `src/content.ts`. `aprovacoes.condicoesComerciais`
-> continua `false` (PUB-19). Os textos do site foram aprovados em 05/11/2026 (PUB-17), mas isso não aprova esta minuta.
+> continua `false` (PUB-19).
+>
+> **Histórico da aprovação dos textos do site (PUB-17):** em 05/11/2026, a titular aprovou os textos comerciais da
+> versão **anterior à PR #15**, correspondente ao merge `e9bb413`. A PR #15 introduziu alterações visíveis: a
+> identificação do fornecedor no rodapé, o endereço comercial e o item "Conversa sem gravação". A aprovação anterior
+> continua registrada como histórico, mas **não se transfere automaticamente** para a versão modificada. Por isso
+> `aprovacoes.textosComerciais` permanece `false` até nova aprovação expressa da titular, e o portão **PUB-17 continua
+> bloqueado**. Só a aprovação da nova versão está pendente. Nenhuma dessas aprovações, anterior ou futura, aprova esta
+> minuta.
 >
 > Marcadores: **[D]** diretriz aprovada pela titular · **[R]** redação proposta pelo agente, a revisar ·
 > **[C-nn]** proposta de correção da LEGAL-BASE-001 (§9), a decidir pela titular · **⚖** ponto que exige avaliação

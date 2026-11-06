@@ -115,9 +115,16 @@ Detalhe: [`privacidade-minuta.md`](../comercial/privacidade-minuta.md) §1, §2,
 
 ### 3.4 Controles operacionais
 
-[`procedimento-retencao-e-direitos.md`](../comercial/procedimento-retencao-e-direitos.md): revisão mensal com corte de
-**5 meses** para contatos e **60 dias** para reservas. Com intervalo de no máximo 30 dias entre revisões, nenhum item
-passa de 6 meses ou 90 dias. O procedimento também traz: registro sem dados pessoais, pedidos dos titulares (art. 18 e
+[`procedimento-retencao-e-direitos.md`](../comercial/procedimento-retencao-e-direitos.md): revisão **manual semanal**,
+preferencialmente às segundas-feiras (§1 do procedimento; atualizado na R1 e corrigido aqui na R2), com corte de
+**5 meses** para contatos e **60 dias** para reservas. O intervalo normal entre revisões é de **7 dias**, o que dá
+permanência máxima de 5 meses + 7 dias (contatos) e 67 dias (reservas). O procedimento admite, como exceção, um
+intervalo de **até 28 dias** entre duas revisões concluídas sem ultrapassar os prazos declarados (5 meses + 28 dias ≤
+6 meses; 60 + 28 = 88 ≤ 90 dias), conforme as premissas do §1.1 e do §1.2. **Acima de 28 dias**, a revisão é feita
+imediatamente e os itens que passaram do prazo máximo são contados e registrados como "prazo excedido", sem declarar
+cumprimento do prazo nesse período (§1.2). A execução é manual: o procedimento **não** promete eliminação automática, e
+cada execução registra "exclusão realizada", não "eliminação definitiva", enquanto OPS-09 e OPS-10 estiverem
+pendentes (§1.3). O procedimento também traz: registro sem dados pessoais, pedidos dos titulares (art. 18 e
 19), conferência do texto real do Bookings (CTL-03), confirmação de que não há gravação (CTL-01), data de recebimento da
 campanha (CTL-04), teste externo do `contato@` (CTL-05) e resposta em até 5 dias (CTL-06).
 
@@ -224,3 +231,40 @@ marcadas.
 | R1-02 | A revisão mensal com corte de 60 dias permitia 91 dias (> 90) | [Procedimento](../comercial/procedimento-retencao-e-direitos.md) **semanal**: maior permanência de 67 dias (reservas) e 5 meses + 7 dias (contatos). Também passou a ter responsável, regra para revisão atrasada (limite de 28 dias; acima disso, registrar "prazo excedido"), registro mínimo, distinção entre exclusão realizada e eliminação definitiva comprovada, e exceções com fundamento | OPS-09 e OPS-10 **continuam pendentes** |
 | R1-03 | Os links do cabeçalho de `com-release-005/texto-com-envio-automatico-e-bookings.md` estavam errados: o gerador escrevia caminhos fixos, válidos só para `docs/com-001/` | `scripts/exportar-texto.mjs` calcula os links em relação ao arquivo de destino (`NEKKORA_TEXTO_SAIDA`). Os dois textos foram gerados de novo; o padrão ficou idêntico. Nenhum link relativo quebrado nos `.md` alterados pela PR | Descrição da PR #15 atualizada |
 | R1-04 | A política `Nekkora-Commercial` ainda permite gravar, embora o aviso diga que não há gravação | [Checklist do Teams](../comercial/procedimento-teams-sem-gravacao.md): configuração-alvo só nessa política, verificações prévias (atribuição, outros usuários, Global intocada, organizador das reuniões do Bookings, mecanismos separados), teste em reunião de homologação e evidências E-1 a E-7. Fontes da Microsoft consultadas em 05/11/2026. Gravação futura no [backlog](../roadmap/NEKKORA-COMMERCIAL-BACKLOG.md) (COMMERCIAL-REC-001) | **CTL-01 pendente.** O agente não alterou o M365 |
+
+---
+
+## 10. Revisão corretiva R2 (NEKKORA-COM-LEGAL-BASE-001-R2, 06/11/2026)
+
+Revisão **estritamente documental**, depois da R1 (commit `877a273`, CI run `42134821163`). Três inconsistências
+corrigidas. Nenhuma decisão comercial, jurídica ou operacional foi alterada: prazos de retenção, bases legais,
+finalidades, fornecedores, transferência internacional, condições C-01 a C-12, preços, campanha, `publicacao.json` e
+`src/` ficaram intactos.
+
+| ID | Problema | Arquivo e seção | Correção | Evidência |
+|---|---|---|---|---|
+| R2-01 | O relatório ainda descrevia a revisão de retenção como mensal, com intervalo de até 30 dias, o que ficou desatualizado na R1 | Este relatório, §3.4 | Revisão manual **semanal**, preferencialmente às segundas-feiras; cortes de 5 meses e 60 dias mantidos; intervalo normal de 7 dias; intervalo excepcional de até 28 dias sem ultrapassar os prazos declarados; acima de 28 dias, tratamento de atraso e registro de "prazo excedido"; sem promessa de eliminação automática ou definitiva. Link para o [procedimento](../comercial/procedimento-retencao-e-direitos.md) §1.1 a §1.3 | Texto conferido com o procedimento §1, §1.1, §1.2 e §1.3 |
+| R2-02 | O inventário de tratamentos descrevia a eliminação de contatos por e-mail como "manual mensal" | [`privacidade-minuta.md`](../comercial/privacidade-minuta.md) §6 | Linha do e-mail: revisão **manual semanal** com corte de 5 meses, prazo de 6 meses mantido, registro de "exclusão realizada" e eliminação definitiva não comprovada (OPS-09). Linha do Bookings, para coerência: prazo de 90 dias mantido, revisão manual semanal com corte de 60 dias e OPS-10 citado | Inventário (§6), tabela de retenção (§3) e procedimento (§1) agora dizem o mesmo; OPS-09 e OPS-10 continuam pendentes |
+| R2-03 | A introdução das condições comerciais dizia que os textos do site "foram aprovados em 05/11/2026", sem deixar claro que a aprovação era da versão anterior | [`condicoes-comerciais-minuta.md`](../comercial/condicoes-comerciais-minuta.md), introdução | Histórico explícito: aprovação de 05/11/2026 da versão anterior à PR #15 (merge `e9bb413`); alterações visíveis da PR #15 (identificação do fornecedor, endereço comercial, "Conversa sem gravação"); a aprovação não se transfere; `aprovacoes.textosComerciais` segue `false`; PUB-17 segue bloqueado; só a aprovação da nova versão está pendente | Coerente com `publicacao.json` (`$origem` e `aprovacoes.textosComerciais: false`), com [COM-RELEASE-PENDENCIAS](COM-RELEASE-PENDENCIAS.md) (PUB-17) e com R-03/R1-01 deste relatório |
+
+**Outras referências à revisão mensal:** as que restam são **históricas legítimas** e foram mantidas: o cabeçalho do
+procedimento ("passou de mensal para semanal"), a linha R1-02 acima e OPS-01 em COM-RELEASE-PENDENCIAS ("a versão
+mensal permitia passar de 90 dias"). As menções a "mensal" nos relatórios da AWS tratam de custo, não de retenção.
+
+**Verificações:**
+
+- `npm test`: 236 testes, 236 aprovados, 0 falhas. `npm run check` (typecheck, testes, build, preços do artefato e
+  configuração AWS): concluído sem erro.
+- `npm run verificar:publicacao`: o portão continua recusando, com PUB-19, PUB-17, PUB-09, PUB-18 e PUB-10.
+- Textos comerciais gerados de novo (`npm run texto` e a variante com a fixture
+  `scripts/fixtures/publicacao-homologacao-api.json`): **nenhuma diferença**, ou seja, a geração continua reproduzível.
+- Links relativos dos `.md` de `docs/comercial/`, deste relatório e de COM-RELEASE-PENDENCIAS: 66 conferidos, nenhum
+  quebrado.
+- Arquivos alterados pela R2: só os três `.md` acima.
+
+**Tema 4 (Teams/Copilot): fora do escopo da R2**, por diretriz da titular. O
+[checklist do Teams](../comercial/procedimento-teams-sem-gravacao.md) não foi alterado, nenhum teste foi feito no
+Microsoft 365 e nenhuma pendência nova foi criada. As evidências e conclusões anteriores ficam preservadas, e o estado
+de CTL-01 não foi alterado.
+
+**Não houve** merge, deploy, aprovação em nome da titular nem alteração no Microsoft 365, na AWS ou na Cloudflare.
