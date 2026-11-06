@@ -2,6 +2,12 @@
 
 **Data:** 06/11/2026 · **Base:** `main` em `01c7f6d` · **Branch:** `docs/contract-001`
 
+> **Atualizado pela [R1](NEKKORA-COM-CONTRACT-001-R1.md).** A titular decidiu C-03 (5 dias úteis), C-04 (por
+> enquadramento: consumidor até 90% com reserva prévia de 10%; B2B até 100%), C-06 (lembretes no 5º e 9º dia útil),
+> C-07 (metas de atendimento), C-10 (critérios por horas) e C-11 (atualização monetária). Onde este relatório e a R1
+> divergirem — em especial as Alternativas A/B da C-04 e os itens "Exige decisão adicional" do §6 —, **vale a R1**.
+> O texto abaixo fica como registro da CONTRACT-001.
+
 > **Pronto para revisão ≠ pronto para contratar ≠ autorizado para publicar.** Esta missão consolida as **decisões
 > empresariais definitivas da titular** em minutas e textos propostos. **Não é parecer jurídico.** A revisão por
 > advogado(a) continua **pendente**, nenhuma aprovação foi marcada e `publicacao.json` **não** foi alterado:
