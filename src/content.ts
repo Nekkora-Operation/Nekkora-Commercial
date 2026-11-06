@@ -114,6 +114,24 @@ export const PRICING = {
       'Valem para automações simples e médias solicitadas durante a campanha, conforme a categoria definida na avaliação. A proposta pode ser aceita em até 7 dias corridos da emissão. A automação complexa tem orçamento individual.',
     /** Só na prévia de homologação, sem datas aprovadas: nenhuma elegibilidade antes do início oficial. */
     pendingDates: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
+    // NEKKORA-COM-CONTRACT-001 (C-10): regras completas e acessíveis da campanha (CDC arts. 30 e 31; Decreto 7.962/2013,
+    // art. 2º, V). Texto NOVO, pendente da aprovação da titular (PUB-17). Só aparece com as datas aprovadas e a campanha
+    // em vigor; sem datas, não há regra a anunciar. Regulamento: docs/comercial/regulamento-campanha-lancamento.md.
+    rules: LAUNCH_PERIOD
+      ? {
+          title: 'Regras da campanha de lançamento',
+          items: [
+            `Período: solicitações de avaliação recebidas pela Nekkora de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}, inclusive, no horário de Brasília.`,
+            `Vale a data de recebimento da solicitação: e-mail recebido em ${CHANNELS.email ?? 'nosso e-mail comercial'}${BOOKINGS_URL ? ', reserva criada no Microsoft Bookings' : ''}${CHANNELS.linkedin ? ' ou mensagem recebida na página da Nekkora no LinkedIn' : ''}. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.`,
+            'O preço de lançamento vale para automações simples e médias, por automação, conforme os cartões acima. A automação complexa tem orçamento individual, sem desconto automático.',
+            'A categoria é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Solicitação recebida no período, de automação simples ou média, tem o preço de lançamento da categoria, mesmo que a proposta seja emitida depois do fim da campanha.',
+            'A proposta pode ser aceita em até 7 dias corridos da emissão.',
+            'Várias automações: cada uma tem categoria e preço próprios. Pedir várias juntas não muda a categoria de nenhuma.',
+            'Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.',
+            'Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.',
+          ],
+        }
+      : null,
   },
   // [PR-06] — nenhum processo é enquadrado de antemão como simples ou médio
   criteria: {
@@ -138,11 +156,16 @@ export const PRICING = {
       // [CO-07] AUD-07/AUD-13 — contratar várias automações juntas não as transforma em uma complexa
       'Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios',
       'Preço aprovado por você antes do início do desenvolvimento',
+      // CONTRACT-001 (C-02): espera de 7 dias corridos depois da assinatura antes de começar — texto NOVO (PUB-17)
+      'O desenvolvimento começa depois de 7 dias corridos da assinatura do contrato',
       // [CO-03] AUD-16 — 50/50 é condição de PAGAMENTO, não percentual de desconto
       'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal',
-      'Demandas organizadas em fila: o início depende da fila e da aprovação da proposta',
+      // CONTRACT-001 (C-12): a fila não deixa o início a critério exclusivo da Nekkora (CDC art. 39, XII) — texto ALTERADO (PUB-17)
+      'Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação',
       'Reuniões e acompanhamento conforme as condições acordadas',
       'Licenças e custos externos tratados à parte, quando aplicáveis',
+      // CONTRACT-001 (C-03): política mais favorável ao cliente — texto NOVO (PUB-17)
+      'Se você desistir antes da conclusão do desenvolvimento, devolvemos integralmente o que pagou à Nekkora pelo desenvolvimento',
       // [CO-08] AUD-17/AUD-18 — sem cláusula absoluta: as regras ficam na proposta e no contrato, com os direitos legais
       'Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei',
     ],
@@ -282,7 +305,8 @@ export const HOW_IT_WORKS = {
     // COM-008-B §5.4: disponibilização, registro e correção de defeitos, aceite formal — o silêncio não vale como aceite
     {
       title: 'Homologação e aceite',
-      description: 'Você valida a automação no seu cenário e registra os defeitos encontrados. Depois das correções, a homologação só é concluída com o seu aceite formal.',
+      // CONTRACT-001 (C-06): explicita que o silêncio não vale como aceite — texto ALTERADO (PUB-17)
+      description: 'Você valida a automação no seu cenário e registra os defeitos encontrados. Depois das correções, a homologação só é concluída com o seu aceite formal: o silêncio não vale como aceite.',
     },
     {
       title: 'Entrega definitiva',
@@ -326,7 +350,8 @@ export const TRANSPARENCY = {
       'Tecnologias e licenças necessárias',
       'Responsabilidades de cada parte',
       'Critérios de homologação e aceite',
-      'Correção de defeitos do que foi entregue: prazo e condições, além das garantias legais',
+      // CONTRACT-001 (C-07): garantia contratual em termo escrito, sem anunciar prazo total — texto ALTERADO (PUB-17)
+      'Garantia contratual de correção de defeitos, em termo escrito, além das garantias legais',
     ],
   },
   excluded: {
@@ -335,7 +360,8 @@ export const TRANSPARENCY = {
     items: [
       'Alterações futuras e novas funcionalidades',
       'Sustentação e evolução das automações',
-      'Suporte, sustentação e garantia adicional após a entrega, salvo se previstos',
+      // CONTRACT-001 (C-07): a garantia contratual passa a ser padrão; suporte continua fora — texto ALTERADO (PUB-17)
+      'Suporte técnico após a entrega, salvo se previsto em proposta',
       'Infraestrutura e serviços de Hosting',
       'Licenças e serviços de terceiros — em regra, contratados pelo cliente',
       'Monitoramento, 24 horas, alta disponibilidade ou SLA',

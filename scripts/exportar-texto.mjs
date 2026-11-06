@@ -53,7 +53,7 @@ L.push('', c.SOLUTIONS.note);
 
 h('3. Preços (bloco data-pricing)');
 header(P);
-L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', '| Faixa | Para | Valor (campanha em vigor) | Fora da campanha |', '|---|---|---|---|');
+L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Valor (campanha em vigor) | Fora da campanha |', '|---|---|---|---|');
 for (const t of P.tiers) {
   const value = t.price
     ? `~~${t.price.standardLabel}~~ **${t.price.launchLabel}** −${t.price.percentLabel} · ${P.savings(t.price.savingsLabel)} — ${P.launchUnit}`

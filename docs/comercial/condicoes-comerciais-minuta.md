@@ -1,5 +1,14 @@
 # Minuta — condições comerciais do Nekkora Delivery
 
+> **NEKKORA-COM-CONTRACT-001 (06/11/2026) — este arquivo passou a ser o HISTÓRICO das decisões.** A titular tomou as
+> **decisões empresariais definitivas C-01 a C-12** (§10). A redação vigente para revisão está no
+> [**contrato-base**](contrato-base-delivery.md) e nos anexos ([termo de garantia](termo-garantia-delivery.md),
+> [Anexo de Componentes](anexo-componentes-delivery.md), [Anexo B2B](anexo-b2b-delivery.md),
+> [regulamento da campanha](regulamento-campanha-lancamento.md),
+> [procedimento operacional](procedimento-operacional-delivery.md)). Os §1 a §9 abaixo ficam **como registro**: onde
+> divergirem do contrato-base, **prevalece o contrato-base**, e a linha está marcada "**Supersedido (CONTRACT-001)**".
+> Continua **não aprovado** juridicamente; `aprovacoes.condicoesComerciais` continua `false` (PUB-19).
+
 > **MINUTA NÃO APROVADA.** Redação preparada na NEKKORA-COM-008-C a partir das diretrizes aprovadas pela titular na
 > COM-008-B e **revisada internamente na NEKKORA-COM-LEGAL-BASE-001 (05/11/2026)** com base no texto vigente do CDC, do
 > Código Civil e da Lei do Software (relatório e fontes:
@@ -75,8 +84,8 @@ Diretrizes aprovadas **[D]**:
 | Momento | Regra |
 |---|---|
 | Antes do início do desenvolvimento | Reembolso **integral** da entrada |
-| Durante o desenvolvimento | **Apuração proporcional** do trabalho realizado e das despesas justificadas; devolução do saldo da entrada, se houver |
-| Após a homologação concluída | Possibilidade de **retenção dos 50% iniciais** em caso de desistência injustificada, conforme o contrato e a legislação aplicável. **Substituir: [C-04]** (sem retenção automática) |
+| Durante o desenvolvimento | **Apuração proporcional** do trabalho realizado e das despesas justificadas; devolução do saldo da entrada, se houver. **Supersedido (CONTRACT-001, C-03):** reembolso integral do que foi pago pelo desenvolvimento, sem apuração |
+| Após a homologação concluída | Possibilidade de **retenção dos 50% iniciais** em caso de desistência injustificada, conforme o contrato e a legislação aplicável. **Substituir: [C-04]** (sem retenção automática). **Supersedido (CONTRACT-001, C-04):** cobrança de até 100% após a conclusão comprovada, com alternativas A/B pendentes (contrato-base cl. 10) |
 | Descumprimento da Nekkora | Observar as soluções e restituições legalmente devidas |
 
 - **Não publicar cláusulas absolutas de retenção ou de renúncia de direitos.** O site diz apenas: "Cancelamento,
@@ -90,7 +99,7 @@ Diretrizes aprovadas **[D]**:
 
 | Diretriz **[D]** | Redação proposta **[R]** |
 |---|---|
-| Garantia contratual **adicional** proposta de **30 dias** após a entrega definitiva | "Por 30 dias corridos após a entrega definitiva, a Nekkora corrige, sem custo, defeitos atribuíveis à entrega, conforme o escopo aprovado." **Revisar: [C-07]** (o prazo não pode se sobrepor ao legal) |
+| Garantia contratual **adicional** proposta de **30 dias** após a entrega definitiva. **Supersedido (CONTRACT-001, C-07):** 30 dias adicionais, termo inicial pendente de parecer ([termo](termo-garantia-delivery.md) §3) | "Por 30 dias corridos após a entrega definitiva, a Nekkora corrige, sem custo, defeitos atribuíveis à entrega, conforme o escopo aprovado." **Revisar: [C-07]** (o prazo não pode se sobrepor ao legal) |
 | Correção de defeitos atribuíveis à entrega, conforme o escopo | "Não são defeitos da entrega: mudanças em sistemas, APIs, telas ou regras de terceiros ou do cliente após a homologação; uso fora do escopo; alterações feitas por terceiros." ⚖ |
 | Preservação integral das garantias legais | "Esta garantia é adicional e não substitui nem reduz as garantias previstas em lei." |
 | Sustentação, mudanças de escopo e novas funcionalidades avaliadas separadamente | "Suporte, sustentação, evolução e novas funcionalidades dependem de proposta própria." |
@@ -120,7 +129,7 @@ Diretrizes aprovadas **[D]**:
 | Infraestrutura própria do contratante | Servidores, máquinas e ambientes do cliente continuam dele, sob a responsabilidade dele |
 | Nekkora Hosting | Infraestrutura e serviços associados contratados à parte, com avaliação de viabilidade e proposta próprias |
 
-### 7.2 Propriedade intelectual — Modelo A (aprovado como diretriz)
+### 7.2 Propriedade intelectual — Modelo A (aprovado como diretriz) — **Supersedido (CONTRACT-001, C-09): Modelo A-R aprovado** ([Anexo de Componentes](anexo-componentes-delivery.md))
 
 1. **[D]** **Licenciamento** da automação entregue ao cliente. **Afasta a regra supletiva da Lei 9.609/1998, art. 4º (direitos do contratante de serviços): só vale com estipulação expressa. Ver [C-09].**
 2. **[D]** Direito do cliente de **utilizar e modificar o código específico** da automação, conforme o contrato.
@@ -142,7 +151,7 @@ credenciais: **pendente de redação jurídica**. Os requisitos técnicos futuro
 
 | Regra **[D]** | Como o site trata |
 |---|---|
-| Duração de **dois meses** a partir da publicação oficial | Datas **informadas pela titular** em 04/11/2026: `publicacao.json → campanhaLancamento` = **06/11/2026 a 06/01/2027** (fuso de Brasília). O código nunca as calcula nem preenche. Se a publicação oficial ocorrer depois de 06/11/2026, a titular decide se ajusta as datas (o portão recusa campanha encerrada) |
+| Duração de **dois meses** a partir da publicação oficial | **Histórico (CONTRACT-001, C-10): as datas abaixo não valem como nova autorização; datas fixas pendentes da titular.** Datas **informadas pela titular** em 04/11/2026: `publicacao.json → campanhaLancamento` = **06/11/2026 a 06/01/2027** (fuso de Brasília). O código nunca as calcula nem preenche. Se a publicação oficial ocorrer depois de 06/11/2026, a titular decide se ajusta as datas (o portão recusa campanha encerrada) |
 | Vale a **data da solicitação** recebida durante a campanha | "Preços especiais de lançamento para solicitações de avaliação recebidas de DD/MM/AAAA a DD/MM/AAAA." |
 | Proposta com prazo de aceite de **7 dias corridos** | "A proposta pode ser aceita em até 7 dias corridos da emissão." |
 | Preço individual por automação; complexa sob orçamento | Cartões e simulador; a complexa nunca tem valor |
@@ -217,3 +226,24 @@ preexistentes cobre tudo o que é preciso para usar e manter a automação, sem 
 Retenção automática de valores; multa por desistência dentro do prazo de arrependimento; renúncia antecipada de
 direitos (CC art. 424; CDC art. 51, I); exclusão genérica de responsabilidade (CDC arts. 24, 25 e 51, I); aceite tácito;
 cancelamento unilateral sem igual direito para o cliente (CDC art. 51, XI).
+
+## 10. Decisões definitivas da titular — NEKKORA-COM-CONTRACT-001 (06/11/2026)
+
+> **Aprovações empresariais, não parecer jurídico.** Não aprovam a redação do contrato-base, não autorizam contratar nem
+> marcar `aprovacoes.condicoesComerciais` como `true`. Matriz completa (implementação, testes, fundamento, risco):
+> [relatório CONTRACT-001 §2](../release/NEKKORA-COM-CONTRACT-001.md).
+
+| ID | Proposta anterior (§9, LEGAL-BASE-001) | Decisão definitiva da titular | Efeito sobre o histórico | Onde está a redação |
+|---|---|---|---|---|
+| C-01 | Natureza da relação na proposta; na dúvida, CDC | Contrato-base compatível com o CDC; Anexo B2B só com justificativa; CNPJ não basta | Confirma e detalha | Contrato-base cl. 1; Anexo B2B |
+| C-02 | Iniciar após o 7º dia, **salvo pedido do cliente** | Início só depois de 7 dias da assinatura, **sem exceção** nesta versão; arrependimento legal preservado; canal e confirmação imediata | **Supersede** a exceção a pedido do cliente | Contrato-base cl. 3 |
+| C-03 | Marcos com percentual e evidência | **Reembolso integral** do pago pelo desenvolvimento até a conclusão, mesmo iniciado | **Supersede** os marcos e a apuração proporcional (§4) | Contrato-base cl. 9 |
+| C-04 | "Serviço prestado" após a homologação concluída | Até 100% após **conclusão comprovada e disponibilização**, sem aceite fictício; ponto jurídico crítico | **Supersede** a "retenção dos 50%" (§4) | Contrato-base cl. 10 (Alternativas A e B) |
+| C-05 | Ordem homologação → aceite → 2ª parcela → entrega | Mesma sequência de 6 etapas, conciliada com a C-04 | Confirma | Contrato-base cl. 7 e 12 |
+| C-06 | 10 dias úteis, 2 lembretes, suspensão; 2 rodadas de preferência | Mesmo, com status "Homologação suspensa — aguardando cliente" | Confirma | Contrato-base cl. 8 |
+| C-07 | Opções (a) após o prazo legal, (b) "120 dias", (c) só B2B | 30 dias adicionais em termo escrito; **não anunciar 120 dias**; contagem ao parecer | Opção (b) **descartada**; (a)/(c) ao parecer | Termo de garantia |
+| C-08 | Aditivo antes; custos de terceiros listados | Escopo fechado por automação; cliente contrata serviços externos de preferência | Confirma | Contrato-base cl. 4 |
+| C-09 | Modelo A-R recomendado | **Modelo A-R aprovado**, com exclusividade do código, trabalhos independentes e Anexo de Componentes; Framework sem licença pública | **Supersede** o Modelo A (§7.2) | Anexo de Componentes |
+| C-10 | A oferta vincula; publicar a regra completa | Mesma direção; datas **não** autorizadas; proposta após o fim mantém o preço; critérios objetivos | Confirma; **as datas do §8 ficam como histórico** | Regulamento; site (`PRICING.launch.rules`) |
+| C-11 | Multa 2% e juros 1% a.m. | Mesmos encargos, juros simples sem capitalização, lembretes, dispensa, sem cancelamento automático | Confirma, com conflito da Lei de Usura identificado | Contrato-base cl. 15 |
+| C-12 | Datas de início e término na proposta | Datas previstas por automação; 7 dias iniciais no cronograma; sem reuniões diárias, painel nem portal | Confirma | Contrato-base cl. 5 |

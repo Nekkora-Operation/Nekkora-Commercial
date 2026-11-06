@@ -33,6 +33,20 @@ export function Pricing() {
             )}
           </p>
         )}
+        {/* NEKKORA-COM-CONTRACT-001 (C-10): regras completas da campanha, só com datas aprovadas e campanha em vigor */}
+        {launch && !preview && PRICING.launch.rules && (
+          <details className="campaign-rules" data-campanha-regras>
+            <summary>{PRICING.launch.rules.title}</summary>
+            <ul className="checklist checklist--sm">
+              {PRICING.launch.rules.items.map((item) => (
+                <li key={item}>
+                  <Icon name="arrow-right" size="sm" color="var(--nk-color-accent)" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
         <ul className="cards cards--3 cards--poster plain-list">
           {PRICING.tiers.map((t) => (
             <li key={t.title}>

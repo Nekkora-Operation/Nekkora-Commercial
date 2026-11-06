@@ -58,6 +58,17 @@ Valores por automação. A categoria é definida na avaliação e fica registrad
 
 Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial._
 
+**Regras da campanha de lançamento** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):
+
+- Período: solicitações de avaliação recebidas pela Nekkora de 06/11/2026 a 06/01/2027, inclusive, no horário de Brasília.
+- Vale a data de recebimento da solicitação: e-mail recebido em contato@nekkora.com, reserva criada no Microsoft Bookings ou mensagem recebida na página da Nekkora no LinkedIn. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.
+- O preço de lançamento vale para automações simples e médias, por automação, conforme os cartões acima. A automação complexa tem orçamento individual, sem desconto automático.
+- A categoria é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Solicitação recebida no período, de automação simples ou média, tem o preço de lançamento da categoria, mesmo que a proposta seja emitida depois do fim da campanha.
+- A proposta pode ser aceita em até 7 dias corridos da emissão.
+- Várias automações: cada uma tem categoria e preço próprios. Pedir várias juntas não muda a categoria de nenhuma.
+- Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.
+- Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.
+
 | Faixa | Para | Valor (campanha em vigor) | Fora da campanha |
 |---|---|---|---|
 | Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | ~~R$ 1.500~~ **R$ 1.000** −33,33% · Economia de R$ 500 — por automação · preço de lançamento | **R$ 1.500** — por automação |
@@ -110,10 +121,12 @@ Nem todo processo é simples ou médio: a avaliação indica a categoria antes d
 - Desenvolvimento sob demanda, com escopo formalizado em proposta
 - Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios
 - Preço aprovado por você antes do início do desenvolvimento
+- O desenvolvimento começa depois de 7 dias corridos da assinatura do contrato
 - Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal
-- Demandas organizadas em fila: o início depende da fila e da aprovação da proposta
+- Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação
 - Reuniões e acompanhamento conforme as condições acordadas
 - Licenças e custos externos tratados à parte, quando aplicáveis
+- Se você desistir antes da conclusão do desenvolvimento, devolvemos integralmente o que pagou à Nekkora pelo desenvolvimento
 - Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei
 
 Hosting tem avaliação e proposta próprias.
@@ -126,7 +139,7 @@ Hosting tem avaliação e proposta próprias.
 2. **Viabilidade e dimensionamento** — Analisamos sistemas, acessos e complexidade para dimensionar a automação.
 3. **Proposta** — Escopo, preço e condições por escrito. O desenvolvimento começa após a sua aprovação.
 4. **Desenvolvimento e testes** — Construímos e testamos a automação conforme o escopo aprovado.
-5. **Homologação e aceite** — Você valida a automação no seu cenário e registra os defeitos encontrados. Depois das correções, a homologação só é concluída com o seu aceite formal.
+5. **Homologação e aceite** — Você valida a automação no seu cenário e registra os defeitos encontrados. Depois das correções, a homologação só é concluída com o seu aceite formal: o silêncio não vale como aceite.
 6. **Entrega definitiva** — Após o aceite e a confirmação do pagamento, entregamos o que foi previsto na proposta, com documentação e dependências identificadas.
 
 ## 5. Hosting
@@ -153,13 +166,13 @@ O que é definido em proposta, o que não está incluído sem acordo explícito 
 - Tecnologias e licenças necessárias
 - Responsabilidades de cada parte
 - Critérios de homologação e aceite
-- Correção de defeitos do que foi entregue: prazo e condições, além das garantias legais
+- Garantia contratual de correção de defeitos, em termo escrito, além das garantias legais
 
 **Não incluído automaticamente**
 
 - Alterações futuras e novas funcionalidades
 - Sustentação e evolução das automações
-- Suporte, sustentação e garantia adicional após a entrega, salvo se previstos
+- Suporte técnico após a entrega, salvo se previsto em proposta
 - Infraestrutura e serviços de Hosting
 - Licenças e serviços de terceiros — em regra, contratados pelo cliente
 - Monitoramento, 24 horas, alta disponibilidade ou SLA

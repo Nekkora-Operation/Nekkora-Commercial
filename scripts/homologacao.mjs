@@ -394,6 +394,8 @@ await block('funcionais', async () => {
       // Elementos da campanha (src/sections/Pricing.tsx): faixa de lançamento, prévia sem datas, economia e percentual
       launchStrip: block?.querySelector('.launch-strip')?.innerText.replace(/\s+/g, ' ').trim() ?? null,
       previewNotice: !!block?.querySelector('[data-campanha="pendente"]'),
+      // NEKKORA-COM-CONTRACT-001 (C-10): regras completas da campanha (recolhíveis: lidas por textContent)
+      campaignRules: block?.querySelector('[data-campanha-regras]')?.textContent.replace(/\s+/g, ' ').trim() ?? null,
       economyNodes: block?.querySelectorAll('[data-price="economia"], .price__savings').length ?? 0,
       percentNodes: block?.querySelectorAll('[data-price="percentual"]').length ?? 0,
       // Percentual de desconto escrito nos cartões ("−33,33%"), economia ("Economia de R$") e unidade "preço de lançamento"
@@ -410,6 +412,17 @@ await block('funcionais', async () => {
       !!pricing.launchStrip &&
       (CAMPAIGN === 'pendente' ? pricing.previewNotice : pricing.launchStrip.includes(PERIOD) && !pricing.previewNotice)
     : pricing.launchStrip === null && !pricing.previewNotice && !campaignCondition.test(pricing.cardsText) && !/aceita em até 7 dias corridos/.test(pricing.cardsText);
+  // C-10: com a campanha em vigor e datas aprovadas, as regras completas estão no bloco de preços; fora dela, não aparecem
+  const rulesOk =
+    PROMO && CAMPAIGN !== 'pendente'
+      ? !!pricing.campaignRules &&
+        PERIOD.match(/\d{2}\/\d{2}\/\d{4}/g).every((d) => pricing.campaignRules.includes(d)) &&
+        /Vale a data de recebimento da solicitação/.test(pricing.campaignRules) &&
+        /mesmo que a proposta seja emitida depois do fim da campanha/.test(pricing.campaignRules) &&
+        /aceita em até 7 dias corridos da emissão/.test(pricing.campaignRules) &&
+        /sem desconto automático/.test(pricing.campaignRules)
+      : pricing.campaignRules === null;
+  check('campanha-regras-completas', rulesOk, pricing.campaignRules ? pricing.campaignRules.slice(0, 160) : 'ausentes');
   check(
     'precos-com-condicoes-visiveis',
     conditionsOk && pricing.confirmedInProposal && pricing.licenses,
