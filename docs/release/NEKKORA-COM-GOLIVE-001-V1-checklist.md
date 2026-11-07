@@ -80,10 +80,12 @@ Não é preciso contratar nada novo. O caminho mínimo, sem afirmar mecanismo qu
    Os logs da opção 3.1 também ficariam em `sa-east-1`.
 2. **Se a região for o Brasil:** os dados armazenados ficam no país, e a entrega pelo CloudFront é coleta
    internacional, não transferência (Res. 19/2024, Anexo I, art. 6º). O que pode sobrar são os acessos de suporte e
-   de subprocessadores dos provedores. Para isso, o art. 33, IX, combinado com o art. 7º, V (atender a pedido do
-   titular), é o fundamento candidato, **com o risco já registrado**: "necessário" pode ser lido de forma estrita.
-3. **Decisão escrita da titular:** aceitar esse risco para a V1 e manter o texto atual do aviso ("podem processar
-   dados fora do Brasil", que é verdadeiro e não promete mecanismo), ou esperar um parecer.
+   de subprocessadores dos provedores. O art. 33, IX, só serve para os fluxos com base no art. 7º, II e V: quem
+   contrata em nome próprio e os registros de acesso. Ainda assim, há o risco de "necessário" ser lido de forma
+   estrita. Os contatos de **representantes de empresa** têm base no art. 7º, IX, que o art. 33, IX, não cobre, e hoje
+   **não têm mecanismo** (JUR-07 §2, correção R1).
+3. **Decisão escrita da titular, com parecer:** o mecanismo de cada fluxo (JUR-07 §3, itens 2 a 5). Aceitar o risco
+   não é opção para os fluxos com base no IX.
 4. **Se a região não for o Brasil:** sem CPC brasileira verificável, a JUR-07 **continua impeditiva**. A saída é
    parecer jurídico ou mudança de configuração.
 
@@ -144,8 +146,14 @@ anterior).
 
 **Decisões escritas (titular):**
 
-- [ ] **D1 — JUR-07:** art. 33, IX, para a V1 com risco aceito, ou parecer antes. O texto do aviso (JUR-07 §3,
-      item 3) entra na PR de texto.
+- [ ] **D1 — JUR-07, fluxo a fluxo e com parecer:**
+  - para o V e o II (quem contrata em nome próprio; registros de acesso), o art. 33, IX;
+  - para o IX (representantes de empresa), o mecanismo adotado: CPC com a Microsoft, ou consentimento específico
+    onde puder ser coletado e comprovado;
+  - para a entrega do site, a leitura de coleta internacional.
+
+  Aceitar o risco **não** resolve os fluxos com base no IX. O texto do aviso (JUR-07 §3, item 7) entra na PR de
+  texto com o mecanismo de cada caso.
 - [ ] **D2 — Datas da campanha**, quando a janela de deploy estiver definida.
 
 **Autorizações expressas (titular), nesta ordem:**
