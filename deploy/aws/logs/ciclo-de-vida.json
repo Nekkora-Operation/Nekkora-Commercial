@@ -3,7 +3,7 @@
     {
       "ID": "registros-de-acesso-6-meses",
       "Status": "Enabled",
-      "Filter": { "Prefix": "AWSLogs/" },
+      "Filter": {},
       "Expiration": { "Days": 190 },
       "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
     }

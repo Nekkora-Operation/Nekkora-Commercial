@@ -17,7 +17,8 @@ porque descreveria um tratamento que ainda não ocorre.
 - Os quatro primeiros cumprem o art. 15 e o art. 15-A.
 - `x-host-header` identifica qual aplicação foi acessada: o domínio ou o endereço `cloudfront.net`.
 - **Ficam de fora**, por minimização: URL e query, user agent, referer, cookies e país.
-- Para incluir algum campo depois, é preciso criar uma nova entrega e mudar o aviso.
+- A AWS permite mudar os campos depois (`UpdateDeliveryConfiguration`, efeito em até 12 h). Mas qualquer mudança aqui exige, **antes**, mudar o aviso [PV-12] e o teste `aviso-logs.test.mjs`. O formato (`json`) não pode ser mudado.
+- `c-ip` é o IP que abriu a conexão com o CloudFront. Se o visitante usar proxy, é o IP do proxy. Por isso o aviso diz "endereço IP e porta de origem da conexão".
 
 Definição versionada: [`entrega.json`](entrega.json).
 
@@ -29,16 +30,25 @@ Definição versionada: [`entrega.json`](entrega.json).
 | Bloqueio público | os quatro *Block Public Access* ativos | sigilo (art. 15) |
 | Object Ownership | `BucketOwnerEnforced` (ACLs desabilitadas) | O v2 usa bucket policy, não ACL. O S3 aceita o cabeçalho `bucket-owner-full-control` com ACLs desabilitadas. **Conferir no §4** que os objetos chegam |
 | Criptografia | SSE-S3 (`AES256`) | Com SSE-KMS seria preciso uma chave gerenciada pelo cliente (custo) |
-| Política | [`politica-bucket-logs.json`](politica-bucket-logs.json): só `delivery.logs.amazonaws.com` grava, restrito à conta e à *delivery source*; HTTPS obrigatório | menor privilégio |
-| Retenção | [`ciclo-de-vida.json`](ciclo-de-vida.json): expiração em **190 dias** | 6 meses mais margem para a expiração assíncrona do S3 |
+| Política | [`politica-bucket-logs.json`](politica-bucket-logs.json): só `delivery.logs.amazonaws.com` grava (`s3:PutObject`), em `AWSLogs/<conta>/*`, restrito à conta (`aws:SourceAccount`) e a **esta** *delivery source* (`aws:SourceArn`); HTTPS obrigatório. Ninguém mais tem permissão concedida pela política | menor privilégio; o prefixo é o da política que a própria AWS gera (R2). Com o `suffixPath` não está documentado se as chaves passam por `CloudFront/`; por isso a política usa o prefixo da conta |
+| Retenção | [`ciclo-de-vida.json`](ciclo-de-vida.json): expiração em **190 dias**, aplicada ao **bucket inteiro** (`"Filter": {}`), que é exclusivo dos logs | 6 meses mais margem. O S3 conta os dias a partir da criação de cada arquivo, arredonda para a meia-noite UTC seguinte e remove os objetos de forma assíncrona, sem cobrar o atraso. O filtro vazio garante a expiração mesmo que o caminho das chaves seja diferente do esperado |
 | Versionamento | desligado | evita cópias que escapariam da expiração |
 | Acesso | só a titular (console e CloudShell). As roles de deploy e de auditoria **não** leem os objetos | sigilo |
 | Região da API | `us-east-1`, que é exigência do CloudFront para o v2, com entrega cruzada para `sa-east-1` | documentação AWS (standard-logging) |
 | Formato | `json`; não pode ser mudado depois | leitura simples |
 
-**Custo:** os documentos da AWS divergem. O guia do CloudFront fala em "no additional charges for log delivery to
-Amazon S3"; o do CloudWatch Logs cita cobrança de entrega. No volume da V1 (poucos MB por mês), o armazenamento custa
-centavos. A titular confere a fatura do primeiro mês, e um alerta do AWS Budgets (gratuito) é recomendado.
+**Custo (fontes oficiais, R2):**
+
+- **CloudFront.** O guia do CloudFront (standard-logging, seção Pricing) diz: "There are no additional charges for log
+  delivery to Amazon S3, though you incur Amazon S3 charges for storing and accessing the log files". Só a opção
+  Parquet gera cobrança do CloudWatch. Por isso a configuração usa `json`, sem Parquet.
+- **CloudWatch Logs.** A página genérica de *vended logs* diz que "CloudWatch delivery charges apply" também para o
+  S3. As duas fontes **divergem**, e o valor por GB não estava legível na página de preços.
+- **No volume da V1**, mesmo pela leitura menos favorável, a conta é de poucos MB por mês. O custo fica em centavos de
+  dólar, mais o armazenamento S3 Standard, que não tem duração mínima cobrada.
+- **Expiração e remoção** não são cobradas, nem o período entre a data de expiração e a remoção efetiva.
+- **Controle:** criar um alerta do AWS Budgets (gratuito) de US$ 1 por mês para a conta e, na fatura do primeiro mês,
+  conferir as linhas `S3-Egress-Bytes` / *Vended Logs* (critério 6 do §4).
 
 **Transferência internacional:** a entrega v2 é configurada em `us-east-1`, e a AWS não informa se os registros
 passam por lá antes de chegar ao bucket. Por isso o fluxo entra na análise da [JUR-07](../../../docs/release/NEKKORA-COM-GOLIVE-001-JUR-07.md).
@@ -80,15 +90,26 @@ aws s3api get-bucket-ownership-controls --bucket "$LOGS_BUCKET"
 aws s3api get-bucket-lifecycle-configuration --bucket "$LOGS_BUCKET"
 aws s3api get-bucket-location --bucket "$LOGS_BUCKET"            # "sa-east-1"
 # Acesse https://dnl1wnnmoqhaj.cloudfront.net/ e espere alguns minutos:
-aws s3 ls "s3://$LOGS_BUCKET/AWSLogs/$AWS_ACCOUNT_ID/CloudFront/" --recursive | tail -3
+aws s3api get-bucket-policy-status --bucket "$LOGS_BUCKET"       # "IsPublic": false
+aws s3 ls "s3://$LOGS_BUCKET/AWSLogs/$AWS_ACCOUNT_ID/" --recursive | tail -3
+# Só os NOMES dos campos do primeiro registro (nenhum IP vai para a evidência):
+OBJ=$(aws s3 ls "s3://$LOGS_BUCKET/AWSLogs/$AWS_ACCOUNT_ID/" --recursive | tail -1 | awk '{print $4}')
+aws s3 cp "s3://$LOGS_BUCKET/$OBJ" - | (gunzip 2>/dev/null || cat) | head -1 | jq -c 'keys'
+#   esperado: ["c-ip","c-port","date","time","x-host-header"]
 ```
 
-Critérios para dar a LOG-01 como aplicada, todos necessários:
+Critérios objetivos para dar a LOG-01 como aplicada. Todos são necessários, e a saída de cada comando entra na
+evidência `docs/release/evidencias/golive-001/log-01-<data>.md`, **sem IPs**:
 
-1. a entrega existe com exatamente os 5 campos;
-2. o bucket está em `sa-east-1`, bloqueado ao público, com `BucketOwnerEnforced` e expiração de 190 dias;
-3. pelo menos um objeto chegou, e as chaves dele contêm só esses campos (registrar só os **nomes** dos campos);
-4. a auditoria AWS dá 0 falha.
+1. `describe-deliveries` mostra uma entrega com `recordFields` = exatamente `date, time, c-ip, c-port, x-host-header`;
+2. `get-bucket-location` = `sa-east-1`;
+3. os quatro *Block Public Access* estão `true`, `IsPublic` = `false` e `ObjectOwnership` = `BucketOwnerEnforced`;
+4. o ciclo de vida tem uma regra `Enabled`, com `Expiration.Days` = 190, igual ao `ciclo-de-vida.json`;
+5. pelo menos um objeto chegou em até 30 minutos depois do acesso de teste, e o `jq 'keys'` mostra só os 5 campos.
+   Se nada chegar, o `BucketOwnerEnforced` ou o prefixo da política são os primeiros suspeitos: desfazer (§5) e
+   avisar Claude, **sem** afrouxar a política;
+6. o alerta do Budgets está criado. Na primeira fatura, conferir a cobrança de entrega, se houver;
+7. a auditoria AWS dá 0 falha.
 
 Só depois disso o texto [PV-12] pode ser integrado e aprovado (PUB-09 e PUB-17).
 
@@ -107,3 +128,10 @@ aws logs delete-delivery-source --region us-east-1 --name nekkora-commercial-clo
 
 **Não apagar o bucket nem os objetos antes dos 6 meses:** a guarda é obrigação legal. Se os logs forem desligados,
 o aviso precisa ser atualizado antes.
+
+**Quando desfazer:** se algum critério do §4 falhar e não for resolvido no mesmo dia. Se isso acontecer **antes** do
+merge do [PV-12], o site não diz nada sobre logs, e basta desfazer. Se acontecer **depois**, o aviso volta ao texto
+anterior na mesma janela.
+
+**Conferência de que foi desfeito:** `describe-deliveries` não mostra a entrega `nekkora-commercial-cloudfront`, e
+nenhum objeto novo chega ao bucket depois de um acesso de teste.
