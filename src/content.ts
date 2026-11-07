@@ -621,12 +621,14 @@ export const PRIVACY = {
       icon: 'server' as IconName,
       title: 'Registros de acesso',
       // [PV-04] — o provedor processa esses dados para entregar as páginas; a página não grava nada além disso.
-      // [PV-12] LOG-01 (NEKKORA-COM-GOLIVE-001, 06/11/2026): guarda dos registros de acesso por 6 meses (Marco Civil, art. 15),
-      // com campos mínimos (deploy/aws/logs/README.md). Só pode ser integrado DEPOIS de os logs v2 estarem ativos e conferidos
+      // [PV-12] LOG-01 (NEKKORA-COM-GOLIVE-001, 06/11/2026): guarda mínima de 6 meses (Marco Civil, art. 15). O texto descreve
+      // exatamente os campos de deploy/aws/logs/entrega.json (date, time, c-ip, c-port, x-host-header: sem URL, sem user agent)
+      // e a expiração de ciclo-de-vida.json (190 dias, assíncrona no S3). Mudou a configuração, muda o texto.
+      // Só pode ser integrado DEPOIS de os logs v2 estarem ativos e conferidos
       // na AWS: antes disso o texto afirmaria um tratamento que não ocorre. Nova aprovação: PUB-17 e PUB-09.
       text:
         `${HOSTING_PROVIDER ? `A ${HOSTING_PROVIDER}, que hospeda este site,` : 'O provedor de hospedagem'} processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.` +
-        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda os registros de acesso a este site (data e hora, endereço IP e porta de origem e o endereço do site acessado) por 6 meses, sob sigilo e com acesso restrito, e eles são apagados automaticamente depois desse prazo. Esses registros só são fornecidos a terceiros mediante ordem judicial, nos termos da lei (LGPD, art. 7º, II).' +
+        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. Esses registros só são fornecidos a terceiros mediante ordem judicial, nos termos da lei (LGPD, art. 7º, II).' +
         (viaApi ? ' Para limitar abusos, o serviço de solicitações conta envios por endereço IP sem guardar o endereço (só um código derivado dele), por até 2 dias.' : ''),
     },
     // [PV-09] AUD-39: prazos aprovados na COM-008-B. A eliminação é feita pela Nekkora (não há rotina automática): o texto
