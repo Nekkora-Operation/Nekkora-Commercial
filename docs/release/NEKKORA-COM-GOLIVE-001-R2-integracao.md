@@ -71,16 +71,27 @@ Se o passo 3 acontecer antes do passo 2, use a base `docs/contract-001` e troque
 ```bash
 git switch -c docs/v1-preparacao-r2 "$M17"
 # Grupo A: preparação, JUR-07 R1 e R2
-git cherry-pick 55f52c3 ede1c15 <commits R2>
-# package.json: a linha "test" do grupo A leva conferir-bookings e campanha-datas, sem aviso-logs
+git cherry-pick 55f52c3 ede1c15 158a15b 8e539c4 c48a05a
+# conflito esperado só no c48a05a, em package.json: manter a linha "test" do c48a05a SEM aviso-logs.test.mjs
 git switch -c docs/v1-texto-publico
 # Grupo B: os dois commits do [PV-12]; no package.json, acrescentar aviso-logs.test.mjs
 git cherry-pick e3df785 d1df3b8
+# conflito esperado só no d1df3b8, em package.json: acrescentar aviso-logs.test.mjs ao fim da linha "test"
 git push origin docs/v1-texto-publico             # sem abrir PR
 git switch docs/v1-preparacao && git reset --hard docs/v1-preparacao-r2
 git push --force-with-lease origin docs/v1-preparacao
 gh pr edit 19 --base main
 ```
 
-Com isso, o merge da #19 com o CI verde não leva o [PV-12] ao ar antes de os logs existirem. Antes do passo 3, Claude
-monta os dois ramos localmente, roda `npm run check` em cada um e mostra o resultado à titular.
+Com isso, o merge da #19 com o CI verde não leva o [PV-12] ao ar antes de os logs existirem.
+
+**Simulação local de 06/11/2026 (worktree descartável, sem push):**
+
+| Etapa | Resultado |
+|---|---|
+| M17: merge da `main` na `docs/contract-001` | Conflito só no `package.json`; árvore **idêntica** à da `3e088aa` |
+| Grupo A (5 commits) | Conflito só no `package.json` do `c48a05a`; sem [PV-12] no `content.ts`; `npm run check` **301/301** |
+| Grupo B (+2 commits) | Conflito só no `package.json` do `d1df3b8`; árvore igual à da #19 atual (só muda a ordem dos testes na linha `test`); `npm run check` **304/304** |
+
+Os hashes acima são os da #19 em 06/11/2026. Se a #19 receber novos commits, a lista do grupo A precisa ser
+atualizada antes do passo 3.
