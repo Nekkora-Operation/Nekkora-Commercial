@@ -1,15 +1,14 @@
 # Proposta-modelo — Nekkora Delivery
 
-> **MODELO NÃO APROVADO. Não é parecer jurídico.** Preparado na
-> [NEKKORA-COM-LEGAL-BASE-001](../release/NEKKORA-COM-LEGAL-BASE-001.md) (05/11/2026) a partir das diretrizes da titular
-> e das propostas de correção C-01 a C-12 de [`condicoes-comerciais-minuta.md` §9](condicoes-comerciais-minuta.md).
-> Uso só depois da decisão da titular sobre as propostas e da aprovação das condições comerciais (PUB-19). A revisão por
-> advogado(a) foi adiada pela titular e **continua pendente**. Os campos `{{…}}` são preenchidos em cada proposta.
-> Nenhum dado real de cliente deve ser versionado neste repositório.
->
-> Fica de fora deste modelo: cláusula de tratamento de dados do cliente (operadora, LGPD art. 39), confidencialidade e
-> guarda de credenciais (JUR-05, AUD-21). Essas cláusulas precisam de redação própria antes da primeira contratação
-> que envolva dados pessoais do cliente.
+> **MODELO NÃO APROVADO. Não é parecer jurídico. Não autoriza contratação.** Atualizado na
+> [NEKKORA-COM-CONTRACT-001](../release/NEKKORA-COM-CONTRACT-001.md) (06/11/2026) com as **decisões definitivas da
+> titular C-01 a C-12** e, na [R1](../release/NEKKORA-COM-CONTRACT-001-R1.md), com as decisões complementares
+> (C-03, C-04, C-06, C-07, C-10, C-11), que substituem as propostas de correção da LEGAL-BASE-001 (histórico em
+> [`condicoes-comerciais-minuta.md` §10](condicoes-comerciais-minuta.md)). As cláusulas estão no
+> [contrato-base](contrato-base-delivery.md); esta proposta só traz o que muda por cliente e por automação. Uso só após
+> a aprovação das condições (PUB-19), a revisão por advogado(a) (pendente) e as pendências do
+> [checklist](../release/NEKKORA-COM-CONTRACT-001.md) §6. Os campos `{{…}}` são preenchidos em cada proposta. Nenhum dado
+> real de cliente deve ser versionado neste repositório.
 
 ---
 
@@ -19,109 +18,69 @@
 |---|---|
 | Fornecedor | NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA · CNPJ 68.337.624/0001-32 · Rua Pais Leme, 215, Conjunto 1713, Pinheiros, São Paulo/SP, CEP 05424-150 · contato@nekkora.com |
 | Cliente | `{{razão social ou nome}}` · `{{CNPJ/CPF}}` · `{{representante e e-mail}}` |
-| **Natureza da relação** (C-01) | ☐ Consumidor (pessoa física, ou pessoa jurídica que contrata como destinatária final) · ☐ Contratação empresarial (o serviço integra a atividade produtiva do cliente). **Na dúvida, marcar "Consumidor".** As cláusulas do Anexo B só valem para contratação empresarial |
+| **Natureza da relação** (C-01) | ☐ Contrato-base (padrão, compatível com o CDC) · ☐ Contrato-base **+ Anexo B2B**, com a justificativa: `{{os quatro itens do Anexo B2B §1}}`. **Ter CNPJ não basta. Na dúvida, só o contrato-base** |
 | Número e data de emissão | `{{NK-AAAA-NNN}}` · `{{DD/MM/AAAA}}` |
-| **Data da solicitação** (campanha, OPS-03) | `{{data e hora de recebimento, horário de Brasília}}` · canal `{{e-mail / Bookings / LinkedIn}}` · referência `{{assunto ou identificador da mensagem}}` |
-| Validade da proposta | `{{7 dias corridos da emissão, na campanha / N dias fora dela}}` (estipulação expressa; CDC art. 40, §1º) |
+| **Data da solicitação** (C-10) | `{{data e hora de recebimento, Brasília}}` · canal `{{e-mail / Bookings / LinkedIn}}` · referência `{{…}}` |
+| **Validade** (C-10) | Aceite até `{{DD/MM/AAAA}}` (**7 dias corridos** da emissão, na campanha) |
 
-## 2. Escopo (uma seção por automação — C-08)
+## 2. Automações (uma seção por automação — C-08, C-12)
 
 | Campo | Conteúdo |
 |---|---|
 | Automação | `{{nome}}` |
-| Categoria | ☐ Simples ☐ Média ☐ Complexa. Critérios: sistemas, integrações, regras e exceções, volume, infraestrutura, licenciamento |
+| Categoria e justificativa | ☐ Simples ☐ Média ☐ Complexa · **esforço técnico estimado: `{{N}}` horas** (simples até 8 h; média acima de 8 até 16 h; complexa acima de 16 h) · fatos observados por critério complementar (regulamento §5) `{{…}}` · risco excepcional, se houver: justificativa e fatos verificáveis `{{…}}` |
 | Descrição do processo e resultado esperado | `{{…}}` |
 | Sistemas e integrações | `{{…}}` |
-| Fora do escopo | `{{…}}` (sustentação, novas funcionalidades e hosting dependem de proposta própria) |
-| Responsabilidades do cliente | Acessos e credenciais, ambiente de homologação, equipe disponível para validar |
+| Fora do escopo | `{{…}}` · sustentação, monitoramento, hospedagem, novas funcionalidades e alocação de profissionais não estão incluídos |
+| Dependências e responsabilidades do cliente | `{{acessos, credenciais, ambiente, equipe para homologar}}` |
 | **Critérios de aceite** | `{{lista objetiva e verificável}}` |
+| Preço | `{{R$}}` · ☐ padrão ☐ lançamento (solicitação recebida no período) ☐ orçamento individual |
+| **Início previsto** | `{{DD/MM/AAAA}}` — nunca antes do 8º dia após a assinatura (C-02) |
+| **Disponibilização para homologação prevista** | `{{DD/MM/AAAA}}` |
+| **Reserva das etapas finais** (regime do consumidor, obrigatória — contrato-base 10.3) | `{{10% do valor contratado da automação = R$ …}}`: parte do preço que remunera a homologação assistida e a entrega. Fixada **antes do aceite**; nunca cobrada se você desistir depois da conclusão |
 
-## 3. Preço e despesas
+Total: `{{R$}}` (soma das automações com preço; complexas sob orçamento à parte). Cada automação continua com preço e
+aceite próprios.
 
-| Campo | Conteúdo |
-|---|---|
-| Preço por automação | `{{R$}}` (padrão) · `{{R$}}` (lançamento, se a data da solicitação estiver no período e a categoria for simples ou média) |
-| Licenças e serviços de terceiros | `{{item · quem contrata · custo estimado}}`. **Custo de terceiro não previsto aqui não é cobrado sem nova aprovação** (CDC art. 40, §3º) |
-| Tributos e nota fiscal | `{{…}}` ⚖ |
+## 3. Despesas externas (C-08)
 
-## 4. Prazo (C-12)
-
-| Campo | Conteúdo |
-|---|---|
-| Início estimado | `{{DD/MM/AAAA ou N dias úteis após o pagamento da 1ª parcela}}`. **Cliente consumidor:** depois do fim do prazo de arrependimento (§8), salvo pedido expresso do cliente |
-| Término estimado da disponibilização para homologação | `{{DD/MM/AAAA}}` |
-| Alteração de prazo | Só por escrito, com motivo (dependência do cliente ou de terceiros, mudança de escopo) |
-
-## 5. Pagamento (C-11)
-
-| Parcela | Valor | Quando |
-|---|---|---|
-| 1ª | 50% · `{{R$}}` | Depois do aceite desta proposta, até `{{5 dias úteis}}` da cobrança |
-| 2ª | 50% · `{{R$}}` | Depois da homologação concluída e do aceite formal, até `{{5 dias úteis}}` da cobrança |
-
-Meio: Pix para a conta da empresa. Atraso: multa de `{{até 2%}}` e juros de `{{1% ao mês}}`.
-
-## 6. Marcos (base do cancelamento — C-03)
-
-| Marco | % do preço | Evidência de conclusão |
-|---|---|---|
-| M1 Levantamento documentado | `{{%}}` | Documento enviado ao cliente |
-| M2 Desenvolvimento | `{{%}}` | Comunicação escrita de conclusão |
-| M3 Testes técnicos | `{{%}}` | Relatório de testes |
-| M4 Disponibilização para homologação | `{{%}}` | Comunicação escrita |
-
-## 7. Homologação e aceite (C-06)
-
-1. A Nekkora avisa por escrito quando a automação está disponível para homologação.
-2. O cliente tem `{{10 dias úteis}}` para validar e registrar por escrito os defeitos encontrados.
-3. **Defeito** é o descumprimento do escopo ou dos critérios de aceite, e é sempre corrigido sem custo. Ajustes de
-   preferência dentro do escopo: até `{{2}}` rodadas.
-4. **O silêncio não vale como aceite.** Sem manifestação, a Nekkora envia dois lembretes. Se continuar sem resposta, o
-   projeto fica suspenso: a 2ª parcela não vence e a garantia contratual não começa.
-5. O aceite formal é uma declaração expressa e por escrito do cliente.
-
-## 8. Direito de arrependimento (cliente consumidor — C-02)
-
-> Você pode desistir desta contratação em até **7 dias** contados do aceite, porque ela é feita fora de estabelecimento
-> comercial (CDC, art. 49). Basta responder a este e-mail ou escrever para contato@nekkora.com. Os valores pagos serão
-> devolvidos **integralmente e de imediato**, com atualização monetária. O desenvolvimento só começa depois desse
-> prazo, salvo se você pedir por escrito que comece antes. Mesmo nesse caso, a desistência dentro do prazo dá direito à
-> devolução integral.
-
-## 9. Cancelamento (C-03, C-04)
-
-| Momento | Regra |
-|---|---|
-| No prazo de arrependimento (consumidor) | Devolução integral e imediata (§8) |
-| Antes do início do desenvolvimento | Devolução integral da 1ª parcela |
-| Durante o desenvolvimento | O cliente paga os **marcos concluídos** (§6) e as despesas de terceiros comprovadas e previstas no §3, e recebe o saldo de volta. Sem multa |
-| Depois da homologação concluída | O serviço foi prestado: os valores pagos remuneram o que foi feito. A entrega definitiva e os direitos do §11 dependem da quitação. Os vícios continuam garantidos |
-| Descumprimento da Nekkora | O cliente pode exigir a correção, a devolução do que pagou ou o abatimento do preço (CDC art. 20), sem prejuízo de perdas e danos |
-| Cancelamento pela Nekkora | Só nos casos previstos aqui, com o mesmo direito para o cliente (CDC art. 51, XI) |
-
-## 10. Entrega definitiva e garantia (C-05, C-07)
-
-1. Depois do aceite e da quitação, a Nekkora entrega o código, a documentação e o Anexo de Componentes.
-2. **Garantias legais preservadas** (CDC arts. 24 a 26). Esta proposta não as reduz.
-3. **Garantia contratual** (termo escrito, CDC art. 50): `{{opção escolhida pela titular em C-07 — ex.: 30 dias adicionais, contados depois do fim do prazo legal}}`. Durante a garantia, a Nekkora corrige sem custo os defeitos da entrega. Para exercê-la: e-mail para contato@nekkora.com, com descrição do defeito.
-4. Não são defeitos da entrega: mudanças em sistemas, APIs ou regras de terceiros ou do cliente depois da homologação; uso fora do escopo; alterações feitas por terceiros.
-
-## 11. Propriedade intelectual (C-09 — Modelo A-R, a decidir)
-
-Cláusula em [`condicoes-comerciais-minuta.md` §9.2](condicoes-comerciais-minuta.md). Anexo de Componentes:
-
-| Componente | Tipo | Titular | Licença ao cliente |
+| Item | Quem contrata e paga | Custo estimado | Quando |
 |---|---|---|---|
-| `{{…}}` | Código específico · Preexistente Nekkora · Terceiro | `{{…}}` | `{{…}}` |
+| `{{licença / API / infraestrutura}}` | ☐ Cliente, direto ao fornecedor (preferencial) ☐ Nekkora, com reembolso | `{{R$}}` | Depois do início do desenvolvimento |
 
-## 12. Aceite
+**Custo externo não previsto aqui não é cobrado sem nova aprovação escrita.**
 
-O aceite se dá por `{{assinatura eletrônica / resposta escrita a este e-mail}}` ⚖, com a declaração: "Li e aceito a
-proposta `{{número}}`, inclusive as regras de pagamento, homologação, cancelamento, garantia e propriedade
-intelectual."
+## 4. Pagamento (C-05, C-11)
 
----
+| Parcela | Valor | Vencimento |
+|---|---|---|
+| 1ª — 50% | `{{R$}}` | 5 dias úteis da cobrança enviada após o aceite: `{{DD/MM/AAAA}}` |
+| 2ª — 50% | `{{R$}}` | 5 dias úteis da cobrança enviada **após o aceite formal** (o silêncio não a torna exigível) |
 
-**Anexo B — só para contratação empresarial** (C-01): limitação de indenização em situações justificáveis (CDC art. 51,
-I, parte final, se houver relação de consumo com pessoa jurídica; CC art. 421-A, II, se não houver), com teto e
-exceções `{{a definir}}` ⚖.
+Pix para a conta da empresa. Atraso: lembretes e negociação antes de encargos; multa de 2% e juros simples de 1% ao
+mês pro rata die, limitados ao máximo legal, sem capitalização; sem cancelamento automático (contrato-base cl. 15).
+
+## 5. Como funciona, em resumo (cláusulas do contrato-base)
+
+| Tema | Regra | Cláusula |
+|---|---|---|
+| Espera e arrependimento | O desenvolvimento só começa depois de 7 dias corridos da assinatura. Seu direito legal de arrependimento é preservado: escreva para contato@nekkora.com ou responda a este e-mail; confirmaremos o recebimento imediatamente | 3 |
+| Desistência antes da conclusão | **Reembolso integral** do que você pagou à Nekkora pelo desenvolvimento, mesmo com o trabalho iniciado, em até 5 dias úteis do pedido, com comprovante (no arrependimento legal, de imediato). Despesas que você pagou direto a terceiros não passam pela Nekkora | 9 |
+| Desistência após a conclusão ⚖ | Só com a conclusão integral comprovada, a disponibilização real e a sua desistência por escrito; você recebe as evidências e tem 10 dias úteis para contestar. **Consumidor:** até 90% do valor contratado, abatido o que já pagou (ex.: média de R$ 2.800 com entrada de R$ 1.400 → saldo máximo de R$ 1.120); a reserva das etapas finais não é cobrada. **B2B (só com o Anexo B2B):** até 100%. Pago o valor apurado, você recebe o desenvolvimento concluído. Sujeito a revisão jurídica | 10 |
+| Homologação | 10 dias úteis; lembretes no 5º e no 9º dia útil; sem resposta, suspensão no dia útil seguinte e, 30 dias depois, pedido de reprogramação (sem cancelamento automático); defeitos corrigidos sem limite de rodadas; até 2 rodadas de ajustes de preferência; **sem aceite tácito** | 8 |
+| Entrega definitiva | Após o aceite e a quitação: código específico, documentação, Anexo de Componentes e termo de garantia | 12 |
+| Garantia | Garantias legais + **30 dias** de cobertura corretiva adicional, no termo de garantia; recebimento confirmado em até 2 dias úteis e diagnóstico inicial em até 5 dias úteis | 13 |
+| Propriedade intelectual | Código específico seu após a quitação; componentes da Nekkora licenciados para operar e manter; pode contratar outro desenvolvedor | 14 e Anexo de Componentes |
+| Mudança de prazo | Só com motivo, comunicação e concordância por escrito | 5.4 |
+
+| Ordem dos documentos | Norma obrigatória; condições particulares desta proposta que indiquem a cláusula alterada; Anexo B2B, se aplicável; contrato-base; na dúvida, a interpretação mais favorável a você | Preâmbulo |
+
+## 6. Anexos
+
+Contrato-base · Anexo de Componentes (preenchido) · Termo de garantia (na entrega) · Anexo B2B (só se marcado no §1).
+
+## 7. Aceite
+
+O aceite se dá por `{{assinatura eletrônica / resposta escrita}}` ⚖ **[!]**, com a declaração: "Li e aceito a proposta
+`{{número}}` e o contrato-base `{{versão}}`, inclusive as regras de pagamento, homologação, desistência, garantia e
+propriedade intelectual."
