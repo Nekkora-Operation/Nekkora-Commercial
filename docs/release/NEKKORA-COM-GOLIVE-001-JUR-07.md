@@ -60,8 +60,9 @@ pequena do atendimento.
    transferência é necessária: o atendimento pedido por quem contrata em nome próprio só ocorre pelos meios
    contratados, e a guarda dos registros é obrigação legal. Risco: "necessária" pode ser lida de forma estrita,
    porque o provedor estrangeiro é escolha do controlador.
-3. **Fluxos com base no IX (representantes de empresa).** É preciso um mecanismo próprio, definido fluxo a fluxo. Há
-   só dois disponíveis:
+3. **Fluxos com base no IX (representantes de empresa).** É preciso um mecanismo próprio, definido fluxo a fluxo. Os instrumentos que
+   existem hoje são dois (as alternativas de configuração e as perguntas em aberto estão no §4; antes, a JUR-06 pode
+   reduzir este grupo):
    - **(a) CPC (art. 33, II; Res. 19/2024):** exigem contrato com a Microsoft. Hoje não são oferecidas (§1). O pedido
      por escrito à Microsoft deixa de ser providência paralela e passa a ser **condição** deste caminho.
    - **(b) Consentimento específico e em destaque para a transferência (art. 33, VIII):** com informação prévia
@@ -98,3 +99,79 @@ pequena do atendimento.
 - o texto do item 7 integrado e aprovado na PUB-09.
 
 Nenhuma delas existe hoje.
+
+## 4. R2 — fecho da investigação técnica (06/11/2026)
+
+Esta seção **encerra a parte técnica**. Ela **não** encerra a JUR-07, que continua pendente até haver fundamento
+jurídico e evidências. Como na R1, a análise não presume que todos os contatos B2B dependam de consentimento, nem que
+o art. 33, IX, resolva todos os casos.
+
+### 4.1 Conceitos (Res. CD/ANPD 19/2024, Anexo I)
+
+| Categoria | Definição | Consequência |
+|---|---|---|
+| **Coleta internacional** | "coleta de dados pessoais do titular efetuada diretamente pelo agente de tratamento localizado no exterior" (art. 3º, V) | **Não** é transferência (art. 6º) |
+| **Transferência** | um agente "transmite, compartilha ou **disponibiliza acesso**" a dados para outro agente (art. 3º, III), em país estrangeiro (art. 3º, IV; art. 5º) | Exige um mecanismo do art. 33 |
+| **Armazenamento no exterior** | o operador guarda os dados fora do Brasil | Transferência da Nekkora (exportadora) para o operador (importador) |
+| **Acesso de suporte do exterior** | um engenheiro do operador acessa a partir de fora do país | A norma não usa a expressão "acesso remoto". **Inferência:** cabe em "disponibiliza acesso". ⚖ |
+| **Subprocessadores** | o operador repassa a outro agente no exterior | Transferência ulterior; a Nekkora responde pelo mecanismo da cadeia ⚖ |
+
+### 4.2 Matriz por fluxo
+
+Legenda: **S** = ocorre ou pode ocorrer; **N** = não ocorre; **?** = depende de evidência (E3) ou de interpretação.
+
+| Fluxo | Coleta internacional | Armazenamento no exterior | Acesso de suporte | Subprocessadores | Base do tratamento (art. 7º) | Mecanismo do art. 33 |
+|---|---|---|---|---|---|---|
+| **E-mail** `contato@` (Exchange) | N (a Nekkora coleta no Brasil, pelo próprio tenant) | **?** Brasil se o "Local dos dados" mostrar BRA (E3); o processamento em trânsito pode ocorrer em outra região | S, limitado e registrado. Pode depender de aprovação, com Customer Lockbox | S (DPA: EUA ou qualquer país) | V (contrata em nome próprio) ou IX (representante): **JUR-06** | V → IX do art. 33 (candidato). IX → **sem mecanismo hoje** (§4.3) |
+| **Bookings** | N | **?** Não tem compromisso de residência próprio. Os dados ficam em caixa do Exchange; a cobertura é **inferência** | S | S | idem | idem |
+| **Teams**: reunião em tempo real | N | Mídia: a conferência é hospedada "in the same region where the first participant joined"; **não há compromisso de residência para mídia** | S | S | idem | idem |
+| **Teams**: chat da reunião | N | **?** Tenants brasileiros antigos "continue to have their data stored in the Americas". E3 decide | S | S | idem | idem |
+| **Entrega do site** (CloudFront) | **S?** Ponto de presença no exterior para visitante fora do Brasil. ⚖ Pode ser coleta internacional se a AWS for vista como meio da coleta da Nekkora | N (sem guarda na entrega) | — | — | IX (entregar e proteger o serviço) | Se for coleta internacional, nenhum. Se for transferência, o IX do art. 33 não cobre ⚖ |
+| **Registros de acesso** (LOG-01) | N | N (bucket em `sa-east-1`) | S (suporte AWS) | ? | II (Marco Civil, art. 15) | IX + art. 7º, II (candidato) |
+| **Hospedagem** (S3 do site) | N | N (`sa-east-1`) | S | ? | — (conteúdo público, sem dados pessoais) | Não se aplica |
+
+### 4.3 Instrumentos contratuais disponíveis (verificados em 06/11/2026)
+
+| Provedor | O que existe | O que **não** existe |
+|---|---|---|
+| Microsoft | DPA de 01/11/2026: autoriza transferência para os EUA e para os países dos subprocessadores; SCC 2021 da UE, IDTA do Reino Unido e DPF, **só** para dados que saem da UE, do EEE, do Reino Unido ou da Suíça | Nenhuma menção a Brasil, LGPD, ANPD ou CPC brasileiras (anexos e rodapés não foram lidos por inteiro) |
+| AWS | DPA que, segundo a página "Brazil Data Privacy", "meets the requirements of LGPD"; dados na região escolhida "except as necessary to provide the Services" | Nenhuma menção às CPC da Res. 19/2024. O texto do PDF do DPA não pôde ser extraído na R2 |
+| ANPD | CPC (Res. 19/2024, Anexo II), obrigatórias nos contratos desde agosto de 2025 (art. 2º, parágrafo único); adequação só da UE e do EEE (Res. 32/2026) | Nenhuma equivalência reconhecida das SCC europeias |
+
+### 4.4 Alternativas reais de configuração (nenhuma aplicada; todas exigem autorização)
+
+| Alternativa | Efeito | Limite |
+|---|---|---|
+| Confirmar o tenant em BRA (E3) | O armazenamento de Exchange, SharePoint e (talvez) Teams fica no Brasil | Não cobre processamento, suporte, subprocessadores, mídia do Teams nem Bookings |
+| **Advanced Data Residency** (add-on; Brasil incluído) | Compromisso contratual de residência ampliado | Exige 100% das licenças pagas; custo; o Bookings não é citado |
+| **Customer Lockbox** (E5, ou add-on de Compliance) | O suporte da Microsoft só acessa conteúdo com aprovação da titular (até 4 h) | Reduz o acesso de suporte, mas **não** cobre subprocessadores nem pedidos de autoridades |
+| Teams: manter sem gravação e sem transcrição (CTL-01) | Nada fica armazenado da conversa | A mídia em tempo real continua sujeita ao roteamento |
+| CloudFront: sem mudança | Já é o mínimo: sem cookies, sem logs de URL | O ponto de presença depende do visitante |
+
+### 4.5 Perguntas para o parecer jurídico
+
+1. **Base do representante (JUR-06).** O empregado ou representante que pede proposta em nome da empresa pode ser
+   atendido com base no art. 7º, V, ou a base é o IX? A resposta define quanto do atendimento cabe no art. 33, IX.
+2. **Acesso remoto.** O acesso de suporte do operador a partir do exterior, a dados armazenados no Brasil, é
+   transferência internacional ("disponibiliza acesso", art. 3º, III, da Res. 19/2024)?
+3. **"Necessária" no art. 33, IX.** Para quem contrata em nome próprio (art. 7º, V) e para os registros de acesso
+   (art. 7º, II), a transferência ao operador estrangeiro pode ser tida como necessária, se o operador foi escolha da
+   Nekkora?
+4. **Fluxos com base no IX.** Sem CPC oferecidas pela Microsoft, qual mecanismo é admissível? Opções:
+   - (a) pedir à Microsoft a adoção das CPC, com prazo;
+   - (b) consentimento específico (art. 33, VIII) no Bookings;
+   - (c) outra saída, com base no art. 33.
+
+   Para o e-mail de entrada, há saída que não dependa da Microsoft?
+5. **Entrega do site.** O atendimento por ponto de presença do CloudFront no exterior é coleta internacional (art. 6º)
+   ou transferência?
+6. **Dever de transparência.** Que redação mínima do aviso cumpre o art. 33 e a Res. 19/2024 (país de destino,
+   mecanismo) sem prometer mecanismo inexistente?
+7. **Risco residual.** Com E3 em BRA e Customer Lockbox, o que sobra de transferência sem mecanismo? É impeditivo para
+   publicar o site **sem** o Bookings, ou só para o atendimento?
+
+### 4.6 Situação
+
+- **Investigação técnica:** concluída, com as fontes listadas e as inferências marcadas como tais.
+- **JUR-07:** **pendente.** Depende de E3, do parecer (§4.5) e do mecanismo adotado para cada fluxo.
+- **Texto do aviso (grupo C):** não escrito no site até o parecer.
