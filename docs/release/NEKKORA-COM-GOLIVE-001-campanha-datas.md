@@ -42,4 +42,35 @@ Os testes fixam as datas atuais **de propósito**, para que nenhuma mudança pas
 - a homologação nos três navegadores com `NEKKORA_DATA` em `D-1`, `D` e `fim+1`;
 - o portão, que tem de continuar bloqueado até a PR de liberação.
 
-Claude prepara essa PR assim que receber as datas escritas.
+## Alteração preparada (R2): `scripts/campanha-datas.mjs`
+
+O script troca as datas em todos os arquivos da tabela acima, menos os dois documentos, que são atualizados à mão. Por
+padrão ele **só simula**.
+
+```bash
+# 1. Simulação: mostra cada troca e não grava nada
+node scripts/campanha-datas.mjs --publicacao AAAA-MM-DD
+# 2. Só com a autorização escrita da titular, numa branch:
+node scripts/campanha-datas.mjs --publicacao AAAA-MM-DD --autorizacao "Titular, DD/MM/AAAA: campanha de DD/MM/AAAA a DD/MM/AAAA (fuso de Brasília)." --aplicar
+npm run texto && npm run check   # e atualizar a PUB-13 em COM-RELEASE-PENDENCIAS.md
+```
+
+**Proteções:**
+
+- recusa um início anterior a hoje em Brasília, que encurtaria a vigência efetiva;
+- `--aplicar` exige a autorização, que é gravada em `$origem.campanhaLancamento`;
+- se alguma contagem de ocorrências divergir do esperado, **nada** é gravado;
+- não muda nenhum outro campo do `publicacao.json`: flags, aprovações e `avisoHomologacao`;
+- não toca as datas sintéticas de fixtures nem o teste de fuso.
+
+O teste `scripts/testes/campanha-datas.test.mjs` monta o plano em memória: confere o cálculo do fim (inclusive fim de
+mês e ano bissexto), a colisão de datas e a repetição depois de um atraso.
+
+**Para não reduzir a vigência:**
+
+- escolher D = o dia em que o domínio passa a servir a V1;
+- rodar o script **na mesma PR aprovada na PUB-17**;
+- se o deploy escorregar para depois de D, repetir o script com a nova data, o que exige nova PUB-17. Isso é melhor que
+  publicar um período já iniciado.
+
+Claude executa o passo 2 assim que receber as datas escritas.

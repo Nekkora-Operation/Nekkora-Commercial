@@ -41,6 +41,8 @@ export const REGRAS = [
   { id: 'B09', titulo: 'Remete ao aviso de privacidade do site', passa: (t) => /nekkora\.com\/#privacidade/.test(t) },
   { id: 'B10', titulo: 'Não pede telefone', passa: (t) => !/telefone|celular/i.test(t) },
   { id: 'B11', titulo: 'Usa ciência, não consentimento', passa: (t) => !/(voc[êe]|ao marcar[^.]*) concorda/i.test(t) },
+  // B12: a caixa existe e é de ciência ("Li e entendi"), como na minuta §4. A B11 só confere a ausência de "concorda".
+  { id: 'B12', titulo: 'Tem a caixa de ciência ("Li e entendi")', passa: (t) => /Li e entendi/i.test(t) },
 ];
 
 export function avaliar(texto) {

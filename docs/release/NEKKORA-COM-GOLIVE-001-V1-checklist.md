@@ -129,44 +129,51 @@ anterior).
 | Campanha | mantém a regra de dois meses a partir da publicação; datas quando a janela de deploy estiver definida | [procedimento e lista de arquivos](NEKKORA-COM-GOLIVE-001-campanha-datas.md) | datas atuais **não alteradas** |
 | LOG-01 | standard logging v2, campos mínimos, bucket privado, retenção documentada; AWS só com autorização específica | [`deploy/aws/logs/`](../../deploy/aws/logs/README.md) (política, ciclo de vida de 190 dias, entrega com `date time c-ip c-port x-host-header`), texto [PV-12] do aviso, minuta §6, mensagem da C13 | **preparado, não aplicado** |
 | JUR-07 | verificar regiões e transferências; o Brasil não basta | [análise e solução mínima](NEKKORA-COM-GOLIVE-001-JUR-07.md) | **continua impeditiva** |
-| Bookings | reconferir depois da correção | `node scripts/conferir-bookings.mjs --saida <pasta>` (11 regras, sem reserva) + 3 testes | hoje: **6 falhas** |
+| Bookings | reconferir depois da correção | `node scripts/conferir-bookings.mjs --saida <pasta>` (12 regras, sem reserva) + 3 testes | hoje: **6 falhas** |
 | E-mail | registrar o teste externo | [roteiro e registro](evidencias/golive-001/email-recebimento-externo.md) | **não executado** |
 | PRs #16 e #17 | integrar preservando os dois testes e o portão | PR #18 (rascunho): `main` + #16 + #17, conflito do `package.json` resolvido | ver CI da PR #18 |
 
-## 6. Lista final para publicar a V1
+## 6. Lista final para publicar a V1 (atualizada na R2)
+
+Roteiros: [evidências da titular](NEKKORA-COM-GOLIVE-001-evidencias-titular.md) ·
+[integração #17 → #19](NEKKORA-COM-GOLIVE-001-R2-integracao.md) · [LOG-01](../../deploy/aws/logs/README.md) ·
+[JUR-07 §4](NEKKORA-COM-GOLIVE-001-JUR-07.md) · [datas](NEKKORA-COM-GOLIVE-001-campanha-datas.md).
 
 **Evidências (titular executa; Claude registra e confere):**
 
-- [ ] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com 11 de 11.
+- [ ] **E5 — Teams:** gravação e transcrição desligadas na política `Nekkora-Commercial` (CTL-01). Vem **antes** do
+      E1.
+- [ ] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com **12 de 12**: as 11 regras mais a B12, da caixa de
+      ciência.
 - [ ] **E2 — E-mail externo** recebido na Caixa de Entrada e respondido.
-- [ ] **E3 — Local dos dados** do Microsoft 365 (captura do cartão "Local dos dados").
-- [ ] **E4 — Logs v2** ativos e conferidos (README §4) e auditoria AWS com 0 falha.
-- [ ] **E5 — Teams:** gravação desligada na política `Nekkora-Commercial` (CTL-01), coerente com "Conversa sem
-      gravação".
+- [ ] **E3 — Local dos dados** do Microsoft 365 (captura do cartão).
+- [ ] **E4 — Logs v2** ativos e conferidos pelos 7 critérios do README §4.
 
 **Decisões escritas (titular):**
 
-- [ ] **D1 — JUR-07, fluxo a fluxo e com parecer:**
-  - para o V e o II (quem contrata em nome próprio; registros de acesso), o art. 33, IX;
-  - para o IX (representantes de empresa), o mecanismo adotado: CPC com a Microsoft, ou consentimento específico
-    onde puder ser coletado e comprovado;
-  - para a entrega do site, a leitura de coleta internacional.
+- [ ] **D1 — JUR-07 / JUR-06, com parecer:**
+  - respostas às perguntas da JUR-07 §4.5;
+  - o mecanismo adotado em cada fluxo;
+  - a redação do aviso.
 
-  Aceitar o risco **não** resolve os fluxos com base no IX. O texto do aviso (JUR-07 §3, item 7) entra na PR de
-  texto com o mecanismo de cada caso.
-- [ ] **D2 — Datas da campanha**, quando a janela de deploy estiver definida.
+  Aceitar o risco **não** resolve os fluxos com base no IX.
+- [ ] **D2 — Datas da campanha.** `scripts/campanha-datas.mjs` está pronto e só simula sem a autorização.
 
 **Autorizações expressas (titular), nesta ordem:**
 
 1. [ ] **A1 — AWS:** aplicar `deploy/aws/logs/README.md` §3.
-2. [ ] **A2 — Merges da integração:** #16, depois #17 (ou a #18).
-3. [ ] **A3 — Merge da PR de texto:** [PV-12] logs + JUR-07 + datas. Só depois de E4 e D1/D2.
-4. [ ] **A4 — Aprovações sobre o mesmo commit:** PUB-17 (textos), PUB-09 (aviso) e PUB-19 (condições exibidas no
-       site).
-5. [ ] **A5 — Merge da PR de liberação** (`publicacao: true`, `avisoHomologacao: false`, aprovações com `$origem`)
-       e tag `v1.0.0`.
-6. [ ] **A6 — Deploy** de produção (aprovação no environment).
-7. [ ] **A7 — DNS:** os 2 CNAMEs na Cloudflare, DNS only.
-8. [ ] **A8 — Variável** `DOMINIO_PUBLICO`.
+2. [ ] **A2a — #17:** push do merge da `main` (passo 1 da integração). **A2b:** merge da #17 com o CI verde.
+3. [ ] **A2c — #19:** realinhar e reorganizar (passo 3), base `main`, e fazer o merge com o CI verde. Só o grupo A
+       entra.
+4. [ ] **A3 — PR de texto** (`docs/v1-texto-publico`):
+   - o [PV-12], só depois do E4;
+   - o texto da JUR-07, só depois do D1;
+   - as datas, com o D2.
+5. [ ] **A4 — Aprovações sobre o mesmo commit:** PUB-17, PUB-09 e PUB-19.
+6. [ ] **A5 — PR de liberação** (`publicacao: true`, `avisoHomologacao: false`, aprovações com `$origem`) e a tag
+       `v1.0.0`.
+7. [ ] **A6 — Deploy** de produção (aprovação no environment).
+8. [ ] **A7 — DNS:** os 2 CNAMEs na Cloudflare, DNS only.
+9. [ ] **A8 — Variável** `DOMINIO_PUBLICO`. Em seguida, repetir o E1, porque o link `#privacidade` passa a funcionar.
 
 Sequência técnica, critérios de aborto e rollback: §4 deste checklist e runbook §6 do relatório GOLIVE-001.

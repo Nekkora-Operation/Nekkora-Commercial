@@ -25,13 +25,14 @@ test('o texto proposto na privacidade-minuta §4 passa em todas as regras', () =
 test('o texto público de 06/11/2026 (com gravação) é reprovado', () => {
   const ev = ler('docs/release/evidencias/golive-001/bookings-texto-publico-2026-11-06.md');
   const texto = `${citacao(ev, '## Descrição do serviço')}\n${citacao(ev, 'Bloco "Privacidade')}`;
-  assert.deepEqual(falhas(texto), ['B01', 'B02', 'B04', 'B05', 'B06', 'B07']);
+  assert.deepEqual(falhas(texto), ['B01', 'B02', 'B04', 'B05', 'B06', 'B07', 'B12']);
 });
 
 test('pequenas variações de redação continuam aceitas, e o consentimento é recusado', () => {
-  const base = 'Reunião pelo Microsoft Teams. Nesta fase, a Nekkora não grava as conversas. LGPD, art. 7º, V. Podem processar dados fora do Brasil. Reservas guardadas por até 90 dias. Não inclua senhas. contato@nekkora.com. https://nekkora.com/#privacidade';
+  const base = 'Reunião pelo Microsoft Teams. Nesta fase, a Nekkora não grava as conversas. LGPD, art. 7º, V. Podem processar dados fora do Brasil. Reservas guardadas por até 90 dias. Não inclua senhas. contato@nekkora.com. https://nekkora.com/#privacidade. Li e entendi como meus dados serão usados.';
   assert.deepEqual(falhas(base), []);
   assert.deepEqual(falhas(`${base} Ao marcar esta caixa, você concorda com o tratamento.`), ['B11']);
   assert.deepEqual(falhas(`${base} Informe seu telefone.`), ['B10']);
   assert.deepEqual(falhas(base.replace('não grava as conversas', 'a reunião poderá ser gravada')), ['B01', 'B02']);
+  assert.deepEqual(falhas(base.replace(' Li e entendi como meus dados serão usados.', '')), ['B12'], 'sem a caixa de ciência');
 });
