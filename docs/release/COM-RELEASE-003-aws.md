@@ -222,6 +222,12 @@ restrição de branches. Assim, ele não é criado "aberto" pelo primeiro uso.
 
 ### 2.4 Primeiro teste de autenticação OIDC (só a role de auditoria)
 
+**Executado em 06/11/2026** (NEKKORA-COM-GOLIVE-001 §2): "Auditoria AWS", run `42223072197`, commit `01c7f6d`.
+O STS aceitou o token do environment `auditoria-aws` e A01 registrou
+`assumed-role/nekkora-commercial-auditoria/nekkora-commercial-auditoria-42223072197`; resultado 26 OK, 0 pendente,
+0 falha, 3 info. A role de deploy **não** foi exercida: ela só será provada na primeira publicação autorizada.
+O workflow "Teste OIDC (auditoria)" ficou redundante. Texto original, mantido como referência:
+
 Ainda não executado. Os workflows deste PR não estão na `main`, então o GitHub não oferece o `workflow_dispatch`
 deles. Além disso, as três barreiras exigem a `main`: o `if` do job, a restrição de branches do environment e a
 condição `ref` da confiança. O teste só é possível **depois do merge**, e deve vir antes de qualquer deploy:
@@ -471,7 +477,7 @@ O alerta de orçamento é da titular. Um alarme do CloudWatch na taxa de 5xx (US
 | 6 | Política do bucket (`gerar-config.mjs` → `politica-bucket.json`) | titular | **Concluído** (informado em 27/10; auditoria: 26 ok, 0 pendente, 0 falha) |
 | 7 | Provedor OIDC e roles de deploy e auditoria (§2) | titular | **Concluído** (informado em 27/10). Confiança com a identidade imutável e `ref` (§2.2), validada pelo IAM Access Analyzer |
 | 8 | Environments `production` e `auditoria-aws` com as proteções e variáveis do §2.3 | titular | **Concluído** (informado em 27/10), com as variáveis AWS dos dois environments |
-| 9 | Rodar a auditoria de novo, também pelo workflow, até ficar sem falhas | titular/agente | Auditoria pelo CloudShell sem falhas. Pelo workflow: depois do merge, primeiro teste OIDC (§2.4) |
+| 9 | Rodar a auditoria de novo, também pelo workflow, até ficar sem falhas | titular/agente | **Concluído**: CloudShell sem falhas; workflow em 06/11/2026, run `42223072197`, 26 OK, 0 falha (§2.4). Runbook definitivo dos passos 10 a 13: [NEKKORA-COM-GOLIVE-001 §6](NEKKORA-COM-GOLIVE-001.md) |
 | 10 | Preencher o que falta em `publicacao.json` (PENDENCIAS) e fazer o merge dos PRs (lib #6, depois Commercial) | titular | pendente |
 | 11 | Actions → "Deploy de produção", ref = tag/commit da `main`, `PUBLICAR`; aprovar no environment | titular | pendente |
 | 12 | Conferir no domínio do CloudFront (o workflow faz). DNS do site (§7) com **autorização**; preencher `DOMINIO_PUBLICO` | titular | pendente |
