@@ -1,0 +1,9 @@
+{
+  "$comentario": "LOG-01 (Marco Civil, art. 15; Decreto 8.771/2016, art. 15-A). Campos mínimos para identificar o acesso: data e hora (UTC), IP e porta lógica de origem, host acessado. Sem URL, user agent, referer, query ou cookies (LGPD, art. 6º, III). Formato não pode ser alterado depois de criado.",
+  "deliverySource": { "name": "nekkora-commercial-cloudfront", "logType": "ACCESS_LOGS", "resourceArn": "arn:aws:cloudfront::${AWS_ACCOUNT_ID}:distribution/${AWS_CLOUDFRONT_DISTRIBUTION_ID}" },
+  "deliveryDestination": { "name": "nekkora-commercial-registros-s3", "outputFormat": "json", "destinationResourceArn": "arn:aws:s3:::${LOGS_BUCKET}" },
+  "delivery": { "recordFields": ["date", "time", "c-ip", "c-port", "x-host-header"], "s3DeliveryConfiguration": { "suffixPath": "{DistributionId}/{yyyy}/{MM}/{dd}", "enableHiveCompatiblePath": false } },
+  "regiaoDaApi": "us-east-1",
+  "regiaoDoBucket": "sa-east-1",
+  "retencaoDias": 190
+}

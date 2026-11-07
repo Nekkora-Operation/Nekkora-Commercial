@@ -1,0 +1,11 @@
+{
+  "Rules": [
+    {
+      "ID": "registros-de-acesso-6-meses",
+      "Status": "Enabled",
+      "Filter": {},
+      "Expiration": { "Days": 190 },
+      "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+    }
+  ]
+}
