@@ -142,11 +142,13 @@ Roteiros: [evidências da titular](NEKKORA-COM-GOLIVE-001-evidencias-titular.md)
 **Evidências (titular executa; Claude registra e confere):**
 
 - [ ] **E5 — Teams:** gravação e transcrição desligadas na política `Nekkora-Commercial` (CTL-01). Vem **antes** do
-      E1.
+      E1. **Relatado pela titular em 09/11/2026, evidência não arquivada; teste não será repetido**
+      ([registro](evidencias/golive-001/decisoes-titular-2026-11-09.md)).
 - [x] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com **12 de 12**: as 11 regras mais a B12, da caixa de
       ciência. Verificado em 09/11/2026: [registro](evidencias/golive-001/bookings-validacao-final/registro.md). Repetir
       depois da A8.
-- [ ] **E2 — E-mail externo** recebido na Caixa de Entrada e respondido.
+- [ ] **E2 — E-mail externo** recebido na Caixa de Entrada e respondido. **Relatado pela titular em 09/11/2026, evidência
+      não arquivada; teste não será repetido** ([registro](evidencias/golive-001/decisoes-titular-2026-11-09.md)).
 - [ ] **E3 — Local dos dados** do Microsoft 365 (captura do cartão).
 - [ ] **E4 — Logs v2** ativos e conferidos pelos 7 critérios do README §4.
 
@@ -158,7 +160,8 @@ Roteiros: [evidências da titular](NEKKORA-COM-GOLIVE-001-evidencias-titular.md)
   - a redação do aviso.
 
   Aceitar o risco **não** resolve os fluxos com base no IX.
-- [ ] **D2 — Datas da campanha.** `scripts/campanha-datas.mjs` está pronto e só simula sem a autorização.
+- [x] **D2 — Datas da campanha.** Titular, 09/11/2026: **manter 06/11/2026 a 06/01/2027**, sem alterações
+      ([registro](evidencias/golive-001/decisoes-titular-2026-11-09.md)). `scripts/campanha-datas.mjs` não será usado.
 
 **Autorizações expressas (titular), nesta ordem:**
 
