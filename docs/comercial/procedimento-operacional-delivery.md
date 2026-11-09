@@ -1,7 +1,7 @@
 # Procedimento operacional — contratação, homologação, cobrança e entrega (Nekkora Delivery)
 
 > **Rascunho para a titular. Não autoriza contratação.** NEKKORA-COM-CONTRACT-001 (06/11/2026), atualizado na
-> [R1](../release/NEKKORA-COM-CONTRACT-001-R1.md) (reembolso, C-04 por enquadramento, lembretes, garantia, critérios
+> [R1](../release/NEKKORA-COM-CONTRACT-001-R1.md) (reembolso, C-04 por enquadramento, depois substituída pela regra de 09/11/2026, lembretes, garantia, critérios
 > por horas, atualização monetária). Aplica o [contrato-base](contrato-base-delivery.md) no dia a dia. Os prazos podem
 > ser conferidos com [`scripts/comercial/regras-delivery.mjs`](../../scripts/comercial/regras-delivery.mjs) (feriados
 > nacionais fixos; feriados estaduais e municipais devem ser informados). **Sempre escrever a data explícita** em
@@ -15,8 +15,8 @@
    não muda a categoria. Complexa por risco excepcional: justificativa, fatos verificáveis e aviso ao cliente **antes** do
    aceite (`classificarAutomacao`).
 3. Preencher a [proposta-modelo](proposta-modelo-delivery.md): escopo, preço, cronograma (data prevista de início conforme a
-   fila, nunca antes da assinatura), dependências, critérios de aceite, Anexo de Componentes, despesas externas e, no regime do consumidor, a
-   **reserva das etapas finais (10%)** — sem ela, a cláusula 10 não pode ser usada depois.
+   fila, nunca antes da assinatura), dependências, critérios de aceite, Anexo de Componentes, despesas externas e a data de disponibilização
+   para homologação, registrada quando ocorrer (cláusula 10).
 4. Validade: 7 dias corridos da emissão, com a **data final escrita**.
 5. Natureza da relação: **declarar** consumidor ou B2B; B2B só com os quatro itens do [Anexo B2B](anexo-b2b-delivery.md)
    §1. Ter CNPJ não basta.
@@ -28,7 +28,7 @@
 | 1. Receber | Qualquer canal escrito (resposta ao e-mail da proposta, `contato@nekkora.com`) |
 | 2. Confirmar | **Imediatamente**, por escrito, no mesmo canal (Decreto 7.962/2013, art. 5º, §4º). **[!] OPS-11:** definir como garantir a confirmação imediata (ex.: resposta automática na caixa `contato@`, configurada pela titular). O agente não alterou o Microsoft 365 |
 | 3. Registrar | Data e hora do pedido, canal, automação e situação do desenvolvimento |
-| 4. Classificar | Arrependimento legal (contrato-base 3.4) → devolver **tudo, de imediato**, com atualização monetária · Antes da conclusão (9.1) → devolver o pago pelo desenvolvimento em até **5 dias úteis** · Após a conclusão (10) → §5 · Defeito ou atraso da Nekkora → cláusula 11 |
+| 4. Classificar | Arrependimento legal (contrato-base 3.4) → devolver **tudo, de imediato**, com atualização monetária · Antes da conclusão (9.1) → devolver o pago pelo desenvolvimento em até **5 dias úteis** · Durante a homologação (10) → §5 · Defeito ou atraso da Nekkora → cláusula 11 |
 | 5. Concluir | Pix e **comprovante de devolução** enviado ao cliente; registrar a data. O prazo de 5 dias úteis **nunca** posterga uma devolução que a lei exige de imediato |
 
 O desenvolvimento começa na data prevista na proposta, sem espera fixa depois da assinatura. Não pedir ao cliente a
@@ -60,24 +60,23 @@ compra de licenças ou serviços externos enquanto houver prazo legal de arrepen
    escrito antes de qualquer medida.
 5. Nunca cancelar automaticamente por atraso.
 
-## 5. Desistência após a conclusão (C-04) ⚖
+## 5. Desistência durante a homologação (C-04) ⚖
 
-**Até o parecer jurídico: não cobrar com base na cláusula 10**; registrar o caso e consultar.
+Regra da titular de 09/11/2026 (contrato-base, cláusula 10), **sujeita a revisão jurídica**: registrar cada caso.
 
 Checklist (contrato-base 10.1, todos): conclusão integral comprovada · critérios de aceite cumpridos · nenhum defeito
-ou obrigação técnica pendente · disponibilização real (ambiente, instruções, meios de teste) · desistência expressa
-por escrito · sem arrependimento legal em curso · sem contestação pendente · conformidade jurídica.
+ou obrigação técnica pendente · **disponibilização formal registrada** (data, ambiente, instruções, meios de teste) ·
+desistência expressa por escrito, depois da disponibilização e antes do aceite formal · sem arrependimento legal em
+curso · sem contestação pendente · conformidade jurídica. Faltando um item: cláusula 9 (reembolso integral) ou 11.
 
-Depois: enviar as evidências ao cliente → **10 dias úteis** para contestar → contestação fundamentada suspende →
-apurar o valor: **consumidor** até 90% (a reserva de 10% nunca é cobrada); **B2B com Anexo válido** até 100%; sempre
-abatidos os pagamentos → quitado o valor apurado, transferir os entregáveis (§6).
+Depois: enviar as evidências ao cliente → **10 dias úteis** para contestar → a contestação fundamentada suspende a
+retenção → devolver **50% do que o cliente pagou à Nekkora** pelo desenvolvimento (a base é o valor pago, não o preço)
+em até 5 dias úteis do pedido válido, com comprovante. Não cobrar a 2ª parcela nem outro valor. A contratação daquela automação se encerra: nada é entregue nem transferido.
 
 ## 6. Entrega definitiva
 
 Após aceite e quitação: entregar código específico, documentação, Anexo de Componentes preenchido e termo de garantia
-datado. Na desistência após a conclusão: quitado o **valor validamente apurado**, entregar código-fonte específico
-concluído, documentação, relatório de testes e Anexo de Componentes, no repositório ou arquivo indicado pelo cliente,
-com instruções escritas e registro do envio (prazo **[!]** a definir pela titular). Registrar a data do término da
+datado. Na desistência antes da conclusão ou durante a homologação, nada é entregue (contrato-base 10.4). Registrar a data do término da
 execução e a da entrega (contagem dos prazos de garantia).
 
 ## 7. Garantia (C-07)

@@ -166,7 +166,9 @@ export const PRICING = {
       'Reuniões e acompanhamento conforme as condições acordadas',
       'Licenças e custos externos tratados à parte, quando aplicáveis',
       // CONTRACT-001 (C-03): política mais favorável ao cliente — texto NOVO (PUB-17)
-      'Se você desistir antes da conclusão do desenvolvimento, devolvemos integralmente o que pagou à Nekkora pelo desenvolvimento',
+      // C-03 e C-04 (titular, 09/11/2026): integral antes da disponibilização; 50% do valor PAGO durante a homologação,
+      // sem cobrança adicional e sem entrega definitiva — texto da titular (PUB-17/PUB-19), sujeito a revisão jurídica
+      'Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. Durante a homologação, após a disponibilização formal da automação concluída, devolvemos 50% do valor já pago, sem cobrança adicional. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados',
       // [CO-08] AUD-17/AUD-18 — sem cláusula absoluta: as regras ficam na proposta e no contrato, com os direitos legais
       'Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei',
     ],

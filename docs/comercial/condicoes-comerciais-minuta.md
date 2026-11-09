@@ -271,3 +271,16 @@ cancelamento unilateral sem igual direito para o cliente (CDC art. 51, XI).
 O prazo de 7 dias para aceitar a proposta na campanha (§8) **não muda**. A alteração vai para a revisão jurídica
 (JUR-03): (a) se o início dentro do prazo do CDC art. 49 exige alguma informação adicional ao consumidor; (b) se a
 regra de não pedir licenças durante o prazo de arrependimento (contrato-base 3.4) basta para os contratos acessórios.
+
+## 13. Alteração da titular — desistência durante a homologação (09/11/2026)
+
+| Diretriz | Antes | Agora | Onde |
+|---|---|---|---|
+| C-04 | Cobrança de até 90% do preço (consumidor, com reserva de 10%) ou de até 100% (B2B), após a conclusão | Desistência voluntária **durante a homologação**, depois da disponibilização formal registrada: devolução de **50% dos valores pagos** à Nekkora pelo desenvolvimento e retenção dos outros 50%. A base é o valor pago, não o preço; sem cobrança adicional; regra igual para consumidor e B2B; nada é entregue sem quitação integral. Após o aceite formal, valem as condições dessa etapa e a lei | Contrato-base cl. 6.3, 9.1, 10, 12.1 e 14.2; Anexo B2B §2-A; Anexo de Componentes; proposta-modelo; procedimento §5 e §6; `resultadoDaDesistencia`; site (CO-11) |
+
+Preservados: reembolso integral antes da conclusão (C-03), arrependimento legal (cl. 3), defeitos e descumprimento
+(cl. 11), garantias legais (cl. 13), aceite formal sem aceite tácito (cl. 8), pagamento 50% + 50% (cl. 6).
+
+**Revisão jurídica (JUR-03):** (a) validade da retenção de 50% do valor pago na relação de consumo (CDC art. 51, IV, e
+art. 53); (b) se a retenção de 50% sem entrega é equilibrada (contrato-base 10.4: decidido pela titular em 09/11/2026 que a
+desistência encerra a contratação, sem entrega definitiva); (c) se a mesma regra serve ao B2B sem ajuste. A decisão empresarial **não** confirma a validade jurídica.

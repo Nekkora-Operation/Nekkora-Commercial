@@ -126,7 +126,7 @@ Nem todo processo é simples ou médio: a avaliação indica a categoria antes d
 - Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação
 - Reuniões e acompanhamento conforme as condições acordadas
 - Licenças e custos externos tratados à parte, quando aplicáveis
-- Se você desistir antes da conclusão do desenvolvimento, devolvemos integralmente o que pagou à Nekkora pelo desenvolvimento
+- Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. Durante a homologação, após a disponibilização formal da automação concluída, devolvemos 50% do valor já pago, sem cobrança adicional. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados
 - Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei
 
 Hosting tem avaliação e proposta próprias.
