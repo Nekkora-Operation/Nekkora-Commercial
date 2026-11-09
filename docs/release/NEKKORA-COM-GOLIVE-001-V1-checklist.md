@@ -143,8 +143,9 @@ Roteiros: [evidências da titular](NEKKORA-COM-GOLIVE-001-evidencias-titular.md)
 
 - [ ] **E5 — Teams:** gravação e transcrição desligadas na política `Nekkora-Commercial` (CTL-01). Vem **antes** do
       E1.
-- [ ] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com **12 de 12**: as 11 regras mais a B12, da caixa de
-      ciência.
+- [x] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com **12 de 12**: as 11 regras mais a B12, da caixa de
+      ciência. Verificado em 09/11/2026: [registro](evidencias/golive-001/bookings-validacao-final/registro.md). Repetir
+      depois da A8.
 - [ ] **E2 — E-mail externo** recebido na Caixa de Entrada e respondido.
 - [ ] **E3 — Local dos dados** do Microsoft 365 (captura do cartão).
 - [ ] **E4 — Logs v2** ativos e conferidos pelos 7 critérios do README §4.

@@ -169,6 +169,10 @@ Legenda: **S** = ocorre ou pode ocorrer; **N** = não ocorre; **?** = depende de
    mecanismo) sem prometer mecanismo inexistente?
 7. **Risco residual.** Com E3 em BRA e Customer Lockbox, o que sobra de transferência sem mecanismo? É impeditivo para
    publicar o site **sem** o Bookings, ou só para o atendimento?
+8. **Campo livre do Bookings.** O formulário tem o campo opcional de texto livre "Adicionar solicitações especiais". O
+   aviso cita "as respostas deste formulário (empresa e processo, quando informados)", sem mencionar esse campo. A
+   redação basta ou precisa citá-lo? Registrado em 09/11/2026 para a revisão do texto final; o Bookings não foi alterado
+   por isso.
 
 ### 4.6 Situação
 
