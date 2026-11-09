@@ -56,17 +56,19 @@ contrato-base. ⚖ Forma do aceite e da assinatura (assinatura eletrônica ou e-
 **[R]** A contagem exclui o dia da emissão e inclui o último (ex.: emitida em 10/11, aceitável até 17/11). Fora da
 campanha, a validade é a indicada na proposta.
 
-## Cláusula 3 — Espera inicial e direito de arrependimento (C-02)
+## Cláusula 3 — Início do desenvolvimento e direito de arrependimento (C-02)
 
-3.1 **[D]** O desenvolvimento **só começa depois de transcorridos 7 dias corridos da assinatura** deste contrato.
-**[D]** Nesta versão, **não há início antecipado**, nem a pedido do CONTRATANTE. Qualquer exceção futura depende de
-revisão jurídica e de nova autorização da titular.
+3.1 **[D]** Não há prazo de espera obrigatório depois da assinatura. O desenvolvimento de cada automação começa na
+**data prevista de início** informada na proposta, conforme a fila operacional (cláusula 5). Desde a formalização, a
+Nekkora mantém o atendimento ao CONTRATANTE pelos canais deste contrato. Isso não é promessa de início imediato nem de
+prazo igual para todas as automações. **[!]** Alteração da titular de 09/11/2026, que substitui a espera de 7 dias da
+redação anterior. Está sujeita à revisão jurídica (JUR-03).
 
 3.2 **[N]** CDC art. 49: o consumidor pode desistir em 7 dias, a contar da assinatura ou do recebimento do serviço,
 quando a contratação ocorre fora do estabelecimento comercial; os valores pagos "a qualquer título" são devolvidos de
 imediato, monetariamente atualizados. **[R]** Este contrato **preserva integralmente** esse direito e **não fixa** um
-termo final diferente do legal: a espera de 7 dias do item 3.1 é regra operacional da Nekkora e **não extingue** direito
-legal com termo inicial ou forma de exercício diferente. ⚖ Termo inicial do arrependimento em serviço sob encomenda
+termo final diferente do legal: o início do desenvolvimento, mesmo dentro do prazo legal, **não extingue** direito legal
+com termo inicial ou forma de exercício diferente, nem reduz a restituição do item 3.4. ⚖ Termo inicial do arrependimento em serviço sob encomenda
 ("recebimento do serviço").
 
 3.3 **[R]** Exercício: resposta ao e-mail da proposta ou mensagem para **contato@nekkora.com**, sem necessidade de
@@ -77,8 +79,8 @@ recebimento do pedido. **[!]** Como garantir a confirmação **imediata** (respo
 3.4 **[R]** No arrependimento legal, a Nekkora devolve **tudo o que recebeu do CONTRATANTE, a qualquer título**, de
 imediato e com atualização monetária, sem multa nem desconto. **[N]** Decreto 7.962/2013, art. 5º, §2º: o
 arrependimento rescinde os contratos acessórios sem ônus. **[R]** Para evitar custo de terceiros dentro do prazo, a
-Nekkora **não pede** ao CONTRATANTE que contrate licenças ou serviços externos antes de iniciado o desenvolvimento
-(item 3.1). ⚖ Alcance de "contratos acessórios" para licenças contratadas diretamente pelo CONTRATANTE.
+Nekkora **não pede** ao CONTRATANTE que contrate licenças ou serviços externos enquanto houver prazo legal de
+arrependimento em curso. ⚖ Alcance de "contratos acessórios" para licenças contratadas diretamente pelo CONTRATANTE.
 
 ## Cláusula 4 — Escopo, mudanças e custos externos (C-08)
 
@@ -100,8 +102,8 @@ CONTRATANTE. **[N]** CDC art. 40, §3º.
 disponibilização para homologação**, dependências informadas e critérios objetivos de aceite.
 
 5.2 **[D]** A Nekkora organiza as demandas em fila, mas **a fila não deixa o início a critério exclusivo da Nekkora**:
-vale a data prevista na proposta. **[N]** CDC art. 39, XII. **[R]** A data prevista de início nunca é anterior ao 8º dia
-após a assinatura (cláusula 3.1).
+vale a data prevista na proposta. **[N]** CDC art. 39, XII. **[R]** A data prevista de início é definida em cada
+proposta, nunca antes da assinatura, e não há data universal (cláusula 3.1).
 
 5.3 **[D]** "Dois dias úteis de desenvolvimento" é referência operacional possível, **nunca promessa universal**; não
 aparece como prazo garantido.

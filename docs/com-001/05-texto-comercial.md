@@ -122,7 +122,6 @@ Nem todo processo é simples ou médio: a avaliação indica a categoria antes d
 - Desenvolvimento sob demanda, com escopo formalizado em proposta
 - Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios
 - Preço aprovado por você antes do início do desenvolvimento
-- O desenvolvimento começa depois de 7 dias corridos da assinatura do contrato
 - Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal
 - Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação
 - Reuniões e acompanhamento conforme as condições acordadas

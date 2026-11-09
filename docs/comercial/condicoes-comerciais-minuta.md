@@ -261,3 +261,13 @@ cancelamento unilateral sem igual direito para o cliente (CDC art. 51, XI).
 | C-07 | Prazo estimado de correção a decidir | Confirmação em até **2 dias úteis**, diagnóstico em até **5 dias úteis**, previsão de correção por caso; termo inicial dos 30 dias continua ⚖ | Termo de garantia §3 e §4; contrato-base 13.3 |
 | C-10 | Limites numéricos `[!]` (COM-10) | **Esforço técnico estimado:** simples até 8 h; média acima de 8 até 16 h; complexa acima de 16 h ou risco excepcional justificado e informado antes do aceite; sem enquadramento pela contagem isolada de sistemas ou APIs | Regulamento §5; site ("O que define a categoria") |
 | C-11 | Atualização monetária: aplicar ou dispensar | **Prever** a atualização quando juridicamente devida, sem cumulação indevida; 1% a.m. não presumido permitido para todos | Contrato-base 15.2 e 15.2-A |
+
+## 12. Alteração da titular — início do desenvolvimento (09/11/2026)
+
+| Diretriz | Antes | Agora | Onde |
+|---|---|---|---|
+| C-02 | Início só depois de 7 dias corridos da assinatura, sem exceção | **Sem espera obrigatória.** O início segue a data prevista em cada proposta e a fila operacional; atendimento desde a formalização, sem promessa de início imediato nem prazo universal. Arrependimento legal preservado (contrato-base 3.2 a 3.4) | Contrato-base cl. 3.1, 3.2, 3.4 e 5.2; proposta-modelo; procedimento operacional; `validarCronograma`; frase removida do site |
+
+O prazo de 7 dias para aceitar a proposta na campanha (§8) **não muda**. A alteração vai para a revisão jurídica
+(JUR-03): (a) se o início dentro do prazo do CDC art. 49 exige alguma informação adicional ao consumidor; (b) se a
+regra de não pedir licenças durante o prazo de arrependimento (contrato-base 3.4) basta para os contratos acessórios.

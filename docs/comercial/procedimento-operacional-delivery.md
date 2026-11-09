@@ -14,8 +14,8 @@
    acima de 16 h) e escrever os fatos dos critérios complementares (regulamento §5). Contagem de sistemas ou APIs, sozinha,
    não muda a categoria. Complexa por risco excepcional: justificativa, fatos verificáveis e aviso ao cliente **antes** do
    aceite (`classificarAutomacao`).
-3. Preencher a [proposta-modelo](proposta-modelo-delivery.md): escopo, preço, cronograma (início **≥ 8º dia** após a
-   assinatura), dependências, critérios de aceite, Anexo de Componentes, despesas externas e, no regime do consumidor, a
+3. Preencher a [proposta-modelo](proposta-modelo-delivery.md): escopo, preço, cronograma (data prevista de início conforme a
+   fila, nunca antes da assinatura), dependências, critérios de aceite, Anexo de Componentes, despesas externas e, no regime do consumidor, a
    **reserva das etapas finais (10%)** — sem ela, a cláusula 10 não pode ser usada depois.
 4. Validade: 7 dias corridos da emissão, com a **data final escrita**.
 5. Natureza da relação: **declarar** consumidor ou B2B; B2B só com os quatro itens do [Anexo B2B](anexo-b2b-delivery.md)
@@ -31,7 +31,8 @@
 | 4. Classificar | Arrependimento legal (contrato-base 3.4) → devolver **tudo, de imediato**, com atualização monetária · Antes da conclusão (9.1) → devolver o pago pelo desenvolvimento em até **5 dias úteis** · Após a conclusão (10) → §5 · Defeito ou atraso da Nekkora → cláusula 11 |
 | 5. Concluir | Pix e **comprovante de devolução** enviado ao cliente; registrar a data. O prazo de 5 dias úteis **nunca** posterga uma devolução que a lei exige de imediato |
 
-Não iniciar o desenvolvimento nem pedir compra de licenças antes do 8º dia após a assinatura.
+O desenvolvimento começa na data prevista na proposta, sem espera fixa depois da assinatura. Não pedir ao cliente a
+compra de licenças ou serviços externos enquanto houver prazo legal de arrependimento em curso (contrato-base 3.4).
 
 ## 3. Homologação (C-06)
 

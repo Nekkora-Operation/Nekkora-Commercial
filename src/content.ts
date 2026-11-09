@@ -159,8 +159,6 @@ export const PRICING = {
       // [CO-07] AUD-07/AUD-13 — contratar várias automações juntas não as transforma em uma complexa
       'Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios',
       'Preço aprovado por você antes do início do desenvolvimento',
-      // CONTRACT-001 (C-02): espera de 7 dias corridos depois da assinatura antes de começar — texto NOVO (PUB-17)
-      'O desenvolvimento começa depois de 7 dias corridos da assinatura do contrato',
       // [CO-03] AUD-16 — 50/50 é condição de PAGAMENTO, não percentual de desconto
       'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal',
       // CONTRACT-001 (C-12): a fila não deixa o início a critério exclusivo da Nekkora (CDC art. 39, XII) — texto ALTERADO (PUB-17)

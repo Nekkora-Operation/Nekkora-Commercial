@@ -94,18 +94,17 @@ export const propostaAceitavel = (emissao, aceiteEm) => diaEmBrasilia(aceiteEm) 
 /* C-02 / C-12 — início do desenvolvimento e cronograma                 */
 /* ------------------------------------------------------------------ */
 
-export const ESPERA_INICIAL_DIAS = 7;
-
-/** Primeiro dia em que o desenvolvimento pode começar: depois de transcorridos 7 dias corridos da assinatura. */
-export const inicioMinimoDoDesenvolvimento = (assinatura) => somarUmDia(somarDiasCorridos(assinatura, ESPERA_INICIAL_DIAS));
-
-/** Cada automação: escopo, preço, início e homologação previstos, dependências e critérios de aceite (C-12). */
+/**
+ * Cada automação: escopo, preço, início e homologação previstos, dependências e critérios de aceite (C-12).
+ * Sem espera fixa depois da assinatura (titular, 09/11/2026, C-02 alterada): o início é a data da proposta, conforme a
+ * fila, e só não pode ser anterior à assinatura.
+ */
 export function validarCronograma({ assinatura, inicioPrevisto, homologacaoPrevista, dependencias, criteriosDeAceite, precoCentavos, escopo }) {
   const faltas = [];
   if (!escopo) faltas.push('escopo próprio');
   if (!Number.isInteger(precoCentavos) || precoCentavos <= 0) faltas.push('preço próprio');
   if (!inicioPrevisto) faltas.push('data prevista de início');
-  else if (inicioPrevisto < inicioMinimoDoDesenvolvimento(assinatura)) faltas.push(`início antes de ${inicioMinimoDoDesenvolvimento(assinatura)} (7 dias da assinatura, C-02)`);
+  else if (assinatura && inicioPrevisto < assinatura) faltas.push(`início antes da assinatura (${assinatura})`);
   if (!homologacaoPrevista || (inicioPrevisto && homologacaoPrevista <= inicioPrevisto)) faltas.push('data prevista de disponibilização para homologação, depois do início');
   if (!Array.isArray(dependencias)) faltas.push('dependências informadas (lista, mesmo vazia)');
   if (!Array.isArray(criteriosDeAceite) || criteriosDeAceite.length === 0) faltas.push('critérios objetivos de aceite');

@@ -21,7 +21,6 @@ import {
   regimeDaContratacao,
   reservaDasEtapasFinais,
   encargosDeAtraso,
-  inicioMinimoDoDesenvolvimento,
   parcelas,
   periodosDeReclamacao,
   precoDaAutomacao,
@@ -64,19 +63,28 @@ test('1. arrependimento legal: restituição integral de tudo o que foi pago, a 
   assert.equal(r.restituirCentavos, 145_000);
   assert.equal(r.saldoMaximoPretendidoCentavos, 0);
   assert.equal(r.aceite, false);
-  // Contrato: canal, confirmação imediata, sem termo final diferente do legal, sem início antecipado
+  // Contrato: canal, confirmação imediata, sem termo final diferente do legal
   assert.match(CONTRATO, /contato@nekkora\.com/);
   assert.match(CONTRATO, /confirmação imediata/);
   assert.match(CONTRATO, /não extingue/);
-  assert.match(CONTRATO, /não há início antecipado/);
-  assert.doesNotMatch(PROPOSTA, /salvo se você pedir|salvo pedido expresso/i, 'C-02: sem início antecipado a pedido do cliente');
+  assert.match(CONTRATO, /nem reduz a restituição do item 3\.4/);
 });
 
-test('1b. espera de 7 dias: o desenvolvimento só começa no 8º dia após a assinatura', () => {
-  assert.equal(inicioMinimoDoDesenvolvimento('2026-12-10'), '2026-12-18');
+test('1b. sem espera fixa (titular, 09/11/2026): o início é a data da proposta, nunca antes da assinatura', () => {
   const ok = { assinatura: '2026-12-10', escopo: 'x', precoCentavos: PRECO, homologacaoPrevista: '2027-01-08', dependencias: [], criteriosDeAceite: ['a'] };
-  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-17' }).valido, false);
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-09' }).valido, false, 'antes da assinatura');
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-11' }).valido, true, 'antes do antigo 8º dia');
   assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-18' }).valido, true);
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: undefined }).valido, false, 'a proposta continua exigindo a data de início');
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2027-01-08' }).valido, false, 'homologação continua depois do início');
+  for (const doc of [CONTRATO, PROPOSTA, ler('docs/comercial/procedimento-operacional-delivery.md')]) {
+    assert.doesNotMatch(doc, /só começa depois de (transcorridos )?7 dias|8º dia após a assinatura|≥ 8º dia/);
+    assert.doesNotMatch(doc, /início imediato garantido|24 ?horas|24h/i, 'sem promessa de início imediato nem atendimento 24 h');
+  }
+  assert.match(CONTRATO, /Não há prazo de espera obrigatório/);
+  assert.match(CONTRATO, /não é promessa de início imediato/);
+  assert.match(PROPOSTA, /\*\*Início previsto\*\*/);
+  assert.equal(ultimoDiaDeAceite('2026-12-10'), '2026-12-17', 'o prazo de 7 dias para aceitar a proposta não muda');
 });
 
 /* 2 ------------------------------------------------------------------ */
@@ -258,7 +266,11 @@ test('14. bloqueios de produção preservados: nenhuma aprovação presumida', (
 
 /* Coerência dos textos públicos com as decisões ------------------------ */
 test('textos públicos coerentes com C-02, C-03, C-06, C-07 e C-12', () => {
-  assert.match(CONTENT, /O desenvolvimento começa depois de 7 dias corridos da assinatura do contrato/);
+  // Titular, 09/11/2026 (PUB-19): os 7 dias da assinatura não aparecem como espera obrigatória; o início vem da fila e da
+  // proposta. O prazo de 7 dias para aceitar a proposta é outra regra e continua.
+  assert.doesNotMatch(CONTENT, /começa depois de 7 dias|dias corridos da assinatura/);
+  assert.match(CONTENT, /Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação/);
+  assert.match(CONTENT, /aceita em até 7 dias corridos da emissão/);
   assert.match(CONTENT, /devolvemos integralmente o que pagou à Nekkora pelo desenvolvimento/);
   assert.match(CONTENT, /o silêncio não vale como aceite/);
   assert.match(CONTENT, /Garantia contratual de correção de defeitos, em termo escrito, além das garantias legais/);
