@@ -103,7 +103,8 @@ export const PRICING = {
   // cada preço mostra a própria economia. Com as datas da campanha em publicacao.json (PUB-13), o período aparece por
   // extenso e a página só mostra os preços de lançamento dentro dele (config.ts, isLaunchActive); sem as datas, só como
   // prévia de homologação, e o deploy de produção fica bloqueado (scripts/verificar-publicacao.mjs).
-  // [PR-07] Regras aprovadas na COM-008-B (AUD-04, AUD-06): dois meses a partir da publicação oficial; vale a data da
+  // [PR-07] Regras aprovadas na COM-008-B (AUD-04, AUD-06); período mantido pela titular em 09/11/2026 (06/11/2026 a
+  // 06/01/2027, no lugar dos dois meses a partir da publicação oficial); vale a data da
   // SOLICITAÇÃO; proposta com prazo de aceite de 7 dias corridos; preço individual por automação.
   launch: {
     badge: 'Lançamento',

@@ -510,8 +510,11 @@ test('R1-26. preços promocionais e padrão preservados; complexa sem desconto',
 });
 
 test('R1-27. datas da campanha não alteradas nem inferidas', () => {
-  assert.deepEqual(PUBLICACAO.campanhaLancamento, { inicio: '2026-11-06', fim: '2027-01-06' }, 'datas históricas intactas');
-  assert.match(REGULAMENTO, /Datas fixas pendentes de aprovação da titular/);
+  // Decisão da titular de 09/11/2026 (D2/PUB-13): manter o período já gravado. Mudar as datas exige nova autorização.
+  assert.deepEqual(PUBLICACAO.campanhaLancamento, { inicio: '2026-11-06', fim: '2027-01-06' }, 'datas mantidas pela titular intactas');
+  assert.match(REGULAMENTO, /De \*\*06\/11\/2026 a 06\/01\/2027\*\*/, 'regulamento com as datas mantidas');
+  assert.match(REGULAMENTO, /mantidas pela titular em 09\/11\/2026/);
+  assert.doesNotMatch(REGULAMENTO, /Datas fixas pendentes/, 'regulamento sem a pendência antiga');
   assert.doesNotMatch(ler('scripts/comercial/regras-delivery.mjs'), /20\d\d-\d\d-\d\d/, 'nenhuma data fixa nas regras');
 });
 

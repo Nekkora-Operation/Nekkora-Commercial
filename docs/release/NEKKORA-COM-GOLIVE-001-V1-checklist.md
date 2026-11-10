@@ -98,6 +98,9 @@ A decisão é da titular. Este documento não declara o ponto juridicamente reso
 
 ### 3.3 Datas da campanha
 
+**Decisão (D2, 09/11/2026): mantidas.** O regulamento e o teste R1-27 foram ajustados juntos na `release/v1`. O texto
+visível não muda.
+
 - **Se forem mantidas (06/11/2026 a 06/01/2027):** a página publicará um período que começou antes de o site existir,
   e o prazo efetivo fica menor que os dois meses aprovados.
 - **Se forem ajustadas:** muda o texto visível. Os testes que fixam as datas também precisam ser atualizados na mesma
@@ -166,6 +169,7 @@ Roteiros: [evidências da titular](NEKKORA-COM-GOLIVE-001-evidencias-titular.md)
 **Decisões escritas (titular):**
 
 - [ ] **D1 — JUR-07 / JUR-06, com parecer:**
+  - perguntas consolidadas no [dossiê jurídico](NEKKORA-COM-GOLIVE-001-dossie-juridico.md) (10/11/2026);
   - respostas às perguntas da JUR-07 §4.5;
   - o mecanismo adotado em cada fluxo;
   - a redação do aviso.
@@ -183,12 +187,13 @@ Roteiros: [evidências da titular](NEKKORA-COM-GOLIVE-001-evidencias-titular.md)
 4. [ ] **A3 — PR de texto** (`docs/v1-texto-publico`):
    - o [PV-12], só depois do E4. **E4 feito; integrado na `release/v1` em 10/11/2026, ainda sem aprovação;**
    - o texto da JUR-07, só depois do D1;
-   - as datas, com o D2.
+   - as datas, com o D2. **Mantidas; regulamento e R1-27 ajustados na `release/v1`.**
 5. [ ] **A4 — Aprovações sobre o mesmo commit:** PUB-17, PUB-09 e PUB-19.
 6. [ ] **A5 — PR de liberação** (`publicacao: true`, `avisoHomologacao: false`, aprovações com `$origem`) e a tag
        `v1.0.0`.
 7. [ ] **A6 — Deploy** de produção (aprovação no environment).
 8. [ ] **A7 — DNS:** os 2 CNAMEs na Cloudflare, DNS only.
-9. [ ] **A8 — Variável** `DOMINIO_PUBLICO`. Em seguida, repetir o E1, porque o link `#privacidade` passa a funcionar.
+9. [ ] **A8 — Variável** `DOMINIO_PUBLICO`. Em seguida, repetir o E1, porque o link `#privacidade` passa a funcionar,
+   e testar o "Abrir no e-mail" no computador e no celular (REP-04, homologação pública; não bloqueia a publicação).
 
 Sequência técnica, critérios de aborto e rollback: §4 deste checklist e runbook §6 do relatório GOLIVE-001.
