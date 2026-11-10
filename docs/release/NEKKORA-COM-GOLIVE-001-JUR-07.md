@@ -15,6 +15,7 @@ encerra** o item.
 | Ponto | Fato | Fonte |
 |---|---|---|
 | M365, residência no Brasil | Brasil tem compromisso de residência para Exchange Online, SharePoint/OneDrive e Teams (Product Terms, sem custo, para tenant provisionado no Brasil): corpo de e-mails, calendário, anexos, arquivos, chats e mensagens de reunião | learn.microsoft.com/…/m365-dr-compare-offerings e …/m365-dr-product-terms (ms.date 08/10/2026) |
+| **E3: tenant da Nekkora (10/11/2026)** | Cartão "Localização dos dados": Exchange Online, Teams, OneDrive e SharePoint em **Brasil/Brasil** (atual/confirmada). Proteção do Exchange Online e Viva Connections em Brasil, sem compromisso. Copilot não informado. Bookings não aparece. Só dados **em repouso** | [registro E3](evidencias/golive-001/m365-local-dos-dados-2026-11-10.md) (captura da titular) |
 | Bookings | **Fora** da lista de serviços com compromisso de residência. O FAQ diz que ele guarda os dados em caixas compartilhadas do Exchange. Que a residência do Exchange cubra o Bookings é **inferência, não compromisso** | …/m365-dr-services-data-location; …/bookings/bookings-faq |
 | Processamento fora do país (M365) | Os compromissos são sobre dados **armazenados**. Requisições "may be handled by servers in a different region"; há acesso de engenheiros, limitado e registrado; a documentação sobre dados em processamento está "coming soon" | …/m365-dr-what-is-data-residency |
 | DPA da Microsoft (01/11/2026) | O cliente autoriza transferência para os EUA ou qualquer país em que a Microsoft ou seus subprocessadores operem. **Sem** menção a LGPD, ANPD ou CPC brasileiras | microsoft.com/licensing/docs/…/Microsoft-Products-and-Services-Data-Protection-Addendum-DPA |
@@ -56,6 +57,8 @@ pequena do atendimento.
 1. **Evidência de localização.** A titular captura, no Centro de administração, o caminho Configurações →
    Configurações da organização → Perfil da organização → **Local dos dados** ("Current" e "Committed
    Geography"). Sozinha, essa evidência não resolve a JUR-07; ela só reduz o escopo do que vai ao exterior.
+   **Feito em 10/11/2026 (E3):** Exchange, Teams, OneDrive e SharePoint em Brasil/Brasil
+   ([registro](evidencias/golive-001/m365-local-dos-dados-2026-11-10.md)).
 2. **Fluxos com base no V e no II.** Adotar o **art. 33, IX** e registrar na `privacidade-minuta.md` §5 por que a
    transferência é necessária: o atendimento pedido por quem contrata em nome próprio só ocorre pelos meios
    contratados, e a guarda dos registros é obrigação legal. Risco: "necessária" pode ser lida de forma estrita,
@@ -90,15 +93,17 @@ pequena do atendimento.
 
    A frase "guardam preferencialmente no Brasil" só entra se a evidência do item 1 mostrar o Brasil. O trecho entre
    colchetes **não** pode ir ao ar com um mecanismo único para todos.
+   O E3 (10/11/2026) mostra o Brasil para Exchange, Teams, OneDrive e SharePoint. Ele não cobre o Bookings, nem a AWS,
+   nem o processamento. A redação final continua dependendo do parecer.
 
 **A JUR-07 só sai da lista de impeditivos quando houver as quatro coisas:**
 
-- a evidência do item 1;
+- a evidência do item 1 (**existe desde 10/11/2026**: E3);
 - o parecer do item 5, com o mecanismo de cada fluxo;
 - o mecanismo dos fluxos com base no IX efetivamente adotado: CPC assinada ou consentimento coletado e registrado;
 - o texto do item 7 integrado e aprovado na PUB-09.
 
-Nenhuma delas existe hoje.
+Em 10/11/2026, só a primeira existe. As outras três continuam pendentes.
 
 ## 4. R2 — fecho da investigação técnica (06/11/2026)
 
@@ -118,14 +123,15 @@ o art. 33, IX, resolva todos os casos.
 
 ### 4.2 Matriz por fluxo
 
-Legenda: **S** = ocorre ou pode ocorrer; **N** = não ocorre; **?** = depende de evidência (E3) ou de interpretação.
+Legenda: **S** = ocorre ou pode ocorrer; **N** = não ocorre; **?** = depende de evidência ou de interpretação. Desde
+10/11/2026, o E3 está incorporado.
 
 | Fluxo | Coleta internacional | Armazenamento no exterior | Acesso de suporte | Subprocessadores | Base do tratamento (art. 7º) | Mecanismo do art. 33 |
 |---|---|---|---|---|---|---|
-| **E-mail** `contato@` (Exchange) | N (a Nekkora coleta no Brasil, pelo próprio tenant) | **?** Brasil se o "Local dos dados" mostrar BRA (E3); o processamento em trânsito pode ocorrer em outra região | S, limitado e registrado. Pode depender de aprovação, com Customer Lockbox | S (DPA: EUA ou qualquer país) | V (contrata em nome próprio) ou IX (representante): **JUR-06** | V → IX do art. 33 (candidato). IX → **sem mecanismo hoje** (§4.3) |
+| **E-mail** `contato@` (Exchange) | N (a Nekkora coleta no Brasil, pelo próprio tenant) | N em repouso: Exchange em Brasil/Brasil (E3, 10/11/2026). O processamento em trânsito pode ocorrer em outra região | S, limitado e registrado. Pode depender de aprovação, com Customer Lockbox | S (DPA: EUA ou qualquer país) | V (contrata em nome próprio) ou IX (representante): **JUR-06** | V → IX do art. 33 (candidato). IX → **sem mecanismo hoje** (§4.3) |
 | **Bookings** | N | **?** Não tem compromisso de residência próprio. Os dados ficam em caixa do Exchange; a cobertura é **inferência** | S | S | idem | idem |
 | **Teams**: reunião em tempo real | N | Mídia: a conferência é hospedada "in the same region where the first participant joined"; **não há compromisso de residência para mídia** | S | S | idem | idem |
-| **Teams**: chat da reunião | N | **?** Tenants brasileiros antigos "continue to have their data stored in the Americas". E3 decide | S | S | idem | idem |
+| **Teams**: chat da reunião | N | N em repouso: Teams em Brasil/Brasil (E3, 10/11/2026). Isso afasta a hipótese de tenant antigo nas Américas | S | S | idem | idem |
 | **Entrega do site** (CloudFront) | **S?** Ponto de presença no exterior para visitante fora do Brasil. ⚖ Pode ser coleta internacional se a AWS for vista como meio da coleta da Nekkora | N (sem guarda na entrega) | — | — | IX (entregar e proteger o serviço) | Se for coleta internacional, nenhum. Se for transferência, o IX do art. 33 não cobre ⚖ |
 | **Registros de acesso** (LOG-01) | N | N (bucket em `sa-east-1`) | S (suporte AWS) | ? | II (Marco Civil, art. 15) | IX + art. 7º, II (candidato) |
 | **Hospedagem** (S3 do site) | N | N (`sa-east-1`) | S | ? | — (conteúdo público, sem dados pessoais) | Não se aplica |
@@ -142,7 +148,7 @@ Legenda: **S** = ocorre ou pode ocorrer; **N** = não ocorre; **?** = depende de
 
 | Alternativa | Efeito | Limite |
 |---|---|---|
-| Confirmar o tenant em BRA (E3) | O armazenamento de Exchange, SharePoint e (talvez) Teams fica no Brasil | Não cobre processamento, suporte, subprocessadores, mídia do Teams nem Bookings |
+| Confirmar o tenant em BRA (E3). **Confirmado em 10/11/2026** | O armazenamento de Exchange, SharePoint, OneDrive e Teams fica no Brasil, com compromisso | Não cobre processamento, suporte, subprocessadores, mídia do Teams, Bookings nem Copilot |
 | **Advanced Data Residency** (add-on; Brasil incluído) | Compromisso contratual de residência ampliado | Exige 100% das licenças pagas; custo; o Bookings não é citado |
 | **Customer Lockbox** (E5, ou add-on de Compliance) | O suporte da Microsoft só acessa conteúdo com aprovação da titular (até 4 h) | Reduz o acesso de suporte, mas **não** cobre subprocessadores nem pedidos de autoridades |
 | Teams: manter sem gravação e sem transcrição (CTL-01) | Nada fica armazenado da conversa | A mídia em tempo real continua sujeita ao roteamento |
@@ -177,5 +183,8 @@ Legenda: **S** = ocorre ou pode ocorrer; **N** = não ocorre; **?** = depende de
 ### 4.6 Situação
 
 - **Investigação técnica:** concluída, com as fontes listadas e as inferências marcadas como tais.
-- **JUR-07:** **pendente.** Depende de E3, do parecer (§4.5) e do mecanismo adotado para cada fluxo.
+- **E3:** **verificado em 10/11/2026**, só quanto aos dados em repouso dos serviços do cartão
+  ([registro](evidencias/golive-001/m365-local-dos-dados-2026-11-10.md)).
+- **JUR-07:** **pendente.** Depende do parecer (§4.5) e do mecanismo adotado para cada fluxo. Transferências
+  internacionais, acessos de suporte, subprocessadores e bases legais (JUR-06) **não** estão resolvidos.
 - **Texto do aviso (grupo C):** não escrito no site até o parecer.
