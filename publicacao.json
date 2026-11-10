@@ -7,7 +7,7 @@
     "campanhaLancamento": "Titular, 04/11/2026 (commit 337449b): 06/11/2026 a 06/01/2027 (fuso de Brasília).",
     "hospedagem.provedor": "COM-RELEASE-003 §1.1: Amazon S3 + Amazon CloudFront.",
     "aprovacoes.precos": "COM-RELEASE-003-R1 §3.1 (decisão interna de 22/10/2026): simples R$ 1.500 → R$ 1.000, média R$ 3.500 → R$ 2.800, complexa sob orçamento. Não inclui as condições comerciais (§3.5).",
-    "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. URL da página pública criada pela titular no Microsoft Bookings (página compartilhada \"Nekkora\", serviço \"Conversa inicial — Nekkora Delivery\"), conferida em 28/10/2026 (NEKKORA-COM-007).",
+    "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. URL da página pública criada pela titular no Microsoft Bookings (página compartilhada \"Nekkora\", serviço \"Conversa inicial — Nekkora Delivery\"), conferida em 28/10/2026 (NEKKORA-COM-007). Titular, 10/11/2026 (NEKKORA-COM-GOLIVE-001, revisão interna §4): Bookings DESATIVADO temporariamente na publicação inicial (url null, obrigatorio false); a aprovação PUB-20 de 05/11/2026 fica preservada, e a URL oficial (https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/) continua validada por scripts/testes/agendamento-url.test.mjs para uma reativação; atendimento inicial por e-mail e LinkedIn, sem reuniões pelo Teams anunciadas até o aviso contemplar esse tratamento.",
     "aprovacoes.agendamento": "Titular, 05/11/2026: agendamento pelo Microsoft Bookings aprovado (PUB-20).",
     "aprovacoes.textosComerciais": "Histórico: titular, 05/11/2026, aprovou os textos comerciais da versão da main após a PR #14 (commit ef5f4a3, merge e9bb413) (PUB-17). NEKKORA-COM-LEGAL-BASE-001-R1 (05/11/2026): a PR #15 alterou textos visíveis (rodapé com razão social, CNPJ, endereço e e-mail; item \"Conversa sem gravação\"; retenção sem as gravações). A aprovação anterior não se transfere para a nova versão: o campo volta a false até nova aprovação explícita da titular.",
     "fornecedor.endereco": "NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): Decreto 7.962/2013, art. 2º, II. Endereço informado pela titular em 05/11/2026, com base no cartão CNPJ (PUB-22). Endereço de escritório virtual: identifica o fornecedor e não indica atendimento presencial.",
@@ -20,8 +20,8 @@
     "instagram": null
   },
   "agendamento": {
-    "url": "https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/",
-    "obrigatorio": true
+    "url": null,
+    "obrigatorio": false
   },
   "envioAutomatico": {
     "endpoint": null,

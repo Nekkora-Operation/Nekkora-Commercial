@@ -167,9 +167,11 @@ export const PRICING = {
       'Reuniões e acompanhamento conforme as condições acordadas',
       'Licenças e custos externos tratados à parte, quando aplicáveis',
       // CONTRACT-001 (C-03): política mais favorável ao cliente — texto NOVO (PUB-17)
-      // C-03 e C-04 (titular, 09/11/2026): integral antes da disponibilização; 50% do valor PAGO durante a homologação,
-      // sem cobrança adicional e sem entrega definitiva — texto da titular (PUB-17/PUB-19), sujeito a revisão jurídica
-      'Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. Durante a homologação, após a disponibilização formal da automação concluída, devolvemos 50% do valor já pago, sem cobrança adicional. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados',
+      // C-03 (titular, 09/11/2026): devolução integral antes da disponibilização para homologação.
+      // GOLIVE-001, publicação sem parecer externo (10/11/2026): a frase pública da C-04 (devolução de 50% durante a
+      // homologação) saiu do site enquanto a validade de reter os outros 50% não estiver fundamentada (JUR-03, J3-c a J3-e). A regra
+      // continua só na minuta do contrato, e a 1ª contratação depende de decisão própria. Nova aprovação: PUB-17/PUB-19.
+      'Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados',
       // [CO-08] AUD-17/AUD-18 — sem cláusula absoluta: as regras ficam na proposta e no contrato, com os direitos legais
       'Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei',
     ],
@@ -627,11 +629,13 @@ export const PRIVACY = {
       // e a expiração de ciclo-de-vida.json (190 dias, assíncrona no S3). Mudou a configuração, muda o texto.
       // Integrado em 10/11/2026, depois de os logs v2 estarem ativos e conferidos na AWS (E4:
       // docs/release/evidencias/golive-001/log-01-2026-11-10.md). Se os logs forem desligados, este texto sai antes.
-      // Nova aprovação: PUB-17 e PUB-09 (não presume aprovação jurídica). Revisão jurídica pendente, em especial das
-      // hipóteses de compartilhamento ("só são fornecidos a terceiros mediante ordem judicial").
+      // Nova aprovação: PUB-17 e PUB-09 (não presume aprovação jurídica). Revisão interna de 10/11/2026 (sem parecer
+      // externo, ajuste 3 da titular): registros de acesso dependem de ordem judicial (Marco Civil, art. 10, §1º, e art.
+      // 15, §3º); o pedido de guarda cautelar (art. 15, §2º) não dá acesso; dados cadastrais (art. 10, §3º) têm regra
+      // própria e não estão nestes registros. A base da guarda (art. 7º, II) ficou numa frase própria.
       text:
         `${HOSTING_PROVIDER ? `A ${HOSTING_PROVIDER}, que hospeda este site,` : 'O provedor de hospedagem'} processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.` +
-        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. Esses registros só são fornecidos a terceiros mediante ordem judicial, nos termos da lei (LGPD, art. 7º, II).' +
+        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. A guarda cumpre uma obrigação legal (LGPD, art. 7º, II). Pela lei, a disponibilização desses registros a terceiros depende de ordem judicial (Marco Civil da Internet, art. 10, §1º, e art. 15, §3º). Autoridades podem pedir que eles sejam guardados por mais tempo (art. 15, §2º), mas o acesso continua dependendo de ordem judicial. Os registros não contêm dados cadastrais, como nome ou endereço, que seguem regras legais próprias (art. 10, §3º).' +
         (viaApi ? ' Para limitar abusos, o serviço de solicitações conta envios por endereço IP sem guardar o endereço (só um código derivado dele), por até 2 dias.' : ''),
     },
     // [PV-09] AUD-39: prazos aprovados na COM-008-B. A eliminação é feita pela Nekkora (não há rotina automática): o texto
@@ -641,17 +645,26 @@ export const PRIVACY = {
       title: 'Por quanto tempo guardamos',
       text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante.${BOOKINGS_URL ? ' Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento.' : ''} Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
     },
-    // [PV-10] AUD-40: transferência internacional (regiões dos provedores a confirmar — revisão jurídica)
+    // [PV-10] AUD-40: transferência internacional. Revisão interna de 10/11/2026 (sem parecer externo): o texto diz só o
+    // que foi verificado e não cita nenhum mecanismo do art. 33 que não esteja comprovado (JUR-07). Fatos: site e logs
+    // em sa-east-1 (auditoria 42809550459 e E4); e-mail e arquivos do M365 em repouso no Brasil (E3). Possível
+    // tratamento no exterior: entrega pelo CloudFront, API dos logs v2 em us-east-1, DPA da Microsoft com transferência
+    // para os EUA, acesso de suporte. Bookings e mídia do Teams estão fora do E3, por isso não são dados como no Brasil.
     {
       icon: 'link' as IconName,
       title: 'Onde os dados são processados',
-      text: `Os serviços da Microsoft (Microsoft 365${BOOKINGS_URL ? ', Bookings e Teams' : ''}) e ${HOSTING_PROVIDER ? `da ${HOSTING_PROVIDER}` : 'do provedor de hospedagem'} usados pela Nekkora podem processar dados em servidores fora do Brasil.`,
+      text: `Os arquivos deste site e os registros de acesso ficam armazenados ${HOSTING_PROVIDER ? `na ${HOSTING_PROVIDER}` : 'no provedor de hospedagem'}, na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países.${BOOKINGS_URL ? ' A localização das reservas do Microsoft Bookings e das reuniões pelo Teams não foi confirmada e pode ser fora do Brasil.' : ''}`,
     },
-    // [PV-08] COM-008-B §9: base legal ≠ ciência da política ≠ consentimento
+    // [PV-08] COM-008-B §9: base legal ≠ ciência da política ≠ consentimento. Revisão interna de 10/11/2026 (sem parecer
+    // externo): aplica a redação já proposta na privacidade-minuta §2 (LEGAL-BASE-001), em que o representante de empresa
+    // fica no art. 7º, IX, porque o V supõe que o titular seja parte. Avaliação do legítimo interesse documentada em
+    // docs/release/NEKKORA-COM-GOLIVE-001-revisao-interna.md §2 (pendente de aprovação da titular; não é parecer). Dela vêm
+    // a menção à oposição (art. 18, §2º) e a retirada de "os dados são necessários", que não serve ao IX. Não resolve o
+    // mecanismo do art. 33 para esse fluxo (J7-4).
     {
       icon: 'user' as IconName,
       title: 'Uso e seus direitos',
-      text: `Usamos os dados que você nos envia só para responder à solicitação${BOOKINGS_URL ? ', realizar a conversa agendada' : ''} e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V). Para isso não pedimos consentimento: os dados são necessários para atender ao seu pedido. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados e, quando houver consentimento, revogá-lo (LGPD, art. 18)${CHANNELS.email ? `, pelo e-mail ${CHANNELS.email}` : ', pelos canais de contato desta página'}.`,
+      text: `Usamos os dados que você nos envia só para responder à solicitação${BOOKINGS_URL ? ', realizar a conversa agendada' : ''} e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18)${CHANNELS.email ? `, pelo e-mail ${CHANNELS.email}` : ', pelos canais de contato desta página'}.`,
     },
   ],
 };

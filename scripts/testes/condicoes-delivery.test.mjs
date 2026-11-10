@@ -270,7 +270,10 @@ test('textos públicos coerentes com C-02, C-03, C-06, C-07 e C-12', () => {
   assert.match(CONTENT, /Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação/);
   assert.match(CONTENT, /aceita em até 7 dias corridos da emissão/);
   assert.match(CONTENT, /devolvemos integralmente o valor pago pelo desenvolvimento/);
-  assert.match(CONTENT, /Durante a homologação, após a disponibilização formal da automação concluída, devolvemos 50% do valor já pago, sem cobrança adicional/);
+  // GOLIVE-001 (10/11/2026, publicação sem parecer externo): a regra dos 50% na homologação (C-04) não aparece no site
+  // enquanto a retenção não estiver fundamentada (JUR-03). O site remete à proposta e ao contrato, com os direitos legais.
+  assert.doesNotMatch(CONTENT, /devolvemos 50%|50% do valor já pago/, 'cláusula pública da C-04 fora do site');
+  assert.match(CONTENT, /'Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei'/);
   assert.match(CONTENT, /A desistência não inclui a entrega definitiva da automação/);
   assert.doesNotMatch(CONTENT, /juridicamente válid|validade jurídica (confirmada|garantida)/i, 'sem promessa de validade jurídica');
   assert.doesNotMatch(CONTENT, /50% do (valor|preço) (total|do contrato)/);
