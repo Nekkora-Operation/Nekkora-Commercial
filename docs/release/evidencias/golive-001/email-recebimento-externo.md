@@ -1,7 +1,13 @@
 # CTL-05 / REP-04 — teste externo de recebimento em `contato@nekkora.com`
 
-**Estado: PENDENTE.** O teste ainda não foi executado. A titular o executa e Claude registra o resultado aqui. Nenhum
-campo pode ser preenchido sem evidência.
+**Estado: RELATADO PELA TITULAR, EVIDÊNCIA NÃO ARQUIVADA.** Em 09/11/2026, a titular informou que envio, recebimento e
+resposta foram testados, e que o teste não será repetido ([registro](decisoes-titular-2026-11-09.md)). A tabela abaixo
+segue em branco porque nenhum campo pode ser preenchido sem evidência.
+
+**"Abrir no e-mail" (REP-04), decisão da titular de 09/11/2026:** o teste do passo 4 será feito na **homologação
+pública**, com o site já em `nekkora.com` (depois da A8, junto com a repetição do E1). Ele **não impede a
+publicação**. O resultado entra nas duas linhas "Abrir no e-mail" da tabela abaixo. Enquanto isso, a homologação
+automatizada confere o `mailto` exato (destinatário e texto), mas não abre um aplicativo real.
 
 ## Pré-condições já verificadas (DNS público, 06/11/2026, somente leitura)
 

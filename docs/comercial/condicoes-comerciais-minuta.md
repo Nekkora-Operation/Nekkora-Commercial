@@ -151,7 +151,7 @@ credenciais: **pendente de redação jurídica**. Os requisitos técnicos futuro
 
 | Regra **[D]** | Como o site trata |
 |---|---|
-| Duração de **dois meses** a partir da publicação oficial | **Histórico (CONTRACT-001, C-10): as datas abaixo não valem como nova autorização; datas fixas pendentes da titular.** Datas **informadas pela titular** em 04/11/2026: `publicacao.json → campanhaLancamento` = **06/11/2026 a 06/01/2027** (fuso de Brasília). O código nunca as calcula nem preenche. Se a publicação oficial ocorrer depois de 06/11/2026, a titular decide se ajusta as datas (o portão recusa campanha encerrada) |
+| Período **06/11/2026 a 06/01/2027** (fuso de Brasília), **mantido pela titular em 09/11/2026** (D2/PUB-13), no lugar da regra anterior de dois meses a partir da publicação oficial | `publicacao.json → campanhaLancamento` = **06/11/2026 a 06/01/2027**, informado em 04/11/2026 e mantido em 09/11/2026 ([registro](../release/evidencias/golive-001/decisoes-titular-2026-11-09.md)). O código nunca calcula nem preenche as datas. O período efetivo no ar fica menor que dois meses. O portão recusa campanha encerrada |
 | Vale a **data da solicitação** recebida durante a campanha | "Preços especiais de lançamento para solicitações de avaliação recebidas de DD/MM/AAAA a DD/MM/AAAA." |
 | Proposta com prazo de aceite de **7 dias corridos** | "A proposta pode ser aceita em até 7 dias corridos da emissão." |
 | Preço individual por automação; complexa sob orçamento | Cartões e simulador; a complexa nunca tem valor |
@@ -261,3 +261,26 @@ cancelamento unilateral sem igual direito para o cliente (CDC art. 51, XI).
 | C-07 | Prazo estimado de correção a decidir | Confirmação em até **2 dias úteis**, diagnóstico em até **5 dias úteis**, previsão de correção por caso; termo inicial dos 30 dias continua ⚖ | Termo de garantia §3 e §4; contrato-base 13.3 |
 | C-10 | Limites numéricos `[!]` (COM-10) | **Esforço técnico estimado:** simples até 8 h; média acima de 8 até 16 h; complexa acima de 16 h ou risco excepcional justificado e informado antes do aceite; sem enquadramento pela contagem isolada de sistemas ou APIs | Regulamento §5; site ("O que define a categoria") |
 | C-11 | Atualização monetária: aplicar ou dispensar | **Prever** a atualização quando juridicamente devida, sem cumulação indevida; 1% a.m. não presumido permitido para todos | Contrato-base 15.2 e 15.2-A |
+
+## 12. Alteração da titular — início do desenvolvimento (09/11/2026)
+
+| Diretriz | Antes | Agora | Onde |
+|---|---|---|---|
+| C-02 | Início só depois de 7 dias corridos da assinatura, sem exceção | **Sem espera obrigatória.** O início segue a data prevista em cada proposta e a fila operacional; atendimento desde a formalização, sem promessa de início imediato nem prazo universal. Arrependimento legal preservado (contrato-base 3.2 a 3.4) | Contrato-base cl. 3.1, 3.2, 3.4 e 5.2; proposta-modelo; procedimento operacional; `validarCronograma`; frase removida do site |
+
+O prazo de 7 dias para aceitar a proposta na campanha (§8) **não muda**. A alteração vai para a revisão jurídica
+(JUR-03): (a) se o início dentro do prazo do CDC art. 49 exige alguma informação adicional ao consumidor; (b) se a
+regra de não pedir licenças durante o prazo de arrependimento (contrato-base 3.4) basta para os contratos acessórios.
+
+## 13. Alteração da titular — desistência durante a homologação (09/11/2026)
+
+| Diretriz | Antes | Agora | Onde |
+|---|---|---|---|
+| C-04 | Cobrança de até 90% do preço (consumidor, com reserva de 10%) ou de até 100% (B2B), após a conclusão | Desistência voluntária **durante a homologação**, depois da disponibilização formal registrada: devolução de **50% dos valores pagos** à Nekkora pelo desenvolvimento e retenção dos outros 50%. A base é o valor pago, não o preço; sem cobrança adicional; regra igual para consumidor e B2B; nada é entregue sem quitação integral. Após o aceite formal, valem as condições dessa etapa e a lei | Contrato-base cl. 6.3, 9.1, 10, 12.1 e 14.2; Anexo B2B §2-A; Anexo de Componentes; proposta-modelo; procedimento §5 e §6; `resultadoDaDesistencia`; site (CO-11) |
+
+Preservados: reembolso integral antes da conclusão (C-03), arrependimento legal (cl. 3), defeitos e descumprimento
+(cl. 11), garantias legais (cl. 13), aceite formal sem aceite tácito (cl. 8), pagamento 50% + 50% (cl. 6).
+
+**Revisão jurídica (JUR-03):** (a) validade da retenção de 50% do valor pago na relação de consumo (CDC art. 51, IV, e
+art. 53); (b) se a retenção de 50% sem entrega é equilibrada (contrato-base 10.4: decidido pela titular em 09/11/2026 que a
+desistência encerra a contratação, sem entrega definitiva); (c) se a mesma regra serve ao B2B sem ajuste. A decisão empresarial **não** confirma a validade jurídica.

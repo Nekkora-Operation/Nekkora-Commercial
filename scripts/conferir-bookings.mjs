@@ -23,7 +23,8 @@ const opt = (name) => {
 const publicacao = JSON.parse(readFileSync(new URL('../publicacao.json', import.meta.url), 'utf8'));
 const url = opt('--url') ?? publicacao.agendamento?.url;
 const saida = opt('--saida');
-if (!url) throw new Error('URL do Bookings ausente (agendamento.url ou --url)');
+// A exigência da URL fica na execução pela linha de comando: as regras (avaliar) continuam importáveis sem o Bookings
+// configurado (V1 inicial sem Bookings, titular, 10/11/2026).
 
 /**
  * Regras derivadas de docs/comercial/privacidade-minuta.md §4 e do aviso do site ("Conversa sem gravação"). Elas
@@ -88,6 +89,7 @@ async function capturar() {
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
+  if (!url) throw new Error('URL do Bookings ausente (agendamento.url ou --url)');
   const { descricao, formulario, png } = await capturar();
   if (!formulario) {
     console.error('Formulário do Bookings não encontrado: a página mudou ou não carregou. Nada foi avaliado.');

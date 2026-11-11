@@ -7,9 +7,13 @@
     "campanhaLancamento": "Titular, 04/11/2026 (commit 337449b): 06/11/2026 a 06/01/2027 (fuso de Brasília).",
     "hospedagem.provedor": "COM-RELEASE-003 §1.1: Amazon S3 + Amazon CloudFront.",
     "aprovacoes.precos": "COM-RELEASE-003-R1 §3.1 (decisão interna de 22/10/2026): simples R$ 1.500 → R$ 1.000, média R$ 3.500 → R$ 2.800, complexa sob orçamento. Não inclui as condições comerciais (§3.5).",
-    "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. URL da página pública criada pela titular no Microsoft Bookings (página compartilhada \"Nekkora\", serviço \"Conversa inicial — Nekkora Delivery\"), conferida em 28/10/2026 (NEKKORA-COM-007).",
+    "agendamento": "COM-RELEASE-005 §4 (P0): o agendamento faz parte do lançamento. URL da página pública criada pela titular no Microsoft Bookings (página compartilhada \"Nekkora\", serviço \"Conversa inicial — Nekkora Delivery\"), conferida em 28/10/2026 (NEKKORA-COM-007). Titular, 10/11/2026 (NEKKORA-COM-GOLIVE-001, revisão interna §4): Bookings DESATIVADO temporariamente na publicação inicial (url null, obrigatorio false); a aprovação PUB-20 de 05/11/2026 fica preservada, e a URL oficial (https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/) continua validada por scripts/testes/agendamento-url.test.mjs para uma reativação; atendimento inicial por e-mail e LinkedIn, sem reuniões pelo Teams anunciadas até o aviso contemplar esse tratamento.",
     "aprovacoes.agendamento": "Titular, 05/11/2026: agendamento pelo Microsoft Bookings aprovado (PUB-20).",
-    "aprovacoes.textosComerciais": "Histórico: titular, 05/11/2026, aprovou os textos comerciais da versão da main após a PR #14 (commit ef5f4a3, merge e9bb413) (PUB-17). NEKKORA-COM-LEGAL-BASE-001-R1 (05/11/2026): a PR #15 alterou textos visíveis (rodapé com razão social, CNPJ, endereço e e-mail; item \"Conversa sem gravação\"; retenção sem as gravações). A aprovação anterior não se transfere para a nova versão: o campo volta a false até nova aprovação explícita da titular.",
+    "aprovacoes.textosComerciais": "Histórico: titular, 05/11/2026, aprovou os textos comerciais da versão da main após a PR #14 (commit ef5f4a3, merge e9bb413) (PUB-17). NEKKORA-COM-LEGAL-BASE-001-R1 (05/11/2026): a PR #15 alterou textos visíveis (rodapé com razão social, CNPJ, endereço e e-mail; item \"Conversa sem gravação\"; retenção sem as gravações). A aprovação anterior não se transfere para a nova versão: o campo volta a false até nova aprovação explícita da titular. Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001, pré-liberação §1, PUB-17): textos comerciais da Nekkora Commercial V1 aprovados na configuração sem Bookings, conforme o commit e4bc72c (release/v1). Revisão interna, sem parecer jurídico externo.",
+    "aprovacoes.condicoesComerciais": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001, pré-liberação §1.1, PUB-19): aprovadas exclusivamente as condições divulgadas no site, no commit e4bc72c: pagamento 50/50, fila operacional, prazos por proposta e regras públicas de reembolso. Não abrange a minuta contratual nem a cláusula de retenção de 50% durante a homologação (cl. 10); a minuta deverá ser validada antes da primeira contratação. Revisão interna, sem parecer jurídico externo.",
+    "aprovacoes.avisoDePrivacidade": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001, pré-liberação §2, PUB-09): aprovação interna da redação do aviso de privacidade da V1, sem Bookings e sem envio automático, no commit e4bc72c, com o registro da avaliação de legítimo interesse para o atendimento comercial (revisão interna §2). Revisão interna, sem parecer jurídico externo. Esta aprovação interna não constitui demonstração de conformidade jurídica. Pendência F5 preservada: aguardam-se os esclarecimentos solicitados à Microsoft sobre o e-mail de representantes de empresa no Microsoft 365. Nenhum mecanismo do art. 33 da LGPD está comprovado para uma eventual transferência internacional efetiva nesse fluxo; esta aprovação não substitui tal mecanismo nem autoriza operações que dependam dele. A decisão de 06/11/2026 permanece válida.",
+    "aprovacoes.publicacao": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001): autorizada a preparação da publicação em produção da Nekkora Commercial V1, com base no commit 2fdaed6, sem Bookings, envio automático, gateway de pagamento ou contratação automática. Pendências preservadas: F5, aguardando resposta da Microsoft, e minuta contratual a validar antes da primeira contratação. A autorização não comprova conformidade jurídica nem substitui mecanismos legais exigíveis para eventuais transferências internacionais.",
+    "avisoHomologacao": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001, PUB-10): aviso \"Versão para homologação\" desligado para a publicação da V1, com base no commit 2fdaed6.",
     "fornecedor.endereco": "NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): Decreto 7.962/2013, art. 2º, II. Endereço informado pela titular em 05/11/2026, com base no cartão CNPJ (PUB-22). Endereço de escritório virtual: identifica o fornecedor e não indica atendimento presencial.",
     "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail."
   },
@@ -20,8 +24,8 @@
     "instagram": null
   },
   "agendamento": {
-    "url": "https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/",
-    "obrigatorio": true
+    "url": null,
+    "obrigatorio": false
   },
   "envioAutomatico": {
     "endpoint": null,
@@ -43,12 +47,12 @@
   },
   "aprovacoes": {
     "precos": true,
-    "condicoesComerciais": false,
-    "textosComerciais": false,
-    "avisoDePrivacidade": false,
+    "condicoesComerciais": true,
+    "textosComerciais": true,
+    "avisoDePrivacidade": true,
     "agendamento": true,
     "envioAutomatico": false,
-    "publicacao": false
+    "publicacao": true
   },
-  "avisoHomologacao": true
+  "avisoHomologacao": false
 }

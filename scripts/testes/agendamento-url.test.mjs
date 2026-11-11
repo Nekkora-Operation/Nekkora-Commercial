@@ -94,12 +94,19 @@ test('domínio fictício: aceito na homologação, recusado em produção', () =
   assert.equal(isBookingsUrl(OFICIAL, { ...NEKKORA, producao: true }), true);
 });
 
-test('publicacao.json: a URL registrada é a oficial, válida em produção, e a aprovação foi gravada pela titular (05/11/2026)', () => {
+// GOLIVE-001 (titular, 10/11/2026): a V1 inicial sai sem o Bookings (url null, obrigatorio false). Só essas duas
+// configurações são aceitas: sem URL, o agendamento não pode ser obrigatório; com URL, ela tem de ser a oficial e válida
+// em produção. A aprovação PUB-20 gravada em 05/11/2026 não muda.
+test('publicacao.json: sem Bookings (V1 inicial) ou com a URL oficial, válida em produção; aprovação PUB-20 preservada', () => {
   const pub = JSON.parse(readFileSync('publicacao.json', 'utf8'));
-  assert.equal(pub.agendamento.url, OFICIAL);
-  assert.equal(pub.agendamento.obrigatorio, true);
   assert.equal(pub.aprovacoes.agendamento, true);
-  assert.equal(isBookingsUrl(pub.agendamento.url, { emailDomain: pub.canais.email.split('@')[1], producao: true }), true);
+  if (pub.agendamento.url === null) {
+    assert.equal(pub.agendamento.obrigatorio, false, 'sem URL, o agendamento não pode ser obrigatório');
+  } else {
+    assert.equal(pub.agendamento.url, OFICIAL);
+    assert.equal(pub.agendamento.obrigatorio, true);
+    assert.equal(isBookingsUrl(pub.agendamento.url, { emailDomain: pub.canais.email.split('@')[1], producao: true }), true);
+  }
 });
 
 test('fixtures sintéticas: a da API usa o domínio atual e é aceita; a de outra organização continua recusada', () => {

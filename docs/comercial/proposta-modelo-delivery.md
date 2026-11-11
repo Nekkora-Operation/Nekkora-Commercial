@@ -35,9 +35,8 @@
 | Dependências e responsabilidades do cliente | `{{acessos, credenciais, ambiente, equipe para homologar}}` |
 | **Critérios de aceite** | `{{lista objetiva e verificável}}` |
 | Preço | `{{R$}}` · ☐ padrão ☐ lançamento (solicitação recebida no período) ☐ orçamento individual |
-| **Início previsto** | `{{DD/MM/AAAA}}` — nunca antes do 8º dia após a assinatura (C-02) |
+| **Início previsto** | `{{DD/MM/AAAA}}` — definido para esta automação conforme a fila operacional, nunca antes da assinatura (C-02, C-12) |
 | **Disponibilização para homologação prevista** | `{{DD/MM/AAAA}}` |
-| **Reserva das etapas finais** (regime do consumidor, obrigatória — contrato-base 10.3) | `{{10% do valor contratado da automação = R$ …}}`: parte do preço que remunera a homologação assistida e a entrega. Fixada **antes do aceite**; nunca cobrada se você desistir depois da conclusão |
 
 Total: `{{R$}}` (soma das automações com preço; complexas sob orçamento à parte). Cada automação continua com preço e
 aceite próprios.
@@ -64,9 +63,9 @@ mês pro rata die, limitados ao máximo legal, sem capitalização; sem cancelam
 
 | Tema | Regra | Cláusula |
 |---|---|---|
-| Espera e arrependimento | O desenvolvimento só começa depois de 7 dias corridos da assinatura. Seu direito legal de arrependimento é preservado: escreva para contato@nekkora.com ou responda a este e-mail; confirmaremos o recebimento imediatamente | 3 |
+| Início e arrependimento | Não há espera fixa depois da assinatura: o desenvolvimento começa na data de início prevista nesta proposta, conforme a fila. Seu direito legal de arrependimento é preservado: escreva para contato@nekkora.com ou responda a este e-mail; confirmaremos o recebimento imediatamente | 3 |
 | Desistência antes da conclusão | **Reembolso integral** do que você pagou à Nekkora pelo desenvolvimento, mesmo com o trabalho iniciado, em até 5 dias úteis do pedido, com comprovante (no arrependimento legal, de imediato). Despesas que você pagou direto a terceiros não passam pela Nekkora | 9 |
-| Desistência após a conclusão ⚖ | Só com a conclusão integral comprovada, a disponibilização real e a sua desistência por escrito; você recebe as evidências e tem 10 dias úteis para contestar. **Consumidor:** até 90% do valor contratado, abatido o que já pagou (ex.: média de R$ 2.800 com entrada de R$ 1.400 → saldo máximo de R$ 1.120); a reserva das etapas finais não é cobrada. **B2B (só com o Anexo B2B):** até 100%. Pago o valor apurado, você recebe o desenvolvimento concluído. Sujeito a revisão jurídica | 10 |
+| Desistência durante a homologação ⚖ | Só depois de a automação concluída ser **disponibilizada formalmente** para sua validação, com a data registrada, e antes do seu aceite formal; a conclusão interna da Nekkora não basta. Você recebe as evidências e tem 10 dias úteis para contestar. Devolvemos **50% do que você pagou** à Nekkora pelo desenvolvimento e retemos os outros 50% (ex.: preço de R$ 2.000 com entrada de R$ 1.000 → devolução de R$ 500). A base é o valor pago, não o preço total, e não há cobrança adicional. A desistência encerra a contratação desta automação, sem entrega definitiva nem transferência do software; sem desistência, você pode concluir normalmente com homologação, aceite e pagamento integral. Não vale para defeito, descumprimento da Nekkora ou arrependimento legal. Sujeito a revisão jurídica | 10 |
 | Homologação | 10 dias úteis; lembretes no 5º e no 9º dia útil; sem resposta, suspensão no dia útil seguinte e, 30 dias depois, pedido de reprogramação (sem cancelamento automático); defeitos corrigidos sem limite de rodadas; até 2 rodadas de ajustes de preferência; **sem aceite tácito** | 8 |
 | Entrega definitiva | Após o aceite e a quitação: código específico, documentação, Anexo de Componentes e termo de garantia | 12 |
 | Garantia | Garantias legais + **30 dias** de cobertura corretiva adicional, no termo de garantia; recebimento confirmado em até 2 dias úteis e diagnóstico inicial em até 5 dias úteis | 13 |

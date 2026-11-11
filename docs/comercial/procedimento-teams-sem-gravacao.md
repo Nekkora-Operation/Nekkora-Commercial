@@ -115,6 +115,7 @@ não for dado pessoal.
 | Data | E-1 | E-2 | E-3 | E-4 | E-5 | E-6 | E-7 | CTL-01 |
 |---|---|---|---|---|---|---|---|---|
 | `AAAA-MM-DD` | — | — | — | — | — | — | — | **Pendente** |
+| `2026-11-09` (data do relato) | — | — | — | — | — | — | — | **Relatado pela titular: configurações ajustadas e teste realizado. Evidência não arquivada** ([registro](../release/evidencias/golive-001/decisoes-titular-2026-11-09.md)) |
 
 **CTL-01 só passa a "verificado"** quando E-1 a E-7 estiverem preenchidos e o teste do §4 tiver confirmado que a
 gravação e a transcrição não podem ser iniciadas. A revisão semanal ([procedimento de retenção](procedimento-retencao-e-direitos.md)

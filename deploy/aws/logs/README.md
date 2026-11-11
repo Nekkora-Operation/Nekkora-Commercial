@@ -1,8 +1,11 @@
 # LOG-01 — registros de acesso do CloudFront (standard logging v2)
 
-**Estado: PREPARADO, NÃO APLICADO.** Nenhuma alteração foi feita na AWS. A execução depende de **autorização
-específica da titular**. Até lá, o texto [PV-12] do aviso (`src/content.ts`) **não pode** ser integrado à `main`,
-porque descreveria um tratamento que ainda não ocorre.
+**Estado: APLICADO E CONFERIDO em 10/11/2026.** A titular executou o §3 no CloudShell e conferiu o §4.
+- Entrega `BMl6sEOG0xUZrwzd`; os critérios do §4 foram atendidos.
+- No critério 5, a entrega real foi comprovada, mas o intervalo de 30 minutos **não foi medido**.
+- Registro: [`log-01-2026-11-10.md`](../../../docs/release/evidencias/golive-001/log-01-2026-11-10.md).
+- Com isso, o texto [PV-12] do aviso pode ser integrado. A aprovação dele continua na PUB-09 e na PUB-17.
+- Qualquer nova alteração na AWS depende de **autorização específica da titular**.
 
 ## 1. Fundamento e campos mínimos
 
@@ -78,8 +81,12 @@ DEST_ARN=$(aws logs put-delivery-destination --region us-east-1 --name nekkora-c
   --delivery-destination-configuration "destinationResourceArn=arn:aws:s3:::$LOGS_BUCKET" --query deliveryDestination.arn --output text)
 aws logs create-delivery --region us-east-1 --delivery-source-name nekkora-commercial-cloudfront --delivery-destination-arn "$DEST_ARN" \
   --record-fields date time c-ip c-port x-host-header \
-  --s3-delivery-configuration 'suffixPath={DistributionId}/{yyyy}/{MM}/{dd},enableHiveCompatiblePath=false'
+  --s3-delivery-configuration '{"suffixPath":"{DistributionId}/{yyyy}/{MM}/{dd}","enableHiveCompatiblePath":false}'
 ```
+
+`--s3-delivery-configuration` vai em **JSON**. Na sintaxe *shorthand* (`suffixPath=...,enableHiveCompatiblePath=...`),
+o CLI tenta interpretar as chaves de `{DistributionId}/{yyyy}/{MM}/{dd}` e o comando falha. O conteúdo é o mesmo de
+`delivery.s3DeliveryConfiguration` em [`entrega.json`](entrega.json). Corrigido em 10/11/2026, depois da aplicação.
 
 ## 4. Conferência (só leitura; a evidência vai sem IPs)
 

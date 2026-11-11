@@ -83,9 +83,12 @@ SharePoint/OneDrive, Teams), as colunas **"Current"** e **"Committed Geography"*
 
 | Serviço | Local atual | Local comprometido |
 |---|---|---|
-| Exchange Online | | |
-| SharePoint / OneDrive | | |
-| Teams | | |
+| Exchange Online | Brasil | Brasil |
+| SharePoint / OneDrive | Brasil | Brasil |
+| Teams | Brasil | Brasil |
+
+**Feito em 10/11/2026:** [registro](evidencias/golive-001/m365-local-dos-dados-2026-11-10.md), com a captura e os demais
+serviços do cartão.
 
 **Critério de sucesso:** a captura legível, guardada em `evidencias/golive-001/m365-local-dos-dados-<data>.png`.
 Essa evidência **não encerra** a JUR-07: ela só delimita o que é armazenado no Brasil (ver [JUR-07](NEKKORA-COM-GOLIVE-001-JUR-07.md)).

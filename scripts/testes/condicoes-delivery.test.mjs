@@ -16,12 +16,9 @@ import {
   classificarAutomacao,
   cronogramaDaHomologacao,
   diaEmBrasilia,
-  entregaAposQuitacao,
   prazoDaRestituicao,
   regimeDaContratacao,
-  reservaDasEtapasFinais,
   encargosDeAtraso,
-  inicioMinimoDoDesenvolvimento,
   parcelas,
   periodosDeReclamacao,
   precoDaAutomacao,
@@ -53,7 +50,7 @@ const PUBLICACAO = JSON.parse(ler('publicacao.json'));
 const PERIODO = { inicio: '2026-12-01', fim: '2027-01-31' };
 const PRECO = 280_000; // R$ 2.800 (média, lançamento) em centavos
 const CONSUMIDOR = { enquadramento: 'consumidor' };
-const CONCLUIDA = { conclusaoComprovada: true, criteriosDeAceiteCumpridos: true, disponibilizadaParaHomologacao: true };
+const CONCLUIDA = { conclusaoComprovada: true, criteriosDeAceiteCumpridos: true, disponibilizadaParaHomologacaoEm: '2027-01-05' };
 const ANEXO_B2B_COMPLETO = { atividadeEconomicaPropria: true, automacaoComoInsumo: true, estruturaParaNegociar: true, justificativaAssinadaEAceita: true };
 const DESISTENCIA = { desistenciaExpressaEm: '2027-01-10' };
 
@@ -62,30 +59,39 @@ test('1. arrependimento legal: restituição integral de tudo o que foi pago, a 
   const r = resultadoDaDesistencia({ ...CONSUMIDOR, precoCentavos: PRECO, pagoANekkora: { desenvolvimento: 140_000, outros: 5_000 }, arrependimentoLegal: true });
   assert.equal(r.regra, 'arrependimento-legal');
   assert.equal(r.restituirCentavos, 145_000);
-  assert.equal(r.saldoMaximoPretendidoCentavos, 0);
+  assert.equal(r.cobrancaAdicionalCentavos, 0);
   assert.equal(r.aceite, false);
-  // Contrato: canal, confirmação imediata, sem termo final diferente do legal, sem início antecipado
+  // Contrato: canal, confirmação imediata, sem termo final diferente do legal
   assert.match(CONTRATO, /contato@nekkora\.com/);
   assert.match(CONTRATO, /confirmação imediata/);
   assert.match(CONTRATO, /não extingue/);
-  assert.match(CONTRATO, /não há início antecipado/);
-  assert.doesNotMatch(PROPOSTA, /salvo se você pedir|salvo pedido expresso/i, 'C-02: sem início antecipado a pedido do cliente');
+  assert.match(CONTRATO, /nem reduz a restituição do item 3\.4/);
 });
 
-test('1b. espera de 7 dias: o desenvolvimento só começa no 8º dia após a assinatura', () => {
-  assert.equal(inicioMinimoDoDesenvolvimento('2026-12-10'), '2026-12-18');
+test('1b. sem espera fixa (titular, 09/11/2026): o início é a data da proposta, nunca antes da assinatura', () => {
   const ok = { assinatura: '2026-12-10', escopo: 'x', precoCentavos: PRECO, homologacaoPrevista: '2027-01-08', dependencias: [], criteriosDeAceite: ['a'] };
-  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-17' }).valido, false);
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-09' }).valido, false, 'antes da assinatura');
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-11' }).valido, true, 'antes do antigo 8º dia');
   assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2026-12-18' }).valido, true);
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: undefined }).valido, false, 'a proposta continua exigindo a data de início');
+  assert.equal(validarCronograma({ ...ok, inicioPrevisto: '2027-01-08' }).valido, false, 'homologação continua depois do início');
+  for (const doc of [CONTRATO, PROPOSTA, ler('docs/comercial/procedimento-operacional-delivery.md')]) {
+    assert.doesNotMatch(doc, /só começa depois de (transcorridos )?7 dias|8º dia após a assinatura|≥ 8º dia/);
+    assert.doesNotMatch(doc, /início imediato garantido|24 ?horas|24h/i, 'sem promessa de início imediato nem atendimento 24 h');
+  }
+  assert.match(CONTRATO, /Não há prazo de espera obrigatório/);
+  assert.match(CONTRATO, /não é promessa de início imediato/);
+  assert.match(PROPOSTA, /\*\*Início previsto\*\*/);
+  assert.equal(ultimoDiaDeAceite('2026-12-10'), '2026-12-17', 'o prazo de 7 dias para aceitar a proposta não muda');
 });
 
 /* 2 ------------------------------------------------------------------ */
 test('2. desistência após o início e antes da conclusão: reembolso integral do pago pelo desenvolvimento', () => {
-  for (const evidencias of [{}, { conclusaoComprovada: true }, { conclusaoComprovada: true, disponibilizadaParaHomologacao: true, defeitoPendente: true }]) {
+  for (const evidencias of [{}, { conclusaoComprovada: true }, { ...CONCLUIDA, defeitoPendente: true }]) {
     const r = resultadoDaDesistencia({ ...CONSUMIDOR, ...DESISTENCIA, precoCentavos: PRECO, pagoANekkora: { desenvolvimento: 140_000 }, evidencias });
     assert.equal(r.regra, 'C-03');
     assert.equal(r.restituirCentavos, 140_000, 'sem apuração por horas ou marcos');
-    assert.equal(r.saldoMaximoPretendidoCentavos, 0);
+    assert.equal(r.cobrancaAdicionalCentavos, 0);
     assert.match(r.despesasPagasDiretamenteATerceiros, /fora do reembolso/);
   }
   assert.match(CONTRATO, /inclusive se o trabalho já\s+tiver começado/);
@@ -93,25 +99,25 @@ test('2. desistência após o início e antes da conclusão: reembolso integral 
 });
 
 /* 3 ------------------------------------------------------------------ */
-test('3. desistência após conclusão e disponibilização: teto pretendido sujeito a revisão jurídica, sem aceite fictício', () => {
+test('3. desistência durante a homologação: 50% do valor pago, sem cobrança adicional nem aceite (titular, 09/11/2026)', () => {
   const comum = { ...DESISTENCIA, precoCentavos: PRECO, pagoANekkora: { desenvolvimento: 140_000 }, evidencias: CONCLUIDA };
-  const c = resultadoDaDesistencia({ ...comum, ...CONSUMIDOR, reservaNaPropostaCentavos: 28_000 });
-  assert.equal(c.regra, 'C-04-consumidor');
-  assert.equal(c.saldoMaximoPretendidoCentavos, 112_000, 'consumidor (R1): até 90% do preço, abatido o já pago');
+  const c = resultadoDaDesistencia({ ...comum, ...CONSUMIDOR });
   const b = resultadoDaDesistencia({ ...comum, enquadramento: 'b2b-nao-consumerista', anexoB2B: ANEXO_B2B_COMPLETO });
-  assert.equal(b.saldoMaximoPretendidoCentavos, 140_000, 'B2B legítimo (R1): até 100% do preço, abatido o já pago');
   for (const r of [c, b]) {
-    assert.equal(r.exigibilidade, 'depende-de-revisao-juridica');
+    assert.deepEqual([r.regra, r.restituirCentavos, r.retidoCentavos, r.cobrancaAdicionalCentavos], ['C-04-homologacao', 70_000, 70_000, 0], 'mesma regra nos dois regimes');
+    assert.equal(r.situacaoDaRetencao, 'depende-de-revisao-juridica');
     assert.equal(r.aceite, false);
-    assert.equal(r.autorizadoParaFaturamento, false);
+    assert.deepEqual(r.entrega.entregaveis, []);
   }
-  assert.equal(resultadoDaDesistencia({ ...comum, ...CONSUMIDOR, reservaNaPropostaCentavos: 28_000, evidencias: { ...CONCLUIDA, contestacaoPendente: true } }).exigibilidade, 'suspensa-ate-analise-da-contestacao');
+  assert.equal(resultadoDaDesistencia({ ...comum, ...CONSUMIDOR, evidencias: { ...CONCLUIDA, contestacaoPendente: true } }).situacaoDaRetencao, 'suspensa-ate-analise-da-contestacao');
   // Motivo atribuível à Nekkora ou arrependimento legal nunca caem na C-04
   assert.equal(resultadoDaDesistencia({ ...comum, ...CONSUMIDOR, motivoAtribuivelANekkora: true }).regra, 'vicio-ou-descumprimento');
   assert.equal(resultadoDaDesistencia({ ...comum, ...CONSUMIDOR, arrependimentoLegal: true }).regra, 'arrependimento-legal');
-  assert.match(CONTRATO, /Regime do consumidor — modelo conservador/);
+  assert.match(CONTRATO, /Desistência durante a homologação \(C-04\)/);
   assert.match(CONTRATO, /\*\*não\*\* é registrada como aceite/);
-  assert.match(B2B, /até \*\*100% do preço\*\*/);
+  assert.match(CONTRATO, /sujeita à revisão jurídica \(JUR-03\)/);
+  assert.match(B2B, /a regra é a \*\*mesma\*\* do contrato-base/);
+  for (const t of [CONTRATO, PROPOSTA, B2B, COMPONENTES]) assert.doesNotMatch(t, /saldo máximo pretendido|valor validamente apurado|Reserva das etapas finais|até 90% do valor/i);
 });
 
 /* 4 ------------------------------------------------------------------ */
@@ -249,8 +255,25 @@ test('13. alteração de prazo só com motivo, comunicação e concordância esc
 /* 14 ----------------------------------------------------------------- */
 test('14. bloqueios de produção preservados: nenhuma aprovação presumida', () => {
   const a = PUBLICACAO.aprovacoes;
-  for (const k of ['condicoesComerciais', 'textosComerciais', 'avisoDePrivacidade', 'publicacao']) assert.equal(a[k], false, `${k} continua false`);
-  assert.equal(PUBLICACAO.avisoHomologacao, true);
+  // PUB-17, PUB-19 e PUB-09: aprovações expressas da titular em 11/11/2026 (commit e4bc72c), cada uma com registro em
+  // $origem. PUB-18 (publicação) e PUB-10 (aviso de homologação desligado): autorizações expressas da titular em
+  // 11/11/2026 (commit 2fdaed6), também registradas em $origem.
+  for (const k of ['condicoesComerciais', 'textosComerciais', 'avisoDePrivacidade']) {
+    assert.equal(a[k], true, `${k} aprovada`);
+    assert.match(PUBLICACAO.$origem[`aprovacoes.${k}`], /Titular, 11\/11\/2026 .*e4bc72c.*sem parecer jurídico externo/, `${k}: registro da aprovação`);
+  }
+  assert.equal(a.publicacao, true, 'publicacao (PUB-18) autorizada');
+  const pub18 = PUBLICACAO.$origem['aprovacoes.publicacao'];
+  for (const t of ['Titular, 11/11/2026', 'commit 2fdaed6', 'sem Bookings, envio automático, gateway de pagamento ou contratação automática', 'F5, aguardando resposta da Microsoft', 'minuta contratual a validar antes da primeira contratação', 'A autorização não comprova conformidade jurídica'])
+    assert.ok(pub18.includes(t), `PUB-18 registra: ${t}`);
+  assert.match(PUBLICACAO.$origem['aprovacoes.condicoesComerciais'], /Não abrange a minuta contratual nem a cláusula de retenção de 50%/);
+  const pv = PUBLICACAO.$origem['aprovacoes.avisoDePrivacidade'];
+  for (const t of ['Esta aprovação interna não constitui demonstração de conformidade jurídica.', 'Pendência F5 preservada', 'Nenhum mecanismo do art. 33 da LGPD está comprovado', 'A decisão de 06/11/2026 permanece válida.'])
+    assert.ok(pv.includes(t), `PUB-09 registra: ${t}`);
+  assert.equal(PUBLICACAO.avisoHomologacao, false, 'PUB-10: aviso de homologação desligado');
+  assert.match(PUBLICACAO.$origem.avisoHomologacao, /Titular, 11\/11\/2026 .*PUB-10/);
+  assert.deepEqual(PUBLICACAO.agendamento, { url: null, obrigatorio: false }, 'V1 inicial sem Bookings');
+  assert.equal(PUBLICACAO.envioAutomatico.endpoint, null, 'sem envio automático');
   assert.deepEqual(PUBLICACAO.campanhaLancamento, { inicio: '2026-11-06', fim: '2027-01-06' }, 'datas históricas não alteradas');
   const portao = ler('scripts/verificar-publicacao.mjs');
   for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.match(portao, new RegExp(`need\\([^\\n]*'${id}'`), `${id} continua exigido`);
@@ -258,8 +281,19 @@ test('14. bloqueios de produção preservados: nenhuma aprovação presumida', (
 
 /* Coerência dos textos públicos com as decisões ------------------------ */
 test('textos públicos coerentes com C-02, C-03, C-06, C-07 e C-12', () => {
-  assert.match(CONTENT, /O desenvolvimento começa depois de 7 dias corridos da assinatura do contrato/);
-  assert.match(CONTENT, /devolvemos integralmente o que pagou à Nekkora pelo desenvolvimento/);
+  // Titular, 09/11/2026 (PUB-19): os 7 dias da assinatura não aparecem como espera obrigatória; o início vem da fila e da
+  // proposta. O prazo de 7 dias para aceitar a proposta é outra regra e continua.
+  assert.doesNotMatch(CONTENT, /começa depois de 7 dias|dias corridos da assinatura/);
+  assert.match(CONTENT, /Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação/);
+  assert.match(CONTENT, /aceita em até 7 dias corridos da emissão/);
+  assert.match(CONTENT, /devolvemos integralmente o valor pago pelo desenvolvimento/);
+  // GOLIVE-001 (10/11/2026, publicação sem parecer externo): a regra dos 50% na homologação (C-04) não aparece no site
+  // enquanto a retenção não estiver fundamentada (JUR-03). O site remete à proposta e ao contrato, com os direitos legais.
+  assert.doesNotMatch(CONTENT, /devolvemos 50%|50% do valor já pago/, 'cláusula pública da C-04 fora do site');
+  assert.match(CONTENT, /'Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei'/);
+  assert.match(CONTENT, /A desistência não inclui a entrega definitiva da automação/);
+  assert.doesNotMatch(CONTENT, /juridicamente válid|validade jurídica (confirmada|garantida)/i, 'sem promessa de validade jurídica');
+  assert.doesNotMatch(CONTENT, /50% do (valor|preço) (total|do contrato)/);
   assert.match(CONTENT, /o silêncio não vale como aceite/);
   assert.match(CONTENT, /Garantia contratual de correção de defeitos, em termo escrito, além das garantias legais/);
   assert.doesNotMatch(CONTENT, /garantia adicional após a entrega, salvo se previstos/, 'a garantia contratual deixou de ser "não incluída"');
@@ -275,95 +309,94 @@ test('textos públicos coerentes com C-02, C-03, C-06, C-07 e C-12', () => {
 const SIMPLES = 100_000; // R$ 1.000 (simples, lançamento)
 const MEDIA = 280_000; // R$ 2.800 (média, lançamento)
 const desistir = (o) => resultadoDaDesistencia({ ...DESISTENCIA, evidencias: CONCLUIDA, ...o });
-const consumidor = (preco, pago, extra = {}) => desistir({ ...CONSUMIDOR, precoCentavos: preco, reservaNaPropostaCentavos: reservaDasEtapasFinais(preco), pagoANekkora: { desenvolvimento: pago }, ...extra });
+const consumidor = (preco, pago, extra = {}) => desistir({ ...CONSUMIDOR, precoCentavos: preco, pagoANekkora: { desenvolvimento: pago }, ...extra });
 
-/* C-04 ---------------------------------------------------------------- */
-test('R1-1. C-04 consumidor: cancelamento antes da conclusão → reembolso integral (C-03)', () => {
+/* C-04 (titular, 09/11/2026) ------------------------------------------ */
+test('R1-1. desistência antes da conclusão → reembolso integral (C-03)', () => {
   const r = consumidor(SIMPLES, 50_000, { evidencias: { conclusaoComprovada: true } });
-  assert.deepEqual([r.regra, r.restituirCentavos, r.saldoMaximoPretendidoCentavos], ['C-03', 50_000, 0]);
+  assert.deepEqual([r.regra, r.restituirCentavos, r.cobrancaAdicionalCentavos], ['C-03', 50_000, 0]);
 });
 
-test('R1-2. C-04 consumidor: conclusão comprovada e desistência expressa → teto pretendido de 90%, sem exigibilidade automática', () => {
-  const r = consumidor(MEDIA, 140_000);
-  assert.equal(r.regra, 'C-04-consumidor');
-  assert.equal(r.tetoPretendidoCentavos, 252_000, '90% do preço');
-  assert.equal(r.exigibilidade, 'depende-de-revisao-juridica');
-  assert.equal(r.autorizadoParaFaturamento, false);
-  assert.equal(r.aceite, false);
-  // A reserva tem de constar da proposta ANTES: ausente ou menor que 10% → não há cobrança retroativa
-  for (const reserva of [null, 10_000]) {
-    const s = desistir({ ...CONSUMIDOR, precoCentavos: MEDIA, reservaNaPropostaCentavos: reserva, pagoANekkora: { desenvolvimento: 140_000 } });
-    assert.deepEqual([s.regra, s.saldoMaximoPretendidoCentavos], ['C-04-sem-reserva-previa', 0]);
+test('R1-2. exemplo da titular: contrato de R$ 2.000, entrada de R$ 1.000 → devolução de R$ 500', () => {
+  const r = consumidor(200_000, 100_000);
+  assert.deepEqual([r.regra, r.baseDeCalculoCentavos, r.restituirCentavos, r.retidoCentavos], ['C-04-homologacao', 100_000, 50_000, 50_000]);
+  for (const t of [CONTRATO, PROPOSTA]) assert.match(t, /R\$ 2\.000/);
+});
+
+test('R1-3. a base é o valor PAGO, nunca o preço do contrato', () => {
+  for (const [preco, pago, devolve] of [[SIMPLES, 50_000, 25_000], [MEDIA, 140_000, 70_000], [MEDIA, 280_000, 140_000], [MEDIA, 0, 0]]) {
+    const r = consumidor(preco, pago);
+    assert.equal(r.restituirCentavos, devolve, `preço ${preco}, pago ${pago}`);
+    assert.equal(r.restituirCentavos + r.retidoCentavos, pago, 'retido + devolvido = pago');
+    assert.equal(r.cobrancaAdicionalCentavos, 0, 'nunca cobra a diferença do preço');
   }
-  assert.match(CONTRATO, /não pode ser fixada depois/);
-  assert.match(PROPOSTA, /Reserva das etapas finais/);
+  assert.equal(consumidor(MEDIA, 100_001).restituirCentavos, 50_001, 'centavo ímpar a favor do cliente');
 });
 
-test('R1-3. C-04 B2B não consumerista válido → teto contratual pretendido de até 100%, condicionado aos requisitos', () => {
-  const r = desistir({ enquadramento: 'b2b-nao-consumerista', anexoB2B: ANEXO_B2B_COMPLETO, precoCentavos: MEDIA, pagoANekkora: { desenvolvimento: 140_000 } });
-  assert.deepEqual([r.regime, r.regra, r.tetoPretendidoCentavos, r.saldoMaximoPretendidoCentavos], ['b2b-nao-consumerista', 'C-04-b2b', 280_000, 140_000]);
-  assert.equal(r.exigibilidade, 'depende-de-revisao-juridica');
-  assert.match(r.obrigacoesPendentes, /revisão jurídica/);
-  // Mesmos requisitos: sem conclusão integral, também no B2B vale a C-03
-  assert.equal(desistir({ enquadramento: 'b2b-nao-consumerista', anexoB2B: ANEXO_B2B_COMPLETO, precoCentavos: MEDIA, pagoANekkora: { desenvolvimento: 140_000 }, evidencias: { ...CONCLUIDA, defeitoPendente: true } }).regra, 'C-03');
-});
-
-test('R1-4. CNPJ sem enquadramento B2B demonstrado → a regra dos 100% não é habilitada', () => {
+test('R1-4. CNPJ sem enquadramento demonstrado não muda nada; enquadramento continua obrigatório', () => {
   assert.throws(() => regimeDaContratacao({ cnpj: '00.000.000/0001-00' }), /enquadramento explícito obrigatório/);
   assert.throws(() => resultadoDaDesistencia({ precoCentavos: MEDIA, cnpj: '00.000.000/0001-00' }), /o CNPJ não define/);
-  const r = desistir({ enquadramento: 'b2b-nao-consumerista', anexoB2B: { atividadeEconomicaPropria: true }, cnpj: '00.000.000/0001-00', precoCentavos: MEDIA, reservaNaPropostaCentavos: 28_000, pagoANekkora: { desenvolvimento: 140_000 } });
+  const r = desistir({ enquadramento: 'b2b-nao-consumerista', anexoB2B: { atividadeEconomicaPropria: true }, precoCentavos: MEDIA, pagoANekkora: { desenvolvimento: 140_000 } });
   assert.equal(r.regime, 'consumidor');
-  assert.equal(r.tetoPretendidoCentavos, 252_000, 'anexo incompleto: modelo conservador');
+  assert.equal(r.restituirCentavos, 70_000);
   assert.ok(r.faltasDoAnexoB2B.length === 3);
   assert.match(B2B, /Ter CNPJ \*\*não basta\*\*/);
 });
 
-test('R1-5. automação simples R$ 1.000, entrada R$ 500 → saldo pretendido máximo de R$ 400 (consumidor)', () => {
-  const r = consumidor(SIMPLES, 50_000);
-  assert.deepEqual([r.tetoPretendidoCentavos, r.saldoMaximoPretendidoCentavos, r.reservaNaoCobravelCentavos], [90_000, 40_000, 10_000]);
+test('R1-5. transição: a homologação começa na disponibilização formal registrada, não na conclusão interna', () => {
+  const semData = consumidor(MEDIA, 140_000, { evidencias: { conclusaoComprovada: true, criteriosDeAceiteCumpridos: true } });
+  assert.deepEqual([semData.regra, semData.restituirCentavos], ['C-03', 140_000], 'concluída internamente, sem disponibilização: reembolso integral');
+  const booleano = consumidor(MEDIA, 140_000, { evidencias: { conclusaoComprovada: true, criteriosDeAceiteCumpridos: true, disponibilizadaParaHomologacao: true } });
+  assert.equal(booleano.regra, 'C-03', 'sem a DATA registrada, não vale');
+  const antes = consumidor(MEDIA, 140_000, { desistenciaExpressaEm: '2027-01-04' });
+  assert.equal(antes.regra, 'C-03', 'desistência antes da data de disponibilização');
+  const noDia = consumidor(MEDIA, 140_000, { desistenciaExpressaEm: '2027-01-05' });
+  assert.deepEqual([noDia.regra, noDia.disponibilizadaParaHomologacaoEm], ['C-04-homologacao', '2027-01-05']);
+  assert.match(CONTRATO, /A conclusão interna da Nekkora, sozinha, \*\*não basta\*\*/);
 });
 
-test('R1-6. automação média R$ 2.800, entrada R$ 1.400 → saldo pretendido máximo de R$ 1.120 (consumidor)', () => {
-  const r = consumidor(MEDIA, 140_000);
-  assert.deepEqual([r.tetoPretendidoCentavos, r.saldoMaximoPretendidoCentavos, r.reservaNaoCobravelCentavos], [252_000, 112_000, 28_000]);
-  for (const t of [CONTRATO, PROPOSTA]) assert.match(t, /R\$ 1\.120/);
+test('R1-6. após o aceite formal, a C-04 não se aplica: valem as condições dessa etapa e a lei', () => {
+  const r = consumidor(MEDIA, 140_000, { evidencias: { ...CONCLUIDA, aceiteFormalEm: '2027-01-08' } });
+  assert.deepEqual([r.regra, r.restituirCentavos, r.cobrancaAdicionalCentavos], ['apos-aceite-formal', null, 0]);
+  assert.match(r.observacao, /cláusulas 6, 12 e 13/);
+  assert.equal(consumidor(MEDIA, 140_000, { evidencias: { ...CONCLUIDA, aceiteFormalEm: '2027-01-12' } }).regra, 'C-04-homologacao', 'desistência antes do aceite');
 });
 
-test('R1-7. arrependimento legal aplicável → restituição integral, mesmo com a conclusão técnica', () => {
+test('R1-7. arrependimento legal aplicável → restituição integral, mesmo durante a homologação', () => {
   const r = consumidor(MEDIA, 140_000, { arrependimentoLegal: true, pagoANekkora: { desenvolvimento: 140_000, outros: 3_000 }, pedidoValidoEm: '2026-12-18' });
-  assert.deepEqual([r.regra, r.restituirCentavos, r.saldoMaximoPretendidoCentavos], ['arrependimento-legal', 143_000, 0]);
+  assert.deepEqual([r.regra, r.restituirCentavos], ['arrependimento-legal', 143_000]);
   assert.equal(r.prazo.tipo, 'imediato-legal');
 });
 
-test('R1-8. contestação fundamentada pendente → exigibilidade suspensa; prazo de 10 dias úteis após as evidências', () => {
+test('R1-8. contestação fundamentada pendente → retenção suspensa; prazo de 10 dias úteis após as evidências', () => {
   const r = consumidor(MEDIA, 140_000, { evidencias: { ...CONCLUIDA, contestacaoPendente: true, comunicadasAoClienteEm: '2027-01-11' } });
-  assert.equal(r.exigibilidade, 'suspensa-ate-analise-da-contestacao');
+  assert.equal(r.situacaoDaRetencao, 'suspensa-ate-analise-da-contestacao');
   assert.equal(r.prazoDeContestacao, '2027-01-25');
   assert.match(consumidor(MEDIA, 140_000).proximaAcao, /enviar as evidências/);
 });
 
-test('R1-9. defeito, critério de aceite não cumprido ou entrega incompleta → nunca a cobrança da C-04', () => {
-  for (const ev of [{ defeitoPendente: true }, { obrigacaoTecnicaPendente: true }, { criteriosDeAceiteCumpridos: false }, { disponibilizadaParaHomologacao: false }]) {
+test('R1-9. defeito, critério de aceite não cumprido ou entrega incompleta → nunca a retenção da C-04', () => {
+  for (const ev of [{ defeitoPendente: true }, { obrigacaoTecnicaPendente: true }, { criteriosDeAceiteCumpridos: false }, { disponibilizadaParaHomologacaoEm: undefined }]) {
     const r = consumidor(MEDIA, 140_000, { evidencias: { ...CONCLUIDA, ...ev } });
-    assert.deepEqual([r.regra, r.restituirCentavos, r.saldoMaximoPretendidoCentavos], ['C-03', 140_000, 0], JSON.stringify(ev));
+    assert.deepEqual([r.regra, r.restituirCentavos, r.cobrancaAdicionalCentavos], ['C-03', 140_000, 0], JSON.stringify(ev));
   }
 });
 
-test('R1-10. quitação do valor legitimamente apurado → entregáveis liberados, sem exigir a reserva de 10%', () => {
+test('R1-10. desistência durante a homologação: nada é entregue nem transferido sem quitação integral', () => {
   const r = consumidor(MEDIA, 140_000);
-  const ok = entregaAposQuitacao({ resultado: r, valorApuradoCentavos: 252_000, pagoCentavos: 252_000 });
-  assert.equal(ok.liberar, true);
-  assert.equal(ok.exigeAReserva, false);
-  assert.ok(ok.entregaveis.includes('código-fonte específico concluído'));
-  assert.equal(entregaAposQuitacao({ resultado: r, valorApuradoCentavos: 252_000, pagoCentavos: 140_000 }).liberar, false);
-  assert.equal(entregaAposQuitacao({ resultado: r, valorApuradoCentavos: 252_000, pagoCentavos: 252_000, contestacaoPendente: true }).liberar, false);
-  assert.throws(() => entregaAposQuitacao({ resultado: r, valorApuradoCentavos: 280_000, pagoCentavos: 280_000 }), /acima do teto/);
-  assert.match(COMPONENTES, /valor validamente apurado/);
+  assert.deepEqual([r.entrega.encerraContratacao, r.entrega.entregaDefinitiva, r.entrega.entregaveis, r.entrega.transferenciaDeDireitos], [true, false, [], false]);
+  assert.match(CONTRATO, /encerra o desenvolvimento e a contratação daquela automação/);
+  assert.match(CONTRATO, /pode concluir normalmente a contratação, com homologação, aceite formal e pagamento integral/);
+  assert.match(CONTRATO, /esta redação não presume a sua validade/);
+  // Sem desistência, a conclusão normal continua possível: o silêncio não encerra nada
+  assert.equal(resultadoDaDesistencia({ ...CONSUMIDOR, precoCentavos: MEDIA, pagoANekkora: { desenvolvimento: 140_000 }, evidencias: CONCLUIDA }).regra, 'sem-desistencia-expressa');
+  assert.match(COMPONENTES, /homologação \(contrato-base, cláusulas 9 e 10\), nada é entregue/);
+  assert.doesNotMatch(CONTRATO, /A única outra hipótese de cobrança do saldo/);
 });
 
 test('R1-11. silêncio do cliente → jamais aceite nem desistência', () => {
-  const r = resultadoDaDesistencia({ ...CONSUMIDOR, precoCentavos: MEDIA, reservaNaPropostaCentavos: 28_000, pagoANekkora: { desenvolvimento: 140_000 }, evidencias: CONCLUIDA });
-  assert.deepEqual([r.regra, r.desistencia, r.aceite, r.saldoMaximoPretendidoCentavos, r.restituirCentavos], ['sem-desistencia-expressa', false, false, 0, 0]);
+  const r = resultadoDaDesistencia({ ...CONSUMIDOR, precoCentavos: MEDIA, pagoANekkora: { desenvolvimento: 140_000 }, evidencias: CONCLUIDA });
+  assert.deepEqual([r.regra, r.desistencia, r.aceite, r.cobrancaAdicionalCentavos, r.restituirCentavos], ['sem-desistencia-expressa', false, false, 0, 0]);
   const h = situacaoDaHomologacao({ disponibilizadaEm: '2026-12-01', hoje: '2028-01-01', suspensaoRegistradaEm: '2026-12-16' });
   assert.deepEqual([h.aceiteTacito, h.desistenciaPresumida, h.cancelamentoAutomatico, h.segundaParcelaExigivel], [false, false, false, false]);
 });
@@ -376,6 +409,7 @@ test('R1-12. reembolso voluntário em até 5 dias úteis; arrependimento legal c
   const leg = prazoDaRestituicao({ pedidoValidoEm: '2026-12-18', arrependimentoLegal: true });
   assert.deepEqual([leg.tipo, leg.ate, leg.atualizacaoMonetaria], ['imediato-legal', '2026-12-18', true]);
   assert.equal(consumidor(MEDIA, 140_000, { evidencias: {}, pedidoValidoEm: '2026-12-18' }).prazo.ate, '2026-12-28');
+  assert.equal(consumidor(MEDIA, 140_000, { pedidoValidoEm: '2026-12-18' }).prazo.ate, '2026-12-28', 'C-04: mesmo prazo de 5 dias úteis');
   assert.match(CONTRATO, /até \*\*5 dias úteis\*\*/);
   assert.match(CONTRATO, /não autoriza postergar/);
 });
@@ -496,8 +530,11 @@ test('R1-26. preços promocionais e padrão preservados; complexa sem desconto',
 });
 
 test('R1-27. datas da campanha não alteradas nem inferidas', () => {
-  assert.deepEqual(PUBLICACAO.campanhaLancamento, { inicio: '2026-11-06', fim: '2027-01-06' }, 'datas históricas intactas');
-  assert.match(REGULAMENTO, /Datas fixas pendentes de aprovação da titular/);
+  // Decisão da titular de 09/11/2026 (D2/PUB-13): manter o período já gravado. Mudar as datas exige nova autorização.
+  assert.deepEqual(PUBLICACAO.campanhaLancamento, { inicio: '2026-11-06', fim: '2027-01-06' }, 'datas mantidas pela titular intactas');
+  assert.match(REGULAMENTO, /De \*\*06\/11\/2026 a 06\/01\/2027\*\*/, 'regulamento com as datas mantidas');
+  assert.match(REGULAMENTO, /mantidas pela titular em 09\/11\/2026/);
+  assert.doesNotMatch(REGULAMENTO, /Datas fixas pendentes/, 'regulamento sem a pendência antiga');
   assert.doesNotMatch(ler('scripts/comercial/regras-delivery.mjs'), /20\d\d-\d\d-\d\d/, 'nenhuma data fixa nas regras');
 });
 
@@ -525,9 +562,11 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção continua bloqueando (execução real)', () => {
+test('R1-30. portão de produção: nenhuma pendência de aprovação no publicacao.json versionado (execução real)', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
-  assert.notEqual(r.status, 0, 'o portão deve falhar');
-  assert.match(r.stdout + r.stderr, /PUBLICAÇÃO BLOQUEADA/);
-  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.match(r.stdout + r.stderr, new RegExp(id));
+  // Todas as aprovações foram dadas expressamente pela titular (PUB-17/19/09 e PUB-10/18 em 11/11/2026). O portão
+  // continua exigindo cada uma (teste 14) e ainda bloqueia por artefato ausente ou árvore suja (BUILD), que dependem do build.
+  const saida = r.stdout + r.stderr;
+  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
+  if (r.status !== 0) assert.doesNotMatch(saida, /- PUB-\d+ —/, 'só pendências de build, nunca de aprovação');
 });

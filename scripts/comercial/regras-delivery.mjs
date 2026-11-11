@@ -94,18 +94,17 @@ export const propostaAceitavel = (emissao, aceiteEm) => diaEmBrasilia(aceiteEm) 
 /* C-02 / C-12 — início do desenvolvimento e cronograma                 */
 /* ------------------------------------------------------------------ */
 
-export const ESPERA_INICIAL_DIAS = 7;
-
-/** Primeiro dia em que o desenvolvimento pode começar: depois de transcorridos 7 dias corridos da assinatura. */
-export const inicioMinimoDoDesenvolvimento = (assinatura) => somarUmDia(somarDiasCorridos(assinatura, ESPERA_INICIAL_DIAS));
-
-/** Cada automação: escopo, preço, início e homologação previstos, dependências e critérios de aceite (C-12). */
+/**
+ * Cada automação: escopo, preço, início e homologação previstos, dependências e critérios de aceite (C-12).
+ * Sem espera fixa depois da assinatura (titular, 09/11/2026, C-02 alterada): o início é a data da proposta, conforme a
+ * fila, e só não pode ser anterior à assinatura.
+ */
 export function validarCronograma({ assinatura, inicioPrevisto, homologacaoPrevista, dependencias, criteriosDeAceite, precoCentavos, escopo }) {
   const faltas = [];
   if (!escopo) faltas.push('escopo próprio');
   if (!Number.isInteger(precoCentavos) || precoCentavos <= 0) faltas.push('preço próprio');
   if (!inicioPrevisto) faltas.push('data prevista de início');
-  else if (inicioPrevisto < inicioMinimoDoDesenvolvimento(assinatura)) faltas.push(`início antes de ${inicioMinimoDoDesenvolvimento(assinatura)} (7 dias da assinatura, C-02)`);
+  else if (assinatura && inicioPrevisto < assinatura) faltas.push(`início antes da assinatura (${assinatura})`);
   if (!homologacaoPrevista || (inicioPrevisto && homologacaoPrevista <= inicioPrevisto)) faltas.push('data prevista de disponibilização para homologação, depois do início');
   if (!Array.isArray(dependencias)) faltas.push('dependências informadas (lista, mesmo vazia)');
   if (!Array.isArray(criteriosDeAceite) || criteriosDeAceite.length === 0) faltas.push('critérios objetivos de aceite');
@@ -177,15 +176,19 @@ export function regimeDaContratacao({ enquadramento, anexoB2B = {} } = {}) {
 }
 
 /* ------------------------------------------------------------------ */
-/* C-02 / C-03 / C-04 — desistência, reembolso e cobrança               */
+/* C-02 / C-03 / C-04 — desistência e reembolso                          */
 /* ------------------------------------------------------------------ */
 
 export const PRAZO_REEMBOLSO_DIAS_UTEIS = 5;
-/** C-04 consumidor: parcela do preço reservada, NA PROPOSTA, às etapas de homologação assistida e entrega. */
-export const RESERVA_ETAPAS_FINAIS_PERCENTUAL = 10;
 export const PRAZO_CONTESTACAO_DIAS_UTEIS = 10;
+/**
+ * C-04 (titular, 09/11/2026): na desistência voluntária durante a homologação, a Nekkora devolve 50% do que o cliente
+ * pagou a ela pelo desenvolvimento até então e retém os outros 50%. A base é o valor PAGO, nunca o preço do contrato, e
+ * não há cobrança adicional. A validade da retenção depende de revisão jurídica.
+ */
+export const RETENCAO_NA_HOMOLOGACAO_PERCENTUAL = 50;
 
-export const reservaDasEtapasFinais = (precoCentavos) => Math.round((precoCentavos * RESERVA_ETAPAS_FINAIS_PERCENTUAL) / 100);
+const isoData = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 
 /**
  * Prazo de restituição (C-03, R1). Arrependimento legal: imediato, com atualização monetária (CDC art. 49, p.ú.) —
@@ -202,33 +205,19 @@ export function prazoDaRestituicao({ pedidoValidoEm, arrependimentoLegal = false
   };
 }
 
-/** Entregáveis do desenvolvimento concluído, disponibilizados após a quitação do valor validamente apurado (C-04, 1.4). */
-export const ENTREGAVEIS_APOS_DESISTENCIA = Object.freeze([
-  'código-fonte específico concluído',
-  'documentação técnica prevista na proposta',
-  'relatório de testes técnicos por critério de aceite',
-  'Anexo de Componentes preenchido (licença dos componentes preexistentes)',
-]);
-/** Etapas não executadas por causa da desistência (cobertas pela reserva de 10% no regime consumidor). */
-export const ETAPAS_NAO_EXECUTADAS = Object.freeze(['homologação assistida', 'entrega acompanhada']);
-
 /**
  * Resultado de um pedido de desistência. Entradas (centavos):
- *   precoCentavos; enquadramento + anexoB2B (regimeDaContratacao); reservaNaPropostaCentavos (consumidor: a reserva
- *   das etapas finais que CONSTAVA da proposta — nunca fixada depois);
+ *   enquadramento + anexoB2B (regimeDaContratacao: só informa o regime; a regra de reembolso é a mesma nos dois);
  *   pagoANekkora { desenvolvimento, outros } (despesas pagas pelo cliente direto a terceiros não entram);
  *   desistenciaExpressaEm (declaração escrita; sem ela não há desistência); pedidoValidoEm (prazo de restituição);
  *   arrependimentoLegal; motivoAtribuivelANekkora;
- *   evidencias { conclusaoComprovada, criteriosDeAceiteCumpridos, disponibilizadaParaHomologacao, defeitoPendente,
- *                obrigacaoTecnicaPendente, comunicadasAoClienteEm, contestacaoPendente }.
- * Na C-04 devolve TETOS PRETENDIDOS, nunca valor autorizado: `exigibilidade` é 'depende-de-revisao-juridica' (ou
- * suspensa por contestação) e `autorizadoParaFaturamento` é sempre false. Nunca registra aceite.
+ *   evidencias { conclusaoComprovada, criteriosDeAceiteCumpridos, disponibilizadaParaHomologacaoEm (data registrada),
+ *                defeitoPendente, obrigacaoTecnicaPendente, aceiteFormalEm, comunicadasAoClienteEm, contestacaoPendente }.
+ * Nunca registra aceite e nunca gera cobrança adicional.
  */
 export function resultadoDaDesistencia({
-  precoCentavos,
   enquadramento,
   anexoB2B,
-  reservaNaPropostaCentavos = null,
   pagoANekkora = {},
   desistenciaExpressaEm = null,
   pedidoValidoEm = null,
@@ -244,75 +233,54 @@ export function resultadoDaDesistencia({
     regime,
     ...(enq.faltas ? { faltasDoAnexoB2B: enq.faltas } : {}),
     aceite: false,
-    autorizadoParaFaturamento: false,
+    cobrancaAdicionalCentavos: 0,
     despesasPagasDiretamenteATerceiros: 'fora do reembolso da Nekkora (C-03), salvo culpa da Nekkora',
   };
   if (!desistenciaExpressaEm && !arrependimentoLegal) {
-    return { ...base, regra: 'sem-desistencia-expressa', desistencia: false, restituirCentavos: 0, saldoMaximoPretendidoCentavos: 0, observacao: 'o silêncio não é aceite nem desistência: o contrato segue (homologação: situacaoDaHomologacao)' };
+    return { ...base, regra: 'sem-desistencia-expressa', desistencia: false, restituirCentavos: 0, observacao: 'o silêncio não é aceite nem desistência: o contrato segue (homologação: situacaoDaHomologacao)' };
   }
   if (arrependimentoLegal) {
-    return { ...base, regra: 'arrependimento-legal', desistencia: true, restituirCentavos: dev + outros, saldoMaximoPretendidoCentavos: 0, prazo: prazoDaRestituicao({ pedidoValidoEm, arrependimentoLegal: true }) };
+    return { ...base, regra: 'arrependimento-legal', desistencia: true, restituirCentavos: dev + outros, prazo: prazoDaRestituicao({ pedidoValidoEm, arrependimentoLegal: true }) };
   }
   if (motivoAtribuivelANekkora) {
-    return { ...base, regra: 'vicio-ou-descumprimento', desistencia: true, restituirAteCentavos: dev + outros, saldoMaximoPretendidoCentavos: 0, escolhaDoCliente: ['reexecução', 'restituição imediata', 'abatimento proporcional'], observacao: 'CDC art. 20; perdas e danos conforme a lei' };
+    return { ...base, regra: 'vicio-ou-descumprimento', desistencia: true, restituirAteCentavos: dev + outros, escolhaDoCliente: ['reexecução', 'restituição imediata', 'abatimento proporcional'], observacao: 'CDC art. 20; perdas e danos conforme a lei' };
   }
   const e = evidencias;
-  const concluida = e.conclusaoComprovada === true && e.criteriosDeAceiteCumpridos === true && e.disponibilizadaParaHomologacao === true && e.defeitoPendente !== true && e.obrigacaoTecnicaPendente !== true;
-  if (!concluida) {
+  if (isoData(e.aceiteFormalEm) && desistenciaExpressaEm >= e.aceiteFormalEm) {
+    return { ...base, regra: 'apos-aceite-formal', desistencia: true, restituirCentavos: null, observacao: 'fora da C-03 e da C-04: valem as condições do contrato para a etapa após o aceite (cláusulas 6, 12 e 13) e os direitos legais' };
+  }
+  const emHomologacao =
+    e.conclusaoComprovada === true &&
+    e.criteriosDeAceiteCumpridos === true &&
+    isoData(e.disponibilizadaParaHomologacaoEm) &&
+    desistenciaExpressaEm >= e.disponibilizadaParaHomologacaoEm &&
+    e.defeitoPendente !== true &&
+    e.obrigacaoTecnicaPendente !== true;
+  if (!emHomologacao) {
     return {
       ...base,
       regra: 'C-03',
       desistencia: true,
       restituirCentavos: dev,
-      saldoMaximoPretendidoCentavos: 0,
       prazo: prazoDaRestituicao({ pedidoValidoEm, feriadosExtras }),
-      observacao: 'reembolso integral do que foi pago pelo desenvolvimento, mesmo com o trabalho iniciado; defeito ou entrega incompleta nunca levam à C-04',
+      observacao: 'reembolso integral do que foi pago pelo desenvolvimento, mesmo com o trabalho iniciado; sem disponibilização formal registrada, defeito ou entrega incompleta, nunca a C-04',
     };
   }
-  let tetoPretendidoCentavos;
-  let reservaCentavos = 0;
-  if (regime === 'consumidor') {
-    const minima = reservaDasEtapasFinais(precoCentavos);
-    if (!Number.isInteger(reservaNaPropostaCentavos) || reservaNaPropostaCentavos < minima) {
-      return { ...base, regra: 'C-04-sem-reserva-previa', desistencia: true, restituirCentavos: null, saldoMaximoPretendidoCentavos: 0, exigibilidade: 'depende-de-revisao-juridica', observacao: `a proposta não reservou ${RESERVA_ETAPAS_FINAIS_PERCENTUAL}% às etapas finais: a reserva não pode ser fixada depois da desistência; não cobrar e consultar` };
-    }
-    reservaCentavos = reservaNaPropostaCentavos;
-    tetoPretendidoCentavos = precoCentavos - reservaCentavos;
-  } else {
-    tetoPretendidoCentavos = precoCentavos;
-  }
+  const retidoCentavos = Math.floor((dev * RETENCAO_NA_HOMOLOGACAO_PERCENTUAL) / 100);
   return {
     ...base,
-    regra: regime === 'consumidor' ? 'C-04-consumidor' : 'C-04-b2b',
+    regra: 'C-04-homologacao',
     desistencia: true,
-    tetoPretendidoCentavos,
-    reservaNaoCobravelCentavos: reservaCentavos,
-    saldoMaximoPretendidoCentavos: Math.max(tetoPretendidoCentavos - dev, 0),
-    restituirCentavos: Math.max(dev - tetoPretendidoCentavos, 0),
-    exigibilidade: e.contestacaoPendente ? 'suspensa-ate-analise-da-contestacao' : 'depende-de-revisao-juridica',
+    baseDeCalculoCentavos: dev,
+    restituirCentavos: dev - retidoCentavos,
+    retidoCentavos,
+    disponibilizadaParaHomologacaoEm: e.disponibilizadaParaHomologacaoEm,
+    prazo: prazoDaRestituicao({ pedidoValidoEm, feriadosExtras }),
+    situacaoDaRetencao: e.contestacaoPendente ? 'suspensa-ate-analise-da-contestacao' : 'depende-de-revisao-juridica',
     prazoDeContestacao: e.comunicadasAoClienteEm ? somarDiasUteis(e.comunicadasAoClienteEm, PRAZO_CONTESTACAO_DIAS_UTEIS, feriadosExtras) : null,
     ...(e.comunicadasAoClienteEm ? {} : { proximaAcao: `enviar as evidências ao cliente; ${PRAZO_CONTESTACAO_DIAS_UTEIS} dias úteis para contestar` }),
-    entrega: { entregaveis: ENTREGAVEIS_APOS_DESISTENCIA, etapasNaoExecutadas: ETAPAS_NAO_EXECUTADAS, exigeAReserva: false },
-    ...(regime === 'b2b-nao-consumerista' ? { obrigacoesPendentes: 'relação dos 100% com homologação e entrega não executadas: depende de revisão jurídica' } : {}),
-    observacao: 'teto pretendido do preço do serviço concluído, não multa, retenção nem presunção de aceite; garantias legais preservadas',
-  };
-}
-
-/**
- * Liberação dos entregáveis após a desistência (C-04, 1.4): basta quitar o valor VALIDAMENTE APURADO (até o teto
- * pretendido, depois da contestação e da revisão jurídica). No regime consumidor, a reserva das etapas não executadas
- * nunca é condição para receber o que já foi remunerado.
- */
-export function entregaAposQuitacao({ resultado, valorApuradoCentavos, pagoCentavos, contestacaoPendente = false }) {
-  if (!resultado?.regra?.startsWith('C-04-') || resultado.tetoPretendidoCentavos == null) throw new Error('só se aplica a resultado C-04 com teto');
-  if (valorApuradoCentavos > resultado.tetoPretendidoCentavos) throw new Error('valor apurado acima do teto pretendido');
-  const quitado = !contestacaoPendente && pagoCentavos >= valorApuradoCentavos;
-  return {
-    liberar: quitado,
-    entregaveis: quitado ? ENTREGAVEIS_APOS_DESISTENCIA : [],
-    exigeAReserva: false,
-    transferencia: 'repositório ou arquivo indicado pelo cliente, com instruções escritas e registro do envio; prazo [!] decisão da titular',
-    propriedadeIntelectual: 'Anexo de Componentes (C-09): código específico do cliente a partir da quitação do valor apurado',
+    entrega: { encerraContratacao: true, entregaDefinitiva: false, entregaveis: [], transferenciaDeDireitos: false, observacao: 'a desistência encerra a contratação da automação: sem entrega definitiva nem transferência do software (contrato-base 10.4)' },
+    observacao: '50% do valor pago (não do preço do contrato); sem cobrança adicional; não é aceite; garantias e direitos legais preservados',
   };
 }
 

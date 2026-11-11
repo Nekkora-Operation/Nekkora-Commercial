@@ -35,7 +35,7 @@ Depois deles vêm as 3 aprovações e a PR de liberação. A parte técnica est�
 | 1 | **Bookings × site (OPS-02 / CTL-03).** O Bookings diz que a reunião "poderá ser gravada"; o site diz "Conversa sem gravação". Também faltam a base legal, o processamento fora do Brasil, a retenção de 90 dias e o alerta sobre senhas | No Microsoft 365 → Bookings → serviço "Conversa inicial — Nekkora Delivery": **(a)** na descrição, trocar a frase sobre gravação por "Nesta fase, a Nekkora não grava as conversas comerciais."; **(b)** trocar o bloco "Privacidade e gravação de reuniões" pelo texto de [`privacidade-minuta.md` §4](../comercial/privacidade-minuta.md), com a caixa "Li e entendi"; **(c)** deixar "Empresa" opcional | Titular | Repetir a conferência só de leitura (Claude executa) |
 | 2 | **Recebimento do e-mail (CTL-05 / REP-04)** | De uma conta **fora** do tenant, enviar mensagem para `contato@nekkora.com`. Confirmar que chegou na Caixa de Entrada (não na quarentena) e responder | Titular | Data e hora, domínio do remetente e resposta recebida |
 | 3 | **LOG-01 (Marco Civil, art. 15)** | Ver §3.1. Decisão escrita. Na opção recomendada, a titular ativa os logs na AWS e Claude ajusta o texto do aviso | Titular (decisão e AWS) · Claude (texto) | Decisão em `$origem` + nova auditoria AWS sem falha |
-| 4 | **JUR-07 (LGPD, art. 33)** | Ver §3.2. Confirmar a região do tenant e decidir por escrito | Titular | Captura da região + decisão escrita |
+| 4 | **JUR-07 (LGPD, art. 33)** | Ver §3.2. Confirmar a região do tenant e decidir por escrito | Titular | Captura da região (**feita em 10/11/2026, E3**) + decisão escrita (**pendente**) |
 | 5 | **Datas da campanha (PUB-13)** | Decidir **antes** da PUB-17: manter as datas ou passar para "data real da publicação + 2 meses" (regra da COM-008-B). Claude só altera com as datas escritas pela titular. Ver §3.3 | Titular | Decisão com as duas datas |
 | 6 | **PUB-17, PUB-09, PUB-19** | Aprovar sobre o **mesmo commit candidato**, depois dos itens 1 a 5 (ver §4) | Titular | Declaração citando o commit |
 | 7 | **PUB-10, PUB-18** | PR de liberação: `avisoHomologacao: false`, `publicacao: true` e as três aprovações, cada uma com `$origem` | Claude prepara · Titular **[AUTORIZAR]** merge | CI verde e portão "LIBERADA" |
@@ -50,7 +50,10 @@ Não bloqueiam a V1, e por isso não estão no caminho:
 
 ## 3. Soluções mínimas
 
-### 3.1 LOG-01 — **continua bloqueando**
+### 3.1 LOG-01 — **parte técnica concluída em 10/11/2026**; o texto [PV-12] aguarda PUB-09/PUB-17
+
+A opção (a) foi aplicada pela titular e conferida ([E4](evidencias/golive-001/log-01-2026-11-10.md)). O texto abaixo
+é o planejamento original.
 
 O art. 15 obriga a pessoa jurídica que explora uma aplicação de internet com fins econômicos a guardar os registros
 de acesso por 6 meses. Um site comercial de PJ se enquadra. A opção (b), dizer que o artigo não se aplica, tem
@@ -78,6 +81,8 @@ Não é preciso contratar nada novo. O caminho mínimo, sem afirmar mecanismo qu
 1. **Titular:** no Centro de administração do Microsoft 365 → Configurações → Perfil da organização → **Local dos
    dados**, capturar a região de Exchange, Teams e SharePoint/OneDrive. A AWS já está confirmada: S3 em `sa-east-1`.
    Os logs da opção 3.1 também ficariam em `sa-east-1`.
+   **Feito em 10/11/2026 (E3):** Exchange, Teams, OneDrive e SharePoint estão em Brasil/Brasil. Vale o item 2, e não o
+   item 4. O Bookings não aparece no cartão ([registro](evidencias/golive-001/m365-local-dos-dados-2026-11-10.md)).
 2. **Se a região for o Brasil:** os dados armazenados ficam no país, e a entrega pelo CloudFront é coleta
    internacional, não transferência (Res. 19/2024, Anexo I, art. 6º). O que pode sobrar são os acessos de suporte e
    de subprocessadores dos provedores. O art. 33, IX, só serve para os fluxos com base no art. 7º, II e V: quem
@@ -92,6 +97,9 @@ Não é preciso contratar nada novo. O caminho mínimo, sem afirmar mecanismo qu
 A decisão é da titular. Este documento não declara o ponto juridicamente resolvido.
 
 ### 3.3 Datas da campanha
+
+**Decisão (D2, 09/11/2026): mantidas.** O regulamento e o teste R1-27 foram ajustados juntos na `release/v1`. O texto
+visível não muda.
 
 - **Se forem mantidas (06/11/2026 a 06/01/2027):** a página publicará um período que começou antes de o site existir,
   e o prazo efetivo fica menor que os dois meses aprovados.
@@ -127,7 +135,7 @@ anterior).
 | Tema | Decisão | O que foi preparado | Estado |
 |---|---|---|---|
 | Campanha | mantém a regra de dois meses a partir da publicação; datas quando a janela de deploy estiver definida | [procedimento e lista de arquivos](NEKKORA-COM-GOLIVE-001-campanha-datas.md) | datas atuais **não alteradas** |
-| LOG-01 | standard logging v2, campos mínimos, bucket privado, retenção documentada; AWS só com autorização específica | [`deploy/aws/logs/`](../../deploy/aws/logs/README.md) (política, ciclo de vida de 190 dias, entrega com `date time c-ip c-port x-host-header`), texto [PV-12] do aviso, minuta §6, mensagem da C13 | **preparado, não aplicado** |
+| LOG-01 | standard logging v2, campos mínimos, bucket privado, retenção documentada; AWS só com autorização específica | [`deploy/aws/logs/`](../../deploy/aws/logs/README.md) (política, ciclo de vida de 190 dias, entrega com `date time c-ip c-port x-host-header`), texto [PV-12] do aviso, minuta §6, mensagem da C13 | **aplicado e conferido em 10/11/2026** ([E4](evidencias/golive-001/log-01-2026-11-10.md)); [PV-12] aguarda PUB-09/PUB-17 |
 | JUR-07 | verificar regiões e transferências; o Brasil não basta | [análise e solução mínima](NEKKORA-COM-GOLIVE-001-JUR-07.md) | **continua impeditiva** |
 | Bookings | reconferir depois da correção | `node scripts/conferir-bookings.mjs --saida <pasta>` (12 regras, sem reserva) + 3 testes | hoje: **6 falhas** |
 | E-mail | registrar o teste externo | [roteiro e registro](evidencias/golive-001/email-recebimento-externo.md) | **não executado** |
@@ -142,38 +150,50 @@ Roteiros: [evidências da titular](NEKKORA-COM-GOLIVE-001-evidencias-titular.md)
 **Evidências (titular executa; Claude registra e confere):**
 
 - [ ] **E5 — Teams:** gravação e transcrição desligadas na política `Nekkora-Commercial` (CTL-01). Vem **antes** do
-      E1.
-- [ ] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com **12 de 12**: as 11 regras mais a B12, da caixa de
-      ciência.
-- [ ] **E2 — E-mail externo** recebido na Caixa de Entrada e respondido.
-- [ ] **E3 — Local dos dados** do Microsoft 365 (captura do cartão).
-- [ ] **E4 — Logs v2** ativos e conferidos pelos 7 critérios do README §4.
+      E1. **Relatado pela titular em 09/11/2026, evidência não arquivada; teste não será repetido**
+      ([registro](evidencias/golive-001/decisoes-titular-2026-11-09.md)).
+- [x] **E1 — Bookings** corrigido. `conferir-bookings.mjs` com **12 de 12**: as 11 regras mais a B12, da caixa de
+      ciência. Verificado em 09/11/2026: [registro](evidencias/golive-001/bookings-validacao-final/registro.md). Repetir
+      depois da A8.
+- [ ] **E2 — E-mail externo** recebido na Caixa de Entrada e respondido. **Relatado pela titular em 09/11/2026, evidência
+      não arquivada; teste não será repetido** ([registro](evidencias/golive-001/decisoes-titular-2026-11-09.md)).
+- [x] **E3 — Local dos dados** do Microsoft 365 (captura do cartão). **Verificado em 10/11/2026**, só quanto aos dados
+      em repouso: Exchange, Teams, OneDrive e SharePoint em Brasil/Brasil
+      ([registro](evidencias/golive-001/m365-local-dos-dados-2026-11-10.md)). Não resolve transferências, suporte,
+      subprocessadores nem bases legais; D1 continua aberto.
+- [x] **E4 — Logs v2** ativos e conferidos pelos 7 critérios do README §4. **Verificado tecnicamente em 10/11/2026**:
+      entrega `BMl6sEOG0xUZrwzd`, auditoria com 26 OK, 3 info e 0 falhas
+      ([registro](evidencias/golive-001/log-01-2026-11-10.md)). Entrega real comprovada; o intervalo de 30 minutos do
+      critério 5 não foi medido. O texto [PV-12] continua sujeito à PUB-09, à PUB-17 e à revisão jurídica.
 
 **Decisões escritas (titular):**
 
 - [ ] **D1 — JUR-07 / JUR-06, com parecer:**
+  - perguntas consolidadas no [dossiê jurídico](NEKKORA-COM-GOLIVE-001-dossie-juridico.md) (10/11/2026);
   - respostas às perguntas da JUR-07 §4.5;
   - o mecanismo adotado em cada fluxo;
   - a redação do aviso.
 
   Aceitar o risco **não** resolve os fluxos com base no IX.
-- [ ] **D2 — Datas da campanha.** `scripts/campanha-datas.mjs` está pronto e só simula sem a autorização.
+- [x] **D2 — Datas da campanha.** Titular, 09/11/2026: **manter 06/11/2026 a 06/01/2027**, sem alterações
+      ([registro](evidencias/golive-001/decisoes-titular-2026-11-09.md)). `scripts/campanha-datas.mjs` não será usado.
 
 **Autorizações expressas (titular), nesta ordem:**
 
-1. [ ] **A1 — AWS:** aplicar `deploy/aws/logs/README.md` §3.
+1. [x] **A1 — AWS:** aplicar `deploy/aws/logs/README.md` §3. **Executada pela titular em 10/11/2026** (E4).
 2. [ ] **A2a — #17:** push do merge da `main` (passo 1 da integração). **A2b:** merge da #17 com o CI verde.
 3. [ ] **A2c — #19:** realinhar e reorganizar (passo 3), base `main`, e fazer o merge com o CI verde. Só o grupo A
        entra.
 4. [ ] **A3 — PR de texto** (`docs/v1-texto-publico`):
-   - o [PV-12], só depois do E4;
+   - o [PV-12], só depois do E4. **E4 feito; integrado na `release/v1` em 10/11/2026, ainda sem aprovação;**
    - o texto da JUR-07, só depois do D1;
-   - as datas, com o D2.
+   - as datas, com o D2. **Mantidas; regulamento e R1-27 ajustados na `release/v1`.**
 5. [ ] **A4 — Aprovações sobre o mesmo commit:** PUB-17, PUB-09 e PUB-19.
 6. [ ] **A5 — PR de liberação** (`publicacao: true`, `avisoHomologacao: false`, aprovações com `$origem`) e a tag
        `v1.0.0`.
 7. [ ] **A6 — Deploy** de produção (aprovação no environment).
 8. [ ] **A7 — DNS:** os 2 CNAMEs na Cloudflare, DNS only.
-9. [ ] **A8 — Variável** `DOMINIO_PUBLICO`. Em seguida, repetir o E1, porque o link `#privacidade` passa a funcionar.
+9. [ ] **A8 — Variável** `DOMINIO_PUBLICO`. Em seguida, repetir o E1, porque o link `#privacidade` passa a funcionar,
+   e testar o "Abrir no e-mail" no computador e no celular (REP-04, homologação pública; não bloqueia a publicação).
 
 Sequência técnica, critérios de aborto e rollback: §4 deste checklist e runbook §6 do relatório GOLIVE-001.

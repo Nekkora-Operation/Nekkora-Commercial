@@ -21,9 +21,7 @@ direitos sobre o Framework e os demais componentes preexistentes, ou que tem **a
 ## 2. Cláusula de propriedade intelectual (Modelo A-R) **[R]** sobre **[D]**
 
 > (1) **Código Específico.** Os direitos sobre o código-fonte e a documentação desenvolvidos especificamente para o
-> CONTRATANTE nesta proposta pertencem ao CONTRATANTE **a partir da quitação integral** do preço ou, na desistência
-> após a conclusão, da quitação do **valor validamente apurado** (contrato-base 10.5; R1), sem exigir a reserva das
-> etapas não executadas. **[N]** Lei
+> CONTRATANTE nesta proposta pertencem ao CONTRATANTE **a partir da quitação integral** do preço. **[N]** Lei
 > 9.609/1998, art. 4º (conferida na LEGAL-BASE-001).
 >
 > (2) **Componentes Preexistentes.** Continuam pertencendo aos respectivos titulares os programas, bibliotecas,
@@ -49,8 +47,8 @@ direitos sobre o Framework e os demais componentes preexistentes, ou que tem **a
 > *Exemplo: clientes diferentes podem contratar automações para o ReceitaNet BX; cada implementação específica
 > continua protegida.*
 >
-> (7) **Antes da quitação** a automação só é usada para homologação; na desistência antes da conclusão nada é entregue
-> e nenhum direito é transferido.
+> (7) **Antes da quitação** a automação só é usada para homologação; na desistência antes da conclusão ou durante a
+> homologação (contrato-base, cláusulas 9 e 10), nada é entregue e nenhum direito é transferido.
 >
 > (8) **Manutenção por terceiros.** O CONTRATANTE pode contratar outro desenvolvedor para manter o Código Específico. A
 > Nekkora **não oferece alocação permanente** de profissionais no modelo Delivery.

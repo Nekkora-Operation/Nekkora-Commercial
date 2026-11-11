@@ -1,15 +1,18 @@
 # Regulamento da campanha de lançamento — Nekkora Delivery (minuta)
 
 > **MINUTA NÃO APROVADA.** NEKKORA-COM-CONTRACT-001 (06/11/2026), diretriz **C-10**. Os preços são os já aprovados
-> (PUB-14) e vêm de `src/precos.ts`, sem alteração. **As datas não foram fixadas nesta missão:** o período em
-> `publicacao.json` (06/11/2026 a 06/01/2027) é **histórico** e não vale como nova autorização (§1). O resumo exibido no
-> site está em `src/content.ts` (`PRICING.launch.rules`) e depende da nova aprovação dos textos (PUB-17).
-> Marcadores como no [contrato-base](contrato-base-delivery.md). **R1 (06/11/2026):** critérios de classificação por
-> esforço técnico estimado (§5), aprovados pela titular; as datas continuam pendentes.
+> (PUB-14) e vêm de `src/precos.ts`, sem alteração. **Datas (09/11/2026):** a titular decidiu **manter 06/11/2026 a
+> 06/01/2027**, o período já gravado em `publicacao.json` (§1; [registro](../release/evidencias/golive-001/decisoes-titular-2026-11-09.md)).
+> O resumo exibido no site está em `src/content.ts` (`PRICING.launch.rules`) e depende da aprovação dos textos
+> (PUB-17). Marcadores como no [contrato-base](contrato-base-delivery.md). **R1 (06/11/2026):** critérios de
+> classificação por esforço técnico estimado (§5), aprovados pela titular.
 
-## 1. Período **[!]**
+## 1. Período
 
-**[D]** Dois meses a partir da **publicação oficial**. **[!] Datas fixas pendentes de aprovação da titular** (PUB-13).
+**[D]** De **06/11/2026 a 06/01/2027**, incluindo o primeiro e o último dia, no horário de Brasília.
+- As datas foram mantidas pela titular em 09/11/2026 (D2/PUB-13).
+- Elas substituem a regra anterior de "dois meses a partir da publicação oficial" (COM-008-B).
+- Como a publicação ocorre depois de 06/11/2026, o período efetivo com o site no ar fica **menor que dois meses**.
 O código nunca calcula nem preenche as datas: a titular registra `campanhaLancamento.inicio/fim` em `publicacao.json`.
 O portão recusa campanha encerrada.
 

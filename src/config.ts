@@ -129,8 +129,8 @@ const toBr = (iso: string) => iso.split('-').reverse().join('/');
 
 /**
  * Datas da campanha de lançamento (PUB-13) — só quando as duas existem, são AAAA-MM-DD e estão em ordem. Decisão da
- * titular (COM-008-B): dois meses a partir da publicação oficial. As datas exatas só existem depois dela e são gravadas
- * pela titular em publicacao.json; o código nunca as calcula nem preenche.
+ * titular de 09/11/2026: manter 06/11/2026 a 06/01/2027, no lugar da regra de dois meses da COM-008-B. As datas são
+ * gravadas pela titular em publicacao.json; o código nunca as calcula nem preenche.
  */
 export const LAUNCH_DATES = (() => {
   const { inicio, fim } = publicacao.campanhaLancamento;

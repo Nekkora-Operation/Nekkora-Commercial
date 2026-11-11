@@ -62,19 +62,12 @@ test('WhatsApp válido também é aceito', async () => {
   assert.equal((await gate()).code, 0);
 });
 
-test('o publicacao.json versionado continua bloqueado (nenhuma aprovação presumida)', async () => {
+test('o publicacao.json versionado passa no portão (aprovações expressas da titular em 11/11/2026)', async () => {
   setup(JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8')));
   const r = await gate();
-  assert.equal(r.code, 1, r.stdout);
-  for (const id of [
-    'PUB-19',
-    'PUB-18',
-    'PUB-10',
-    // LEGAL-BASE-001-R1: a PR #15 alterou textos aprovados em 05/11/2026; a nova versão aguarda aprovação da titular
-    'PUB-17'
-  ]) {
-    assert.match(r.stdout, new RegExp(id));
-  }
+  // PUB-17/19/09 (commit e4bc72c) e PUB-10/18 (commit 2fdaed6), registradas em $origem; com artefato limpo, liberado
+  assert.equal(r.code, 0, r.stdout);
+  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
   // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
   assert.doesNotMatch(r.stdout, /PUB-20/);
   // PUB-22: endereço comercial informado pela titular em 05/11/2026 (cartão CNPJ) — o portão não o acusa mais

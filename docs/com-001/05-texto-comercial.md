@@ -1,7 +1,7 @@
 # Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)
 
-> **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,
-> condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.
+> **Aprovado internamente** pela titular em 11/11/2026 (PUB-17, PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico
+> externo. Pendências registradas em `publicacao.json` ($origem) e em docs/release/NEKKORA-COM-GOLIVE-001-pre-liberacao.md.
 
 > Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere
 > o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.
@@ -61,7 +61,7 @@ Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: a
 **Regras da campanha de lançamento** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):
 
 - Período: solicitações de avaliação recebidas pela Nekkora de 06/11/2026 a 06/01/2027, inclusive, no horário de Brasília.
-- Vale a data de recebimento da solicitação: e-mail recebido em contato@nekkora.com, reserva criada no Microsoft Bookings ou mensagem recebida na página da Nekkora no LinkedIn. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.
+- Vale a data de recebimento da solicitação: e-mail recebido em contato@nekkora.com ou mensagem recebida na página da Nekkora no LinkedIn. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.
 - O preço de lançamento vale para automações simples e médias, por automação, conforme os cartões acima. A automação complexa tem orçamento individual, sem desconto automático.
 - A categoria é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Solicitação recebida no período, de automação simples ou média, tem o preço de lançamento da categoria, mesmo que a proposta seja emitida depois do fim da campanha.
 - A proposta pode ser aceita em até 7 dias corridos da emissão.
@@ -122,12 +122,11 @@ Nem todo processo é simples ou médio: a avaliação indica a categoria antes d
 - Desenvolvimento sob demanda, com escopo formalizado em proposta
 - Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios
 - Preço aprovado por você antes do início do desenvolvimento
-- O desenvolvimento começa depois de 7 dias corridos da assinatura do contrato
 - Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal
 - Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação
 - Reuniões e acompanhamento conforme as condições acordadas
 - Licenças e custos externos tratados à parte, quando aplicáveis
-- Se você desistir antes da conclusão do desenvolvimento, devolvemos integralmente o que pagou à Nekkora pelo desenvolvimento
+- Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados
 - Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei
 
 Hosting tem avaliação e proposta próprias.
@@ -269,13 +268,11 @@ Responsável pelos dados pessoais desta página: NICOLLY OLIVEIRA DE CARVALHO DE
 
 - **O formulário não envia nada** — O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.
 - **O que vai para o e-mail** — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a contato@nekkora.com. Ela só é enviada se você a enviar pelo aplicativo.
-- **Agendamento pelo Microsoft Bookings** — Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para confirmar e lembrar o horário e realizar a conversa pelo Microsoft Teams. Não informe senhas, credenciais nem documentos sigilosos.
-- **Conversa sem gravação** — Nesta fase, a Nekkora não grava as conversas comerciais pelo Microsoft Teams. Se isso mudar, este aviso será atualizado antes, e a gravação só acontecerá com aviso prévio.
-- **Sem cookies nem rastreamento** — Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro); o simulador de investimento não guarda nem envia o que você seleciona. Fontes e imagens vêm do próprio site. O Microsoft Bookings, para onde leva o botão "Agendar conversa", segue as regras da Microsoft.
-- **Registros de acesso** — A Amazon Web Services (AWS), que hospeda este site, processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.
-- **Por quanto tempo guardamos** — Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante. Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento. Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.
-- **Onde os dados são processados** — Os serviços da Microsoft (Microsoft 365, Bookings e Teams) e da Amazon Web Services (AWS) usados pela Nekkora podem processar dados em servidores fora do Brasil.
-- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação, realizar a conversa agendada e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V). Para isso não pedimos consentimento: os dados são necessários para atender ao seu pedido. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados e, quando houver consentimento, revogá-lo (LGPD, art. 18), pelo e-mail contato@nekkora.com.
+- **Sem cookies nem rastreamento** — Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro); o simulador de investimento não guarda nem envia o que você seleciona. Fontes e imagens vêm do próprio site.
+- **Registros de acesso** — A Amazon Web Services (AWS), que hospeda este site, processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço. Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. A guarda cumpre uma obrigação legal (LGPD, art. 7º, II). Pela lei, a disponibilização desses registros a terceiros depende de ordem judicial (Marco Civil da Internet, art. 10, §1º, e art. 15, §3º). Autoridades podem pedir que eles sejam guardados por mais tempo (art. 15, §2º), mas o acesso continua dependendo de ordem judicial. Os registros não contêm dados cadastrais, como nome ou endereço, que seguem regras legais próprias (art. 10, §3º).
+- **Por quanto tempo guardamos** — Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante. Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.
+- **Onde os dados são processados** — Os arquivos deste site e os registros de acesso ficam armazenados na Amazon Web Services (AWS), na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países.
+- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18), pelo e-mail contato@nekkora.com.
 
 ## 8. Barra de navegação
 

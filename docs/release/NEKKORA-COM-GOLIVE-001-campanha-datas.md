@@ -1,5 +1,9 @@
 # Datas definitivas da campanha de lançamento — procedimento
 
+> **Decisão da titular, 09/11/2026: manter 06/11/2026 a 06/01/2027, sem alterações**
+> ([registro](evidencias/golive-001/decisoes-titular-2026-11-09.md)). Este procedimento fica sem uso, salvo nova decisão
+> escrita. O período efetivo no ar será menor que dois meses.
+
 **Regra aprovada (COM-008-B, mantida pela titular em 06/11/2026):** a campanha dura dois meses a partir da
 publicação oficial. As datas atuais (`06/11/2026 a 06/01/2027`) são históricas e **só mudam com as datas escritas
 pela titular**, depois de a janela de deploy estar definida. O código não calcula as datas; elas ficam em

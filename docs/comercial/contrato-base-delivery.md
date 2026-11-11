@@ -10,6 +10,9 @@
 > titular (C-03 prazo do reembolso, C-04 por enquadramento, C-06 lembretes, C-07 atendimento, C-10 critérios por horas,
 > C-11 atualização monetária). A redação anterior está no histórico do git (commit `43da08f`).
 >
+> **Alterações da titular de 09/11/2026:** sem espera obrigatória para o início (cl. 3.1) e nova regra de desistência
+> durante a homologação, com reembolso de 50% do valor pago (cl. 10). As duas estão sujeitas à revisão jurídica.
+>
 > **Hierarquia (R1, [R] ⚖):** (1) norma obrigatória; (2) **condição particular da proposta** que indique expressamente
 > a cláusula deste contrato que altera, desde que não reduza direito legal; (3) [Anexo B2B](anexo-b2b-delivery.md),
 > **só quando validamente aplicável** e só nos temas que lista; (4) este contrato-base; (5) termo de garantia e Anexo de
@@ -56,17 +59,19 @@ contrato-base. ⚖ Forma do aceite e da assinatura (assinatura eletrônica ou e-
 **[R]** A contagem exclui o dia da emissão e inclui o último (ex.: emitida em 10/11, aceitável até 17/11). Fora da
 campanha, a validade é a indicada na proposta.
 
-## Cláusula 3 — Espera inicial e direito de arrependimento (C-02)
+## Cláusula 3 — Início do desenvolvimento e direito de arrependimento (C-02)
 
-3.1 **[D]** O desenvolvimento **só começa depois de transcorridos 7 dias corridos da assinatura** deste contrato.
-**[D]** Nesta versão, **não há início antecipado**, nem a pedido do CONTRATANTE. Qualquer exceção futura depende de
-revisão jurídica e de nova autorização da titular.
+3.1 **[D]** Não há prazo de espera obrigatório depois da assinatura. O desenvolvimento de cada automação começa na
+**data prevista de início** informada na proposta, conforme a fila operacional (cláusula 5). Desde a formalização, a
+Nekkora mantém o atendimento ao CONTRATANTE pelos canais deste contrato. Isso não é promessa de início imediato nem de
+prazo igual para todas as automações. **[!]** Alteração da titular de 09/11/2026, que substitui a espera de 7 dias da
+redação anterior. Está sujeita à revisão jurídica (JUR-03).
 
 3.2 **[N]** CDC art. 49: o consumidor pode desistir em 7 dias, a contar da assinatura ou do recebimento do serviço,
 quando a contratação ocorre fora do estabelecimento comercial; os valores pagos "a qualquer título" são devolvidos de
 imediato, monetariamente atualizados. **[R]** Este contrato **preserva integralmente** esse direito e **não fixa** um
-termo final diferente do legal: a espera de 7 dias do item 3.1 é regra operacional da Nekkora e **não extingue** direito
-legal com termo inicial ou forma de exercício diferente. ⚖ Termo inicial do arrependimento em serviço sob encomenda
+termo final diferente do legal: o início do desenvolvimento, mesmo dentro do prazo legal, **não extingue** direito legal
+com termo inicial ou forma de exercício diferente, nem reduz a restituição do item 3.4. ⚖ Termo inicial do arrependimento em serviço sob encomenda
 ("recebimento do serviço").
 
 3.3 **[R]** Exercício: resposta ao e-mail da proposta ou mensagem para **contato@nekkora.com**, sem necessidade de
@@ -77,8 +82,8 @@ recebimento do pedido. **[!]** Como garantir a confirmação **imediata** (respo
 3.4 **[R]** No arrependimento legal, a Nekkora devolve **tudo o que recebeu do CONTRATANTE, a qualquer título**, de
 imediato e com atualização monetária, sem multa nem desconto. **[N]** Decreto 7.962/2013, art. 5º, §2º: o
 arrependimento rescinde os contratos acessórios sem ônus. **[R]** Para evitar custo de terceiros dentro do prazo, a
-Nekkora **não pede** ao CONTRATANTE que contrate licenças ou serviços externos antes de iniciado o desenvolvimento
-(item 3.1). ⚖ Alcance de "contratos acessórios" para licenças contratadas diretamente pelo CONTRATANTE.
+Nekkora **não pede** ao CONTRATANTE que contrate licenças ou serviços externos enquanto houver prazo legal de
+arrependimento em curso. ⚖ Alcance de "contratos acessórios" para licenças contratadas diretamente pelo CONTRATANTE.
 
 ## Cláusula 4 — Escopo, mudanças e custos externos (C-08)
 
@@ -100,8 +105,8 @@ CONTRATANTE. **[N]** CDC art. 40, §3º.
 disponibilização para homologação**, dependências informadas e critérios objetivos de aceite.
 
 5.2 **[D]** A Nekkora organiza as demandas em fila, mas **a fila não deixa o início a critério exclusivo da Nekkora**:
-vale a data prevista na proposta. **[N]** CDC art. 39, XII. **[R]** A data prevista de início nunca é anterior ao 8º dia
-após a assinatura (cláusula 3.1).
+vale a data prevista na proposta. **[N]** CDC art. 39, XII. **[R]** A data prevista de início é definida em cada
+proposta, nunca antes da assinatura, e não há data universal (cláusula 3.1).
 
 5.3 **[D]** "Dois dias úteis de desenvolvimento" é referência operacional possível, **nunca promessa universal**; não
 aparece como prazo garantido.
@@ -123,8 +128,8 @@ este contrato.
 6.2 **[D]** **50% na contratação** e **50% após a homologação e o aceite formal** (cláusula 8). **[D]** Cada parcela
 vence em **5 dias úteis** da cobrança, com a **data de vencimento escrita na cobrança**.
 
-6.3 **[D]** O silêncio do CONTRATANTE **não torna exigível** a segunda parcela (cláusula 8.4). A única outra hipótese de
-cobrança do saldo é a desistência após a conclusão (cláusula 10).
+6.3 **[D]** O silêncio do CONTRATANTE **não torna exigível** a segunda parcela (cláusula 8.4). A desistência também não
+o torna exigível: durante a homologação, vale a cláusula 10, sem cobrança adicional.
 
 6.4 Meio: Pix para a conta da Nekkora. ⚖ **[!]** Nota fiscal e tributos: pendente (JUR-01).
 
@@ -178,8 +183,8 @@ aceite.
 
 ## Cláusula 9 — Desistência antes da conclusão (C-03)
 
-9.1 **[D]** Enquanto o desenvolvimento **não estiver integralmente concluído** (cláusula 7.2), o CONTRATANTE pode
-desistir e recebe **reembolso integral dos valores pagos à Nekkora pelo desenvolvimento**, **inclusive se o trabalho já
+9.1 **[D]** Enquanto o desenvolvimento **não estiver integralmente concluído** (cláusula 7.2) **e formalmente
+disponibilizado para homologação** (item 10.1, d), o CONTRATANTE pode desistir e recebe **reembolso integral dos valores pagos à Nekkora pelo desenvolvimento**, **inclusive se o trabalho já
 tiver começado**. Não há apuração por marcos ou por horas, nem cobrança pelo tempo trabalhado.
 
 9.2 **[D]** Despesas contratadas e pagas **diretamente** pelo CONTRATANTE a terceiros não são restituídas pela Nekkora,
@@ -193,71 +198,64 @@ comprovante da devolução enviado ao CONTRATANTE. **[N]** No exercício válido
 é **imediata** e monetariamente atualizada (CDC art. 49, parágrafo único): prevalece sempre o prazo legal mais favorável.
 **[R]** O prazo operacional de 5 dias úteis **não autoriza postergar** uma restituição que a lei exige de imediato.
 
-## Cláusula 10 — Desistência após a conclusão (C-04) ⚖ ponto crítico
+## Cláusula 10 — Desistência durante a homologação (C-04) ⚖ ponto crítico
 
-> **R1: decisão da titular de tratar a C-04 de forma diferente conforme o enquadramento** (substitui as Alternativas A
-> e B da CONTRACT-001). Os percentuais são **tetos pretendidos**, não valores exigíveis automaticamente: a redação
-> continua **sujeita a parecer jurídico**, sobretudo quanto à exigibilidade de pagamento sem aceite formal. Análise:
-> [relatório R1 §B e §D](../release/NEKKORA-COM-CONTRACT-001-R1.md).
+> **Decisão da titular de 09/11/2026**, que substitui a regra anterior (cobrança de até 90% do preço no regime do
+> consumidor, com reserva de 10%, e de até 100% no B2B). A retenção parcial do item 10.3 está **sujeita à revisão
+> jurídica (JUR-03)**: esta redação não afirma que ela é válida.
 
-10.1 **Condições cumulativas, comuns aos dois regimes.** **[D]** Nenhuma cobrança relacionada a esta cláusula é feita
-sem que se verifiquem, **todas**:
-(a) conclusão técnica **integral** comprovada por evidências (cláusula 7.2);
-(b) cumprimento dos critérios de aceite verificáveis da proposta, ressalvada a homologação ainda pendente;
+10.1 **Quando se aplica.** **[D]** Só na desistência **voluntária** do CONTRATANTE **durante a homologação**, com
+**todas** as condições abaixo:
+(a) conclusão técnica **integral** comprovada por evidências (cláusula 7.2). A conclusão interna da Nekkora, sozinha,
+**não basta**;
+(b) cumprimento dos critérios de aceite verificáveis da proposta, ressalvada a homologação em curso;
 (c) nenhum defeito conhecido nem obrigação técnica pendente atribuível à Nekkora;
-(d) **disponibilização real** de ambiente, instruções e meios de teste;
-(e) desistência **expressa, por escrito** e voluntária, sem motivo atribuível à Nekkora (o silêncio nunca é desistência
-— cláusula 8.4);
+(d) **disponibilização formal** da automação ao CONTRATANTE para validação, com ambiente, instruções e meios de teste,
+e com a **data da disponibilização registrada** e comunicada por escrito (cláusula 8.1). A homologação começa nessa
+data;
+(e) desistência **expressa, por escrito** e voluntária, sem motivo atribuível à Nekkora, feita depois da data do item
+(d) e antes do aceite formal (o silêncio nunca é desistência — cláusula 8.4);
 (f) inexistência de direito legal de arrependimento que imponha restituição integral (cláusula 3);
 (g) ausência de contestação fundamentada pendente de análise (item 10.2);
 (h) conformidade com os limites jurídicos aplicáveis ao contrato.
-Faltando qualquer uma, vale a cláusula 9 (reembolso integral) ou a 11. Defeito ou entrega incompleta **nunca** levam a
-esta cláusula. A cobrança **não é multa, retenção do sinal, penalidade nem presunção de aceite**: é o preço do serviço
-efetivamente prestado. **Não** equivale a aceite e **não** é registrada como aceite.
+Faltando qualquer uma, vale a cláusula 9 (reembolso integral) ou a 11. Defeito, descumprimento ou entrega incompleta
+**nunca** levam a esta cláusula. A desistência **não** equivale a aceite e **não** é registrada como aceite.
 
-10.2 **Contestação.** **[D]** Antes de cobrar, a Nekkora envia por escrito ao CONTRATANTE as evidências do item 10.1.
-O CONTRATANTE tem **10 dias úteis** para contestá-las, apontando defeitos ou itens não concluídos. A contestação
-fundamentada **suspende a exigibilidade** da parcela controvertida até a análise e a resposta escrita. **[R]** O prazo
-não é renúncia a direito legal: a falta de contestação não impede o CONTRATANTE de exercer depois os direitos que a lei
-lhe garante (cláusulas 11 e 13).
+10.2 **Contestação.** **[D]** Antes de reter qualquer valor, a Nekkora envia por escrito ao CONTRATANTE as evidências do
+item 10.1. O CONTRATANTE tem **10 dias úteis** para contestá-las, apontando defeitos ou itens não concluídos. A
+contestação fundamentada **suspende a retenção** da parcela controvertida até a análise e a resposta escrita. **[R]** O
+prazo não é renúncia a direito legal: a falta de contestação não impede o CONTRATANTE de exercer depois os direitos que
+a lei lhe garante (cláusulas 11 e 13).
 
-10.3 **Regime do consumidor — modelo conservador.** **[D]** Quando a contratação for relação de consumo (padrão deste
-contrato-base):
-(a) a proposta **reserva previamente 10% do preço** de cada automação às etapas de homologação assistida e de entrega
-(proposta, §2, "Reserva das etapas finais"). A reserva **não pode ser fixada depois** da desistência; se ela não
-constar da proposta, esta cláusula não é usada e o caso vai à revisão jurídica;
-(b) a cobrança máxima pretendida é de **90% do preço contratado**, abatidos os pagamentos já feitos;
-(c) não se cobra valor de serviço não realizado nem de entrega incompleta: os 10% reservados **nunca** são cobrados
-nesta hipótese.
+10.3 **Reembolso de 50% do valor pago.** **[D]** A Nekkora devolve **50% dos valores efetivamente pagos** pelo
+CONTRATANTE à Nekkora pelo desenvolvimento da automação até a desistência e retém os outros 50%. A base de cálculo é o
+**valor pago**, **nunca** o preço total do contrato. **Não há cobrança adicional**: o CONTRATANTE não paga a segunda
+parcela nem qualquer outro valor por causa da desistência. A regra é a mesma nos dois regimes (consumidor e
+[Anexo B2B](anexo-b2b-delivery.md)). A devolução segue o prazo do item 9.4 (5 dias úteis do pedido válido). **[R]**
+Centavos ímpares são arredondados a favor do CONTRATANTE.
 
-10.4 **Regime B2B efetivamente não consumerista.** **[D]** Só com o [Anexo B2B](anexo-b2b-delivery.md) validamente
-aplicável (os quatro itens do §1, justificados e documentados; ter CNPJ **não** basta): cobrança de **até 100% do
-preço**, abatidos os pagamentos já feitos, com as mesmas condições dos itens 10.1 e 10.2. ⚖ Relação dos 100% com as
-etapas de homologação e entrega não executadas.
+10.4 **Efeito da desistência.** **[D]** A desistência voluntária durante a homologação **encerra o desenvolvimento e a
+contratação daquela automação**: não há entrega definitiva nem transferência do software cancelado ou de direitos sobre
+ele (cláusula 14; Anexo de Componentes, item 7). **[D]** Enquanto não houver desistência, o CONTRATANTE pode concluir
+normalmente a contratação, com homologação, aceite formal e pagamento integral (cláusulas 6, 8 e 12). ⚖ A retenção de
+50% sem entrega está **sujeita à revisão jurídica** (JUR-03); esta redação não presume a sua validade.
 
-10.5 **Entrega após a quitação.** **[D]** Quitado o valor **validamente apurado** (depois da contestação, se houver), a
-Nekkora disponibiliza o desenvolvimento concluído e os entregáveis correspondentes, **sem exigir os 10% reservados** no
-regime do consumidor. **[R]** Entregáveis: código-fonte específico concluído; documentação técnica prevista na
-proposta; relatório de testes técnicos por critério de aceite; Anexo de Componentes preenchido, com a licença dos
-componentes preexistentes (cláusula 14). Transferência: no repositório ou arquivo indicado pelo CONTRATANTE, com
-instruções escritas e registro do envio, em prazo **[!]** a definir pela titular. A homologação assistida e a entrega
-acompanhada não executadas não são prestadas nem cobradas. As garantias legais continuam valendo.
+10.5 **Exemplos (hipóteses contratuais).** **[R]** Calculados por `resultadoDaDesistencia`:
 
-10.6 **Exemplos (hipóteses contratuais, não valores exigíveis).** **[R]** Calculados por
-`resultadoDaDesistencia` (relatório R1 §C):
+| Caso | Preço | Pago à Nekkora | Devolução | Retido |
+|---|---:|---:|---:|---:|
+| Desistência na homologação | R$ 2.000 | R$ 1.000 | R$ 500 | R$ 500 |
+| Desistência na homologação — média | R$ 2.800 | R$ 1.400 | R$ 700 | R$ 700 |
+| Antes da disponibilização formal (cláusula 9) | R$ 2.800 | R$ 1.400 | R$ 1.400 | — |
+| Defeito ou descumprimento da Nekkora (cláusula 11) | R$ 2.800 | R$ 1.400 | Conforme a lei | — |
+| Arrependimento legal (cláusula 3.4) | R$ 2.800 | R$ 1.400 | Tudo o que foi pago, de imediato | — |
 
-| Caso | Preço | Entrada paga | Reserva (10%) | Teto pretendido | Saldo máximo pretendido |
-|---|---:|---:|---:|---:|---:|
-| Consumidor — simples | R$ 1.000 | R$ 500 | R$ 100 | R$ 900 | R$ 400 |
-| Consumidor — média | R$ 2.800 | R$ 1.400 | R$ 280 | R$ 2.520 | R$ 1.120 |
-| B2B não consumerista — média | R$ 2.800 | R$ 1.400 | — | R$ 2.800 | R$ 1.400 |
-| Qualquer regime, antes da conclusão | R$ 2.800 | R$ 1.400 | — | — | Reembolso de R$ 1.400 (cláusula 9) |
-| Arrependimento legal | R$ 2.800 | R$ 1.400 | — | — | Restituição de tudo o que foi pago, de imediato (cláusula 3.4) |
+10.6 **Após o aceite formal.** **[D]** Esta cláusula deixa de se aplicar: valem as condições do contrato para essa
+etapa (cláusulas 6, 12 e 13) e os direitos legais.
 
 10.7 **[N]** Limites que nenhum regime afasta: CDC art. 51, II (opção de reembolso nos casos do Código) e IV
-(desvantagem exagerada; §1º, presunções); CDC art. 20 (vícios). **[I]** Fundamento possível da cobrança: o preço
-remunera serviço prestado; em contrato empresarial, CC art. 623 (empreitada) dá base adicional. ⚖ Exigibilidade antes
-do aceite formal, enquadramento consumerista e percentual cobrável.
+(desvantagem exagerada; §1º, presunções); CDC art. 20 (vícios); CDC arts. 24 a 26 (garantias legais). ⚖ Validade da
+retenção de 50% do valor pago na relação de consumo, inclusive diante do CDC art. 53 e do art. 51, IV.
 
 ## Cláusula 11 — Defeitos, descumprimento e atraso da Nekkora
 
@@ -273,8 +271,7 @@ exclusão genérica de responsabilidade por sistemas de terceiros (**[D]** C-07;
 ## Cláusula 12 — Entrega definitiva (C-05)
 
 12.1 **[D]** Após o aceite formal **e** a quitação, a Nekkora entrega o código específico, a documentação, o Anexo de
-Componentes preenchido e o termo de garantia. Na desistência após a conclusão, vale o item 10.5 (quitação do valor
-validamente apurado, sem a reserva das etapas não executadas).
+Componentes preenchido e o termo de garantia. Na desistência durante a homologação, vale o item 10.4.
 
 12.2 **[D]** Condicionar a entrega à quitação **não impede** a verificação nem a correção de defeitos: durante a
 homologação o CONTRATANTE tem acesso para testar; defeitos apontados são corrigidos independentemente da quitação. **[R]**
@@ -306,8 +303,8 @@ contratar outro desenvolvedor; código exclusivo não é revendido nem reutiliza
 independentes para outros clientes sobre o mesmo sistema ou finalidade, sem copiar código exclusivo, dados, credenciais
 ou informações confidenciais.
 
-14.2 **[R]** Antes da quitação, a automação só é usada para homologação. Na desistência antes da conclusão (cláusula 9),
-nada é entregue e nenhum direito é transferido.
+14.2 **[R]** Antes da quitação, a automação só é usada para homologação. Na desistência antes da conclusão (cláusula 9)
+ou durante a homologação (cláusula 10), nada é entregue e nenhum direito é transferido.
 
 ## Cláusula 15 — Atraso no pagamento (C-11)
 
