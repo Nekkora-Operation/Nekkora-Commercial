@@ -166,9 +166,15 @@ async function run(engine) {
       cards.units[0] === `${cards.simples} cada` && cards.units[1] === `${cards.media} cada` && cards.lines[0].includes(`× ${cards.simples}`) && cards.lines[1].includes(`× ${cards.media}`),
       `${cards.units.join(' · ')} | ${cards.lines.join(' · ')}`,
     );
-    // Caminhos após a simulação: Bookings oficial em nova aba, sem opener/Referer; avaliação abre o formulário
-    const bookings = await sim.locator('[data-sim-result] a[data-agendar]').evaluate((a) => ({ href: a.getAttribute('href'), target: a.target, rel: a.rel, text: a.textContent }));
-    check(engine, 'agendar-uma-conversa-bookings-oficial', bookings.href === OFFICIAL_BOOKINGS && bookings.target === '_blank' && /noopener/.test(bookings.rel) && /noreferrer/.test(bookings.rel) && /Agendar uma conversa/.test(bookings.text), JSON.stringify(bookings));
+    // Caminhos após a simulação: Bookings oficial em nova aba, sem opener/Referer; avaliação abre o formulário.
+    // V1 inicial sem Bookings (agendamento.url null, titular, 10/11/2026): o link não pode existir nem citar agendamento.
+    if (OFFICIAL_BOOKINGS) {
+      const bookings = await sim.locator('[data-sim-result] a[data-agendar]').evaluate((a) => ({ href: a.getAttribute('href'), target: a.target, rel: a.rel, text: a.textContent }));
+      check(engine, 'agendar-uma-conversa-bookings-oficial', bookings.href === OFFICIAL_BOOKINGS && bookings.target === '_blank' && /noopener/.test(bookings.rel) && /noreferrer/.test(bookings.rel) && /Agendar uma conversa/.test(bookings.text), JSON.stringify(bookings));
+    } else {
+      const semAgenda = await sim.locator('[data-sim-result]').evaluate((e) => ({ links: e.querySelectorAll('a[data-agendar], a[href*="bookings"], a[href*="/book/"]').length, text: /Agendar|Bookings|Teams/.test(e.innerText) }));
+      check(engine, 'sem-bookings-nenhum-link-de-agendamento', semAgenda.links === 0 && !semAgenda.text, JSON.stringify(semAgenda));
+    }
     const status = await page.locator('[data-testid="status-simulador"]').innerText();
     check(engine, 'resultado-anunciado-em-regiao-viva', /Resultado da simulação atualizado\./.test(status) && (await page.locator('[data-testid="status-simulador"]').getAttribute('role')) === 'status', status.slice(0, 120));
     await shot(sim, 'simulador-vigente-producao');
