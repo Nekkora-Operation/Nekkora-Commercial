@@ -207,9 +207,9 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
   const pub = JSON.parse(readFileSync('publicacao.json', 'utf8'));
   assert.deepEqual(pub.aprovacoes, {
     precos: true,
-    condicoesComerciais: false,
-    textosComerciais: false, // aprovada a versão de 05/11/2026 (PR #14); a versão da PR #15 aguarda nova aprovação (LEGAL-BASE-001-R1)
-    avisoDePrivacidade: false,
+    condicoesComerciais: true, // titular, 11/11/2026 (PUB-19, commit e4bc72c)
+    textosComerciais: true, // titular, 11/11/2026 (PUB-17, commit e4bc72c)
+    avisoDePrivacidade: true, // titular, 11/11/2026 (PUB-09, commit e4bc72c)
     agendamento: true, // titular, 05/11/2026 (PUB-20)
     envioAutomatico: false,
     publicacao: false,

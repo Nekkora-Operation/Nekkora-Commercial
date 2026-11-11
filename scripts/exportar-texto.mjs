@@ -18,6 +18,10 @@ const vite = await createServer({ root, server: { middlewareMode: true }, appTyp
 const c = await vite.ssrLoadModule('/src/content.ts');
 await vite.close();
 const { CONTACT_COPY: K, PRICING: P } = c;
+// Cabeçalho conforme as aprovações reais da configuração usada (publicacao.json ou NEKKORA_PUBLICACAO)
+const { readFileSync } = await import('node:fs');
+const APROVACOES = JSON.parse(readFileSync(path.resolve(root, process.env.NEKKORA_PUBLICACAO ?? 'publicacao.json'), 'utf8')).aprovacoes;
+const APROVADO = !process.env.NEKKORA_PUBLICACAO && APROVACOES.textosComerciais && APROVACOES.condicoesComerciais && APROVACOES.avisoDePrivacidade;
 
 const L = [];
 const h = (t) => L.push('', `## ${t}`, '');
@@ -27,8 +31,11 @@ const header = (s) => L.push(`**${s.eyebrow}** — ${s.title}`, '', s.descriptio
 L.push(
   '# Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)',
   '',
-  '> **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,',
-  '> condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.',
+  ...(APROVADO
+    ? ['> **Aprovado internamente** pela titular em 11/11/2026 (PUB-17, PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico',
+       '> externo. Pendências registradas em `publicacao.json` ($origem) e em docs/release/NEKKORA-COM-GOLIVE-001-pre-liberacao.md.']
+    : ['> **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,',
+       '> condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.']),
   '',
   `> Gerado por \`npm run texto\` a partir de [\`src/content.ts\`](${rel('src/content.ts')}). Não edite este arquivo: altere`,
   `> o \`content.ts\` (e a [matriz de alegações](${rel('docs/com-001/03-matriz-alegacoes.md')}), se a mudança afetar uma promessa) e gere de novo.`,

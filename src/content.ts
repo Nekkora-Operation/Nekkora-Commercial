@@ -6,8 +6,9 @@
  * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
  *
  * NEKKORA-COM-008-C: textos ajustados às decisões da titular na COM-008-B (campanha, condições, várias automações,
- * licenças, homologação, Hosting, botão "Entrar" e privacidade). Redação em revisão: aprovacoes.textosComerciais,
- * condicoesComerciais e avisoDePrivacidade continuam false, e a revisão jurídica é obrigatória antes da aprovação.
+ * licenças, homologação, Hosting, botão "Entrar" e privacidade). Aprovação interna da titular em 11/11/2026 (PUB-17,
+ * PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico externo; ressalvas em publicacao.json ($origem). Qualquer
+ * mudança neste texto exige nova aprovação.
  */
 import type { IconName } from 'nekkora-lib';
 import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';

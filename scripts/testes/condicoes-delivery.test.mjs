@@ -255,7 +255,17 @@ test('13. alteração de prazo só com motivo, comunicação e concordância esc
 /* 14 ----------------------------------------------------------------- */
 test('14. bloqueios de produção preservados: nenhuma aprovação presumida', () => {
   const a = PUBLICACAO.aprovacoes;
-  for (const k of ['condicoesComerciais', 'textosComerciais', 'avisoDePrivacidade', 'publicacao']) assert.equal(a[k], false, `${k} continua false`);
+  // PUB-17, PUB-19 e PUB-09: aprovações expressas da titular em 11/11/2026 (commit e4bc72c), cada uma com registro em
+  // $origem. PUB-18 (publicação) continua false e PUB-10 (aviso de homologação) continua ligado.
+  for (const k of ['condicoesComerciais', 'textosComerciais', 'avisoDePrivacidade']) {
+    assert.equal(a[k], true, `${k} aprovada`);
+    assert.match(PUBLICACAO.$origem[`aprovacoes.${k}`], /Titular, 11\/11\/2026 .*e4bc72c.*sem parecer jurídico externo/, `${k}: registro da aprovação`);
+  }
+  assert.equal(a.publicacao, false, 'publicacao (PUB-18) continua false');
+  assert.match(PUBLICACAO.$origem['aprovacoes.condicoesComerciais'], /Não abrange a minuta contratual nem a cláusula de retenção de 50%/);
+  const pv = PUBLICACAO.$origem['aprovacoes.avisoDePrivacidade'];
+  for (const t of ['Esta aprovação interna não constitui demonstração de conformidade jurídica.', 'Pendência F5 preservada', 'Nenhum mecanismo do art. 33 da LGPD está comprovado', 'A decisão de 06/11/2026 permanece válida.'])
+    assert.ok(pv.includes(t), `PUB-09 registra: ${t}`);
   assert.equal(PUBLICACAO.avisoHomologacao, true);
   assert.deepEqual(PUBLICACAO.campanhaLancamento, { inicio: '2026-11-06', fim: '2027-01-06' }, 'datas históricas não alteradas');
   const portao = ler('scripts/verificar-publicacao.mjs');
@@ -549,5 +559,7 @@ test('R1-30. portão de produção continua bloqueando (execução real)', () =>
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
   assert.notEqual(r.status, 0, 'o portão deve falhar');
   assert.match(r.stdout + r.stderr, /PUBLICAÇÃO BLOQUEADA/);
-  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.match(r.stdout + r.stderr, new RegExp(id));
+  // PUB-19, PUB-17 e PUB-09 aprovadas pela titular em 11/11/2026 (commit e4bc72c); PUB-18 e PUB-10 continuam exigidas
+  for (const id of ['PUB-18', 'PUB-10']) assert.match(r.stdout + r.stderr, new RegExp(id));
+  for (const id of ['PUB-19', 'PUB-17', 'PUB-09']) assert.doesNotMatch(r.stdout + r.stderr, new RegExp(`${id} —`));
 });
