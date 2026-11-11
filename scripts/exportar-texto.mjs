@@ -60,12 +60,13 @@ L.push('', c.SOLUTIONS.note);
 
 h('3. Preços (bloco data-pricing)');
 header(P);
-L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Individual | Pacote de 3 |', '|---|---|---|---|');
+L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', `Sem a data de início das novas condições: _${P.launch.pendingStart}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Individual | Pacote de 3 |', '|---|---|---|---|');
 for (const t of P.tiers) {
-  const individual = t.price ? `**${t.price.individualLabel}** — ${P.unit}` : `**${t.negotiated.label}** — ${t.negotiated.unit}`;
-  const pack = t.price ? `**${t.price.packageLabel}** — ${P.packageUnit} · ${P.savings(t.price.savingsLabel)} ${P.savingsBasis}` : '—';
+  const individual = `**${t.price.individualLabel}** — ${P.unit}`;
+  const pack = `**${t.price.packageLabel}** — ${P.packageUnit} · ${P.savings(t.price.savingsLabel)} ${P.savingsBasis}`;
   L.push(`| ${t.title} | ${t.fit} | ${individual} | ${pack} |`);
 }
+L.push('', `${P.other.text} — link "${P.other.cta}" (abre a solicitação de avaliação).`);
 L.push('', 'Os valores são os mesmos em qualquer data (COM-VITRINE-001, V-01); a campanha controla só a faixa e as regras. Valores de src/precos.ts.');
 const Sm = c.SIMULATOR;
 L.push('', `### ${Sm.title} (NEKKORA-CALC-001 — logo abaixo dos cartões)`, '', Sm.description, '');

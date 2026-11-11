@@ -171,8 +171,8 @@ infraestrutura sem autorização.
 |---|---|---|
 | 0 | Esta especificação | autorizada |
 | 1 | `src/precos.ts`: tabela nova, pacotes, economia calculada, preços previstos de Monitor e AI; fim do retorno automático à tabela anterior; simulador com pacotes e sem complexa; valores dos cartões de simples e média; testes e homologação de preços e simulador | concluída (autorizada pela titular em 11/11/2026) |
-| 2 | Portão de preços versionados, data de início das novas condições, regra pós-campanha (§3.2) e estados de disponibilidade, com testes; regras de proposta com a tabela nova a partir da data de início e pacotes (V-02, V-03) | preparada (diff apresentado à titular) |
-| 3 | Vitrine do Delivery: sai o cartão complexo, entram "A automação é sua", o texto V-04, critérios sem complexa e regras da campanha atualizadas | — |
+| 2 | Portão de preços versionados, data de início das novas condições, regra pós-campanha (§3.2) e estados de disponibilidade, com testes; regras de proposta com a tabela nova a partir da data de início e pacotes (V-02, V-03) | concluída (commit `5e21315`, autorizada pela titular em 11/11/2026) |
+| 3 | Vitrine do Delivery: sai o cartão complexo, entram "A automação é sua", o texto V-04, critérios sem complexa e regras da campanha atualizadas; tabela nova só a partir da data de início (sem retroatividade) | concluída (autorizada pela titular em 11/11/2026; registro em §10.2) |
 | 4 | Catálogo: cartões de Monitor e AI "Em preparação", Hosting mantido; componentes e tokens existentes | — |
 | 5 | Fluxos de solicitação: tipos existentes do Delivery (com interesse em pacote) e do Hosting; sem coleta nova | — |
 | 6 | Documentos: nota de transição no regulamento, condições comerciais (pacotes), anexo de componentes, proposta-modelo | — |
@@ -185,11 +185,47 @@ Estado intermediário da branch, que **não pode ser integrado à `main` nem pub
 | Pendência | Onde | Resolvida na etapa |
 |---|---|---|
 | ~~O portão ainda aceita a tabela nova com as flags de aprovação da V1.0.0~~ — etapa 2: o portão exige a impressão digital aprovada da tabela do código (PUB-14) e a data de início (PUB-13); hoje bloqueia | `scripts/verificar-publicacao.mjs`, `publicacao.json` | 2 (resolvida); reabertura de PUB-17/19 na 7 |
-| Cartão "Automação complexa" com "Sob orçamento" e CTA próprio | `src/content.ts` (`PRICING.tiers`), `src/sections/Pricing.tsx` | 3 |
-| Textos promocionais antigos: faixa "Preços especiais de lançamento…", condição "Valem para automações simples e médias solicitadas durante a campanha…" e regras da campanha citando preço de lançamento e complexa | `src/content.ts` (`PRICING.launch`) | 3 |
-| Critério "complexa acima de 16 horas" na lista pública | `src/content.ts` (`PRICING.criteria`) | 3 |
+| ~~Cartão "Automação complexa" com "Sob orçamento" e CTA próprio~~ — etapa 3: dois cartões e o texto V-04 com link para a solicitação | `src/content.ts` (`PRICING.tiers`), `src/sections/Pricing.tsx` | 3 (resolvida) |
+| ~~Textos promocionais antigos~~ — etapa 3: "Campanha de lançamento…" (período mantido), tabela nova a partir de `novasCondicoes.inicio`; sem a data, aviso de prévia | `src/content.ts` (`PRICING.launch`) | 3 (resolvida); textos novos dependem de PUB-17 (etapa 7) |
+| ~~Critério "complexa acima de 16 horas" na lista pública~~ — etapa 3: "simples até 8 horas; média acima de 8 até 16 horas" | `src/content.ts` (`PRICING.criteria`) | 3 (resolvida) |
+| Regulamento da campanha e condições comerciais ainda citam o preço de lançamento e a complexa | `docs/comercial/` | 6 |
 | ~~Regras de proposta aplicam só a tabela anterior~~ — etapa 2: tabela nova a partir de `novasCondicoes.inicio`, pacotes na proposta e condição mais favorável só sugerida | `scripts/comercial/regras-delivery.mjs` | 2 (resolvida) |
 | V-01 (tabela contínua depois de 06/01/2027) é diretriz, não aprovação definitiva | §3.2, §11 | aprovação da titular antes do deploy |
+
+### 10.2 Registro da etapa 3 (autorização da titular, 11/11/2026)
+
+**Decisões confirmadas:** selo "Lançamento" mantido para o período de 06/11/2026 a 06/01/2027; CTA "Falar com a
+equipe" para demandas fora das categorias, reutilizando a solicitação existente; horas como referência (até 8 h simples;
+acima de 8 até 16 h média), sem classificação garantida só por elas; "A automação é sua" com as exceções; cada
+automação com escopo, documentação, homologação e aceite próprios, também no pacote.
+
+**Continuam pendentes:** `novasCondicoes.inicio` (PUB-13); impressão e registro da tabela (PUB-14); V-01; nova aprovação
+dos textos (PUB-17) e das condições (PUB-19) antes da publicação; 50/50 por pacote, cancelamento e reembolso na revisão
+contratual (etapa 6); LIC-02 (não resolvida).
+
+**Homologação (build local, servidor que reproduz o CloudFront):**
+
+| Execução | Dados | Resultado |
+|---|---|---|
+| Página, 15/11/2026: Chromium, Firefox e WebKit (celular, tablet, desktop e tela larga; dois temas) | reais (`publicacao.json`) | 97 verificações, 0 falha em cada navegador |
+| Página, 05/11/2026 e 07/01/2027: Chromium | reais | 97 verificações, 0 falha em cada data |
+| Página, 15/11/2026: Chromium, depois da nota dos critérios (item 4 da autorização) | reais | 97 verificações, 0 falha |
+| Simulador: Chromium, Firefox e WebKit | reais + fictícios | 171 verificações, 0 falha |
+| Canais (e-mail): Chromium, Firefox e WebKit | fictícios (`publicacao-homologacao-email.json`) | 96 verificações, 0 falha |
+| Página, 31/10/2026, 15/11/2026 e 07/01/2027 (Chromium; 15/11 também Firefox e WebKit) | fictícios (`publicacao-homologacao.json`) | **97 verificações, 2 falhas em cada execução — NÃO aprovada integralmente** |
+
+**As duas falhas com dados fictícios** (registradas à parte, sem alteração das verificações):
+
+- `sem-destinos-provisorios`: a verificação recusa destinos de contato provisórios (domínio `.invalid`, número de
+  WhatsApp sintético). O arquivo fictício usa exatamente esses destinos (`contato@exemplo.invalid`, `wa.me/5511912345678`),
+  de propósito, para não apontar para canais reais. A verificação existe para impedir a publicação com contatos de
+  teste e continua valendo.
+- `dialogo-canal-da-publicacao`: a verificação exige o canal da publicação real (e-mail, sem WhatsApp, decisão de
+  22/10/2026). O arquivo fictício configura WhatsApp, então o diálogo segue o caminho do WhatsApp.
+
+Nas mesmas execuções, todas as verificações da etapa 3 passaram (sem categoria complexa, texto V-04, "A automação é
+sua", regras da campanha com a data de início fictícia de 10/11/2026, tabela oficial). A página deve ser homologada
+com os dados reais; os arquivos fictícios cobrem simulador, canais e campanha.
 
 **[P] Integração futura com a Nekkora Platform:** o catálogo fica tipado (identificador, nome, preço, unidade,
 disponibilidade) para ser consumido depois, sem nenhuma chamada à Platform nesta missão.

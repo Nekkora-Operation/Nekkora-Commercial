@@ -34,5 +34,8 @@
     "envioAutomatico": true,
     "publicacao": true
   },
-  "avisoHomologacao": true
+  "avisoHomologacao": true,
+  "novasCondicoes": {
+    "inicio": "2026-11-10"
+  }
 }

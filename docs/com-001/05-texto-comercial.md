@@ -52,20 +52,24 @@ Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum de
 
 **Preços · Nekkora Delivery** — Quanto custa uma automação
 
-Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
+Valores por automação ou por pacote de 3 automações da mesma categoria, sem mensalidade. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
 
-> **Lançamento** — Preços especiais de lançamento para solicitações de avaliação recebidas de 06/11/2026 a 06/01/2027. Valem para automações simples e médias solicitadas durante a campanha, conforme a categoria definida na avaliação. A proposta pode ser aceita em até 7 dias corridos da emissão. A automação complexa tem orçamento individual.
+> **Lançamento** — Campanha de lançamento para solicitações de avaliação recebidas de 06/11/2026 a 06/01/2027. A proposta pode ser aceita em até 7 dias corridos da emissão.
 
 Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial._
+
+Sem a data de início das novas condições: _Prévia para revisão: a data de início destes valores ainda não foi definida._
 
 **Regras da campanha de lançamento** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):
 
 - Período: solicitações de avaliação recebidas pela Nekkora de 06/11/2026 a 06/01/2027, inclusive, no horário de Brasília.
 - Vale a data de recebimento da solicitação: e-mail recebido em contato@nekkora.com ou mensagem recebida na página da Nekkora no LinkedIn. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.
-- O preço de lançamento vale para automações simples e médias, por automação, conforme os cartões acima. A automação complexa tem orçamento individual, sem desconto automático.
-- A categoria é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Solicitação recebida no período, de automação simples ou média, tem o preço de lançamento da categoria, mesmo que a proposta seja emitida depois do fim da campanha.
+- Os valores e pacotes dos cartões acima valem a partir da data de início das novas condições, ainda não definida. Solicitações recebidas antes dela mantêm as condições da oferta anterior.
+- A categoria, simples ou média, é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Vale o preço da data de recebimento da solicitação, mesmo que a proposta seja emitida depois do fim da campanha.
+- Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.
 - A proposta pode ser aceita em até 7 dias corridos da emissão.
-- Várias automações: cada uma tem categoria e preço próprios. Pedir várias juntas não muda a categoria de nenhuma.
+- Várias automações, avulsas ou em pacote: cada uma tem escopo, documentação, homologação e aceite próprios. Pedir várias juntas não muda a categoria de nenhuma.
+- Demandas que não se enquadram como simples ou média têm avaliação individual, pelos canais de contato.
 - Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.
 - Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.
 
@@ -73,7 +77,8 @@ Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: a
 |---|---|---|---|
 | Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | **R$ 650** — por automação | **R$ 1.500** — pacote de 3 automações da mesma categoria · Economia de R$ 450 em relação a 3 automações individuais |
 | Automação média | Mais de um sistema, validações, tratamento de exceções e relatórios. | **R$ 1.400** — por automação | **R$ 3.500** — pacote de 3 automações da mesma categoria · Economia de R$ 700 em relação a 3 automações individuais |
-| Automação complexa | Processos ponta a ponta ou com várias integrações por API. | **Sob orçamento** — dimensionada na avaliação · orçamento individual | — |
+
+Não encontrou uma modalidade adequada à sua necessidade? Entre em contato com nossa equipe para uma avaliação individual. — link "Falar com a equipe" (abre a solicitação de avaliação).
 
 Os valores são os mesmos em qualquer data (COM-VITRINE-001, V-01); a campanha controla só a faixa e as regras. Valores de src/precos.ts.
 
@@ -98,12 +103,13 @@ Próximo passo: "Agendar uma conversa" (Microsoft Bookings, nova aba) · "Solici
 
 Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.500) + 1 simples (R$ 650) + 1 média (R$ 1.400) = R$ 3.550; sem pacotes R$ 4.000; economia R$ 450.
 
+- **A automação é sua** — O código-fonte, a documentação e os artefatos desenvolvidos especificamente para você e contratados passam a ser seus conforme o contrato e após a quitação integral. Bibliotecas, frameworks e componentes preexistentes da Nekkora, componentes reutilizáveis e tecnologias de terceiros continuam com seus titulares e são licenciados para que você possa usar, manter e executar a automação, nas condições de cada licença.
 - **Como chegamos a esses valores** — Trabalhamos com processos padronizados e ferramentas internas de documentação e desenvolvimento. Isso nos permite oferecer estes valores sem retirar etapas: documentação, desenvolvimento, testes e homologação continuam no escopo.
 - **Licenças e infraestrutura** — Indicamos na proposta as licenças e os serviços de terceiros necessários (UiPath, Power Automate, APIs pagas); em regra, a contratação é do cliente, e esses custos não estão incluídos nos valores acima. A automação pode rodar na infraestrutura do próprio cliente ou, se contratado à parte, no Nekkora Hosting.
 
 **O que define a categoria**
 
-- Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas; complexa acima de 16 horas ou com risco excepcional justificado na proposta
+- Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas
 - Quantidade de sistemas envolvidos
 - Complexidade das integrações
 - Regras de negócio e exceções
@@ -111,12 +117,12 @@ Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.5
 - Exigências de infraestrutura
 - Necessidade de licenciamento
 
-Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta. Os demais critérios fundamentam a estimativa de esforço, e os perfis dos cartões são exemplos típicos.
+As horas são uma referência: o enquadramento definitivo depende da avaliação técnica e dos demais critérios, e nenhuma categoria é garantida só pela quantidade de horas. A avaliação indica a categoria antes de qualquer proposta, e os perfis dos cartões são exemplos típicos. Se a demanda não se enquadrar como simples ou média, a avaliação é individual.
 
 **Condições comerciais**
 
 - Desenvolvimento sob demanda, com escopo formalizado em proposta
-- Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios
+- Pode solicitar várias automações, avulsas ou em pacote de 3 da mesma categoria: cada uma tem escopo, documentação, homologação e aceite próprios
 - Preço aprovado por você antes do início do desenvolvimento
 - Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal
 - Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação

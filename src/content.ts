@@ -11,7 +11,7 @@
  * mudança neste texto exige nova aprovação.
  */
 import type { IconName } from 'nekkora-lib';
-import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
+import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, NEW_CONDITIONS_START, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
 import { priceFacts } from './precos';
 
 /* ------------------------------------------------------------------ */
@@ -99,7 +99,8 @@ export const PRICING = {
   eyebrow: 'Preços · Nekkora Delivery',
   title: 'Quanto custa uma automação',
   // [PR-01] [PR-06]
-  description: 'Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
+  // COM-VITRINE-001 (etapa 3): por automação ou pacote de 3 da mesma categoria, sem mensalidade — texto ALTERADO (PUB-17)
+  description: 'Valores por automação ou por pacote de 3 automações da mesma categoria, sem mensalidade. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
   // [PR-02] Preços especiais de lançamento (COM-RELEASE-003-R1): nunca um percentual único para todas as categorias —
   // cada preço mostra a própria economia. Com as datas da campanha em publicacao.json (PUB-13), o período aparece por
   // extenso e a página só mostra os preços de lançamento dentro dele (config.ts, isLaunchActive); sem as datas, só como
@@ -107,15 +108,22 @@ export const PRICING = {
   // [PR-07] Regras aprovadas na COM-008-B (AUD-04, AUD-06); período mantido pela titular em 09/11/2026 (06/11/2026 a
   // 06/01/2027, no lugar dos dois meses a partir da publicação oficial); vale a data da
   // SOLICITAÇÃO; proposta com prazo de aceite de 7 dias corridos; preço individual por automação.
+  // COM-VITRINE-001 (etapa 3, §2 e §3.1): o período da campanha é mantido (06/11/2026 a 06/01/2027), sem "preços
+  // especiais" nem comparação com a tabela anterior. A tabela nova vale a partir da data de início das novas condições
+  // (V-02) — nunca retroativamente desde o início da campanha. Sem a data, a faixa diz que ela não foi definida.
+  // Textos ALTERADOS, pendentes de nova aprovação (PUB-17, reabertura na etapa 7).
   launch: {
     badge: 'Lançamento',
     text: LAUNCH_PERIOD
-      ? `Preços especiais de lançamento para solicitações de avaliação recebidas de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
-      : 'Preços especiais de lançamento.',
-    condition:
-      'Valem para automações simples e médias solicitadas durante a campanha, conforme a categoria definida na avaliação. A proposta pode ser aceita em até 7 dias corridos da emissão. A automação complexa tem orçamento individual.',
+      ? `Campanha de lançamento para solicitações de avaliação recebidas de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
+      : 'Campanha de lançamento.',
+    condition: NEW_CONDITIONS_START
+      ? `Os valores e pacotes desta tabela valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START}. As recebidas antes mantêm as condições da oferta anterior. A proposta pode ser aceita em até 7 dias corridos da emissão.`
+      : 'A proposta pode ser aceita em até 7 dias corridos da emissão.',
     /** Só na prévia de homologação, sem datas aprovadas: nenhuma elegibilidade antes do início oficial. */
     pendingDates: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
+    /** Sem a data de início das novas condições (PUB-13): a tabela não é apresentada como já vigente. */
+    pendingStart: 'Prévia para revisão: a data de início destes valores ainda não foi definida.',
     // NEKKORA-COM-CONTRACT-001 (C-10): regras completas e acessíveis da campanha (CDC arts. 30 e 31; Decreto 7.962/2013,
     // art. 2º, V). Texto NOVO, pendente da aprovação da titular (PUB-17). Só aparece com as datas aprovadas e a campanha
     // em vigor; sem datas, não há regra a anunciar. Regulamento: docs/comercial/regulamento-campanha-lancamento.md.
@@ -125,10 +133,17 @@ export const PRICING = {
           items: [
             `Período: solicitações de avaliação recebidas pela Nekkora de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}, inclusive, no horário de Brasília.`,
             `Vale a data de recebimento da solicitação: e-mail recebido em ${CHANNELS.email ?? 'nosso e-mail comercial'}${BOOKINGS_URL ? ', reserva criada no Microsoft Bookings' : ''}${CHANNELS.linkedin ? ' ou mensagem recebida na página da Nekkora no LinkedIn' : ''}. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.`,
-            'O preço de lançamento vale para automações simples e médias, por automação, conforme os cartões acima. A automação complexa tem orçamento individual, sem desconto automático.',
-            'A categoria é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Solicitação recebida no período, de automação simples ou média, tem o preço de lançamento da categoria, mesmo que a proposta seja emitida depois do fim da campanha.',
+            // V-02: a tabela nova vale a partir da data de início; os compromissos anteriores são preservados
+            NEW_CONDITIONS_START
+              ? `Os valores e pacotes dos cartões acima valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START}, inclusive. Solicitações recebidas antes dessa data mantêm as condições da oferta anterior; quando o escopo e a modalidade forem equivalentes, propomos a condição mais favorável, sem alterar proposta já aceita sem o seu acordo.`
+              : 'Os valores e pacotes dos cartões acima valem a partir da data de início das novas condições, ainda não definida. Solicitações recebidas antes dela mantêm as condições da oferta anterior.',
+            'A categoria, simples ou média, é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Vale o preço da data de recebimento da solicitação, mesmo que a proposta seja emitida depois do fim da campanha.',
+            // V-03: pacotes de 3 da mesma categoria; o restante no individual; misto só por proposta específica
+            'Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.',
             'A proposta pode ser aceita em até 7 dias corridos da emissão.',
-            'Várias automações: cada uma tem categoria e preço próprios. Pedir várias juntas não muda a categoria de nenhuma.',
+            'Várias automações, avulsas ou em pacote: cada uma tem escopo, documentação, homologação e aceite próprios. Pedir várias juntas não muda a categoria de nenhuma.',
+            // V-04: sem terceira categoria
+            'Demandas que não se enquadram como simples ou média têm avaliação individual, pelos canais de contato.',
             'Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.',
             'Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.',
           ],
@@ -140,7 +155,8 @@ export const PRICING = {
     title: 'O que define a categoria',
     items: [
       // CONTRACT-001-R1 (C-10): parâmetro principal aprovado pela titular — texto NOVO (PUB-17). Regulamento §5.
-      'Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas; complexa acima de 16 horas ou com risco excepcional justificado na proposta',
+      // COM-VITRINE-001 (V-04, etapa 3): só simples e média na vitrine — texto ALTERADO (PUB-17)
+      'Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas',
       'Quantidade de sistemas envolvidos',
       'Complexidade das integrações',
       'Regras de negócio e exceções',
@@ -149,7 +165,9 @@ export const PRICING = {
       'Necessidade de licenciamento',
     ],
     // CONTRACT-001-R1 (C-10): os perfis dos cartões são exemplos; nenhuma contagem isolada define a categoria — texto ALTERADO (PUB-17)
-    note: 'Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta. Os demais critérios fundamentam a estimativa de esforço, e os perfis dos cartões são exemplos típicos.',
+    // COM-VITRINE-001 (V-04, etapa 3) — texto ALTERADO (PUB-17)
+    // Titular, 11/11/2026 (autorização da etapa 3, item 4): as horas são referência; nenhuma classificação garantida só por elas
+    note: 'As horas são uma referência: o enquadramento definitivo depende da avaliação técnica e dos demais critérios, e nenhuma categoria é garantida só pela quantidade de horas. A avaliação indica a categoria antes de qualquer proposta, e os perfis dos cartões são exemplos típicos. Se a demanda não se enquadrar como simples ou média, a avaliação é individual.',
   },
   // [CO-01..CO-08] — modelo de atendimento (NEKKORA-RELEASE-001 §5.5) com as condições da COM-008-B; nada aqui promete
   // prazo, resultado ou disponibilidade. Minuta das cláusulas: docs/comercial/condicoes-comerciais-minuta.md (não
@@ -159,7 +177,8 @@ export const PRICING = {
     items: [
       'Desenvolvimento sob demanda, com escopo formalizado em proposta',
       // [CO-07] AUD-07/AUD-13 — contratar várias automações juntas não as transforma em uma complexa
-      'Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios',
+      // COM-VITRINE-001 (V-03, etapa 3): avulsas ou em pacote — texto ALTERADO (PUB-17/PUB-19)
+      'Pode solicitar várias automações, avulsas ou em pacote de 3 da mesma categoria: cada uma tem escopo, documentação, homologação e aceite próprios',
       'Preço aprovado por você antes do início do desenvolvimento',
       // [CO-03] AUD-16 — 50/50 é condição de PAGAMENTO, não percentual de desconto
       'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal',
@@ -193,17 +212,13 @@ export const PRICING = {
       variant: 'raised' as const,
       price: { tier: 'media' as const, ...priceFacts('media') },
     },
-    {
-      overline: 'Complexa',
-      title: 'Automação complexa',
-      // AUD-07: contratar várias automações juntas não as torna complexas
-      fit: 'Processos ponta a ponta ou com várias integrações por API.',
-      variant: 'outlined' as const,
-      // [PR-03] — sem desconto automático: o valor depende do dimensionamento e da aprovação comercial
-      negotiated: { label: 'Sob orçamento', unit: 'dimensionada na avaliação · orçamento individual' },
-      cta: 'Solicitar avaliação',
-    },
   ],
+  // COM-VITRINE-001 (V-04, etapa 3): só simples e média; sem terceira categoria. Demandas fora das modalidades seguem
+  // pelos canais gerais, com avaliação individual — texto NOVO aprovado como diretriz pela titular (11/11/2026, PUB-17).
+  other: {
+    text: 'Não encontrou uma modalidade adequada à sua necessidade? Entre em contato com nossa equipe para uma avaliação individual.',
+    cta: 'Falar com a equipe',
+  },
   // COM-VITRINE-001 (V-07): preço individual, valor total do pacote de 3 e economia total calculada; sem valor
   // unitário dentro do pacote e sem comparação com a tabela anterior. Valores de src/precos.ts (priceFacts).
   unit: 'por automação',
@@ -212,6 +227,15 @@ export const PRICING = {
   savings: (label: string) => `Economia de ${label}`,
   savingsBasis: 'em relação a 3 automações individuais',
   notes: [
+    {
+      icon: 'code' as IconName,
+      tone: 'success' as const,
+      // COM-VITRINE-001 (V-05, etapa 3): titularidade do desenvolvimento específico após a quitação integral, com as
+      // exceções (componentes preexistentes e de terceiros). Coerente com o Modelo A-R do anexo de componentes; sem
+      // titularidade irrestrita de bibliotecas e frameworks (LIC-02 pendente). Texto NOVO (PUB-17).
+      title: 'A automação é sua',
+      text: 'O código-fonte, a documentação e os artefatos desenvolvidos especificamente para você e contratados passam a ser seus conforme o contrato e após a quitação integral. Bibliotecas, frameworks e componentes preexistentes da Nekkora, componentes reutilizáveis e tecnologias de terceiros continuam com seus titulares e são licenciados para que você possa usar, manter e executar a automação, nas condições de cada licença.',
+    },
     {
       icon: 'studio' as IconName,
       tone: 'accent' as const,

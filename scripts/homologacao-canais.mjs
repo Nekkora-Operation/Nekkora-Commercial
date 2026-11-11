@@ -293,7 +293,9 @@ async function campaign(engine, newContext) {
   check(
     engine,
     'vigencia-durante-campanha',
-    sameTable(during) && /Preços especiais de lançamento para solicitações de avaliação recebidas de 01\/11\/2026 a 31\/12\/2026\./.test(during.strip ?? ''),
+    sameTable(during) && /Campanha de lançamento para solicitações de avaliação recebidas de 01\/11\/2026 a 31\/12\/2026\./.test(during.strip ?? '') &&
+      /valem para solicitações recebidas a partir de 10\/11\/2026\./.test(during.strip ?? '') &&
+      !/Preços especiais|preço de lançamento/i.test(during.text),
     during.values.join(' · '),
   );
   for (const [id, at] of [

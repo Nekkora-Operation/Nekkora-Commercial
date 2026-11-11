@@ -144,6 +144,17 @@ export const LAUNCH_DATES = (() => {
  */
 export const LAUNCH_PERIOD = LAUNCH_DATES && { start: toBr(LAUNCH_DATES.inicio), end: toBr(LAUNCH_DATES.fim) };
 
+/**
+ * Data de início das novas condições (COM-VITRINE-001 §3.1, V-02): a partir dela valem a tabela e os pacotes da
+ * vitrine; solicitações recebidas antes mantêm a oferta anterior. Só a titular grava em publicacao.json; sem ela, a
+ * página diz que a data não foi definida (nunca apresenta os valores novos como válidos desde o início da campanha) e
+ * o portão bloqueia a publicação (PUB-13).
+ */
+export const NEW_CONDITIONS_START: string | null = (() => {
+  const inicio = publicacao.novasCondicoes?.inicio ?? null;
+  return inicio != null && ISO_DATE.test(inicio) ? toBr(inicio) : null;
+})();
+
 /** Situação da campanha hoje, no fuso de Brasília: pendente, futura, vigente ou encerrada (NEKKORA-COM-008-C §3.6). */
 export const launchState = (now: Date = new Date()): CampaignState => campaignState(LAUNCH_DATES ?? { inicio: null, fim: null }, todayInBrazil(now));
 

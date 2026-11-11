@@ -59,7 +59,6 @@ const EXAMPLE_NO_PACKAGE = { estimativa: 'R$ 2.700' };
 const TABLE = {
   simples: { individual: 'R$ 650', pacote: 'R$ 1.500', economia: 'Economia de R$ 450' },
   media: { individual: 'R$ 1.400', pacote: 'R$ 3.500', economia: 'Economia de R$ 700' },
-  complexa: {},
 };
 const UNITS = 'R$ 650 cada · R$ 1.500 o pacote de 3,R$ 1.400 cada · R$ 3.500 o pacote de 3';
 const SUMMARY_EXAMPLE = /4 automações simples: 1 pacote de 3 \(R\$ 1\.500 cada\) \+ 1 individual \(R\$ 650 cada\) = R\$ 2\.150/;
@@ -136,7 +135,7 @@ async function run(engine) {
     const { ctx, page, sim } = await open(prodUrl);
     const place = await page.evaluate(() => {
       const s = document.querySelector('[data-simulator]');
-      const cards = document.querySelector('#precos .cards--3');
+      const cards = document.querySelector('#precos .price-cards');
       return {
         inPricing: !!s?.closest('[data-pricing]') && !!s?.closest('#precos'),
         afterCards: !!cards && !!s && (cards.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_FOLLOWING) > 0,

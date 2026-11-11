@@ -151,7 +151,6 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .price__savings { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
 .price__package { font-size: var(--nk-font-size-sm); color: var(--nk-color-text-secondary); }
 .price__package strong { font-size: var(--nk-font-size-xl); font-weight: 700; color: var(--nk-color-text); white-space: nowrap; }
-.price__negotiated { font-size: 1.6rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--nk-color-text); }
 .price__unit { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
 
 /* NEKKORA-COM-CONTRACT-001 (C-10): regras completas da campanha, recolhíveis, com foco visível */

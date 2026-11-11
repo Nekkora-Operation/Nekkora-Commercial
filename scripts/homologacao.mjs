@@ -73,7 +73,6 @@ const FORBIDDEN = [
 const OFFICIAL_PRICES = {
   simples: { individual: 'R$ 650', pacote: 'R$ 1.500', economia: 'Economia de R$ 450' },
   media: { individual: 'R$ 1.400', pacote: 'R$ 3.500', economia: 'Economia de R$ 700' },
-  complexa: {},
 };
 const fromSource = Object.fromEntries(
   ['simples', 'media'].map((t) => {
@@ -81,7 +80,7 @@ const fromSource = Object.fromEntries(
     return [t, { individual: f.individualLabel, pacote: f.packageLabel, economia: `Economia de ${f.savingsLabel}` }];
   }),
 );
-if (JSON.stringify({ ...fromSource, complexa: {} }) !== JSON.stringify(OFFICIAL_PRICES)) {
+if (JSON.stringify(fromSource) !== JSON.stringify(OFFICIAL_PRICES)) {
   throw new Error(`src/precos.ts diverge da tabela oficial: ${JSON.stringify(fromSource)}`);
 }
 /** Valores da tabela ANTERIOR (lançamento 06/11/2026): nunca podem aparecer nos cartões. */
@@ -194,7 +193,7 @@ for (const theme of THEMES) {
     if (vp.name !== 'wide') {
       const cards = `precos-${theme}-${vp.name}.png`;
       // a barra fixa do topo cobriria o primeiro cartão no recorte: escondida só nesta captura
-      await page.locator('#precos .cards--3').screenshot({ path: path.join(outDir, cards), style: 'header, nav { visibility: hidden !important; }' });
+      await page.locator('#precos .price-cards').screenshot({ path: path.join(outDir, cards), style: 'header, nav { visibility: hidden !important; }' });
       results.screenshots.push(cards);
     }
     if (vp.name === 'desktop') {
@@ -371,7 +370,9 @@ await block('funcionais', async () => {
     return {
       blocks: document.querySelectorAll('[data-pricing]').length,
       // Regras da campanha da COM-008-B: vale a solicitação; aceite da proposta em até 7 dias corridos
-      condition: /Valem para automações simples e médias solicitadas durante a campanha/.test(text) && /aceita em até 7 dias corridos da emissão/.test(text) && /A automação complexa tem orçamento individual/.test(text),
+      // COM-VITRINE-001 (etapa 3): faixa da campanha sem "preços especiais"; a tabela nova a partir da data de início (V-02)
+      condition: /Campanha de lançamento para solicitações de avaliação recebidas/.test(text) && /aceita em até 7 dias corridos da emissão/.test(text) && !/Preços especiais|preço de lançamento/i.test(text),
+      newConditionsPending: !!block?.querySelector('[data-novas-condicoes="pendente"]'),
       confirmedInProposal: /fica registrada na proposta/.test(text),
       licenses: /não estão incluídos nos valores acima/.test(text),
       // Tabela oficial da COM-RELEASE-003-R1 §3.1, lida do que está NA TELA (data-price de cada valor)
@@ -381,9 +382,17 @@ await block('funcionais', async () => {
           Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.getAttribute('data-price'), v.textContent.trim()])),
         ]),
       ),
-      complexa: /Automação complexa[\s\S]*?Sob orçamento[\s\S]*?orçamento individual/.test(text),
+      // COM-VITRINE-001 (V-04): sem categoria complexa, sem "sob orçamento" e sem a faixa acima de 16 horas; demandas fora
+      // das modalidades pelos canais gerais. Lido por textContent (inclui as regras recolhidas).
+      semComplexa: !/complexa|sob orçamento|acima de 16 horas/i.test(block?.textContent ?? '') && (block?.querySelectorAll('[data-price-tier]').length ?? 0) === 2,
+      outrasDemandas: /Não encontrou uma modalidade adequada à sua necessidade\? Entre em contato com nossa equipe para uma avaliação individual\./.test(block?.querySelector('[data-outras-demandas]')?.textContent ?? '') && !!block?.querySelector('[data-outras-demandas] a, [data-outras-demandas] button'),
+      // COM-VITRINE-001 (V-05): "A automação é sua", com a quitação integral e as exceções
+      titularidade: (() => {
+        const t = block?.querySelector('[data-nota="titularidade"]')?.textContent ?? '';
+        return /A automação é sua/.test(t) && /após a quitação integral/.test(t) && /componentes preexistentes da Nekkora/.test(t) && /tecnologias de terceiros continuam com seus titulares/.test(t);
+      })(),
       criteria: ['Esforço técnico estimado', 'Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
-      conditions: /50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal/.test(text) && /cada uma tem categoria, escopo, preço e aceite próprios/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
+      conditions: /50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal/.test(text) && /cada uma tem escopo, documentação, homologação e aceite próprios/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
       srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
       // Elementos da campanha (src/sections/Pricing.tsx): faixa de lançamento, prévia sem datas, economia e percentual
       launchStrip: block?.querySelector('.launch-strip')?.innerText.replace(/\s+/g, ' ').trim() ?? null,
@@ -397,14 +406,20 @@ await block('funcionais', async () => {
     };
   });
   results.pricing = pricing;
-  const campaignCondition = /Valem para automações simples e médias solicitadas durante a campanha/;
+  const campaignCondition = /Campanha de lançamento para solicitações/;
+  // COM-VITRINE-001 (V-02): data de início das novas condições do build (nunca o início da campanha)
+  const NOVAS = typeof publicacao.novasCondicoes?.inicio === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(publicacao.novasCondicoes.inicio) ? publicacao.novasCondicoes.inicio.split('-').reverse().join('/') : null;
+  const startOk = NOVAS
+    ? !pricing.newConditionsPending && (!PROMO || pricing.launchStrip.includes(`valem para solicitações recebidas a partir de ${NOVAS}`))
+    : !PROMO || pricing.newConditionsPending;
   check('precos-so-no-bloco-de-precos', pricing.blocks === 1 && hits.filter((h) => h.pricing).length > 0, `${pricing.blocks} bloco(s) data-pricing`);
   // Com promoção: condição da campanha, período aprovado (ou o aviso de prévia sem datas). Sem promoção: nenhuma faixa
   // nem condição de campanha. Em todos os casos: registro na proposta e licenças à parte.
   const conditionsOk = PROMO
     ? pricing.condition &&
       !!pricing.launchStrip &&
-      (CAMPAIGN === 'pendente' ? pricing.previewNotice : pricing.launchStrip.includes(PERIOD) && !pricing.previewNotice)
+      (CAMPAIGN === 'pendente' ? pricing.previewNotice : pricing.launchStrip.includes(PERIOD) && !pricing.previewNotice) &&
+      startOk
     : pricing.launchStrip === null && !pricing.previewNotice && !campaignCondition.test(pricing.cardsText) && !/aceita em até 7 dias corridos/.test(pricing.cardsText);
   // C-10: com a campanha em vigor e datas aprovadas, as regras completas estão no bloco de preços; fora dela, não aparecem
   const rulesOk =
@@ -414,17 +429,22 @@ await block('funcionais', async () => {
         /Vale a data de recebimento da solicitação/.test(pricing.campaignRules) &&
         /mesmo que a proposta seja emitida depois do fim da campanha/.test(pricing.campaignRules) &&
         /aceita em até 7 dias corridos da emissão/.test(pricing.campaignRules) &&
-        /sem desconto automático/.test(pricing.campaignRules)
+        /Pacote com categorias diferentes só por proposta específica/.test(pricing.campaignRules) &&
+        /não se enquadram como simples ou média têm avaliação individual/.test(pricing.campaignRules) &&
+        (NOVAS ? pricing.campaignRules.includes(`recebidas a partir de ${NOVAS}, inclusive`) : /ainda não definida/.test(pricing.campaignRules))
       : pricing.campaignRules === null;
   check('campanha-regras-completas', rulesOk, pricing.campaignRules ? pricing.campaignRules.slice(0, 160) : 'ausentes');
   check(
     'precos-com-condicoes-visiveis',
     conditionsOk && pricing.confirmedInProposal && pricing.licenses,
-    `${CAMPAIGN_LABEL}; faixa: ${pricing.launchStrip ?? 'ausente'}; proposta=${pricing.confirmedInProposal}; licenças=${pricing.licenses}`,
+    `${CAMPAIGN_LABEL}; faixa: ${pricing.launchStrip ?? 'ausente'}; início das novas condições: ${NOVAS ?? 'pendente'}; proposta=${pricing.confirmedInProposal}; licenças=${pricing.licenses}`,
   );
+  check('vitrine-sem-categoria-complexa', pricing.semComplexa, `${Object.keys(pricing.table).join(', ')}`);
+  check('vitrine-outras-demandas-canais-gerais', pricing.outrasDemandas, 'texto V-04 e link para a solicitação');
+  check('vitrine-a-automacao-e-sua', pricing.titularidade, 'nota V-05 com quitação integral e exceções');
   check(
     'precos-tabela-oficial',
-    JSON.stringify(pricing.table) === JSON.stringify(OFFICIAL_PRICES) && pricing.complexa,
+    JSON.stringify(pricing.table) === JSON.stringify(OFFICIAL_PRICES),
     `${CAMPAIGN_LABEL}: ${JSON.stringify(pricing.table)}`,
   );
   // Nenhum percentual de desconto nos cartões (V-07; ex.: o "−50%" de um build antigo — COM-RELEASE-005 §3.1)

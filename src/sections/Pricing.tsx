@@ -1,5 +1,5 @@
 import { Badge, Card, Icon, IconBox, Link, SectionHeader } from 'nekkora-lib';
-import { isLaunchActive, launchState } from '../config';
+import { NEW_CONDITIONS_START, isLaunchActive, launchState } from '../config';
 import { PRICING } from '../content';
 import { useRequestTrigger } from '../request';
 import { Simulator } from './Simulator';
@@ -8,7 +8,8 @@ import { Simulator } from './Simulator';
  * Preços do Delivery (COM-VITRINE-001: individual e pacote de 3, no layout do mockup "modelo C"). Único bloco em que
  * valores podem aparecer: marcado com data-pricing e verificado por scripts/homologacao.mjs
  * (precos-so-no-bloco-de-precos). Os atributos data-price expõem cada valor à homologação. A campanha (faixa e regras)
- * controla só a comunicação promocional; os valores não mudam com a data.
+ * controla só a comunicação promocional; os valores não mudam com a data. Só simples e média (V-04): demandas fora das
+ * modalidades seguem pelos canais gerais, com avaliação individual, sem terceira categoria.
  */
 export function Pricing() {
   const trigger = useRequestTrigger();
@@ -32,6 +33,12 @@ export function Pricing() {
                 {PRICING.launch.pendingDates}
               </span>
             )}
+            {/* COM-VITRINE-001 (V-02): sem a data de início, os valores novos não aparecem como já vigentes */}
+            {!NEW_CONDITIONS_START && (
+              <span className="launch-strip__preview" data-novas-condicoes="pendente">
+                {PRICING.launch.pendingStart}
+              </span>
+            )}
           </p>
         )}
         {/* NEKKORA-COM-CONTRACT-001 (C-10): regras completas da campanha, só com datas aprovadas e campanha em vigor */}
@@ -48,54 +55,44 @@ export function Pricing() {
             </ul>
           </details>
         )}
-        <ul className="cards cards--3 cards--poster plain-list">
+        <ul className="cards cards--2 cards--poster plain-list price-cards">
           {PRICING.tiers.map((t) => (
             <li key={t.title}>
               <Card className="offer-card" variant={t.variant} padding="lg">
                 <span className="price-overline">{t.overline}</span>
                 <h3>{t.title}</h3>
                 <p className="offer-card__fit">{t.fit}</p>
-                <div className="price" data-price-tier={'price' in t && t.price ? t.price.tier : 'complexa'}>
-                  {'price' in t && t.price ? (
-                    // COM-VITRINE-001 (V-07): individual, pacote de 3 e economia calculada — iguais em qualquer data
-                    <>
-                      <span className="price__row">
-                        <span className="price__value" data-price="individual">
-                          {t.price.individualLabel}
-                        </span>
-                      </span>
-                      <span className="price__unit">{PRICING.unit}</span>
-                      <span className="price__package">
-                        <strong data-price="pacote">{t.price.packageLabel}</strong> <span>{PRICING.packageUnit}</span>
-                      </span>
-                      <span className="price__savings">
-                        <span data-price="economia">{PRICING.savings(t.price.savingsLabel)}</span> <span className="price__unit">{PRICING.savingsBasis}</span>
-                      </span>
-                    </>
-                  ) : (
-                    'negotiated' in t &&
-                    t.negotiated && (
-                      <>
-                        <span className="price__negotiated">{t.negotiated.label}</span>
-                        <span className="price__unit">{t.negotiated.unit}</span>
-                      </>
-                    )
-                  )}
+                {/* COM-VITRINE-001 (V-07): individual, pacote de 3 e economia calculada — iguais em qualquer data */}
+                <div className="price" data-price-tier={t.price.tier}>
+                  <span className="price__row">
+                    <span className="price__value" data-price="individual">
+                      {t.price.individualLabel}
+                    </span>
+                  </span>
+                  <span className="price__unit">{PRICING.unit}</span>
+                  <span className="price__package">
+                    <strong data-price="pacote">{t.price.packageLabel}</strong> <span>{PRICING.packageUnit}</span>
+                  </span>
+                  <span className="price__savings">
+                    <span data-price="economia">{PRICING.savings(t.price.savingsLabel)}</span> <span className="price__unit">{PRICING.savingsBasis}</span>
+                  </span>
                 </div>
-                {'cta' in t && t.cta && (
-                  <Link arrow {...trigger}>
-                    {t.cta}
-                  </Link>
-                )}
               </Card>
             </li>
           ))}
         </ul>
+        {/* COM-VITRINE-001 (V-04): demandas fora das modalidades, pelos canais gerais — sem terceira categoria */}
+        <p className="center-note other-demand" data-outras-demandas>
+          {PRICING.other.text}{' '}
+          <Link arrow {...trigger}>
+            {PRICING.other.cta}
+          </Link>
+        </p>
         {/* NEKKORA-CALC-001: logo abaixo dos cartões, no mesmo bloco data-pricing (preços só aparecem aqui) */}
         <Simulator />
-        <div className="cards cards--2 cards--poster">
+        <div className="cards cards--3 cards--poster price-notes">
           {PRICING.notes.map((n) => (
-            <div key={n.title} className="poster-tile poster-tile--row">
+            <div key={n.title} className="poster-tile poster-tile--row" data-nota={n.title === 'A automação é sua' ? 'titularidade' : undefined}>
               <IconBox icon={n.icon} tone={n.tone} variant="soft" size="md" />
               <div>
                 <h3 className="poster-tile__title">{n.title}</h3>
