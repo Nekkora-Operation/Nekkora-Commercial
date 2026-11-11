@@ -5,9 +5,10 @@ import { useRequestTrigger } from '../request';
 import { Simulator } from './Simulator';
 
 /**
- * Preços do Delivery (tabela oficial de 22/10/2026 no layout do mockup "modelo C"). Único bloco em que valores e
- * percentuais podem aparecer: marcado com data-pricing e verificado por scripts/homologacao.mjs
- * (precos-so-no-bloco-de-precos). Os atributos data-price expõem cada valor à homologação.
+ * Preços do Delivery (COM-VITRINE-001: individual e pacote de 3, no layout do mockup "modelo C"). Único bloco em que
+ * valores podem aparecer: marcado com data-pricing e verificado por scripts/homologacao.mjs
+ * (precos-so-no-bloco-de-precos). Os atributos data-price expõem cada valor à homologação. A campanha (faixa e regras)
+ * controla só a comunicação promocional; os valores não mudam com a data.
  */
 export function Pricing() {
   const trigger = useRequestTrigger();
@@ -56,38 +57,21 @@ export function Pricing() {
                 <p className="offer-card__fit">{t.fit}</p>
                 <div className="price" data-price-tier={'price' in t && t.price ? t.price.tier : 'complexa'}>
                   {'price' in t && t.price ? (
-                    launch ? (
-                      <>
-                        <span className="price__from">
-                          <span className="nk-visually-hidden">{PRICING.srFrom} </span>
-                          <s data-price="padrao">{t.price.standardLabel}</s>
+                    // COM-VITRINE-001 (V-07): individual, pacote de 3 e economia calculada — iguais em qualquer data
+                    <>
+                      <span className="price__row">
+                        <span className="price__value" data-price="individual">
+                          {t.price.individualLabel}
                         </span>
-                        <span className="price__row">
-                          <span className="nk-visually-hidden">{PRICING.srTo} </span>
-                          <span className="price__value" data-price="lancamento">
-                            {t.price.launchLabel}
-                          </span>
-                          {/* solid, não soft: o soft de sucesso sobre o card claro do Sage Light fica em 4,25:1 (P-LIB-07) */}
-                          <Badge tone="success" variant="solid" size="sm">
-                            <span className="nk-visually-hidden">{PRICING.srPercent} </span>
-                            <span data-price="percentual">−{t.price.percentLabel}</span>
-                          </Badge>
-                        </span>
-                        <span className="price__savings" data-price="economia">
-                          {PRICING.savings(t.price.savingsLabel)}
-                        </span>
-                        <span className="price__unit">{PRICING.launchUnit}</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="price__row">
-                          <span className="price__value" data-price="padrao">
-                            {t.price.standardLabel}
-                          </span>
-                        </span>
-                        <span className="price__unit">{PRICING.unit}</span>
-                      </>
-                    )
+                      </span>
+                      <span className="price__unit">{PRICING.unit}</span>
+                      <span className="price__package">
+                        <strong data-price="pacote">{t.price.packageLabel}</strong> <span>{PRICING.packageUnit}</span>
+                      </span>
+                      <span className="price__savings">
+                        <span data-price="economia">{PRICING.savings(t.price.savingsLabel)}</span> <span className="price__unit">{PRICING.savingsBasis}</span>
+                      </span>
+                    </>
                   ) : (
                     'negotiated' in t &&
                     t.negotiated && (

@@ -11,7 +11,9 @@
  * Datas como 'AAAA-MM-DD' no calendário de Brasília. Contagem de prazos: exclui o dia do começo e inclui o do
  * vencimento (CC art. 132), salvo regra própria indicada.
  */
-import { PRICE_TABLE, campaignState } from '../../src/precos.ts';
+// COM-VITRINE-001 (V-02): a tabela ANTERIOR rege as solicitações recebidas antes do início das novas condições
+// (compromissos preservados). A regra para as recebidas depois entra junto com a data de início (etapa do portão).
+import { PREVIOUS_PRICE_TABLE as PRICE_TABLE, campaignState } from '../../src/precos.ts';
 
 /* ------------------------------------------------------------------ */
 /* Calendário                                                         */

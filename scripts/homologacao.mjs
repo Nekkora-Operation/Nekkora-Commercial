@@ -15,8 +15,8 @@
  * Situação da campanha (NEKKORA-COM-RELEASE-FIX-001): derivada do publicacao.json que o artefato servido declara
  * (release.json → "publicacao") e de campaignState/todayInBrazil (src/precos.ts), na data do relógio do navegador —
  * fixado em NEKKORA_DATA ou, sem ela, no instante em que a homologação começa (sem virar o dia no meio da execução).
- * Com preços promocionais (vigente, ou pendente como prévia de homologação), exige o preço padrão riscado, o percentual,
- * a economia e a condição da campanha; sem eles (futura, encerrada), exige o preço padrão e a AUSÊNCIA de tudo isso.
+ * Desde a COM-VITRINE-001 a campanha controla só a comunicação promocional (faixa, condição e regras): os preços —
+ * individual, pacote de 3 e economia — são os mesmos em qualquer data, sem valor riscado nem percentual.
  *
  * Saída: capturas (JPEG), resultados.json e resumo.md na pasta indicada. Código de saída 1 se alguma verificação
  * falhar. Nenhuma requisição sai do localhost: tudo que tentar sair é bloqueado e registrado.
@@ -66,26 +66,26 @@ const FORBIDDEN = [
 ];
 
 /**
- * Tabela oficial (COM-RELEASE-003-R1 §3.1, COM-RELEASE-005 §3.2), digitada aqui de propósito — independente do código —
- * e conferida contra src/precos.ts (a fonte da página) antes de qualquer navegador abrir: se o código mudar, a
- * homologação falha em vez de aceitar o novo valor.
+ * Tabela da COM-VITRINE-001 §3 (individual, pacote de 3 e economia contra três individuais), digitada aqui de propósito
+ * — independente do código — e conferida contra src/precos.ts (a fonte da página) antes de qualquer navegador abrir: se
+ * o código mudar, a homologação falha em vez de aceitar o novo valor. Vale em qualquer data (V-01).
  */
 const OFFICIAL_PRICES = {
-  simples: { padrao: 'R$ 1.500', lancamento: 'R$ 1.000', percentual: '−33,33%', economia: 'Economia de R$ 500' },
-  media: { padrao: 'R$ 3.500', lancamento: 'R$ 2.800', percentual: '−20%', economia: 'Economia de R$ 700' },
+  simples: { individual: 'R$ 650', pacote: 'R$ 1.500', economia: 'Economia de R$ 450' },
+  media: { individual: 'R$ 1.400', pacote: 'R$ 3.500', economia: 'Economia de R$ 700' },
   complexa: {},
 };
 const fromSource = Object.fromEntries(
   ['simples', 'media'].map((t) => {
     const f = priceFacts(t);
-    return [t, { padrao: f.standardLabel, lancamento: f.launchLabel, percentual: `−${f.percentLabel}`, economia: `Economia de ${f.savingsLabel}` }];
+    return [t, { individual: f.individualLabel, pacote: f.packageLabel, economia: `Economia de ${f.savingsLabel}` }];
   }),
 );
 if (JSON.stringify({ ...fromSource, complexa: {} }) !== JSON.stringify(OFFICIAL_PRICES)) {
   throw new Error(`src/precos.ts diverge da tabela oficial: ${JSON.stringify(fromSource)}`);
 }
-/** Fora da campanha, cada cartão mostra só o preço padrão oficial — mesmo valor da tabela acima, sem desconto. */
-const STANDARD_ONLY = { simples: { padrao: OFFICIAL_PRICES.simples.padrao }, media: { padrao: OFFICIAL_PRICES.media.padrao }, complexa: {} };
+/** Valores da tabela ANTERIOR (lançamento 06/11/2026): nunca podem aparecer nos cartões. */
+const PREVIOUS_LABELS = ['R$ 1.000', 'R$ 2.800'];
 
 // Situação da campanha no artefato servido: o release.json diz com qual publicacao.json o build foi feito.
 const release = await fetch(new URL('release.json', baseUrl), { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
@@ -95,12 +95,13 @@ const DATA = process.env.NEKKORA_DATA || null;
 if (DATA != null && !/^\d{4}-\d{2}-\d{2}$/.test(DATA)) throw new Error(`NEKKORA_DATA inválida: ${DATA}`);
 const NOW = DATA ? new Date(`${DATA}T12:00:00-03:00`) : new Date();
 const CAMPAIGN = campaignState(publicacao.campanhaLancamento, todayInBrazil(NOW));
-// Preços promocionais: só com a campanha vigente — ou, sem datas aprovadas, como prévia de um build com aviso de
-// homologação (o portão scripts/verificar-publicacao.mjs recusa publicar sem datas, PUB-13).
+// Comunicação promocional (faixa e regras): só com a campanha vigente — ou, sem datas aprovadas, como prévia de um build
+// com aviso de homologação (o portão scripts/verificar-publicacao.mjs recusa publicar sem datas, PUB-13). Os preços não
+// dependem disso.
 const PROMO = CAMPAIGN === 'vigente' || (CAMPAIGN === 'pendente' && publicacao.avisoHomologacao === true);
 const toBr = (iso) => iso.split('-').reverse().join('/');
 const PERIOD = CAMPAIGN === 'pendente' ? null : `de ${toBr(publicacao.campanhaLancamento.inicio)} a ${toBr(publicacao.campanhaLancamento.fim)}`;
-const CAMPAIGN_LABEL = `campanha ${CAMPAIGN} em ${todayInBrazil(NOW)}${PROMO ? ' — preços promocionais' : ' — só preço padrão'}`;
+const CAMPAIGN_LABEL = `campanha ${CAMPAIGN} em ${todayInBrazil(NOW)}${PROMO ? ' — com comunicação promocional' : ' — sem comunicação promocional'}`;
 console.log(`Campanha (${release.publicacao}): ${CAMPAIGN_LABEL}`);
 
 /** Valores do bloco de preços como aparecem na tela (data-price) e o estilo do preço padrão riscado. */
@@ -125,15 +126,9 @@ const readRenderedPrices = (page) =>
     };
   });
 
-/** Verificação dos preços conforme a campanha: com promoção, o esperado; sem promoção, a ausência do desconto. */
-const expectRendered = (shown) =>
-  PROMO
-    ? JSON.stringify(shown.table) === JSON.stringify(OFFICIAL_PRICES)
-    : JSON.stringify(shown.table) === JSON.stringify(STANDARD_ONLY);
-const expectStruck = (shown) =>
-  PROMO
-    ? shown.struck.length === 2 && shown.struck.every((s) => s.lineThrough && s.visible) && shown.struck.map((s) => s.text).join() === `${OFFICIAL_PRICES.simples.padrao},${OFFICIAL_PRICES.media.padrao}`
-    : shown.struck.length === 0 && shown.anyStruck.length === 0;
+/** Os mesmos preços em qualquer situação da campanha (V-01), sem nenhum valor riscado (V-07). */
+const expectRendered = (shown) => JSON.stringify(shown.table) === JSON.stringify(OFFICIAL_PRICES);
+const expectStruck = (shown) => shown.struck.length === 0 && shown.anyStruck.length === 0;
 
 const results = { baseUrl, navegador: ENGINE, campanha: { estado: CAMPAIGN, data: todayInBrazil(NOW), promocional: PROMO, publicacao: release.publicacao }, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
 const check = (id, ok, detail) => {
@@ -189,12 +184,11 @@ for (const theme of THEMES) {
     const file = `pagina-${theme}-${vp.name}-${vp.width}.jpg`;
     await page.screenshot({ path: path.join(outDir, file), fullPage: true, type: 'jpeg', quality: 72 });
     results.screenshots.push(file);
-    // Preços efetivamente renderizados em cada tema e largura (COM-RELEASE-005 §3.5): valores, percentuais e economia
-    // lidos da tela e comparados com a tabela oficial; com promoção, o preço padrão precisa aparecer riscado, e sem
-    // ela nenhum valor pode aparecer riscado.
+    // Preços efetivamente renderizados em cada tema e largura (COM-RELEASE-005 §3.5): individual, pacote e economia
+    // lidos da tela e comparados com a tabela oficial; nenhum valor pode aparecer riscado.
     const shown = await readRenderedPrices(page);
     check(`precos-renderizados:${theme}:${vp.name}`, expectRendered(shown), `${CAMPAIGN_LABEL}: ${JSON.stringify(shown.table)}`);
-    check(`precos-padrao-riscado:${theme}:${vp.name}`, expectStruck(shown), PROMO ? JSON.stringify(shown.struck) : `nenhum valor riscado esperado; riscados: ${JSON.stringify(shown.anyStruck)}`);
+    check(`precos-sem-valor-riscado:${theme}:${vp.name}`, expectStruck(shown), `riscados: ${JSON.stringify(shown.anyStruck)}`);
     // Conferência visual dos preços (COM-RELEASE-003 §11.2, COM-RELEASE-005 §3.5): os três cartões, em cada tema, no
     // celular, no tablet e no desktop
     if (vp.name !== 'wide') {
@@ -430,18 +424,15 @@ await block('funcionais', async () => {
   );
   check(
     'precos-tabela-oficial',
-    (PROMO ? JSON.stringify(pricing.table) === JSON.stringify(OFFICIAL_PRICES) : JSON.stringify(pricing.table) === JSON.stringify(STANDARD_ONLY)) && pricing.complexa,
+    JSON.stringify(pricing.table) === JSON.stringify(OFFICIAL_PRICES) && pricing.complexa,
     `${CAMPAIGN_LABEL}: ${JSON.stringify(pricing.table)}`,
   );
-  // Nenhum percentual de desconto fora da tabela (ex.: o "−50%" de um build antigo — COM-RELEASE-005 §3.1); fora da
-  // campanha, nenhum percentual de desconto
+  // Nenhum percentual de desconto nos cartões (V-07; ex.: o "−50%" de um build antigo — COM-RELEASE-005 §3.1)
   const badges = await page.$$eval('[data-pricing] .nk-badge', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim()).filter((t) => /%/.test(t)));
   check(
-    'precos-sem-percentual-inconsistente',
-    PROMO
-      ? badges.length === 2 && badges.every((b) => /−(33,33|20)%$/.test(b))
-      : badges.length === 0 && pricing.percentNodes === 0 && !/[−-]\s?\d+(?:,\d+)?\s?%/.test(pricing.cardsText),
-    PROMO ? badges.join(' | ') : `sem percentual esperado; selos com %: ${badges.join(' | ') || 'nenhum'}; data-price="percentual": ${pricing.percentNodes}`,
+    'precos-sem-percentual',
+    badges.length === 0 && pricing.percentNodes === 0 && !/[−-]\s?\d+(?:,\d+)?\s?%/.test(pricing.cardsText),
+    `selos com %: ${badges.join(' | ') || 'nenhum'}; data-price="percentual": ${pricing.percentNodes}`,
   );
   // O artefato servido é o do código em disco (COM-RELEASE-005 §3.3): commit do release.json = HEAD do repositório
   {
@@ -498,25 +489,16 @@ await block('funcionais', async () => {
         : `URL do Bookings não configurada: ${scheduling.buttons} botão(ões), ${scheduling.links} link(s)`,
     );
   }
-  // Coerência matemática do que é exibido: economia = padrão − lançamento; percentual = economia / padrão (2 casas, truncado)
+  // Coerência matemática do que é exibido: economia = 3 × individual − pacote; sem preço de lançamento nem tabela anterior
   const num = (s) => Number(String(s).replace(/[^\d,]/g, '').replace(',', '.'));
-  const coherent = PROMO
-    ? ['simples', 'media'].every((t) => {
-        const v = pricing.table[t] ?? {};
-        const saved = num(v.padrao) - num(v.lancamento);
-        return saved === num(v.economia) && Math.floor((saved / num(v.padrao)) * 10000) / 100 === num(v.percentual);
-      })
-    : // Sem campanha: o valor exibido é o padrão oficial, sem economia, sem preço de lançamento nem unidade promocional
-      ['simples', 'media'].every((t) => pricing.table[t]?.padrao === OFFICIAL_PRICES[t].padrao && pricing.table[t]?.lancamento === undefined) &&
-      pricing.economyNodes === 0 &&
-      !/Economia de R\$|preço de lançamento|Preço especial de lançamento/i.test(pricing.cardsText) &&
-      !pricing.cardsText.includes(OFFICIAL_PRICES.simples.lancamento) &&
-      !pricing.cardsText.includes(OFFICIAL_PRICES.media.lancamento);
-  check(
-    'precos-descontos-coerentes',
-    coherent,
-    PROMO ? 'economia = padrão − lançamento; percentual = economia ÷ padrão' : `${CAMPAIGN_LABEL}: preço padrão oficial, sem economia nem preço de lançamento (economia: ${pricing.economyNodes} nó(s))`,
-  );
+  const coherent =
+    ['simples', 'media'].every((t) => {
+      const v = pricing.table[t] ?? {};
+      return num(v.individual) * 3 - num(v.pacote) === num(v.economia) && num(v.pacote) < num(v.individual) * 3;
+    }) &&
+    !/preço de lançamento|Preço especial de lançamento|Preço padrão/i.test(pricing.cardsText) &&
+    PREVIOUS_LABELS.every((l) => !pricing.cardsText.includes(l));
+  check('precos-pacote-coerente', coherent, `${CAMPAIGN_LABEL}: economia = 3 × individual − pacote; sem a tabela anterior nos cartões`);
   check('precos-criterios-de-categoria', pricing.criteria);
   check('condicoes-comerciais-visiveis', pricing.conditions);
   // Delivery: tecnologias citadas sem promessa de compatibilidade universal
@@ -548,11 +530,10 @@ await block('funcionais', async () => {
     supplier || 'sem identificação no rodapé',
   );
   check(
-    'precos-leitura-do-valor-riscado',
-    // Sem campanha não há valor riscado: nenhum "Preço padrão:/Preço especial de lançamento:/Desconto de" para o leitor
-    JSON.stringify(pricing.srLabels) ===
-      JSON.stringify(PROMO ? ['Preço padrão:', 'Preço especial de lançamento:', 'Desconto de', 'Preço padrão:', 'Preço especial de lançamento:', 'Desconto de'] : []),
-    pricing.srLabels.join(' | ') || `nenhum rótulo de valor riscado (${CAMPAIGN_LABEL})`,
+    'precos-sem-rotulos-de-valor-riscado',
+    // Sem valor riscado: nenhum "Preço padrão:/Preço especial de lançamento:/Desconto de" para o leitor de tela
+    pricing.srLabels.length === 0,
+    pricing.srLabels.join(' | ') || 'nenhum rótulo de valor riscado',
   );
 
   // Produtos internos não aparecem como obrigatórios/disponíveis: cada menção fica em bloco marcado

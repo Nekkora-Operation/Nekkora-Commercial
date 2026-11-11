@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { PRICE_TABLE } from '../../src/precos.ts';
+import { PREVIOUS_PRICE_TABLE } from '../../src/precos.ts';
 import {
   atendimentoDaGarantia,
   classificarAutomacao,
@@ -523,8 +523,8 @@ test('R1-25. contagem de APIs ou sistemas, sozinha, não eleva a categoria', () 
   assert.match(CONTENT, /Esforço técnico estimado/);
 });
 
-test('R1-26. preços promocionais e padrão preservados; complexa sem desconto', () => {
-  assert.deepEqual(PRICE_TABLE, { simples: { standard: 1500, launch: 1000 }, media: { standard: 3500, launch: 2800 } });
+test('R1-26. preços promocionais e padrão da oferta anterior preservados (V-02); complexa sem desconto', () => {
+  assert.deepEqual(PREVIOUS_PRICE_TABLE, { simples: { standard: 1500, launch: 1000 }, media: { standard: 3500, launch: 2800 } });
   assert.equal(precoDaAutomacao({ categoria: classificarAutomacao({ horasEstimadas: 8 }).categoria, recebidaEm: '2026-12-15T12:00:00Z', periodo: PERIODO }).centavos, 100_000);
   assert.equal(precoDaAutomacao({ categoria: classificarAutomacao({ horasEstimadas: 20 }).categoria, recebidaEm: '2026-12-15T12:00:00Z', periodo: PERIODO }).centavos, null);
 });

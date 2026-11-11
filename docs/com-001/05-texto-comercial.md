@@ -69,30 +69,26 @@ Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: a
 - Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.
 - Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.
 
-| Faixa | Para | Valor (campanha em vigor) | Fora da campanha |
+| Faixa | Para | Individual | Pacote de 3 |
 |---|---|---|---|
-| Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | ~~R$ 1.500~~ **R$ 1.000** −33,33% · Economia de R$ 500 — por automação · preço de lançamento | **R$ 1.500** — por automação |
-| Automação média | Mais de um sistema, validações, tratamento de exceções e relatórios. | ~~R$ 3.500~~ **R$ 2.800** −20% · Economia de R$ 700 — por automação · preço de lançamento | **R$ 3.500** — por automação |
-| Automação complexa | Processos ponta a ponta ou com várias integrações por API. | **Sob orçamento** — dimensionada na avaliação · orçamento individual | **Sob orçamento** |
+| Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | **R$ 650** — por automação | **R$ 1.500** — pacote de 3 automações da mesma categoria · Economia de R$ 450 em relação a 3 automações individuais |
+| Automação média | Mais de um sistema, validações, tratamento de exceções e relatórios. | **R$ 1.400** — por automação | **R$ 3.500** — pacote de 3 automações da mesma categoria · Economia de R$ 700 em relação a 3 automações individuais |
+| Automação complexa | Processos ponta a ponta ou com várias integrações por API. | **Sob orçamento** — dimensionada na avaliação · orçamento individual | — |
 
-Leitor de tela: "Preço padrão: <preço padrão>", "Preço especial de lançamento: <preço de lançamento>", "Desconto de <percentual>". Valores de src/precos.ts.
+Os valores são os mesmos em qualquer data (COM-VITRINE-001, V-01); a campanha controla só a faixa e as regras. Valores de src/precos.ts.
 
 ### Simulador de Investimento — Nekkora Delivery (NEKKORA-CALC-001 — logo abaixo dos cartões)
 
-Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento. Sem cadastro: nada do que você seleciona é enviado ou guardado.
+Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento, com pacotes de 3 quando houver. Sem cadastro: nada do que você seleciona é enviado ou guardado.
 
-Controles: Automações simples · Automações médias · Automações complexas — botões "Diminuir …" / "Aumentar …", campo numérico (0 a 20), "Até 20 por categoria. Para mais, fale com a Nekkora."
+Controles: Automações simples · Automações médias — botões "Diminuir …" / "Aumentar …", campo numérico (0 a 20), rótulo "<individual> cada · <pacote> o pacote de 3", "Até 20 por categoria. Para mais, fale com a Nekkora."
 
 Barra: "Total selecionado: 3 automações" · botões "Limpar simulação" e "Calcular meu investimento". Sem seleção: _Selecione ao menos uma automação para calcular._ Mudou depois de calcular: _As quantidades mudaram. Clique em "Calcular meu investimento" para atualizar a estimativa._
 
-**Resultado da simulação** — linhas "2 automações simples × <preço>", depois:
-- "Investimento estimado" / "Investimento estimado com preços de lançamento" / "Subtotal estimado" / "Subtotal estimado com preços de lançamento"
-- Com a campanha em vigor: "Pelo preço padrão", "Economia promocional", "Desconto equivalente sobre o total calculável" — A economia é a diferença entre o preço padrão e o preço de lançamento das categorias selecionadas — não é uma economia operacional comprovada.
-- Com complexa: A automação complexa exige orçamento individual e não entra no valor acima, que não é o preço completo da contratação. Só complexas: Automações complexas têm orçamento individual, definido na avaliação. Por isso, esta simulação não mostra um valor.
-- Campanha vigente: Preços de lançamento em vigor para solicitações recebidas durante a campanha.
-- Campanha pendente: Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.
-- Campanha futura: Valores pelo preço padrão. Os preços de lançamento ainda não estão em vigor.
-- Campanha encerrada: Valores pelo preço padrão. A campanha de lançamento foi encerrada.
+**Resultado da simulação** — linhas "4 automações simples: 1 pacote de 3 (<pacote> cada) + 1 individual (<individual> cada)", depois:
+- "Investimento estimado"
+- Com pacote: "Sem pacotes, no preço individual" e "Economia com pacotes" — A economia é a diferença entre o preço individual e o preço do pacote das categorias selecionadas — não é uma economia operacional comprovada.
+- Pacotes de 3 automações da mesma categoria; o que sobra fica no preço individual. Categorias diferentes não se misturam em um pacote.
 
 > Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.
 
@@ -100,7 +96,7 @@ Próximo passo: "Agendar uma conversa" (Microsoft Bookings, nova aba) · "Solici
 
 **Não sabe a categoria da sua automação?** A categoria depende de sistemas, integrações, regras, volume e licenças, e é confirmada na avaliação. Na dúvida, solicite uma avaliação ou veja o que define a categoria (link para os critérios).
 
-Exemplo de homologação: 2 simples + 1 média → padrão R$ 6.500; lançamento R$ 4.800; economia R$ 1.700; 26,15% (truncado).
+Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.500) + 1 simples (R$ 650) + 1 média (R$ 1.400) = R$ 3.550; sem pacotes R$ 4.000; economia R$ 450.
 
 - **Como chegamos a esses valores** — Trabalhamos com processos padronizados e ferramentas internas de documentação e desenvolvimento. Isso nos permite oferecer estes valores sem retirar etapas: documentação, desenvolvimento, testes e homologação continuam no escopo.
 - **Licenças e infraestrutura** — Indicamos na proposta as licenças e os serviços de terceiros necessários (UiPath, Power Automate, APIs pagas); em regra, a contratação é do cliente, e esses custos não estão incluídos nos valores acima. A automação pode rodar na infraestrutura do próprio cliente ou, se contratado à parte, no Nekkora Hosting.

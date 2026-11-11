@@ -12,7 +12,7 @@
  */
 import type { IconName } from 'nekkora-lib';
 import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
-import { priceFacts, type CampaignState } from './precos';
+import { priceFacts } from './precos';
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
@@ -204,14 +204,13 @@ export const PRICING = {
       cta: 'Solicitar avaliação',
     },
   ],
+  // COM-VITRINE-001 (V-07): preço individual, valor total do pacote de 3 e economia total calculada; sem valor
+  // unitário dentro do pacote e sem comparação com a tabela anterior. Valores de src/precos.ts (priceFacts).
   unit: 'por automação',
-  launchUnit: 'por automação · preço de lançamento',
-  /** "Economia de <valor>" — o valor economizado (padrão − lançamento), ao lado do percentual. */
+  packageUnit: 'pacote de 3 automações da mesma categoria',
+  /** "Economia de <valor>" — 3 × individual − pacote, calculada em src/precos.ts. */
   savings: (label: string) => `Economia de ${label}`,
-  /** Rótulos lidos por leitor de tela: o valor riscado não é anunciado como riscado, então cada valor diz o que é. */
-  srFrom: 'Preço padrão:',
-  srTo: 'Preço especial de lançamento:',
-  srPercent: 'Desconto de',
+  savingsBasis: 'em relação a 3 automações individuais',
   notes: [
     {
       icon: 'studio' as IconName,
@@ -236,23 +235,25 @@ export const PRICING = {
 /* Simulador de investimento — dentro do bloco data-pricing           */
 /* ------------------------------------------------------------------ */
 /**
- * NEKKORA-CALC-001. Valores sempre de src/precos.ts (simulate): nada aqui tem número de preço ou percentual. Sem ROI,
- * horas economizadas ou classificação automática da automação: a categoria é confirmada na avaliação [PR-06] [X-03].
- * A economia exibida é a diferença entre os preços comerciais, nunca economia operacional [PR-08].
+ * NEKKORA-CALC-001 e COM-VITRINE-001 §8. Valores sempre de src/precos.ts (simulate): nada aqui tem número de preço ou
+ * percentual. Sem ROI, horas economizadas ou classificação automática da automação: a categoria é confirmada na
+ * avaliação [PR-06] [X-03]. A economia exibida é a diferença entre o preço individual e o preço do pacote da mesma
+ * tabela, nunca economia operacional [PR-08]. Sem categoria complexa (V-04).
  */
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 export const SIMULATOR = {
   title: 'Simulador de Investimento — Nekkora Delivery',
-  description: 'Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento. Sem cadastro: nada do que você seleciona é enviado ou guardado.',
+  description: 'Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento, com pacotes de 3 quando houver. Sem cadastro: nada do que você seleciona é enviado ou guardado.',
   tiers: [
     { tier: 'simples' as const, label: 'Automações simples', one: 'automação simples', many: 'automações simples' },
     { tier: 'media' as const, label: 'Automações médias', one: 'automação média', many: 'automações médias' },
-    { tier: 'complexa' as const, label: 'Automações complexas', one: 'automação complexa', many: 'automações complexas' },
   ],
   decrease: (label: string) => `Diminuir ${label.toLowerCase()}`,
   increase: (label: string) => `Aumentar ${label.toLowerCase()}`,
   max: (n: number) => `Até ${n} por categoria. Para mais, fale com a Nekkora.`,
   total: (n: number) => `Total selecionado: ${plural(n, 'automação', 'automações')}`,
+  /** "<individual> cada · <pacote> o pacote de 3" — rótulo de cada categoria, com os valores de src/precos.ts. */
+  unit: (individual: string, pack: string) => `${individual} cada · ${pack} o pacote de 3`,
   calculate: 'Calcular meu investimento',
   clear: 'Limpar simulação',
   empty: 'Selecione ao menos uma automação para calcular.',
@@ -265,28 +266,20 @@ export const SIMULATOR = {
   },
   resultTitle: 'Resultado da simulação',
   /** "2 automações simples" — para o resumo. */
-  count: (tier: 'simples' | 'media' | 'complexa', n: number) => {
+  count: (tier: 'simples' | 'media', n: number) => {
     const t = SIMULATOR.tiers.find((x) => x.tier === tier)!;
     return plural(n, t.one, t.many);
   },
-  estimateLabel: (launch: boolean, partial: boolean) =>
-    partial ? (launch ? 'Subtotal estimado com preços de lançamento' : 'Subtotal estimado') : launch ? 'Investimento estimado com preços de lançamento' : 'Investimento estimado',
-  standardLabel: 'Pelo preço padrão',
-  savingsLabel: 'Economia promocional',
-  percentLabel: 'Desconto equivalente sobre o total calculável',
-  each: 'cada',
-  complexLine: 'sob orçamento individual',
-  partialNote: (n: number) =>
-    `${n === 1 ? 'A automação complexa exige' : 'As automações complexas exigem'} orçamento individual e não ${n === 1 ? 'entra' : 'entram'} no valor acima, que não é o preço completo da contratação.`,
-  onlyComplex: 'Automações complexas têm orçamento individual, definido na avaliação. Por isso, esta simulação não mostra um valor.',
-  savingsNote: 'A economia é a diferença entre o preço padrão e o preço de lançamento das categorias selecionadas — não é uma economia operacional comprovada.',
-  /** Por situação da campanha (src/precos.ts, campaignState). */
-  campaign: {
-    vigente: 'Preços de lançamento em vigor para solicitações recebidas durante a campanha.',
-    pendente: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
-    futura: 'Valores pelo preço padrão. Os preços de lançamento ainda não estão em vigor.',
-    encerrada: 'Valores pelo preço padrão. A campanha de lançamento foi encerrada.',
-  } satisfies Record<CampaignState, string>,
+  /** "1 pacote de 3 (<pacote> cada) + 1 individual (<individual> cada)" — composição de uma categoria (V-03). */
+  composition: (packages: number, singles: number, pack: string, individual: string) =>
+    [packages > 0 ? `${plural(packages, 'pacote de 3', 'pacotes de 3')} (${pack} cada)` : null, singles > 0 ? `${plural(singles, 'individual', 'individuais')} (${individual} cada)` : null]
+      .filter(Boolean)
+      .join(' + '),
+  estimateLabel: 'Investimento estimado',
+  individualLabel: 'Sem pacotes, no preço individual',
+  savingsLabel: 'Economia com pacotes',
+  packagesRule: 'Pacotes de 3 automações da mesma categoria; o que sobra fica no preço individual. Categorias diferentes não se misturam em um pacote.',
+  savingsNote: 'A economia é a diferença entre o preço individual e o preço do pacote das categorias selecionadas — não é uma economia operacional comprovada.',
   // Texto obrigatório (NEKKORA-CALC-001 §3.7)
   disclaimer:
     'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.',

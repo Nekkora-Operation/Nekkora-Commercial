@@ -60,28 +60,21 @@ L.push('', c.SOLUTIONS.note);
 
 h('3. Preços (bloco data-pricing)');
 header(P);
-L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Valor (campanha em vigor) | Fora da campanha |', '|---|---|---|---|');
+L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Individual | Pacote de 3 |', '|---|---|---|---|');
 for (const t of P.tiers) {
-  const value = t.price
-    ? `~~${t.price.standardLabel}~~ **${t.price.launchLabel}** −${t.price.percentLabel} · ${P.savings(t.price.savingsLabel)} — ${P.launchUnit}`
-    : `**${t.negotiated.label}** — ${t.negotiated.unit}`;
-  const outside = t.price ? `**${t.price.standardLabel}** — ${P.unit}` : `**${t.negotiated.label}**`;
-  L.push(`| ${t.title} | ${t.fit} | ${value} | ${outside} |`);
+  const individual = t.price ? `**${t.price.individualLabel}** — ${P.unit}` : `**${t.negotiated.label}** — ${t.negotiated.unit}`;
+  const pack = t.price ? `**${t.price.packageLabel}** — ${P.packageUnit} · ${P.savings(t.price.savingsLabel)} ${P.savingsBasis}` : '—';
+  L.push(`| ${t.title} | ${t.fit} | ${individual} | ${pack} |`);
 }
-L.push('', `Leitor de tela: "${P.srFrom} <preço padrão>", "${P.srTo} <preço de lançamento>", "${P.srPercent} <percentual>". Valores de src/precos.ts.`);
+L.push('', 'Os valores são os mesmos em qualquer data (COM-VITRINE-001, V-01); a campanha controla só a faixa e as regras. Valores de src/precos.ts.');
 const Sm = c.SIMULATOR;
 L.push('', `### ${Sm.title} (NEKKORA-CALC-001 — logo abaixo dos cartões)`, '', Sm.description, '');
-L.push(`Controles: ${Sm.tiers.map((t) => t.label).join(' · ')} — botões "${Sm.decrease('…')}" / "${Sm.increase('…')}", campo numérico (0 a 20), "${Sm.max(20)}"`);
+L.push(`Controles: ${Sm.tiers.map((t) => t.label).join(' · ')} — botões "${Sm.decrease('…')}" / "${Sm.increase('…')}", campo numérico (0 a 20), rótulo "${Sm.unit('<individual>', '<pacote>')}", "${Sm.max(20)}"`);
 L.push('', `Barra: "${Sm.total(3)}" · botões "${Sm.clear}" e "${Sm.calculate}". Sem seleção: _${Sm.empty}_ Mudou depois de calcular: _${Sm.changed}_`);
-L.push('', `**${Sm.resultTitle}** — linhas "2 automações simples × <preço>", depois:`);
-list([
-  `"${Sm.estimateLabel(false, false)}" / "${Sm.estimateLabel(true, false)}" / "${Sm.estimateLabel(false, true)}" / "${Sm.estimateLabel(true, true)}"`,
-  `Com a campanha em vigor: "${Sm.standardLabel}", "${Sm.savingsLabel}", "${Sm.percentLabel}" — ${Sm.savingsNote}`,
-  `Com complexa: ${Sm.partialNote(1)} Só complexas: ${Sm.onlyComplex}`,
-  ...Object.entries(Sm.campaign).map(([k, v]) => `Campanha ${k}: ${v}`),
-]);
+L.push('', `**${Sm.resultTitle}** — linhas "4 automações simples: ${Sm.composition(1, 1, '<pacote>', '<individual>')}", depois:`);
+list([`"${Sm.estimateLabel}"`, `Com pacote: "${Sm.individualLabel}" e "${Sm.savingsLabel}" — ${Sm.savingsNote}`, Sm.packagesRule]);
 L.push('', `> ${Sm.disclaimer}`, '', `${Sm.next}: "${Sm.schedule}" (Microsoft Bookings, nova aba) · "${Sm.request}" (abre o formulário; o resumo da simulação é opcional)`);
-L.push('', `**${Sm.help.title}** ${Sm.help.text} ${Sm.help.link} (link para os critérios).`, '', 'Exemplo de homologação: 2 simples + 1 média → padrão R$ 6.500; lançamento R$ 4.800; economia R$ 1.700; 26,15% (truncado).');
+L.push('', `**${Sm.help.title}** ${Sm.help.text} ${Sm.help.link} (link para os critérios).`, '', 'Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.500) + 1 simples (R$ 650) + 1 média (R$ 1.400) = R$ 3.550; sem pacotes R$ 4.000; economia R$ 450.');
 L.push('');
 list(P.notes.map((n) => `**${n.title}** — ${n.text}`));
 L.push('', `**${P.criteria.title}**`, '');
