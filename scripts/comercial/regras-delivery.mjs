@@ -12,8 +12,8 @@
  * vencimento (CC art. 132), salvo regra própria indicada.
  */
 // COM-VITRINE-001 (V-02): a tabela ANTERIOR rege as solicitações recebidas antes do início das novas condições
-// (compromissos preservados). A regra para as recebidas depois entra junto com a data de início (etapa do portão).
-import { PREVIOUS_PRICE_TABLE as PRICE_TABLE, campaignState } from '../../src/precos.ts';
+// (compromissos preservados); a tabela da vitrine (individual e pacote de 3), as recebidas a partir dessa data.
+import { PACKAGE_SIZE, PREVIOUS_PRICE_TABLE as PRICE_TABLE, PRICE_TABLE as TABELA_VITRINE, campaignState } from '../../src/precos.ts';
 
 /* ------------------------------------------------------------------ */
 /* Calendário                                                         */
@@ -67,25 +67,63 @@ export const diaEmBrasilia = (instante) =>
 
 export const VALIDADE_PROPOSTA_DIAS = 7;
 
+/** A data de início das novas condições (publicacao.json → novasCondicoes.inicio), se definida pela titular. */
+const inicioDasNovas = (novasCondicoes) => (typeof novasCondicoes?.inicio === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(novasCondicoes.inicio) ? novasCondicoes.inicio : null);
+
 /**
  * Preço de uma automação conforme a data de RECEBIMENTO da solicitação (não a da proposta) e a categoria registrada
  * na proposta com os critérios publicados. Período `{ inicio, fim }` aprovado pela titular (nunca calculado aqui).
- * Complexa: sempre orçamento individual, sem desconto automático.
+ *
+ * COM-VITRINE-001 (V-02), com `novasCondicoes.inicio` definido:
+ *   - recebida a partir dessa data: tabela da vitrine, preço individual (o pacote é montado na proposta, por
+ *     precosDaProposta); a complexa não faz parte da vitrine e tem avaliação individual;
+ *   - recebida antes: a oferta anterior é preservada (lançamento ou padrão, como antes). Se a tabela da vitrine for mais
+ *     favorável, ela é só SUGERIDA (`condicaoMaisFavoravel`, aplicada: false): a Nekkora a propõe ao cliente, sem
+ *     substituir unilateralmente proposta já aceita.
+ * Sem a data, só a regra anterior (compromissos da campanha de lançamento).
  */
-export function precoDaAutomacao({ categoria, recebidaEm, periodo }) {
+export function precoDaAutomacao({ categoria, recebidaEm, periodo, novasCondicoes }) {
+  const dia = diaEmBrasilia(recebidaEm);
+  const novas = inicioDasNovas(novasCondicoes);
+  if (novas && dia >= novas) {
+    if (categoria === 'complexa') return { categoria, centavos: null, regra: 'avaliacao-individual', campanha: false, diaDoRecebimento: dia };
+    if (!(categoria in TABELA_VITRINE)) throw new Error(`categoria desconhecida: ${categoria}`);
+    return { categoria, centavos: TABELA_VITRINE[categoria].individual * 100, regra: 'tabela-vitrine', campanha: false, diaDoRecebimento: dia };
+  }
   if (categoria === 'complexa') return { categoria, centavos: null, regra: 'orcamento-individual', campanha: false };
   if (!(categoria in PRICE_TABLE)) throw new Error(`categoria desconhecida: ${categoria}`);
-  const dia = diaEmBrasilia(recebidaEm);
   const vigente = Boolean(periodo?.inicio && periodo?.fim) && campaignState(periodo, dia) === 'vigente';
   const { standard, launch } = PRICE_TABLE[categoria];
-  return { categoria, centavos: (vigente ? launch : standard) * 100, regra: vigente ? 'lancamento' : 'padrao', campanha: vigente, diaDoRecebimento: dia };
+  const centavos = (vigente ? launch : standard) * 100;
+  const preco = { categoria, centavos, regra: vigente ? 'lancamento' : 'padrao', campanha: vigente, diaDoRecebimento: dia };
+  const vitrine = TABELA_VITRINE[categoria].individual * 100;
+  if (novas && vitrine < centavos) preco.condicaoMaisFavoravel = { centavos: vitrine, regra: 'tabela-vitrine', aplicada: false };
+  return preco;
 }
 
-/** Várias automações: cada uma com categoria e preço próprios; a soma nunca reclassifica nenhuma delas. */
-export function precosDaProposta(automacoes, periodo) {
-  const itens = automacoes.map((a) => ({ nome: a.nome, ...precoDaAutomacao({ ...a, periodo }) }));
-  const precificados = itens.filter((i) => i.centavos != null);
-  return { itens, totalCentavos: precificados.reduce((s, i) => s + i.centavos, 0), semValor: itens.filter((i) => i.centavos == null).map((i) => i.nome) };
+/**
+ * Várias automações: cada uma com categoria e preço próprios; a soma nunca reclassifica nenhuma delas.
+ * COM-VITRINE-001 (V-03): entre as automações na tabela da vitrine, pacotes de 3 da MESMA categoria enquanto houver 3
+ * (na ordem informada), e o restante no preço individual. Pacote misto só por proposta específica: nunca aqui.
+ */
+export function precosDaProposta(automacoes, periodo, novasCondicoes) {
+  const itens = automacoes.map((a) => ({ nome: a.nome, ...precoDaAutomacao({ ...a, periodo, novasCondicoes }) }));
+  const pacotes = [];
+  for (const categoria of Object.keys(TABELA_VITRINE)) {
+    const elegiveis = itens.filter((i) => i.regra === 'tabela-vitrine' && i.categoria === categoria);
+    for (let k = 0; k + PACKAGE_SIZE <= elegiveis.length; k += PACKAGE_SIZE) {
+      const grupo = elegiveis.slice(k, k + PACKAGE_SIZE);
+      for (const i of grupo) i.pacote = pacotes.length + 1;
+      pacotes.push({ numero: pacotes.length + 1, categoria, nomes: grupo.map((i) => i.nome), centavos: TABELA_VITRINE[categoria].pacote * 100 });
+    }
+  }
+  const avulsos = itens.filter((i) => i.centavos != null && i.pacote == null);
+  return {
+    itens,
+    pacotes,
+    totalCentavos: avulsos.reduce((s, i) => s + i.centavos, 0) + pacotes.reduce((s, p) => s + p.centavos, 0),
+    semValor: itens.filter((i) => i.centavos == null).map((i) => i.nome),
+  };
 }
 
 /** Último dia em que a proposta pode ser aceita: 7 dias corridos a partir da emissão (inclusive o último). */

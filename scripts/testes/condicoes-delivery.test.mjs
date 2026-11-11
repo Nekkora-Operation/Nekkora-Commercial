@@ -562,11 +562,55 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção: nenhuma pendência de aprovação no publicacao.json versionado (execução real)', () => {
+test('R1-30. portão de produção (execução real): a tabela da COM-VITRINE-001 bloqueia sem aprovação própria', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
-  // Todas as aprovações foram dadas expressamente pela titular (PUB-17/19/09 e PUB-10/18 em 11/11/2026). O portão
-  // continua exigindo cada uma (teste 14) e ainda bloqueia por artefato ausente ou árvore suja (BUILD), que dependem do build.
+  // As aprovações da V1.0.0 (PUB-17/19/09 e PUB-10/18 em 11/11/2026) continuam gravadas e não são acusadas. A tabela
+  // nova (COM-VITRINE-001) não pode usar a aprovação de preços anterior: sem a impressão aprovada (PUB-14) e sem a data
+  // de início das novas condições (PUB-13), o portão BLOQUEIA. Nenhuma outra pendência de aprovação aparece.
   const saida = r.stdout + r.stderr;
+  assert.notEqual(r.status, 0, 'publicação bloqueada');
   for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
-  if (r.status !== 0) assert.doesNotMatch(saida, /- PUB-\d+ —/, 'só pendências de build, nunca de aprovação');
+  assert.match(saida, /- PUB-14 — tabela de preços do código sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
+  assert.match(saida, /- PUB-13 — data de início das novas condições/);
+  assert.match(saida, /- PUB-14 — registro da aprovação da tabela ausente ou divergente/);
+  const pubs = [...new Set([...saida.matchAll(/- (PUB-\d+) —/g)].map((m) => m[1]))].sort();
+  assert.deepEqual(pubs, ['PUB-13', 'PUB-14'], 'só as pendências da nova tabela, além das de build');
+});
+
+test('V-02. compromissos anteriores preservados; tabela da vitrine a partir da data de início; pacotes na proposta', () => {
+  const NOVAS = { inicio: '2026-12-10' };
+  // antes da data de início: oferta anterior (lançamento), com a tabela da vitrine só como sugestão
+  const antes = precoDaAutomacao({ categoria: 'simples', recebidaEm: '2026-12-09T15:00:00Z', periodo: PERIODO, novasCondicoes: NOVAS });
+  assert.deepEqual([antes.regra, antes.centavos], ['lancamento', 100_000]);
+  assert.deepEqual(antes.condicaoMaisFavoravel, { centavos: 65_000, regra: 'tabela-vitrine', aplicada: false }, 'proposta ao cliente, nunca aplicada sozinha');
+  // a partir da data de início: tabela da vitrine; complexa em avaliação individual
+  const depois = precoDaAutomacao({ categoria: 'media', recebidaEm: '2026-12-10T03:00:00Z', periodo: PERIODO, novasCondicoes: NOVAS });
+  assert.deepEqual([depois.regra, depois.centavos], ['tabela-vitrine', 140_000]);
+  assert.equal(precoDaAutomacao({ categoria: 'complexa', recebidaEm: '2026-12-11T12:00:00Z', periodo: PERIODO, novasCondicoes: NOVAS }).regra, 'avaliacao-individual');
+  // sem a data, só a regra anterior (nenhuma sugestão)
+  const semData = precoDaAutomacao({ categoria: 'simples', recebidaEm: '2026-12-15T12:00:00Z', periodo: PERIODO });
+  assert.deepEqual([semData.regra, semData.centavos, semData.condicaoMaisFavoravel], ['lancamento', 100_000, undefined]);
+  // proposta: 4 simples + 1 média na tabela da vitrine → 1 pacote de 3 simples + 1 simples + 1 média; a anterior à parte
+  const r = precosDaProposta(
+    [
+      ...['A', 'B', 'C', 'D'].map((nome) => ({ nome, categoria: 'simples', recebidaEm: '2026-12-12T12:00:00Z' })),
+      { nome: 'E', categoria: 'media', recebidaEm: '2026-12-12T12:00:00Z' },
+      { nome: 'F', categoria: 'simples', recebidaEm: '2026-12-05T12:00:00Z' },
+    ],
+    PERIODO,
+    NOVAS,
+  );
+  assert.deepEqual(r.pacotes, [{ numero: 1, categoria: 'simples', nomes: ['A', 'B', 'C'], centavos: 150_000 }]);
+  assert.equal(r.totalCentavos, 150_000 + 65_000 + 140_000 + 100_000, 'pacote + avulsa + média + oferta anterior');
+  // categorias não se misturam: 2 simples + 1 média não formam pacote
+  const misto = precosDaProposta(
+    [
+      { nome: 'A', categoria: 'simples', recebidaEm: '2026-12-12T12:00:00Z' },
+      { nome: 'B', categoria: 'simples', recebidaEm: '2026-12-12T12:00:00Z' },
+      { nome: 'C', categoria: 'media', recebidaEm: '2026-12-12T12:00:00Z' },
+    ],
+    PERIODO,
+    NOVAS,
+  );
+  assert.deepEqual([misto.pacotes.length, misto.totalCentavos], [0, 65_000 * 2 + 140_000]);
 });

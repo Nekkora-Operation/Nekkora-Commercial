@@ -15,7 +15,10 @@
     "aprovacoes.publicacao": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001): autorizada a preparação da publicação em produção da Nekkora Commercial V1, com base no commit 2fdaed6, sem Bookings, envio automático, gateway de pagamento ou contratação automática. Pendências preservadas: F5, aguardando resposta da Microsoft, e minuta contratual a validar antes da primeira contratação. A autorização não comprova conformidade jurídica nem substitui mecanismos legais exigíveis para eventuais transferências internacionais.",
     "avisoHomologacao": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001, PUB-10): aviso \"Versão para homologação\" desligado para a publicação da V1, com base no commit 2fdaed6.",
     "fornecedor.endereco": "NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): Decreto 7.962/2013, art. 2º, II. Endereço informado pela titular em 05/11/2026, com base no cartão CNPJ (PUB-22). Endereço de escritório virtual: identifica o fornecedor e não indica atendimento presencial.",
-    "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail."
+    "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail.",
+    "tabelaDePrecos": "COM-VITRINE-001 §9.3 (11/11/2026): a aprovação de preços vale para UMA tabela, identificada pela impressão digital de src/precos.ts (node scripts/comercial/impressao-precos.mjs). A tabela nova (individual e pacote de 3) ainda não tem aprovação definitiva: impressao null bloqueia o deploy (PUB-14). A aprovação só vale com o registro expresso da titular na chave $origem[\"tabelaDePrecos.impressao\"] (\"Titular, DD/MM/AAAA\", a partir de 11/11/2026, citando a impressão aprovada); a impressão sozinha não libera. As aprovações de preços anteriores valem só para a tabela da v1.0.0. posCampanha (V-01, tabela contínua depois de 06/01/2027) também depende de aprovação definitiva da titular.",
+    "novasCondicoes": "COM-VITRINE-001 §3.1: data de início das novas condições (= data da publicação aprovada da atualização), definida pela titular. Antes dela valem os compromissos da tabela anterior (V-02).",
+    "servicos": "COM-VITRINE-001 §7 (V-06): Monitor e AI em preparação, sem checkout nem contratação; \"disponivel\" só com aprovação própria (aprovacoes.disponibilidade)."
   },
   "canais": {
     "whatsapp": null,
@@ -54,5 +57,16 @@
     "envioAutomatico": false,
     "publicacao": true
   },
-  "avisoHomologacao": false
+  "avisoHomologacao": false,
+  "tabelaDePrecos": {
+    "impressao": null,
+    "posCampanha": false
+  },
+  "novasCondicoes": {
+    "inicio": null
+  },
+  "servicos": {
+    "monitor": "em-preparacao",
+    "ai": "em-preparacao"
+  }
 }

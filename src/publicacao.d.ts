@@ -20,6 +20,12 @@ declare module '@publicacao' {
       publicacao: boolean;
     };
     avisoHomologacao: boolean;
+    /** COM-VITRINE-001 §9.3: impressão digital da tabela aprovada (PUB-14) e aprovação da tabela pós-campanha (V-01). */
+    tabelaDePrecos?: { impressao: string | null; posCampanha: boolean };
+    /** COM-VITRINE-001 §3.1: data de início das novas condições (AAAA-MM-DD), definida pela titular. */
+    novasCondicoes?: { inicio: string | null };
+    /** COM-VITRINE-001 §7: disponibilidade real de Monitor e AI (PUB-23). */
+    servicos?: { monitor: 'em-preparacao' | 'disponivel'; ai: 'em-preparacao' | 'disponivel' };
   };
   export default publicacao;
 }

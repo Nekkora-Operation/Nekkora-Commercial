@@ -152,7 +152,12 @@ Texto público proposto, coerente com o Modelo A-R do
    que a aprovação de 11/11/2026 continua valendo para a `v1.0.0`.
 3. **Portão de preços versionados [P]:** o `publicacao.json` registra a impressão digital (SHA-256) da tabela aprovada
    (Delivery, pacotes, Monitor e AI, de forma canônica). O portão calcula a impressão da tabela em `src/precos.ts` e
-   bloqueia (PUB-14) se ela divergir da aprovada, mesmo com a flag `true`.
+   bloqueia (PUB-14) se ela divergir da aprovada, mesmo com a flag `true`. **Rastreabilidade (autorização da etapa 2):**
+   a impressão sozinha não é aprovação. O portão também exige o registro expresso da titular em
+   `$origem["tabelaDePrecos.impressao"]`, começando por "Titular, DD/MM/AAAA" (data válida, de 11/11/2026 até o dia do
+   deploy) e citando uma única impressão, igual à aprovada e à do código; sem ele, ou com outra impressão, bloqueia.
+   Alterar ou regenerar o hash não é nova aprovação comercial, e os registros da `v1.0.0` não servem. Nenhuma impressão
+   ou registro é preenchido automaticamente: a tabela nova segue **não aprovada para publicação**.
 4. **Disponibilidade no portão [P]:** Monitor ou AI em `disponivel` sem aprovação própria bloqueiam o deploy.
 5. **Data de início das novas condições:** obrigatória no `publicacao.json`, igual à do regulamento.
 6. **PUB-18:** a publicação da atualização exige nova autorização expressa.
@@ -166,7 +171,7 @@ infraestrutura sem autorização.
 |---|---|---|
 | 0 | Esta especificação | autorizada |
 | 1 | `src/precos.ts`: tabela nova, pacotes, economia calculada, preços previstos de Monitor e AI; fim do retorno automático à tabela anterior; simulador com pacotes e sem complexa; valores dos cartões de simples e média; testes e homologação de preços e simulador | concluída (autorizada pela titular em 11/11/2026) |
-| 2 | Portão de preços versionados, data de início das novas condições, regra pós-campanha (§3.2) e estados de disponibilidade, com testes | — |
+| 2 | Portão de preços versionados, data de início das novas condições, regra pós-campanha (§3.2) e estados de disponibilidade, com testes; regras de proposta com a tabela nova a partir da data de início e pacotes (V-02, V-03) | preparada (diff apresentado à titular) |
 | 3 | Vitrine do Delivery: sai o cartão complexo, entram "A automação é sua", o texto V-04, critérios sem complexa e regras da campanha atualizadas | — |
 | 4 | Catálogo: cartões de Monitor e AI "Em preparação", Hosting mantido; componentes e tokens existentes | — |
 | 5 | Fluxos de solicitação: tipos existentes do Delivery (com interesse em pacote) e do Hosting; sem coleta nova | — |
@@ -179,11 +184,11 @@ Estado intermediário da branch, que **não pode ser integrado à `main` nem pub
 
 | Pendência | Onde | Resolvida na etapa |
 |---|---|---|
-| O portão ainda aceita a tabela nova com as flags de aprovação da V1.0.0 (`aprovacoes.precos` e demais `true`): a nova tabela não pode usar aprovações anteriores | `scripts/verificar-publicacao.mjs`, `publicacao.json` | 2 (impressão digital da tabela aprovada) e 7 (reabertura) |
+| ~~O portão ainda aceita a tabela nova com as flags de aprovação da V1.0.0~~ — etapa 2: o portão exige a impressão digital aprovada da tabela do código (PUB-14) e a data de início (PUB-13); hoje bloqueia | `scripts/verificar-publicacao.mjs`, `publicacao.json` | 2 (resolvida); reabertura de PUB-17/19 na 7 |
 | Cartão "Automação complexa" com "Sob orçamento" e CTA próprio | `src/content.ts` (`PRICING.tiers`), `src/sections/Pricing.tsx` | 3 |
 | Textos promocionais antigos: faixa "Preços especiais de lançamento…", condição "Valem para automações simples e médias solicitadas durante a campanha…" e regras da campanha citando preço de lançamento e complexa | `src/content.ts` (`PRICING.launch`) | 3 |
 | Critério "complexa acima de 16 horas" na lista pública | `src/content.ts` (`PRICING.criteria`) | 3 |
-| Regras de proposta aplicam só a tabela anterior; falta a tabela nova para solicitações recebidas a partir da data de início | `scripts/comercial/regras-delivery.mjs` | 2 |
+| ~~Regras de proposta aplicam só a tabela anterior~~ — etapa 2: tabela nova a partir de `novasCondicoes.inicio`, pacotes na proposta e condição mais favorável só sugerida | `scripts/comercial/regras-delivery.mjs` | 2 (resolvida) |
 | V-01 (tabela contínua depois de 06/01/2027) é diretriz, não aprovação definitiva | §3.2, §11 | aprovação da titular antes do deploy |
 
 **[P] Integração futura com a Nekkora Platform:** o catálogo fica tipado (identificador, nome, preço, unidade,

@@ -15,6 +15,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { responseHeadersPolicy } from '../deploy/aws/cabecalhos.mjs';
 import { isBookingsUrl } from '../src/agendamento-url.js';
+import { impressaoDaTabela } from './comercial/impressao-precos.mjs';
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -83,8 +84,19 @@ if (intake.endpoint != null) {
 }
 // Campanha (§4.4, COM-RELEASE-003-R1)
 const { inicio, fim } = pub.campanhaLancamento;
+const tabela = pub.tabelaDePrecos ?? {};
 need(iso(inicio) && iso(fim) && inicio <= fim, 'PUB-13', 'datas de início e fim da campanha de lançamento');
-need(!iso(fim) || fim >= today, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today})`);
+// COM-VITRINE-001 §3.2 (V-01): depois do fim, a página já não mostra comunicação promocional, mas publicar depois do
+// fim exige a aprovação expressa da tabela pós-campanha; sem ela, campanha encerrada continua bloqueando.
+need(!iso(fim) || fim >= today || tabela.posCampanha === true, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today}) e tabela pós-campanha não aprovada (tabelaDePrecos.posCampanha, V-01)`);
+// COM-VITRINE-001 §3.1: data de início das novas condições, dentro da campanha e já alcançada no dia do deploy (a página
+// publicada aplica a tabela nova a partir dela; antes dela valem os compromissos da tabela anterior).
+const novas = pub.novasCondicoes?.inicio ?? null;
+need(
+  iso(novas) && (!iso(inicio) || novas >= inicio) && novas <= today,
+  'PUB-13',
+  `data de início das novas condições (novasCondicoes.inicio): a partir do início da campanha e não depois de hoje (${today})`,
+);
 // Privacidade (§5.4)
 need(Boolean(pub.controlador.nome), 'PUB-09', 'controlador dos dados: razão social (ou nome) para o aviso de privacidade');
 need(isTaxId(pub.controlador.documento), 'PUB-09', 'controlador dos dados: CNPJ ou CPF válido (dígitos verificadores)');
@@ -94,6 +106,38 @@ need(typeof pub.fornecedor?.endereco === 'string' && pub.fornecedor.endereco.tri
 need(Boolean(pub.hospedagem.provedor), 'PUB-11', 'provedor de hospedagem citado no aviso de privacidade');
 // Aprovações da titular — preços e condições são decisões separadas (COM-RELEASE-003-R1 §3.5)
 need(pub.aprovacoes.precos === true, 'PUB-14', 'aprovação dos preços');
+// COM-VITRINE-001 §9.3: a aprovação vale para UMA tabela. A impressão aprovada tem de ser a da tabela do código; sem ela
+// (ou com outra), bloqueia mesmo com aprovacoes.precos === true — nenhum preço novo usa aprovação anterior.
+const impressao = impressaoDaTabela();
+need(
+  tabela.impressao === impressao,
+  'PUB-14',
+  `tabela de preços do código sem aprovação própria: impressão ${impressao}, aprovada ${tabela.impressao ?? 'nenhuma'} (node scripts/comercial/impressao-precos.mjs)`,
+);
+// Rastreabilidade: só a impressão não é aprovação. Exige o registro expresso da titular em
+// $origem["tabelaDePrecos.impressao"], começando por "Titular, DD/MM/AAAA" (data válida, a partir de 11/11/2026, quando
+// a COM-VITRINE-001 foi definida, e não depois de hoje) e citando UMA impressão, exatamente a aprovada e a do código.
+// Regenerar o hash sem o registro correspondente bloqueia; os registros da v1.0.0 (outras chaves) não servem.
+const registro = pub.$origem?.['tabelaDePrecos.impressao'];
+const dataDoRegistro = (() => {
+  const m = typeof registro === 'string' && /^Titular, (\d{2})\/(\d{2})\/(\d{4})\b/.exec(registro);
+  return m && iso(`${m[3]}-${m[2]}-${m[1]}`) && new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00Z`).getUTCDate() === Number(m[1]) ? `${m[3]}-${m[2]}-${m[1]}` : null;
+})();
+const citadas = typeof registro === 'string' ? [...new Set(registro.match(/sha256:[0-9a-f]{64}/g) ?? [])] : [];
+need(
+  dataDoRegistro != null && dataDoRegistro >= '2026-11-11' && dataDoRegistro <= today && citadas.length === 1 && citadas[0] === tabela.impressao && citadas[0] === impressao,
+  'PUB-14',
+  `registro da aprovação da tabela ausente ou divergente: $origem["tabelaDePrecos.impressao"] deve começar por "Titular, DD/MM/AAAA" (de 11/11/2026 até hoje) e citar a impressão aprovada ${impressao}`,
+);
+// COM-VITRINE-001 §7 (V-06): Monitor e AI só "em-preparacao" ou, com aprovação própria, "disponivel"
+for (const servico of ['monitor', 'ai']) {
+  const estado = pub.servicos?.[servico] ?? null;
+  need(
+    estado === 'em-preparacao' || (estado === 'disponivel' && pub.aprovacoes.disponibilidade?.[servico] === true),
+    'PUB-23',
+    `servicos.${servico}: "em-preparacao", ou "disponivel" só com aprovacoes.disponibilidade.${servico} (homologado, sem contratação fictícia)`,
+  );
+}
 need(pub.aprovacoes.condicoesComerciais === true, 'PUB-19', 'aprovação das condições comerciais (50/50, fila, reuniões, licenças, garantia e aceite)');
 need(pub.aprovacoes.textosComerciais === true, 'PUB-17', 'aprovação dos textos comerciais');
 need(pub.aprovacoes.avisoDePrivacidade === true, 'PUB-09', 'aprovação do aviso de privacidade');
