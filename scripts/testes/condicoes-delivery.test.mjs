@@ -256,17 +256,24 @@ test('13. alteração de prazo só com motivo, comunicação e concordância esc
 test('14. bloqueios de produção preservados: nenhuma aprovação presumida', () => {
   const a = PUBLICACAO.aprovacoes;
   // PUB-17, PUB-19 e PUB-09: aprovações expressas da titular em 11/11/2026 (commit e4bc72c), cada uma com registro em
-  // $origem. PUB-18 (publicação) continua false e PUB-10 (aviso de homologação) continua ligado.
+  // $origem. PUB-18 (publicação) e PUB-10 (aviso de homologação desligado): autorizações expressas da titular em
+  // 11/11/2026 (commit 2fdaed6), também registradas em $origem.
   for (const k of ['condicoesComerciais', 'textosComerciais', 'avisoDePrivacidade']) {
     assert.equal(a[k], true, `${k} aprovada`);
     assert.match(PUBLICACAO.$origem[`aprovacoes.${k}`], /Titular, 11\/11\/2026 .*e4bc72c.*sem parecer jurídico externo/, `${k}: registro da aprovação`);
   }
-  assert.equal(a.publicacao, false, 'publicacao (PUB-18) continua false');
+  assert.equal(a.publicacao, true, 'publicacao (PUB-18) autorizada');
+  const pub18 = PUBLICACAO.$origem['aprovacoes.publicacao'];
+  for (const t of ['Titular, 11/11/2026', 'commit 2fdaed6', 'sem Bookings, envio automático, gateway de pagamento ou contratação automática', 'F5, aguardando resposta da Microsoft', 'minuta contratual a validar antes da primeira contratação', 'A autorização não comprova conformidade jurídica'])
+    assert.ok(pub18.includes(t), `PUB-18 registra: ${t}`);
   assert.match(PUBLICACAO.$origem['aprovacoes.condicoesComerciais'], /Não abrange a minuta contratual nem a cláusula de retenção de 50%/);
   const pv = PUBLICACAO.$origem['aprovacoes.avisoDePrivacidade'];
   for (const t of ['Esta aprovação interna não constitui demonstração de conformidade jurídica.', 'Pendência F5 preservada', 'Nenhum mecanismo do art. 33 da LGPD está comprovado', 'A decisão de 06/11/2026 permanece válida.'])
     assert.ok(pv.includes(t), `PUB-09 registra: ${t}`);
-  assert.equal(PUBLICACAO.avisoHomologacao, true);
+  assert.equal(PUBLICACAO.avisoHomologacao, false, 'PUB-10: aviso de homologação desligado');
+  assert.match(PUBLICACAO.$origem.avisoHomologacao, /Titular, 11\/11\/2026 .*PUB-10/);
+  assert.deepEqual(PUBLICACAO.agendamento, { url: null, obrigatorio: false }, 'V1 inicial sem Bookings');
+  assert.equal(PUBLICACAO.envioAutomatico.endpoint, null, 'sem envio automático');
   assert.deepEqual(PUBLICACAO.campanhaLancamento, { inicio: '2026-11-06', fim: '2027-01-06' }, 'datas históricas não alteradas');
   const portao = ler('scripts/verificar-publicacao.mjs');
   for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.match(portao, new RegExp(`need\\([^\\n]*'${id}'`), `${id} continua exigido`);
@@ -555,11 +562,11 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção continua bloqueando (execução real)', () => {
+test('R1-30. portão de produção: nenhuma pendência de aprovação no publicacao.json versionado (execução real)', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
-  assert.notEqual(r.status, 0, 'o portão deve falhar');
-  assert.match(r.stdout + r.stderr, /PUBLICAÇÃO BLOQUEADA/);
-  // PUB-19, PUB-17 e PUB-09 aprovadas pela titular em 11/11/2026 (commit e4bc72c); PUB-18 e PUB-10 continuam exigidas
-  for (const id of ['PUB-18', 'PUB-10']) assert.match(r.stdout + r.stderr, new RegExp(id));
-  for (const id of ['PUB-19', 'PUB-17', 'PUB-09']) assert.doesNotMatch(r.stdout + r.stderr, new RegExp(`${id} —`));
+  // Todas as aprovações foram dadas expressamente pela titular (PUB-17/19/09 e PUB-10/18 em 11/11/2026). O portão
+  // continua exigindo cada uma (teste 14) e ainda bloqueia por artefato ausente ou árvore suja (BUILD), que dependem do build.
+  const saida = r.stdout + r.stderr;
+  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
+  if (r.status !== 0) assert.doesNotMatch(saida, /- PUB-\d+ —/, 'só pendências de build, nunca de aprovação');
 });

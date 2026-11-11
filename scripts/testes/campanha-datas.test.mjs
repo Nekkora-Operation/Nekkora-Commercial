@@ -23,7 +23,7 @@ test('o plano encontra todas as ocorrências no repositório e não toca flags d
   for (const k of ['canais', 'agendamento', 'envioAutomatico', 'aprovacoes', 'avisoHomologacao', 'controlador', 'fornecedor', 'hospedagem']) {
     assert.deepEqual(pub[k], original[k], `${k} não pode mudar`);
   }
-  assert.equal(pub.avisoHomologacao, true);
+  assert.equal(pub.avisoHomologacao, false); // titular, 11/11/2026 (PUB-10): o plano não religa o aviso
   // datas sintéticas fora da campanha real continuam intactas
   assert.match(arquivos.get('scripts/homologacao-simulador.mjs'), /vigente: new Date\('2026-11-15T12:00/);
   assert.match(arquivos.get('scripts/testes/condicoes-delivery.test.mjs'), /diaEmBrasilia\('2026-11-06T02:00:00Z'\), '2026-11-05'/);

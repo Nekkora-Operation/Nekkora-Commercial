@@ -212,9 +212,9 @@ test('20. controles de publicação preservados: aprovações, aviso de homologa
     avisoDePrivacidade: true, // titular, 11/11/2026 (PUB-09, commit e4bc72c)
     agendamento: true, // titular, 05/11/2026 (PUB-20)
     envioAutomatico: false,
-    publicacao: false,
+    publicacao: true, // titular, 11/11/2026 (PUB-18, commit 2fdaed6)
   });
-  assert.equal(pub.avisoHomologacao, true);
+  assert.equal(pub.avisoHomologacao, false); // titular, 11/11/2026 (PUB-10)
   assert.deepEqual(pub.campanhaLancamento, {
     inicio: '2026-11-06',
     fim: '2027-01-06'
