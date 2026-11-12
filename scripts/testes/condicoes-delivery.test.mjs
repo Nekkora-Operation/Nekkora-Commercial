@@ -562,19 +562,33 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 aprovadas pela titular; PUB-13 registrada no Dia D (12/11/2026); falta só a autorização desta versão (PUB-18)', () => {
+test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 aprovadas pela titular; PUB-13 registrada no Dia D (12/11/2026); sem a PUB-18 bloqueia só por ela, com a PUB-18 válida não acusa nada', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
-  // As aprovações da V1.0.0 (PUB-17/19/09 e PUB-10/18 em 11/11/2026) continuam gravadas; PUB-09/10/18 não são
+  // As aprovações da V1.0.0 (PUB-17/19/09 e PUB-10/18 em 11/11/2026) continuam gravadas; PUB-09/10 não são
   // acusadas. Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas por impressão + registro próprio (commit
-  // cf0e733). PUB-13 registrada pela titular no Dia D (12/11/2026). Sem a autorização desta versão (PUB-18), o portão BLOQUEIA.
+  // cf0e733). PUB-13 registrada pela titular no Dia D (12/11/2026).
   const saida = r.stdout + r.stderr;
-  assert.notEqual(r.status, 0, 'publicação bloqueada');
   for (const id of ['PUB-09', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
   assert.doesNotMatch(saida, /PUB-13 —/, 'data de início e registro conferem');
   const ids = [...new Set([...saida.matchAll(/- ((?:PUB|V)-\d+) —/g)].map((m) => m[1]))].sort();
-  // PUB-18 (titular, 12/11/2026): a flag aprovacoes.publicacao herdada da v1.0.0 não autoriza esta versão
-  assert.match(saida, /- PUB-18 — autorização desta versão/);
-  assert.deepEqual(ids, ['PUB-18'], 'só a autorização desta versão, além das de build');
+  // pendências de BUILD dependem do dist/ local (no CI os testes rodam antes do build); o artefato real é conferido
+  // pelo portão no job de deploy. Nenhuma outra pendência é tolerada.
+  const outras = [...saida.matchAll(/^ {2}- ([A-Z]+(?:-\d+)?) —/gm)].map((m) => m[1]).filter((id) => !/^(PUB|V)-\d+$/.test(id) && id !== 'BUILD');
+  assert.deepEqual(outras, [], saida);
+  const pub = JSON.parse(readFileSync(new URL('../../publicacao.json', import.meta.url), 'utf8'));
+  if (pub.publicacaoAutorizada === undefined) {
+    // Estado H: a flag aprovacoes.publicacao herdada da v1.0.0 não autoriza esta versão — o portão BLOQUEIA, só pela PUB-18
+    assert.notEqual(r.status, 0, 'publicação bloqueada');
+    assert.match(saida, /- PUB-18 — autorização desta versão/);
+    assert.deepEqual(ids, ['PUB-18'], 'só a autorização desta versão, além das de build');
+  } else {
+    // Estado C: autorização válida da titular — nenhuma pendência de configuração; sem pendência de build, libera
+    assert.deepEqual(ids, [], 'PUB-18 conferida pelo portão (versão, SHA completo e registro)');
+    if (!/- BUILD —/.test(saida)) {
+      assert.equal(r.status, 0, saida);
+      assert.match(saida, /Publicação liberada/);
+    }
+  }
 });
 
 test('V-02. compromissos anteriores preservados; tabela da vitrine a partir da data de início; pacotes na proposta', () => {

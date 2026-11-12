@@ -90,18 +90,45 @@ test('WhatsApp válido também é aceito', async () => {
   assert.equal((await gate()).code, 0);
 });
 
-test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); PUB-13 registrada no Dia D; falta só a autorização desta versão', async () => {
+test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); PUB-13 registrada no Dia D; sem a PUB-18 bloqueia só por ela, com a PUB-18 válida libera', async () => {
   const real = JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8'));
-  setup(real);
-  const r = await gate();
+  // a cópia usa a versão REAL do package.json e um artefato dessa versão, para a PUB-18 ser conferida como no deploy
+  const versaoReal = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;
+  writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'copia-de-teste', version: versaoReal }));
+  let r;
+  try {
+    setup(real, { ...release(), aplicacao: `copia-de-teste@${versaoReal}` });
+    r = await gate();
+  } finally {
+    writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'copia-de-teste', version: VERSAO }));
+  }
+  const pendencias = [...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort();
   // Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas (commit cf0e733, impressões conferidas no CI em Linux).
-  // PUB-13 (L-02) registrada pela titular no Dia D, 12/11/2026; a PUB-18 só vem depois, para o commit homologado.
-  assert.equal(r.code, 1, r.stdout);
-  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-18'], r.stdout);
-  // PUB-18: a flag aprovacoes.publicacao herdada da v1.0.0 continua true e NÃO autoriza esta versão
+  // PUB-13 (L-02) registrada pela titular no Dia D, 12/11/2026. A flag aprovacoes.publicacao herdada da v1.0.0
+  // continua true e, sozinha, NÃO autoriza esta versão.
   assert.equal(real.aprovacoes.publicacao, true);
-  assert.match(r.stdout, /PUB-18 — autorização desta versão/);
-  assert.equal(real.publicacaoAutorizada, undefined, 'autorização de publicação não preenchida');
+  const autorizada = real.publicacaoAutorizada;
+  if (autorizada === undefined) {
+    // Estado H (commit homologado): sem a PUB-18, o portão bloqueia, e só por ela; nenhum registro avulso da PUB-18
+    assert.equal(r.code, 1, r.stdout);
+    assert.deepEqual(pendencias, ['PUB-18'], r.stdout);
+    assert.match(r.stdout, /PUB-18 — autorização desta versão/);
+    assert.equal(real.$origem.publicacaoAutorizada, undefined, 'registro da PUB-18 sem a autorização');
+  } else {
+    // Estado C (autorização da titular, COM-VITRINE-001, 12/11/2026): autorização completa e válida, sem campos a mais,
+    // para a versão do package.json e UM commit homologado (SHA completo), citado exatamente no registro datado
+    assert.deepEqual(Object.keys(autorizada).sort(), ['commit', 'versao'], 'só versão e commit');
+    assert.equal(autorizada.versao, versaoReal, 'versão autorizada = versão do package.json');
+    assert.match(autorizada.commit ?? '', /^[0-9a-f]{40}$/, 'SHA completo do commit homologado');
+    const registro = real.$origem.publicacaoAutorizada;
+    assert.equal(typeof registro, 'string', 'registro da titular em $origem["publicacaoAutorizada"]');
+    assert.match(registro, /^Titular, 12\/11\/2026 \(COM-VITRINE-001, PUB-18\): /);
+    assert.ok(registro.includes(`versão ${versaoReal}`), 'registro cita a versão');
+    assert.deepEqual(registro.match(/(?<![0-9a-f])[0-9a-f]{40}(?![0-9a-f])/g), [autorizada.commit], 'registro cita exatamente o SHA autorizado');
+    assert.equal(r.code, 0, r.stdout);
+    assert.deepEqual(pendencias, [], r.stdout);
+    assert.match(r.stdout, /Publicação liberada/);
+  }
   assert.doesNotMatch(r.stdout, /PUB-13 —/);
   // PUB-13: data do Dia D, registro da titular no mesmo dia, citando UMA data (a de início), sem retroatividade e com os
   // compromissos anteriores preservados
