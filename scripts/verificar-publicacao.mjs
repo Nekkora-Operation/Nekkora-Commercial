@@ -16,6 +16,7 @@ import { resolve } from 'node:path';
 import { responseHeadersPolicy } from '../deploy/aws/cabecalhos.mjs';
 import { isBookingsUrl } from '../src/agendamento-url.js';
 import { impressaoDaTabela } from './comercial/impressao-precos.mjs';
+import { ITENS, impressaoDoConteudo } from './comercial/impressao-conteudo.mjs';
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -118,14 +119,16 @@ need(
 // $origem["tabelaDePrecos.impressao"], começando por "Titular, DD/MM/AAAA" (data válida, a partir de 11/11/2026, quando
 // a COM-VITRINE-001 foi definida, e não depois de hoje) e citando UMA impressão, exatamente a aprovada e a do código.
 // Regenerar o hash sem o registro correspondente bloqueia; os registros da v1.0.0 (outras chaves) não servem.
-const registro = pub.$origem?.['tabelaDePrecos.impressao'];
-const dataDoRegistro = (() => {
+/** Registro expresso da titular: "Titular, DD/MM/AAAA" (data válida, de `desde` até hoje) citando UMA impressão, que
+ * tem de ser a aprovada e a calculada. Vale para PUB-14, PUB-17 e PUB-19. */
+function registroConfere(registro, aprovada, calculada, desde) {
   const m = typeof registro === 'string' && /^Titular, (\d{2})\/(\d{2})\/(\d{4})\b/.exec(registro);
-  return m && iso(`${m[3]}-${m[2]}-${m[1]}`) && new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00Z`).getUTCDate() === Number(m[1]) ? `${m[3]}-${m[2]}-${m[1]}` : null;
-})();
-const citadas = typeof registro === 'string' ? [...new Set(registro.match(/sha256:[0-9a-f]{64}/g) ?? [])] : [];
+  const data = m && iso(`${m[3]}-${m[2]}-${m[1]}`) && new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00Z`).getUTCDate() === Number(m[1]) ? `${m[3]}-${m[2]}-${m[1]}` : null;
+  const citadas = typeof registro === 'string' ? [...new Set(registro.match(/sha256:[0-9a-f]{64}/g) ?? [])] : [];
+  return data != null && data >= desde && data <= today && citadas.length === 1 && citadas[0] === aprovada && citadas[0] === calculada;
+}
 need(
-  dataDoRegistro != null && dataDoRegistro >= '2026-11-11' && dataDoRegistro <= today && citadas.length === 1 && citadas[0] === tabela.impressao && citadas[0] === impressao,
+  registroConfere(pub.$origem?.['tabelaDePrecos.impressao'], tabela.impressao, impressao, '2026-11-11'),
   'PUB-14',
   `registro da aprovação da tabela ausente ou divergente: $origem["tabelaDePrecos.impressao"] deve começar por "Titular, DD/MM/AAAA" (de 11/11/2026 até hoje) e citar a impressão aprovada ${impressao}`,
 );
@@ -140,6 +143,22 @@ for (const servico of ['monitor', 'ai']) {
 }
 need(pub.aprovacoes.condicoesComerciais === true, 'PUB-19', 'aprovação das condições comerciais (50/50, fila, reuniões, licenças, garantia e aceite)');
 need(pub.aprovacoes.textosComerciais === true, 'PUB-17', 'aprovação dos textos comerciais');
+// COM-VITRINE-001 §12 (titular, 12/11/2026, forma b): a flag herdada da v1.0.0 não basta. Cada aprovação vale para UM
+// conteúdo: a impressão calculada dos arquivos (scripts/comercial/impressao-conteudo.mjs) tem de ser a aprovada em
+// impressoesDeConteudo.<item>, com o registro expresso da titular em $origem["impressoesDeConteudo.<item>"], a partir
+// de 12/11/2026. As flags não mudam; os registros da v1.0.0 (outras chaves) não servem.
+const impressoesAprovadas = pub.impressoesDeConteudo ?? {};
+for (const [item, nome, dos] of [['textosComerciais', 'textos comerciais', 'dos'], ['condicoesComerciais', 'condições comerciais', 'das']]) {
+  const { id } = ITENS[item];
+  const calculada = impressaoDoConteudo(item);
+  const aprovada = impressoesAprovadas[item] ?? null;
+  need(aprovada === calculada, id, `${nome} sem aprovação própria: impressão ${calculada}, aprovada ${aprovada ?? 'nenhuma'} (node scripts/comercial/impressao-conteudo.mjs)`);
+  need(
+    registroConfere(pub.$origem?.[`impressoesDeConteudo.${item}`], aprovada, calculada, '2026-11-12'),
+    id,
+    `registro da aprovação ${dos} ${nome} ausente ou divergente: $origem["impressoesDeConteudo.${item}"] deve começar por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje) e citar a impressão aprovada ${calculada}`,
+  );
+}
 need(pub.aprovacoes.avisoDePrivacidade === true, 'PUB-09', 'aprovação do aviso de privacidade');
 need(pub.aprovacoes.publicacao === true, 'PUB-18', 'autorização expressa de publicação em produção');
 need(pub.avisoHomologacao === false, 'PUB-10', 'desligar o aviso "Versão para homologação"');

@@ -1,7 +1,7 @@
 # Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)
 
-> **Aprovado internamente** pela titular em 11/11/2026 (PUB-17, PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico
-> externo. Pendências registradas em `publicacao.json` ($origem) e em docs/release/NEKKORA-COM-GOLIVE-001-pre-liberacao.md.
+> **Em revisão (COM-VITRINE-001).** Textos e condições alterados depois da aprovação da v1.0.0; sem aprovação
+> própria (impressões de PUB-17 e PUB-19: `node scripts/comercial/impressao-conteudo.mjs`).
 
 > Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere
 > o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.

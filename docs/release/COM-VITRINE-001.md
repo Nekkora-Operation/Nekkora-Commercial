@@ -381,6 +381,14 @@ autorização específica (§10, etapa 7). Duas formas, a decidir:
 **Titular, 12/11/2026:** escolhida a forma **(b)**; as flags históricas não mudam. Implementação do reforço em
 preparação (diff e testes apresentados antes do commit). Até a nova aprovação, PUB-17 e PUB-19 devem bloquear.
 
+**Reforço implementado na branch:** `scripts/comercial/impressao-conteudo.mjs` calcula as impressões e o portão exige,
+para PUB-17 e PUB-19, impressão aprovada igual à calculada (`impressoesDeConteudo.*`) e registro da titular em
+`$origem["impressoesDeConteudo.*"]`, de 12/11/2026 até hoje. As impressões cobrem pastas inteiras (`src/**`; para
+PUB-17 também `index.html`, `public/**` e `vite.config.ts`; para PUB-19 o regulamento e o histórico das condições),
+para nenhuma mudança escapar por estar em outro arquivo. Ficam fora `publicacao.json` (aprovações e registros) e os
+instrumentos de contratação (contrato-base, anexos, proposta-modelo, procedimento). Testes:
+`scripts/testes/impressao-conteudo.test.mjs` e `verificar-publicacao.test.mjs`.
+
 ### 12.1 Decisões comerciais ainda não aprovadas
 
 | ID | O que falta | Bloqueia |
@@ -409,7 +417,7 @@ preparação (diff e testes apresentados antes do commit). Até a nova aprovaç�
 
 | ID | O que falta | Bloqueia |
 |---|---|---|
-| Portão PUB-17/19 | Lacuna acima: reabrir na branch (a) ou (b) | publicação |
+| Portão PUB-17/19 | Forma (b) escolhida; reforço implementado na branch. Falta a aprovação da titular (impressões e registros) | publicação |
 | Homologação final | Repetir nos três navegadores com a configuração aprovada (data de início e impressão reais), depois das aprovações | publicação |
 | PR | PR em rascunho da branch, sem merge | publicação |
 | BUILD | O artefato publicado precisa vir de árvore limpa (o portão já verifica) | publicação |
@@ -429,3 +437,35 @@ preparação (diff e testes apresentados antes do commit). Até a nova aprovaç�
 
 **Nada nesta matriz foi aprovado pelo agente.** A impressão da tabela e o registro em `$origem` só são preenchidos pela
 titular, com autorização expressa.
+
+### 12.5 Campos de `publicacao.json` que podem alterar a oferta pública
+
+`publicacao.json` fica **fora** das impressões de PUB-17 e PUB-19, porque guarda as próprias aprovações e registros
+(evita dependência circular). Esta matriz mostra o que cada campo muda na página e qual controle existe.
+**Validação técnica** = o portão confere formato e coerência; **aprovação comercial** = exige registro expresso da
+titular vinculado ao valor. Nenhum campo foi preenchido ou alterado por esta matriz.
+
+| Campo | Efeito comercial na página | Controle existente | Nova aprovação da titular? | Lacuna ainda não resolvida |
+|---|---|---|---|---|
+| `canais.email`, `canais.linkedin` | Canais de contato e da solicitação | Validação técnica (PUB-02, PUB-03): formato, domínio reservado recusado | Decisão de 22/10/2026 (só e-mail e LinkedIn) | Trocar o endereço por outro válido não pede nova aprovação |
+| `canais.whatsapp` | Liga o botão flutuante e a jornada pelo WhatsApp | Validação técnica (PUB-01): só formato | Sim (fora do lançamento por decisão da titular) | **O portão aceita um número válido sem exigir a correção homologada do botão flutuante no celular (§10.3)** |
+| `canais.instagram` | Link de perfil | Validação técnica (PUB-03) | Sim (fora do lançamento) | Igual ao WhatsApp: só formato |
+| `agendamento.url`, `obrigatorio`, `dominioDoTenant` | Botão "Agendar conversa" | Validação técnica (PUB-20) + flag `aprovacoes.agendamento` | Sim, para o serviço testado | A flag não está vinculada à URL: outra URL válida passa com a flag da v1.0.0 |
+| `envioAutomatico.*` | Recebimento automático do formulário | Validação técnica (PUB-21) + flag `aprovacoes.envioAutomatico` (`false`) | Sim | Fora desta missão; continua desligado |
+| `campanhaLancamento.inicio`, `fim` | Período da campanha, selo e regras de lançamento | Validação técnica (PUB-13): datas válidas, campanha não encerrada sem V-01 | Decisão da titular de 09/11/2026 (06/11/2026 a 06/01/2027), registrada em `$origem` | **Alterar as datas não exige novo registro**: só a validação técnica as confere |
+| `novasCondicoes.inicio` | Data a partir da qual vale a tabela nova (texto e regra V-02) | Validação técnica (PUB-13): dentro da campanha e não depois de hoje | Sim (PUB-13, pendente) | **O portão não exige registro da titular para a data**, só a validade |
+| `tabelaDePrecos.impressao` | Libera a tabela de preços do código | Aprovação comercial (PUB-14): impressão + registro em `$origem` | Sim (pendente) | — |
+| `tabelaDePrecos.posCampanha` | Permite publicar depois de 06/01/2027 (V-01) | Flag booleana no portão (PUB-13) | Sim (V-01, pendente) | **Flag sem registro nem vínculo com a tabela aprovada** |
+| `impressoesDeConteudo.*` | Libera textos (PUB-17) e condições (PUB-19) | Aprovação comercial: impressão + registro em `$origem` | Sim (pendente) | — |
+| `servicos.monitor`, `servicos.ai` | **Nenhum na página**: o catálogo em `src/` mostra "Em preparação" | Validação (PUB-23) + `aprovacoes.disponibilidade` para "disponivel" | Sim | Disponibilizar exige também mudar `src/` (PUB-17/19) |
+| `controlador.*`, `fornecedor.endereco`, `hospedagem.provedor` | Identificação do fornecedor e aviso de privacidade | Validação técnica (PUB-09, PUB-22, PUB-11) + flag `aprovacoes.avisoDePrivacidade` | Decisões de 04 e 05/11/2026 | A flag do aviso não está vinculada aos valores |
+| `avisoHomologacao` | Faixa "Versão para homologação" | Validação técnica (PUB-10): tem de ser `false` | — | — |
+| `aprovacoes.*` | Flags herdadas da v1.0.0 | Exigidas, mas **não bastam** para preços, textos e condições | — | — |
+| `$origem` | Nenhum (registros) | Lido pelo portão em PUB-14, PUB-17 e PUB-19 | — | Texto livre: o portão confere data, autoria declarada e impressão citada, não a identidade de quem escreveu |
+
+**Lacunas a decidir** (nenhuma corrigida nesta etapa, sem nova funcionalidade):
+- **L-01:** WhatsApp ativável só com um número válido, sem a correção do botão flutuante no celular.
+- **L-02:** `novasCondicoes.inicio` sem registro da titular.
+- **L-03:** `campanhaLancamento` alterável sem novo registro.
+- **L-04:** `tabelaDePrecos.posCampanha` (V-01) como flag simples.
+- **L-05:** URL do agendamento e dados do aviso de privacidade sem vínculo com as flags.

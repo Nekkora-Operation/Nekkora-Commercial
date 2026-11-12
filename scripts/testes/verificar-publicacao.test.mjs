@@ -11,6 +11,7 @@ import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { responseHeadersPolicy } from '../../deploy/aws/cabecalhos.mjs';
 import { impressaoDaTabela } from '../comercial/impressao-precos.mjs';
+import { impressaoDoConteudo } from '../comercial/impressao-conteudo.mjs';
 
 const root = resolve('.');
 const dir = mkdtempSync(join(tmpdir(), 'portao-publicacao-'));
@@ -22,8 +23,16 @@ const policy = (hashes = HASHES, origens) => `${JSON.stringify(responseHeadersPo
 
 // Registro fictício da aprovação da tabela (COM-VITRINE-001 §9.3): data e impressão aprovada citadas pela titular
 const REGISTRO = (impressao = impressaoDaTabela(), data = '12/11/2026') => `Titular, ${data} (fictício): tabela aprovada, impressão ${impressao}.`;
+// Registros fictícios das aprovações de PUB-17 e PUB-19 (COM-VITRINE-001 §12, forma b): data e impressão do conteúdo
+const TEXTOS = impressaoDoConteudo('textosComerciais');
+const CONDICOES = impressaoDoConteudo('condicoesComerciais');
+const REGISTRO_DE = (impressao, data = '12/11/2026') => `Titular, ${data} (fictício): conteúdo aprovado, impressão ${impressao}.`;
 const complete = () => ({
-  $origem: { 'tabelaDePrecos.impressao': REGISTRO() },
+  $origem: {
+    'tabelaDePrecos.impressao': REGISTRO(),
+    'impressoesDeConteudo.textosComerciais': REGISTRO_DE(TEXTOS),
+    'impressoesDeConteudo.condicoesComerciais': REGISTRO_DE(CONDICOES),
+  },
   canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
   agendamento: { url: 'https://bookings.cloud.microsoft/book/AvaliacaoInicial@empresa-ficticia.com.br/', obrigatorio: true },
   envioAutomatico: { endpoint: null, chaveDoSiteTurnstile: null },
@@ -37,6 +46,7 @@ const complete = () => ({
   tabelaDePrecos: { impressao: impressaoDaTabela(), posCampanha: false },
   novasCondicoes: { inicio: '2026-11-10' },
   servicos: { monitor: 'em-preparacao', ai: 'em-preparacao' },
+  impressoesDeConteudo: { textosComerciais: TEXTOS, condicoesComerciais: CONDICOES },
 });
 const release = () => ({ homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES });
 
@@ -76,12 +86,19 @@ test('o publicacao.json versionado: aprovações da v1.0.0 preservadas, mas a ta
   // COM-VITRINE-001: a tabela do código não tem impressão aprovada (PUB-14) e a data de início das novas condições não
   // foi definida (PUB-13) — o portão BLOQUEIA, mesmo com aprovacoes.precos === true da v1.0.0. São as únicas pendências.
   assert.equal(r.code, 1, r.stdout);
-  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13', 'PUB-14'], r.stdout);
+  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19'], r.stdout);
   assert.match(r.stdout, /PUB-14 — tabela de preços do código sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
   assert.match(r.stdout, /PUB-14 — registro da aprovação da tabela ausente ou divergente/);
   assert.match(r.stdout, /PUB-13 — data de início das novas condições/);
-  // PUB-17/19/09 (commit e4bc72c) e PUB-10/18 (commit 2fdaed6), registradas em $origem: continuam não acusadas
-  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
+  // PUB-17 e PUB-19 (COM-VITRINE-001 §12, forma b): as flags da v1.0.0 continuam true e NÃO bastam — bloqueiam pela
+  // impressão do conteúdo e pelo registro, nunca pela flag
+  for (const [id, nome] of [['PUB-17', 'textos comerciais'], ['PUB-19', 'condições comerciais']]) {
+    assert.match(r.stdout, new RegExp(`${id} — ${nome} sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma`));
+    assert.match(r.stdout, new RegExp(`${id} — registro da aprovação d[oa]s ${nome} ausente ou divergente`));
+  }
+  assert.doesNotMatch(r.stdout, /PUB-17 — aprovação dos textos comerciais|PUB-19 — aprovação das condições comerciais/);
+  // PUB-09 (commit e4bc72c) e PUB-10/18 (commit 2fdaed6), registradas em $origem: continuam não acusadas
+  for (const id of ['PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
   // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
   assert.doesNotMatch(r.stdout, /PUB-20/);
   // PUB-22: endereço comercial informado pela titular em 05/11/2026 (cartão CNPJ) — o portão não o acusa mais
@@ -139,6 +156,25 @@ const cases = [
   ['registro sem a autoria da titular', (p) => (p.$origem['tabelaDePrecos.impressao'] = `Equipe, 12/11/2026: impressão ${impressaoDaTabela()}.`), /PUB-14 — registro da aprovação da tabela/],
   ['registro de preços da v1.0.0 reaproveitado', (p) => (p.$origem['tabelaDePrecos.impressao'] = 'COM-RELEASE-003-R1 §3.1 (decisão interna de 22/10/2026): simples R$ 1.500 → R$ 1.000'), /PUB-14 — registro da aprovação da tabela/],
   ['impressão em outro formato', (p) => (p.tabelaDePrecos.impressao = impressaoDaTabela().toUpperCase()), /PUB-14 — tabela de preços do código/],
+  // COM-VITRINE-001 §12 (forma b): textos (PUB-17) e condições (PUB-19) aprovados por impressão do conteúdo + registro
+  ...[['textosComerciais', 'PUB-17', TEXTOS, CONDICOES], ['condicoesComerciais', 'PUB-19', CONDICOES, TEXTOS]].flatMap(([item, id, propria, outra]) => {
+    const chave = `impressoesDeConteudo.${item}`;
+    const falta = new RegExp(`${id} — (textos|condições) comerciais sem aprovação própria`);
+    const registro = new RegExp(`${id} — registro da aprovação`);
+    return [
+      [`${id}: flag true sem impressão aprovada`, (p) => (p.impressoesDeConteudo[item] = null), falta],
+      [`${id}: sem o bloco impressoesDeConteudo`, (p) => delete p.impressoesDeConteudo, falta],
+      [`${id}: impressão aprovada de outro conteúdo (texto ou condição alterados)`, (p) => (p.impressoesDeConteudo[item] = `sha256:${'0'.repeat(64)}`), falta],
+      [`${id}: impressão do outro item no lugar desta`, (p) => (p.impressoesDeConteudo[item] = outra), falta],
+      [`${id}: impressão sem registro da titular`, (p) => delete p.$origem[chave], registro],
+      [`${id}: registro citando outra impressão`, (p) => (p.$origem[chave] = REGISTRO_DE(outra)), registro],
+      [`${id}: registro citando duas impressões`, (p) => (p.$origem[chave] = `${REGISTRO_DE(propria)} Antes: ${outra}.`), registro],
+      [`${id}: registro da época da v1.0.0 (11/11/2026)`, (p) => (p.$origem[chave] = REGISTRO_DE(propria, '11/11/2026')), registro],
+      [`${id}: registro com data futura`, (p) => (p.$origem[chave] = REGISTRO_DE(propria, '16/11/2026')), registro],
+      [`${id}: registro sem a autoria da titular`, (p) => (p.$origem[chave] = `Equipe, 12/11/2026: impressão ${propria}.`), registro],
+      [`${id}: só o registro da flag da v1.0.0`, (p) => (delete p.$origem[chave], (p.$origem[`aprovacoes.${item}`] = `Titular, 11/11/2026: aprovado (commit e4bc72c).`)), registro],
+    ];
+  }),
   // COM-VITRINE-001 §3.1: data de início das novas condições
   ['sem data de início das novas condições', (p) => (p.novasCondicoes.inicio = null), /PUB-13 — data de início das novas condições/],
   ['sem o bloco novasCondicoes', (p) => delete p.novasCondicoes, /PUB-13 — data de início das novas condições/],
