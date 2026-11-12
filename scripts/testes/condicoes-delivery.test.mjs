@@ -562,25 +562,18 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 bloqueiam sem aprovação própria', () => {
+test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 aprovadas pela titular; falta só a data de início (PUB-13)', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
   // As aprovações da V1.0.0 (PUB-17/19/09 e PUB-10/18 em 11/11/2026) continuam gravadas; PUB-09/10/18 não são
-  // acusadas. A tabela nova (COM-VITRINE-001) não pode usar a aprovação de preços anterior: sem a impressão aprovada
-  // (PUB-14) e sem a data de início das novas condições (PUB-13), o portão BLOQUEIA. Textos e condições também
-  // (§12, forma b): as flags true de PUB-17/19 não bastam sem a impressão do conteúdo e o registro da titular.
+  // acusadas. Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas por impressão + registro próprio (commit
+  // cf0e733). A data de início das novas condições (PUB-13) só é registrada no dia da publicação: o portão BLOQUEIA.
   const saida = r.stdout + r.stderr;
   assert.notEqual(r.status, 0, 'publicação bloqueada');
   for (const id of ['PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
-  assert.match(saida, /- PUB-17 — textos comerciais sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
-  assert.match(saida, /- PUB-19 — condições comerciais sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
-  assert.doesNotMatch(saida, /PUB-17 — aprovação dos textos|PUB-19 — aprovação das condições/, 'as flags da v1.0.0 continuam true');
-  assert.match(saida, /- PUB-14 — tabela de preços do código sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
   assert.match(saida, /- PUB-13 — data de início das novas condições/);
-  assert.match(saida, /- PUB-14 — registro da aprovação da tabela ausente ou divergente/);
   assert.match(saida, /- PUB-13 — registro da data de início ausente ou divergente/);
-  assert.match(saida, /- V-01 — tabela depois de 06\/01\/2027 sem aprovação própria/);
   const ids = [...new Set([...saida.matchAll(/- ((?:PUB|V)-\d+) —/g)].map((m) => m[1]))].sort();
-  assert.deepEqual(ids, ['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19', 'V-01'], 'só as pendências da nova vitrine, além das de build');
+  assert.deepEqual(ids, ['PUB-13'], 'só a data de início, além das de build');
 });
 
 test('V-02. compromissos anteriores preservados; tabela da vitrine a partir da data de início; pacotes na proposta', () => {

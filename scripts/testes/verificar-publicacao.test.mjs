@@ -83,25 +83,38 @@ test('WhatsApp válido também é aceito', async () => {
   assert.equal((await gate()).code, 0);
 });
 
-test('o publicacao.json versionado: aprovações da v1.0.0 preservadas, mas a tabela nova bloqueia sem aprovação própria', async () => {
-  setup(JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8')));
+test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); falta só a data de início', async () => {
+  const real = JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8'));
+  setup(real);
   const r = await gate();
-  // COM-VITRINE-001: a tabela do código não tem impressão aprovada (PUB-14) e a data de início das novas condições não
-  // foi definida (PUB-13) — o portão BLOQUEIA, mesmo com aprovacoes.precos === true da v1.0.0. São as únicas pendências.
+  // Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas (commit cf0e733, impressões conferidas no CI em Linux).
+  // A data de início das novas condições (PUB-13, L-02) só é registrada no dia da publicação: é a única pendência.
   assert.equal(r.code, 1, r.stdout);
-  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19', 'V-01'], r.stdout);
-  // L-02 e V-01: a data de início e a continuidade da tabela exigem registro próprio da titular
-  assert.match(r.stdout, /PUB-13 — registro da data de início ausente ou divergente/);
-  assert.match(r.stdout, /V-01 — tabela depois de 06\/01\/2027 sem aprovação própria/);
-  assert.match(r.stdout, /PUB-14 — tabela de preços do código sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
-  assert.match(r.stdout, /PUB-14 — registro da aprovação da tabela ausente ou divergente/);
+  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13'], r.stdout);
   assert.match(r.stdout, /PUB-13 — data de início das novas condições/);
-  // PUB-17 e PUB-19 (COM-VITRINE-001 §12, forma b): as flags da v1.0.0 continuam true e NÃO bastam — bloqueiam pela
-  // impressão do conteúdo e pelo registro, nunca pela flag
-  for (const [id, nome] of [['PUB-17', 'textos comerciais'], ['PUB-19', 'condições comerciais']]) {
-    assert.match(r.stdout, new RegExp(`${id} — ${nome} sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma`));
-    assert.match(r.stdout, new RegExp(`${id} — registro da aprovação d[oa]s ${nome} ausente ou divergente`));
+  assert.match(r.stdout, /PUB-13 — registro da data de início ausente ou divergente/);
+  assert.equal(real.novasCondicoes.inicio, null, 'data de início não preenchida antes da publicação');
+  assert.equal(real.$origem['novasCondicoes.inicio'], undefined, 'registro da data de início não preenchido antes da publicação');
+  // as aprovações valem para o conteúdo ATUAL: cada valor aprovado é a impressão calculada agora, e o registro da
+  // titular cita exatamente essa impressão, uma única vez (qualquer mudança em arquivo protegido volta a bloquear)
+  const aprovadas = [
+    ['tabelaDePrecos.impressao', real.tabelaDePrecos.impressao, impressaoDaTabela()],
+    ['tabelaDePrecos.posCampanha', real.tabelaDePrecos.impressao, impressaoDaTabela()],
+    ['impressoesDeConteudo.textosComerciais', real.impressoesDeConteudo.textosComerciais, impressaoDoConteudo('textosComerciais')],
+    ['impressoesDeConteudo.condicoesComerciais', real.impressoesDeConteudo.condicoesComerciais, impressaoDoConteudo('condicoesComerciais')],
+  ];
+  for (const [chave, aprovada, calculada] of aprovadas) {
+    assert.equal(aprovada, calculada, chave);
+    const registro = real.$origem[chave];
+    assert.match(registro, /^Titular, 12\/11\/2026 /, chave);
+    assert.deepEqual(registro.match(/sha256:[0-9a-f]{64}/g), [calculada], chave);
   }
+  assert.equal(real.tabelaDePrecos.posCampanha, true);
+  // PUB-19 aprova só as condições anunciadas: contratos e pacotes continuam pendentes
+  assert.match(real.$origem['impressoesDeConteudo.condicoesComerciais'], /NÃO representa aprovação do contrato-base, anexos, proposta-modelo ou procedimento operacional/);
+  assert.match(real.$origem['impressoesDeConteudo.condicoesComerciais'], /DP-01 a DP-05 .* continuam pendentes; não está autorizada a formalização de contratos de pacotes/);
+  // Monitor e AI continuam em preparação; as flags da v1.0.0 não são acusadas nem alteradas
+  assert.deepEqual(real.servicos, { monitor: 'em-preparacao', ai: 'em-preparacao' });
   assert.doesNotMatch(r.stdout, /PUB-17 — aprovação dos textos comerciais|PUB-19 — aprovação das condições comerciais/);
   // PUB-09 (commit e4bc72c) e PUB-10/18 (commit 2fdaed6), registradas em $origem: continuam não acusadas
   for (const id of ['PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
