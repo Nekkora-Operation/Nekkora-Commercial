@@ -37,8 +37,10 @@ L.push(
   '# Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)',
   '',
   ...(APROVADO
-    ? ['> **Aprovado internamente** pela titular para este conteúdo (impressões de PUB-17 e PUB-19 e registros em',
-       '> `publicacao.json` $origem), sem parecer jurídico externo.']
+    ? ['> **Textos e condições públicas aprovados internamente** pela titular para este conteúdo (impressões de PUB-17 e',
+       '> PUB-19 e registros em `publicacao.json` $origem), sem parecer jurídico externo. **Não é autorização de',
+       '> publicação** (PUB-13 e PUB-18 têm registros próprios) nem aprova contrato-base, anexos, proposta-modelo,',
+       '> procedimento ou as propostas DP-01 a DP-05: a contratação de pacotes segue bloqueada.']
     : FLAGS && !process.env.NEKKORA_PUBLICACAO
       ? ['> **Em revisão (COM-VITRINE-001).** Textos e condições alterados depois da aprovação da v1.0.0; sem aprovação',
          '> própria (impressões de PUB-17 e PUB-19: `node scripts/comercial/impressao-conteudo.mjs`).']

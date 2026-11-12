@@ -499,3 +499,26 @@ a impressão e exige conferência e nova aprovação.
 **Sequência:** (1) titular aprova as quatro primeiras com as impressões conferidas no CI; (2) no dia da publicação,
 registra a data de início; (3) commit, CI e homologação final nos três navegadores com essa configuração; (4) portão sem
 pendências; (5) só então a autorização PUB-18, identificando a versão e o SHA homologado.
+
+**Atualização de estado — titular, 12/11/2026 (commit `e8dbb87`).** O texto acima registra a preparação e fica
+preservado. Depois da CI do commit `cf0e733` (cinco jobs aprovados) e da conferência das três impressões calculadas em
+Linux, idênticas às referências locais, a titular aprovou e foram registrados em `publicacao.json`:
+
+| Item | Campo aprovado | Impressão | Registro em `$origem` |
+|---|---|---|---|
+| PUB-14 | `tabelaDePrecos.impressao` | `sha256:95a612f7b2528cee48fb4b043b4751d8bca66164e6cade01599832d8cc008f35` | `tabelaDePrecos.impressao` |
+| V-01 | `tabelaDePrecos.posCampanha: true` | mesma da PUB-14 | `tabelaDePrecos.posCampanha` |
+| PUB-17 | `impressoesDeConteudo.textosComerciais` | `sha256:fa69c55dfac65645ef13a5e9387d15b8a94ce4f89d1306aa7504e6a5365d9df5` | `impressoesDeConteudo.textosComerciais` |
+| PUB-19 | `impressoesDeConteudo.condicoesComerciais` | `sha256:0b94d467bbad9aab0aee9cd3ff6c7612e42d88ae7b209fe59a4e50d3bf7577c1` | `impressoesDeConteudo.condicoesComerciais` |
+
+A CI do commit `e8dbb87` (cinco jobs aprovados) recalculou as três impressões em Linux, de novo idênticas. O passo (1)
+da sequência está concluído; o portão bloqueia **só** pela PUB-13.
+
+**Continuam pendentes e não foram aprovados:**
+- **PUB-13:** `novasCondicoes.inicio` e o registro próprio — data real da publicação, nunca antecipada nem retroativa;
+- **PUB-18:** nova autorização para o SHA e a versão homologados; a flag `aprovacoes.publicacao` herdada da V1.0.0 não
+  autoriza a nova vitrine;
+- **contratação:** contrato-base, anexos, proposta-modelo, procedimento operacional, DP-01 a DP-05, cláusula 10 e
+  LIC-02. A aprovação da PUB-19 cobre só as condições anunciadas ao público; a formalização de contratos de pacotes
+  **não está autorizada**;
+- Monitor e AI continuam em preparação, sem contratação; Hosting continua sob avaliação.
