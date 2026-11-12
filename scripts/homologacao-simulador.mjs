@@ -464,6 +464,11 @@ async function run(engine) {
     await page.locator('#hosting [aria-haspopup="dialog"]').click();
     const dialog = page.getByRole('dialog');
     await dialog.waitFor();
+    // o tipo é aplicado por efeito logo depois da abertura: espera o ESTADO aplicado (até 1 s), sem espera fixa; se não
+    // aplicar no prazo, a verificação hosting-formulario-adequado falha explicitamente (tipoAplicado=false)
+    const tipoAplicado = await page
+      .waitForFunction(() => document.querySelector('[role="dialog"] [data-dica-servico]')?.getAttribute('data-dica-servico') === 'hospedagem', null, { timeout: 1000 })
+      .then(() => true, () => false);
     const checked = await dialog.getByRole('radio', { name: 'Hospedar uma automação existente' }).isChecked();
     // fechado e reaberto por outro CTA (sem tipo), a escolha continua
     await page.keyboard.press('Escape');
@@ -481,8 +486,8 @@ async function run(engine) {
     check(
       engine,
       'hosting-formulario-adequado',
-      checked && /hospedagem de uma automação existente/.test(description) && /Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente \(Nekkora Hosting\)\./.test(msg),
-      `hospedagem marcada=${checked}`,
+      tipoAplicado && checked && /hospedagem de uma automação existente/.test(description) && /Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente \(Nekkora Hosting\)\./.test(msg),
+      `tipo aplicado em até 1 s=${tipoAplicado}; hospedagem marcada=${checked}`,
     );
     await shot(dialog, 'formulario-hosting');
     await ctx.close();

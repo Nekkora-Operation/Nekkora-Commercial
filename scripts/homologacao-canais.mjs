@@ -294,7 +294,8 @@ async function campaign(engine, newContext) {
     engine,
     'vigencia-durante-campanha',
     sameTable(during) && /Campanha de lançamento para solicitações de avaliação recebidas de 01\/11\/2026 a 31\/12\/2026\./.test(during.strip ?? '') &&
-      /valem para solicitações recebidas a partir de 10\/11\/2026\./.test(during.strip ?? '') &&
+      // V-01 (titular, 12/11/2026): a faixa diz que os valores continuam depois da campanha, até nova revisão
+      /valem para solicitações recebidas a partir de 10\/11\/2026 e continuam valendo depois da campanha, até nova revisão\./.test(during.strip ?? '') &&
       !/Preços especiais|preço de lançamento/i.test(during.text),
     during.values.join(' · '),
   );

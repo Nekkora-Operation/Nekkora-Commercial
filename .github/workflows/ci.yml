@@ -85,7 +85,7 @@ jobs:
             echo "PUB-14 tabelaDePrecos: $(node scripts/comercial/impressao-precos.mjs | tail -n 1)"
             node scripts/comercial/impressao-conteudo.mjs | grep -E '^PUB-1[79] '
             echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: commercial-dist-${{ steps.commit.outputs.commit }}
