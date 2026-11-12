@@ -363,3 +363,69 @@ disponibilidade) para ser consumido depois, sem nenhuma chamada à Platform nest
 | Nekkora Monitor | Condições da cobrança recorrente | primeira contratação |
 | Botão flutuante do WhatsApp | No celular, o botão (`nk-fab--whatsapp`) cobre conteúdo da página (medido na homologação com dados fictícios, §10.3); corrigir e homologar | ativação do WhatsApp |
 | F5 | Resposta da Microsoft; não resolvida pela publicação nem por esta missão | — |
+
+## 12. Etapa 7 — revisão consolidada e matriz de pendências (preparada localmente, 12/11/2026)
+
+Situação do portão com a configuração real (`publicacao.json` sem alteração), depois do build do commit da etapa 6:
+**bloqueado** por PUB-13 (data de início) e PUB-14 (impressão e registro). Nenhuma impressão preenchida, nenhuma flag
+alterada, nenhum item abaixo declarado aprovado.
+
+**[!] Lacuna do portão.** As flags `aprovacoes.textosComerciais` (PUB-17) e `aprovacoes.condicoesComerciais` (PUB-19)
+continuam `true`, mas essas aprovações são da v1.0.0. Os textos e as condições mudaram nesta missão (etapas 3 a 6). Se
+PUB-13 e PUB-14 fossem resolvidas, o portão **não** acusaria PUB-17 nem PUB-19. A reabertura na branch depende de
+autorização específica (§10, etapa 7). Duas formas, a decidir:
+- **(a)** registrar `false` nas duas flags, só na branch (mudança de flag, exige autorização expressa);
+- **(b) recomendada:** vincular PUB-17 e PUB-19 a uma impressão do conteúdo aprovado, como a PUB-14, sem mexer nas
+  flags: a aprovação da v1.0.0 deixa de valer para o conteúdo novo e a liberação exige registro da titular.
+
+**Titular, 12/11/2026:** escolhida a forma **(b)**; as flags históricas não mudam. Implementação do reforço em
+preparação (diff e testes apresentados antes do commit). Até a nova aprovação, PUB-17 e PUB-19 devem bloquear.
+
+### 12.1 Decisões comerciais ainda não aprovadas
+
+| ID | O que falta | Bloqueia |
+|---|---|---|
+| PUB-14 | Aprovação da tabela da vitrine (simples R$ 650 / R$ 1.500 o pacote; média R$ 1.400 / R$ 3.500; Monitor R$ 75 e AI R$ 100 previstos), com impressão e registro da titular | publicação |
+| PUB-13 | Data de início das novas condições (= data da publicação aprovada) | publicação |
+| V-01 | Tabela contínua depois de 06/01/2027 (`tabelaDePrecos.posCampanha`) | publicação depois de 06/01/2027 |
+| PUB-17 | Nova aprovação dos textos alterados nas etapas 3 a 5 (cartões, catálogo, valores previstos, orientação por serviço, primeira linha da solicitação) | publicação |
+| PUB-19 | Nova aprovação das condições comerciais com os pacotes (V-03) | publicação |
+| PUB-18 | Autorização expressa de publicação da atualização | publicação |
+| Pacote misto | Sem regra geral; só por proposta específica | — (não ofertado) |
+
+### 12.2 Pendências contratuais que impedem a primeira contratação
+
+| ID | O que falta | Bloqueia |
+|---|---|---|
+| DP-01 a DP-05 | Propostas da titular registradas (contrato-base 6-A, 9-A, 14.3); falta a aprovação expressa das condições finais | 1ª contratação com pacote |
+| Avaliação jurídica | Revisão da minuta, proporcional aos riscos (JUR-01 a JUR-05) | 1ª contratação |
+| Cláusula 10 | Não aprovada; validade da retenção (JUR-03). Não se aplica a pacotes | 1ª contratação avulsa com desistência na homologação |
+| DP-04 | Viabilidade comercial, direitos legais e redação da devolução na homologação | 1ª contratação com pacote |
+| JUR-05 | Cláusula de dados do cliente (operadora), confidencialidade e credenciais sem redação | 1ª contratação |
+| JUR-01 | Forma do aceite e nota fiscal | 1ª contratação |
+| Monitor | Termos da cobrança recorrente | 1ª contratação do Monitor |
+
+### 12.3 Pendências técnicas que impedem a publicação
+
+| ID | O que falta | Bloqueia |
+|---|---|---|
+| Portão PUB-17/19 | Lacuna acima: reabrir na branch (a) ou (b) | publicação |
+| Homologação final | Repetir nos três navegadores com a configuração aprovada (data de início e impressão reais), depois das aprovações | publicação |
+| PR | PR em rascunho da branch, sem merge | publicação |
+| BUILD | O artefato publicado precisa vir de árvore limpa (o portão já verifica) | publicação |
+| WhatsApp | Botão flutuante cobre conteúdo no celular (§10.3); corrigir e homologar | ativação do WhatsApp (fora do lançamento) |
+| Versão | `package.json` ainda em `1.0.0-rc.1` | — (cosmético; definir na liberação) |
+
+### 12.4 Pendências de privacidade e licenciamento
+
+| ID | O que falta | Bloqueia |
+|---|---|---|
+| LIC-02 | Comprovar que a LTDA é titular ou pode licenciar os componentes preexistentes | 1ª contratação com componente preexistente |
+| LIC-01 | Licenciamento público do Framework (decisão separada) | — |
+| Nekkora AI | Análise de privacidade própria (dados de clientes, provedores de IA, transferência internacional) | disponibilização da AI |
+| JUR-07 | Mecanismo de transferência internacional para representantes de empresa | revisão do aviso de privacidade |
+| JUR-05 | Cláusula de operadora (LGPD art. 39) | 1ª contratação |
+| F5 | Resposta da Microsoft; fora desta missão | — |
+
+**Nada nesta matriz foi aprovado pelo agente.** A impressão da tabela e o registro em `$origem` só são preenchidos pela
+titular, com autorização expressa.
