@@ -521,6 +521,80 @@ await block('funcionais', async () => {
   check('precos-pacote-coerente', coherent, `${CAMPAIGN_LABEL}: economia = 3 × individual − pacote; sem a tabela anterior nos cartões`);
   check('precos-criterios-de-categoria', pricing.criteria);
   check('condicoes-comerciais-visiveis', pricing.conditions);
+  // COM-VITRINE-001 (etapa 4, V-06): catálogo dos quatro serviços com o estado de cada um; Monitor e AI em preparação,
+  // sem contratação (nenhum botão, checkout, assinatura ou formulário próprio) e sem valor fora do bloco de preços
+  const catalog = await page.evaluate(() => {
+    const sec = document.querySelector('#solucoes');
+    const cards = [...(sec?.querySelectorAll('.offer-card') ?? [])].map((c) => ({
+      name: c.querySelector('h3')?.textContent.trim(),
+      stage: c.querySelector('.nk-badge')?.textContent.replace(/\s+/g, ' ').trim(),
+      links: [...c.querySelectorAll('a')].map((a) => a.getAttribute('href')),
+      text: c.innerText,
+    }));
+    const planned = document.querySelector('[data-pricing] [data-servicos-previstos]');
+    return {
+      cards,
+      solutionsText: sec?.innerText ?? '',
+      plannedInPricing: !!planned,
+      plannedPrices: Object.fromEntries([...(planned?.querySelectorAll('[data-preco-previsto]') ?? [])].map((e) => [e.dataset.precoPrevisto, `${e.textContent.trim()} ${e.nextElementSibling?.textContent.trim() ?? ''}`.trim()])),
+      plannedText: planned?.innerText ?? '',
+      plannedActions: planned?.querySelectorAll('a, button, form, input').length ?? -1,
+    };
+  });
+  results.catalog = catalog;
+  const EXPECTED_CATALOG = [
+    ['Nekkora Delivery', 'Contratação assistida'],
+    ['Nekkora Monitor', 'Em preparação'],
+    ['Nekkora AI', 'Em preparação'],
+    ['Nekkora Hosting', 'Sob avaliação e orçamento'],
+  ];
+  check(
+    'catalogo-quatro-servicos',
+    JSON.stringify(catalog.cards.map((c) => [c.name, c.stage])) === JSON.stringify(EXPECTED_CATALOG),
+    catalog.cards.map((c) => `${c.name}: ${c.stage}`).join(' · '),
+  );
+  const preparing = catalog.cards.filter((c) => c.stage === 'Em preparação');
+  check(
+    'catalogo-monitor-ai-sem-contratacao',
+    preparing.length === 2 &&
+      preparing.every((c) => c.links.length === 1 && c.links[0] === '#servicos-em-preparacao' && /Ainda não disponível para contratação/.test(c.text)) &&
+      !/contrat(e|ar) agora|assin(e|ar|atura ativa)|checkout|comprar|teste grátis|lista de espera/i.test(catalog.solutionsText + catalog.plannedText) &&
+      catalog.plannedActions === 0,
+    preparing.map((c) => `${c.name} → ${c.links.join(',')}`).join(' · '),
+  );
+  check(
+    'catalogo-valores-previstos-no-bloco-de-precos',
+    catalog.plannedInPricing &&
+      JSON.stringify(catalog.plannedPrices) === JSON.stringify({ monitor: 'R$ 75 por automação/mês, previsto', ai: 'R$ 100 por empresa/mês, previsto' }) &&
+      /Valores e condições definitivos dependem da disponibilização comercial\./.test(catalog.plannedText) &&
+      !/R\$/.test(catalog.solutionsText),
+    JSON.stringify(catalog.plannedPrices),
+  );
+  // Autorização da etapa 4 (item 2): "Ver valores previstos" leva à área "Serviços em preparação" — pelo teclado
+  // (foco no link + Enter), conferindo o endereço e a área visível na tela. Numa aba própria do mesmo contexto, para não
+  // mudar o foco nem o ponto de partida da navegação por Tab da página principal (primeiro-tab-pular-conteudo).
+  {
+    const tab = await page.context().newPage();
+    for (const name of ['Nekkora Monitor', 'Nekkora AI']) {
+      await tab.goto(new URL('/', page.url()).href, { waitUntil: 'networkidle' });
+      const link = tab.locator('#solucoes .offer-card', { has: tab.getByRole('heading', { name, exact: true }) }).getByRole('link', { name: 'Ver valores previstos' });
+      await link.focus();
+      const focused = await link.evaluate((a) => document.activeElement === a);
+      await tab.keyboard.press('Enter');
+      await tab.waitForTimeout(800);
+      const landed = await tab.evaluate(() => {
+        const el = document.querySelector('#servicos-em-preparacao');
+        const r = el?.getBoundingClientRect();
+        return { hash: location.hash, visible: !!r && r.top < innerHeight && r.bottom > 0, title: el?.querySelector('h3')?.textContent };
+      });
+      check(
+        `catalogo-link-valores-previstos:${name === 'Nekkora AI' ? 'ai' : 'monitor'}`,
+        focused && landed.hash === '#servicos-em-preparacao' && landed.visible && landed.title === 'Serviços em preparação',
+        `foco=${focused} ${JSON.stringify(landed)}`,
+      );
+    }
+    await tab.close();
+  }
   // Delivery: tecnologias citadas sem promessa de compatibilidade universal
   const delivery = await page.locator('#solucoes').innerText();
   check(

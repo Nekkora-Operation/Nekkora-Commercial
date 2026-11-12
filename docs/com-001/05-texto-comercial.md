@@ -22,9 +22,9 @@ CTAs: "Solicitar avaliação" · "Ver como funciona"
 
 ## 2. Soluções
 
-**Soluções** — Duas ofertas. Você escolhe o arranjo.
+**Soluções** — Quatro serviços. Cada um contratado de forma independente.
 
-### 01 · Nekkora Delivery · _Sob proposta_
+### 01 · Nekkora Delivery · _Contratação assistida_
 
 Desenvolvimento de automações por demanda.
 
@@ -36,7 +36,27 @@ Tecnologias, conforme o caso: Python · UiPath · Power Automate · Integraçõe
 
 Link: "Conhecer o Delivery" (#precos)
 
-### 02 · Nekkora Hosting · _Em avaliação de viabilidade_
+### 02 · Nekkora Monitor · _Em preparação_
+
+Acompanhamento das execuções de automações.
+
+- Contratação independente do Delivery, sem número mínimo de automações
+- Para automações da Nekkora ou de terceiros, conforme as integrações suportadas
+- Ainda não disponível para contratação
+
+Link: "Ver valores previstos" (#servicos-em-preparacao)
+
+### 03 · Nekkora AI · _Em preparação_
+
+Recursos de inteligência artificial para a sua empresa.
+
+- Contratação independente dos demais serviços
+- Limites de uso e tratamento de dados definidos antes da disponibilização
+- Ainda não disponível para contratação
+
+Link: "Ver valores previstos" (#servicos-em-preparacao)
+
+### 04 · Nekkora Hosting · _Sob avaliação e orçamento_
 
 Infraestrutura e serviços associados à execução de automações.
 
@@ -46,7 +66,7 @@ Infraestrutura e serviços associados à execução de automações.
 
 Link: "Entender o Hosting" (#hosting)
 
-Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.
+Delivery e Hosting podem ser contratados separadamente ou em conjunto; Monitor e AI estão em preparação e ainda não podem ser contratados. Nenhum deles exige o uso de produtos próprios da Nekkora.
 
 ## 3. Preços (bloco data-pricing)
 
@@ -130,6 +150,13 @@ As horas são uma referência: o enquadramento definitivo depende da avaliação
 - Licenças e custos externos tratados à parte, quando aplicáveis
 - Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados
 - Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei
+
+**Serviços em preparação** (COM-VITRINE-001, V-06 — dentro do bloco de preços, sem contratação):
+
+- Nekkora Monitor — _Em preparação_ — **R$ 75** por automação/mês, previsto
+- Nekkora AI — _Em preparação_ — **R$ 100** por empresa/mês, previsto
+
+Valores e condições definitivos dependem da disponibilização comercial. Ainda não disponíveis para contratação. Para saber mais, fale com a Nekkora pelos canais de contato.
 
 Hosting tem avaliação e proposta próprias.
 

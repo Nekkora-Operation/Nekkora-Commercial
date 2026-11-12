@@ -82,6 +82,10 @@ L.push('', `**${P.criteria.title}**`, '');
 list(P.criteria.items);
 L.push('', P.criteria.note, '', `**${P.conditions.title}**`, '');
 list(P.conditions.items);
+const Ps = c.PLANNED_SERVICES;
+L.push('', `**${Ps.title}** (COM-VITRINE-001, V-06 — dentro do bloco de preços, sem contratação):`, '');
+list(Ps.items.map((s) => `${s.name} — _${Ps.status}_ — **${s.price}** ${s.unit}`));
+L.push('', `${Ps.notice} ${Ps.note}`);
 L.push('', P.hostingNote);
 
 h('4. Como funciona');

@@ -12,7 +12,7 @@
  */
 import type { IconName } from 'nekkora-lib';
 import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, NEW_CONDITIONS_START, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
-import { priceFacts } from './precos';
+import { PLANNED_RECURRING_PRICES, brl, priceFacts } from './precos';
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
@@ -38,15 +38,18 @@ export const HERO = {
 /* ------------------------------------------------------------------ */
 /* Soluções                                                           */
 /* ------------------------------------------------------------------ */
+// COM-VITRINE-001 (etapa 4, V-06): catálogo dos quatro serviços, com o estado de cada um. Delivery com contratação
+// assistida; Hosting sob avaliação e orçamento; Monitor e AI em preparação, sem contratação, checkout ou assinatura.
+// Valores previstos de Monitor e AI só no bloco de preços (data-pricing, X-01). Textos NOVOS (PUB-17).
 export const SOLUTIONS = {
   eyebrow: 'Soluções',
-  title: 'Duas ofertas. Você escolhe o arranjo.',
+  title: 'Quatro serviços. Cada um contratado de forma independente.',
   cards: [
     {
       id: 'delivery',
       number: '01',
       name: 'Nekkora Delivery',
-      stage: 'Sob proposta',
+      stage: 'Contratação assistida',
       stageTone: 'accent' as const,
       variant: 'raised' as const,
       summary: 'Desenvolvimento de automações por demanda.', // [A-01]
@@ -66,11 +69,48 @@ export const SOLUTIONS = {
       href: '#precos',
       cta: 'Conhecer o Delivery',
     },
+    // [MO-01..MO-04] Monitor: em preparação; sem contratação nem promessa de disponibilidade (V-06)
+    {
+      id: 'monitor',
+      number: '02',
+      name: 'Nekkora Monitor',
+      stage: 'Em preparação',
+      stageTone: 'info' as const,
+      // fundo liso: o selo suave sobre o gradiente do "raised" ficava no limite do contraste (4,27–4,54:1)
+      variant: 'surface' as const,
+      summary: 'Acompanhamento das execuções de automações.',
+      items: [
+        'Contratação independente do Delivery, sem número mínimo de automações',
+        'Para automações da Nekkora ou de terceiros, conforme as integrações suportadas',
+        'Ainda não disponível para contratação',
+      ],
+      href: '#servicos-em-preparacao',
+      cta: 'Ver valores previstos',
+    },
+    // [AI-01..AI-04] AI: em preparação; limites de uso e tratamento de dados definidos antes da disponibilização (V-06)
+    {
+      id: 'ai',
+      number: '03',
+      name: 'Nekkora AI',
+      stage: 'Em preparação',
+      stageTone: 'info' as const,
+      // fundo liso: o selo suave sobre o gradiente do "raised" ficava no limite do contraste (4,27–4,54:1)
+      variant: 'surface' as const,
+      summary: 'Recursos de inteligência artificial para a sua empresa.',
+      items: [
+        'Contratação independente dos demais serviços',
+        'Limites de uso e tratamento de dados definidos antes da disponibilização',
+        'Ainda não disponível para contratação',
+      ],
+      href: '#servicos-em-preparacao',
+      cta: 'Ver valores previstos',
+    },
     {
       id: 'hosting',
-      number: '02',
+      number: '04',
       name: 'Nekkora Hosting',
-      stage: 'Em avaliação de viabilidade',
+      // COM-VITRINE-001 (etapa 4): sob avaliação e orçamento, como hoje (H-02 continua pendente)
+      stage: 'Sob avaliação e orçamento',
       stageTone: 'info' as const,
       variant: 'raised' as const,
       summary: 'Infraestrutura e serviços associados à execução de automações.', // [H-01]
@@ -84,7 +124,24 @@ export const SOLUTIONS = {
     },
   ],
   // [C-01] [C-02]
-  note: 'Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.',
+  // COM-VITRINE-001 (etapa 4): Monitor e AI ainda não podem ser contratados — texto ALTERADO (PUB-17)
+  note: 'Delivery e Hosting podem ser contratados separadamente ou em conjunto; Monitor e AI estão em preparação e ainda não podem ser contratados. Nenhum deles exige o uso de produtos próprios da Nekkora.',
+};
+
+/**
+ * Serviços em preparação (COM-VITRINE-001 §7, V-06): valores PREVISTOS de Monitor e AI, dentro do bloco data-pricing,
+ * com o aviso aprovado. Sem botão de contratação, checkout, assinatura ou lista de espera (nova coleta mudaria o aviso de
+ * privacidade, PUB-09): o interesse segue pelos canais gerais. Valores de src/precos.ts (PLANNED_RECURRING_PRICES).
+ */
+export const PLANNED_SERVICES = {
+  title: 'Serviços em preparação',
+  status: 'Em preparação',
+  notice: 'Valores e condições definitivos dependem da disponibilização comercial.',
+  note: 'Ainda não disponíveis para contratação. Para saber mais, fale com a Nekkora pelos canais de contato.',
+  items: [
+    { id: 'monitor' as const, name: 'Nekkora Monitor', price: brl(PLANNED_RECURRING_PRICES.monitor.mensal), unit: 'por automação/mês, previsto' },
+    { id: 'ai' as const, name: 'Nekkora AI', price: brl(PLANNED_RECURRING_PRICES.ai.mensal), unit: 'por empresa/mês, previsto' },
+  ],
 };
 
 /* ------------------------------------------------------------------ */

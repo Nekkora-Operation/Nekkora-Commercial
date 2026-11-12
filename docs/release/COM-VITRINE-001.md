@@ -173,7 +173,7 @@ infraestrutura sem autorização.
 | 1 | `src/precos.ts`: tabela nova, pacotes, economia calculada, preços previstos de Monitor e AI; fim do retorno automático à tabela anterior; simulador com pacotes e sem complexa; valores dos cartões de simples e média; testes e homologação de preços e simulador | concluída (autorizada pela titular em 11/11/2026) |
 | 2 | Portão de preços versionados, data de início das novas condições, regra pós-campanha (§3.2) e estados de disponibilidade, com testes; regras de proposta com a tabela nova a partir da data de início e pacotes (V-02, V-03) | concluída (commit `5e21315`, autorizada pela titular em 11/11/2026) |
 | 3 | Vitrine do Delivery: sai o cartão complexo, entram "A automação é sua", o texto V-04, critérios sem complexa e regras da campanha atualizadas; tabela nova só a partir da data de início (sem retroatividade) | concluída (autorizada pela titular em 11/11/2026; registro em §10.2) |
-| 4 | Catálogo: cartões de Monitor e AI "Em preparação", Hosting mantido; componentes e tokens existentes | — |
+| 4 | Catálogo: cartões de Monitor e AI "Em preparação", Hosting mantido; componentes e tokens existentes | concluída (autorizada pela titular em 11/11/2026; registro em §10.3) |
 | 5 | Fluxos de solicitação: tipos existentes do Delivery (com interesse em pacote) e do Hosting; sem coleta nova | — |
 | 6 | Documentos: nota de transição no regulamento, condições comerciais (pacotes), anexo de componentes, proposta-modelo | — |
 | 7 | Reabertura de PUB-14, PUB-17 e PUB-19 na branch e PR em rascunho | autorização específica |
@@ -227,6 +227,48 @@ Nas mesmas execuções, todas as verificações da etapa 3 passaram (sem categor
 sua", regras da campanha com a data de início fictícia de 10/11/2026, tabela oficial). A página deve ser homologada
 com os dados reais; os arquivos fictícios cobrem simulador, canais e campanha.
 
+### 10.3 Registro da etapa 4 (autorização da titular, 11/11/2026)
+
+**Conteúdo:** catálogo com os quatro serviços em Soluções, nesta ordem: Delivery ("Contratação assistida"), Monitor e
+AI ("Em preparação", cartões de fundo liso, sem contratação, só com o link "Ver valores previstos") e Hosting ("Sob
+avaliação e orçamento"). Os valores previstos (R$ 75 por automação/mês e R$ 100 por empresa/mês, calculados de
+`src/precos.ts`) aparecem só no bloco de preços ("Serviços em preparação"), com o aviso V-06. Não há botão, formulário,
+checkout, assinatura, lista de espera nem chamada à Platform. A matriz de alegações ganhou MO-01..MO-04 e AI-01..AI-04.
+
+**Homologação (build local, servidor que reproduz o CloudFront):**
+
+| Execução | Dados | Resultado |
+|---|---|---|
+| Página, 15/11/2026: Chromium, Firefox e WebKit | reais | 100 verificações, 0 falha em cada navegador |
+| Página, 05/11/2026 e 07/01/2027: Chromium | reais | 100 verificações, 0 falha em cada data |
+| Página, 15/11/2026 (Chromium, Firefox e WebKit), 05/11/2026 e 07/01/2027 (Chromium), com `catalogo-link-valores-previstos` | reais | 102 verificações, 0 falha em cada execução |
+| Simulador: Chromium, Firefox e WebKit | reais + fictícios | 171 verificações, 0 falha |
+| Canais (e-mail): Chromium, Firefox e WebKit | fictícios | 96 verificações, 0 falha |
+| Página, 15/11/2026: Chromium e WebKit | fictícios | **100 verificações, 3 falhas — NÃO aprovada integralmente** |
+| Página, 15/11/2026: Firefox | fictícios | **100 verificações, 2 falhas — NÃO aprovada integralmente** |
+
+**Falhas com dados fictícios** (registradas à parte; nenhuma verificação foi alterada):
+
+- `sem-destinos-provisorios` e `dialogo-canal-da-publicacao`: as mesmas da etapa 3 (§10.2), por causa dos canais
+  simulados.
+- `contraste-por-pixels:sage-light:mobile` (Chromium 4,05:1 e WebKit 4,13:1, na nota de Soluções): a medição alinha o
+  elemento à borda inferior da tela e captura o recorte. Reproduzido nessa posição, o botão flutuante do WhatsApp
+  (`nk-fab--whatsapp`, animado), que só existe com o WhatsApp sintético da fixture, cobre a nota. No build com os dados
+  reais, sem WhatsApp, nada cobre a nota e a medição passa nos três navegadores (pior folga 4,63:1). Durante a
+  preparação, o selo "Em preparação" chegou a ser acusado da mesma forma (3,57 a 4,54:1 com dados fictícios). Ele passou
+  de `neutral` para `info`, e os cartões de Monitor e AI passaram a ter fundo liso (`surface`). Com isso a medição do
+  selo passou em todas as execuções.
+
+**[!] Pendência de acessibilidade, decisão da titular de 11/11/2026 (autorização da etapa 4, item 4):** o botão
+flutuante fictício do WhatsApp cobre conteúdo da página no celular. Essa configuração não existe na produção atual, que
+não tem WhatsApp. O problema deve ser corrigido e homologado antes de uma eventual ativação do WhatsApp (§11). As
+verificações não foram alteradas, e a homologação com dados fictícios **não** está aprovada integralmente.
+
+**Decisões da titular na autorização da etapa 4:** mantidos o tom `info` e o fundo liso de Monitor e AI; valores
+previstos só no bloco de preços ("Serviços em preparação"), sem segundo bloco; textos de Monitor e AI aprovados como
+**preliminares** (a aprovação formal PUB-17 fica para a revisão final da vitrine). Foi acrescentada a verificação
+`catalogo-link-valores-previstos`: o link "Ver valores previstos" é acionado pelo teclado e leva à área correspondente.
+
 **[P] Integração futura com a Nekkora Platform:** o catálogo fica tipado (identificador, nome, preço, unidade,
 disponibilidade) para ser consumido depois, sem nenhuma chamada à Platform nesta missão.
 
@@ -243,4 +285,5 @@ disponibilidade) para ser consumido depois, sem nenhuma chamada à Platform nest
 | Minuta contratual | Validação antes da primeira contratação; cláusula 10 não aprovada | primeira contratação |
 | Nekkora AI | Análise de privacidade própria; limites e franquias | ativação |
 | Nekkora Monitor | Condições da cobrança recorrente | primeira contratação |
+| Botão flutuante do WhatsApp | No celular, o botão (`nk-fab--whatsapp`) cobre conteúdo da página (medido na homologação com dados fictícios, §10.3); corrigir e homologar | ativação do WhatsApp |
 | F5 | Resposta da Microsoft; não resolvida pela publicação nem por esta missão | — |

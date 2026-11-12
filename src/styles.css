@@ -54,6 +54,11 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: max(40px, 5%); align-items: center; }
 .split__visual { position: relative; display: flex; justify-content: center; }
 
+/* COM-VITRINE-001 (V-06): serviços em preparação, no bloco de preços */
+.planned__list { gap: 12px; }
+.planned__item { display: flex; flex-direction: column; gap: 6px; }
+.planned__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.planned__price strong { font-size: var(--nk-font-size-xl); }
 .center-note { margin: 0; text-align: center; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
 
 /* ---------- Hero (centralizado) ---------- */

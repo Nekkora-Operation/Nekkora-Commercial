@@ -1,6 +1,6 @@
 import { Badge, Card, Icon, IconBox, Link, SectionHeader } from 'nekkora-lib';
 import { NEW_CONDITIONS_START, isLaunchActive, launchState } from '../config';
-import { PRICING } from '../content';
+import { PLANNED_SERVICES, PRICING } from '../content';
 import { useRequestTrigger } from '../request';
 import { Simulator } from './Simulator';
 
@@ -125,6 +125,28 @@ export function Pricing() {
               ))}
             </ul>
           </div>
+        </div>
+        {/* COM-VITRINE-001 (V-06): Monitor e AI em preparação, valores previstos e o aviso; sem contratação */}
+        <div className="poster-tile planned" id="servicos-em-preparacao" data-servicos-previstos tabIndex={-1}>
+          <h3 className="poster-tile__title">{PLANNED_SERVICES.title}</h3>
+          <ul className="cards cards--2 plain-list planned__list">
+            {PLANNED_SERVICES.items.map((s) => (
+              <li key={s.id} className="planned__item" data-servico={s.id}>
+                <span className="planned__head">
+                  <strong>{s.name}</strong>
+                  <Badge tone="info" variant="soft" size="sm">
+                    {PLANNED_SERVICES.status}
+                  </Badge>
+                </span>
+                <span className="planned__price">
+                  <strong data-preco-previsto={s.id}>{s.price}</strong> <span className="price__unit">{s.unit}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="poster-tile__text" data-aviso-previstos>
+            {PLANNED_SERVICES.notice} {PLANNED_SERVICES.note}
+          </p>
         </div>
         <p className="center-note">{PRICING.hostingNote}</p>
       </div>
