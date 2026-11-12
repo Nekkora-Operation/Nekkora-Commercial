@@ -23,7 +23,8 @@
     "tabelaDePrecos.posCampanha": "Titular, 12/11/2026 (COM-VITRINE-001, V-01): aprovo expressamente que a tabela comercial de impressão sha256:95a612f7b2528cee48fb4b043b4751d8bca66164e6cade01599832d8cc008f35 (PUB-14) continue vigente depois de 06/01/2027, até nova revisão comercial; o encerramento da campanha de lançamento não encerra automaticamente a validade desses preços.",
     "impressoesDeConteudo.textosComerciais": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-17): aprovo os textos comerciais da nova vitrine correspondentes ao conteúdo homologado no commit cf0e733 — apresentação dos quatro produtos, preços e pacotes, o diferencial \"A automação é sua\", critérios comerciais, comunicação da campanha e jornadas de solicitação — impressão sha256:fa69c55dfac65645ef13a5e9387d15b8a94ce4f89d1306aa7504e6a5365d9df5.",
     "impressoesDeConteudo.condicoesComerciais": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-19): aprovo as condições comerciais anunciadas na vitrine e no regulamento, conforme a versão homologada (commit cf0e733), impressão sha256:0b94d467bbad9aab0aee9cd3ff6c7612e42d88ae7b209fe59a4e50d3bf7577c1. Esta aprovação NÃO representa aprovação do contrato-base, anexos, proposta-modelo ou procedimento operacional; as decisões DP-01 a DP-05 e as demais condições contratuais continuam pendentes; não está autorizada a formalização de contratos de pacotes até a resolução dessas pendências.",
-    "novasCondicoes.inicio": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-13): data de início das novas condições 2026-11-12, data da publicação efetiva da nova vitrine em produção, no horário de Brasília (Dia D antecipado pela titular de 13/11 para 12/11/2026). Compromissos comerciais anteriores preservados: solicitações recebidas antes da entrada efetiva da nova vitrine no ar, inclusive as recebidas em 12/11/2026 antes desse horário, mantêm as condições anteriores e são analisadas individualmente (runbook v1.1.0, §3). Se a publicação não for concluída em 12/11/2026, esta data não vale para outro dia e deve ser revista antes de nova homologação."
+    "novasCondicoes.inicio": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-13): data de início das novas condições 2026-11-12, data da publicação efetiva da nova vitrine em produção, no horário de Brasília (Dia D antecipado pela titular de 13/11 para 12/11/2026). Compromissos comerciais anteriores preservados: solicitações recebidas antes da entrada efetiva da nova vitrine no ar, inclusive as recebidas em 12/11/2026 antes desse horário, mantêm as condições anteriores e são analisadas individualmente (runbook v1.1.0, §3). Se a publicação não for concluída em 12/11/2026, esta data não vale para outro dia e deve ser revista antes de nova homologação.",
+    "publicacaoAutorizada": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-18): autorizo a publicação em produção da versão 1.1.0 da Nekkora Commercial, commit homologado 98f0d9ea2bc327770514c8a789f4ccee940f53a4 (CI 43328062798 aprovada; impressões PUB-14, PUB-17 e PUB-19 conferidas). Esta autorização vale somente para esse conteúdo e para publicação em 12/11/2026. Não autoriza a contratação de pacotes, nem a contratação de Monitor ou AI, nem altera as pendências contratuais. O merge e o deploy dependem de autorizações próprias."
   },
   "canais": {
     "whatsapp": null,
@@ -77,5 +78,9 @@
   "impressoesDeConteudo": {
     "textosComerciais": "sha256:fa69c55dfac65645ef13a5e9387d15b8a94ce4f89d1306aa7504e6a5365d9df5",
     "condicoesComerciais": "sha256:0b94d467bbad9aab0aee9cd3ff6c7612e42d88ae7b209fe59a4e50d3bf7577c1"
+  },
+  "publicacaoAutorizada": {
+    "versao": "1.1.0",
+    "commit": "98f0d9ea2bc327770514c8a789f4ccee940f53a4"
   }
 }
