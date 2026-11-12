@@ -476,7 +476,8 @@ export const CONTACT_COPY = {
   demand: {
     legend: 'O que você precisa?',
     options: [
-      { value: 'automacao', label: 'Desenvolver uma nova automação', line: 'Quero solicitar uma avaliação de automação.' },
+      // COM-VITRINE-001 (etapa 5): a primeira linha identifica o serviço, como já fazem as do Hosting — texto ALTERADO (PUB-17)
+      { value: 'automacao', label: 'Desenvolver uma nova automação', line: 'Quero solicitar uma avaliação de automação (Nekkora Delivery).' },
       {
         value: 'hospedagem',
         label: 'Hospedar uma automação existente',
@@ -488,6 +489,17 @@ export const CONTACT_COPY = {
         line: 'Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting).',
       },
     ],
+  },
+  /**
+   * COM-VITRINE-001 (etapa 5): orientação por serviço, só na tela (não entra na mensagem nem cria campo novo). O interesse
+   * em pacote vai na descrição, com as palavras do visitante, ou no resumo do simulador. Monitor e AI não são tipos de
+   * solicitação (em preparação). Textos NOVOS (PUB-17).
+   */
+  demandHints: {
+    automacao:
+      'Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria. Se tiver interesse no pacote, conte na descrição quantas automações você tem em mente; categoria e composição são confirmadas na avaliação.',
+    hospedagem: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
+    infraestrutura: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
   },
   messageLabel: 'Descreva o processo ou a necessidade',
   processHint: 'O que acontece hoje, quais sistemas envolve, com que frequência e qual resultado você espera. Até 1.000 caracteres.',

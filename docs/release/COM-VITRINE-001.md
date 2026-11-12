@@ -174,7 +174,7 @@ infraestrutura sem autorização.
 | 2 | Portão de preços versionados, data de início das novas condições, regra pós-campanha (§3.2) e estados de disponibilidade, com testes; regras de proposta com a tabela nova a partir da data de início e pacotes (V-02, V-03) | concluída (commit `5e21315`, autorizada pela titular em 11/11/2026) |
 | 3 | Vitrine do Delivery: sai o cartão complexo, entram "A automação é sua", o texto V-04, critérios sem complexa e regras da campanha atualizadas; tabela nova só a partir da data de início (sem retroatividade) | concluída (autorizada pela titular em 11/11/2026; registro em §10.2) |
 | 4 | Catálogo: cartões de Monitor e AI "Em preparação", Hosting mantido; componentes e tokens existentes | concluída (autorizada pela titular em 11/11/2026; registro em §10.3) |
-| 5 | Fluxos de solicitação: tipos existentes do Delivery (com interesse em pacote) e do Hosting; sem coleta nova | — |
+| 5 | Fluxos de solicitação: tipos existentes do Delivery (com interesse em pacote) e do Hosting; sem coleta nova | concluída (autorizada pela titular em 11/11/2026; registro em §10.4) |
 | 6 | Documentos: nota de transição no regulamento, condições comerciais (pacotes), anexo de componentes, proposta-modelo | — |
 | 7 | Reabertura de PUB-14, PUB-17 e PUB-19 na branch e PR em rascunho | autorização específica |
 
@@ -268,6 +268,37 @@ verificações não foram alteradas, e a homologação com dados fictícios **n�
 previstos só no bloco de preços ("Serviços em preparação"), sem segundo bloco; textos de Monitor e AI aprovados como
 **preliminares** (a aprovação formal PUB-17 fica para a revisão final da vitrine). Foi acrescentada a verificação
 `catalogo-link-valores-previstos`: o link "Ver valores previstos" é acionado pelo teclado e leva à área correspondente.
+
+### 10.4 Registro da etapa 5 (autorização da titular, 11/11/2026)
+
+**Conteúdo:** as jornadas reais de solicitação seguem pelo diálogo existente e pelos canais autorizados (e-mail e
+LinkedIn). Continuam três tipos: automação (Delivery), hospedagem e infraestrutura (Hosting). Não há tipo para Monitor
+ou AI. Abaixo do tipo, uma orientação por serviço aparece só na tela e não entra na mensagem. Para o Delivery, ela
+explica que o interesse em pacote de 3 da mesma categoria vai na descrição; para o Hosting, que ele é "sob avaliação e
+orçamento". A primeira linha da mensagem do Delivery passa a dizer "(Nekkora Delivery)", como as do Hosting já faziam.
+O link V-04 ("Falar com a equipe") abre a solicitação de automação. Não há campo novo, coleta nova, checkout, cobrança,
+cadastro, assinatura ou integração com a Platform. A lista do que vai na mensagem, no aviso de privacidade, não muda.
+
+**Homologação (build local, servidor que reproduz o CloudFront):**
+
+| Execução | Dados | Resultado |
+|---|---|---|
+| Página, 15/11/2026: Chromium, Firefox e WebKit; 05/11/2026 e 07/01/2027: Chromium | reais | 104 verificações, 0 falha em cada execução |
+| Simulador: Chromium, Firefox e WebKit | reais + fictícios | 171 verificações, 0 falha |
+| Canais (e-mail), com a nova primeira linha: Chromium, Firefox e WebKit | fictícios | 96 verificações, 0 falha |
+| Página, 15/11/2026: Chromium e WebKit | fictícios | **104 verificações, 3 falhas — NÃO aprovada integralmente** |
+| Página, 15/11/2026: Firefox | fictícios | **104 verificações, 2 falhas — NÃO aprovada integralmente** |
+
+As falhas com dados fictícios são as mesmas registradas em §10.2 e §10.3: canais simulados e o botão flutuante do
+WhatsApp sobre a nota de Soluções (pendência de §11). As duas verificações novas (`solicitacao-tipos-delivery-e-hosting`
+e `solicitacao-orientacao-por-servico`) passaram em todas as execuções. Ajuste da verificação durante a preparação: o
+tipo pedido pelo CTA é aplicado logo depois da primeira pintura do diálogo, então a leitura espera até 1 s por ele. Sem o
+tipo aplicado, a verificação continua falhando.
+
+**Decisões da titular na autorização da etapa 5:** sem campo próprio para pacotes; o visitante informa na descrição
+quantas automações pretende e o interesse no pacote de 3, sem precisar classificar a automação; a primeira linha do
+Delivery foi aprovada e entra na revisão PUB-17. Na homologação, as esperas do diálogo e do link "Ver valores
+previstos" acompanham o estado aplicado na tela (até 1 s e 2 s), e não uma pausa fixa.
 
 **[P] Integração futura com a Nekkora Platform:** o catálogo fica tipado (identificador, nome, preço, unidade,
 disponibilidade) para ser consumido depois, sem nenhuma chamada à Platform nesta missão.

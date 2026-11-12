@@ -12,7 +12,8 @@ import { Simulator } from './Simulator';
  * modalidades seguem pelos canais gerais, com avaliação individual, sem terceira categoria.
  */
 export function Pricing() {
-  const trigger = useRequestTrigger();
+  // V-04: demandas fora das categorias seguem como solicitação de automação (Delivery), pela jornada existente
+  const trigger = useRequestTrigger({ demand: 'automacao' });
   // Avaliado no carregamento da página: fora do período aprovado, só o preço padrão (COM-RELEASE-003-R1 §3.7, item 10).
   const launch = isLaunchActive();
   // Sem datas aprovadas, os preços de lançamento só aparecem como prévia de homologação — e a faixa diz isso.

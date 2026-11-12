@@ -43,7 +43,7 @@ const NEUTRAL = /Pedimos ao navegador para abrir o WhatsApp/;
 const OVERCLAIM = /WhatsApp aberto|aberto em uma nova aba|enviad[ao] com sucesso|mensagem enviada|recebemos sua/i;
 const FORM = { name: 'Pessoa de Teste', company: 'Empresa Sintética', email: 'pessoa@exemplo.invalid', message: 'Conferimos todo dia os pagamentos do banco com o sistema financeiro, manualmente (teste de homologação).' };
 /** Mesma montagem de src/sections/Contact.tsx (buildMessage) — o teste confere o texto exato. */
-const EXPECTED = [`Olá! Sou ${FORM.name}, da ${FORM.company}.`, 'Quero solicitar uma avaliação de automação.', FORM.message, `E-mail para retorno: ${FORM.email}`].join('\n\n');
+const EXPECTED = [`Olá! Sou ${FORM.name}, da ${FORM.company}.`, 'Quero solicitar uma avaliação de automação (Nekkora Delivery).', FORM.message, `E-mail para retorno: ${FORM.email}`].join('\n\n');
 
 const CHANNEL = process.env.NEKKORA_CANAL ?? 'whatsapp';
 const SUBJECT = 'Solicitação de avaliação — Nekkora';

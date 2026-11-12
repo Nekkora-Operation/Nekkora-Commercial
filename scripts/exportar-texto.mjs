@@ -109,6 +109,7 @@ L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (abre o diá
 L.push('', `Diálogo **${K.dialogTitle}** — ${K.dialogDescription}`, '', `Canal da solicitação: WhatsApp, se confirmado; senão o e-mail (publicação atual: e-mail). Sem canal: _${K.pendingCaption}_`);
 L.push('', `Formulário: "${K.demand.legend}"* (${K.demand.options.map((o) => o.label).join(' · ')}; o CTA do Hosting abre com a hospedagem), Nome*, Empresa (opcional), E-mail (${K.emailHint}), "${K.messageLabel}"* — ${K.processHint}. Rodapé: "Cancelar" + envio; link "${K.privacyLink}".`);
 L.push('', `Segunda linha da mensagem, por tipo: ${K.demand.options.map((o) => `_${o.line}_`).join(' · ')}`);
+L.push('', `Orientação abaixo do tipo (só na tela, fora da mensagem — COM-VITRINE-001, etapa 5): ${K.demand.options.map((o) => `${o.label}: _${K.demandHints[o.value]}_`).join(' · ')}`);
 L.push('', `Vindo do simulador: caixa "${K.simulation.include}" (desmarcada) — ${K.simulation.hint} Na mensagem: "${K.simulation.heading}" + resumo.`);
 L.push('', `Modo demonstração: botão "${K.demoSubmit}"; nota "${K.demoNote}"; resultado **${K.demoResult.title}** — ${K.demoResult.text}`);
 for (const [label, f] of [['Pelo e-mail (publicação atual)', K.email], ['Pelo WhatsApp (quando houver número confirmado)', K.whatsapp]]) {

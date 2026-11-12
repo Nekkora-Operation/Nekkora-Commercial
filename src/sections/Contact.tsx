@@ -340,6 +340,10 @@ export function RequestDialog({ open, options = {}, onClose }: { open: boolean; 
             onChange={(v) => setDemand(v as Demand)}
             options={DEMANDS.map((o) => ({ value: o.value, label: o.label }))}
           />
+          {/* COM-VITRINE-001 (etapa 5): orientação do serviço escolhido — só na tela, fora da mensagem */}
+          <p className="request__hint" data-dica-servico={demand} aria-live="polite">
+            {CONTACT_COPY.demandHints[demand]}
+          </p>
           <div className="contact__form-grid">
             <Input label="Nome" required placeholder="Seu nome" leftIcon="user" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} error={errors.name} fullWidth />
             <Input label="Empresa" placeholder="Nome da empresa" leftIcon="building" autoComplete="organization" maxLength={120} value={company} onChange={(e) => setCompany(e.target.value)} hint="Opcional" fullWidth />

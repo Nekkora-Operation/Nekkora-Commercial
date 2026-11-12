@@ -581,7 +581,13 @@ await block('funcionais', async () => {
       await link.focus();
       const focused = await link.evaluate((a) => document.activeElement === a);
       await tab.keyboard.press('Enter');
-      await tab.waitForTimeout(800);
+      // espera o estado efetivo (endereço e área na tela), até 2 s; sem ele, a verificação falha
+      await tab
+        .waitForFunction(() => {
+          const r = document.querySelector('#servicos-em-preparacao')?.getBoundingClientRect();
+          return location.hash === '#servicos-em-preparacao' && !!r && r.top < innerHeight && r.bottom > 0;
+        }, null, { timeout: 2000 })
+        .catch(() => {});
       const landed = await tab.evaluate(() => {
         const el = document.querySelector('#servicos-em-preparacao');
         const r = el?.getBoundingClientRect();
@@ -742,6 +748,53 @@ await block('funcionais', async () => {
     others.push(`${sec}=${ok}`);
   }
   check('dialogo-ctas-de-precos-hosting-contato', others.every((o) => o.endsWith('true')), `${others.join('; ')} (fechado por "Cancelar")`);
+  // COM-VITRINE-001 (etapa 5): jornadas reais do Delivery e do Hosting no mesmo diálogo, pelos canais existentes. Só três
+  // tipos (nenhum de Monitor ou AI); a orientação do serviço muda com o tipo e fica fora da mensagem (sem coleta nova).
+  {
+    const read = () =>
+      dialog.evaluate((d) => ({
+        options: [...d.querySelectorAll('input[name="tipo-solicitacao"]')].map((i) => `${i.value}:${i.checked ? 1 : 0}:${((i.labels && i.labels[0]) || i.closest('label'))?.textContent.trim() ?? ''}`),
+        hint: d.querySelector('[data-dica-servico]')?.textContent.trim() ?? '',
+        hintFor: d.querySelector('[data-dica-servico]')?.getAttribute('data-dica-servico'),
+      }));
+    // O tipo pedido pelo CTA é aplicado num efeito logo depois da primeira pintura do diálogo: espera até 1 s por ele
+    // (sem ele, a verificação falha do mesmo jeito)
+    const settle = (want) => page.waitForFunction((w) => document.querySelector('[role="dialog"] [data-dica-servico]')?.getAttribute('data-dica-servico') === w, want, { timeout: 1000 }).catch(() => {});
+    await page.locator('#precos [aria-haspopup="dialog"]').click();
+    await dialog.waitFor();
+    await settle('automacao');
+    const fromOther = await read();
+    await dialog.getByRole('radio', { name: 'Hospedar uma automação existente' }).check();
+    const switched = await read();
+    await dialog.getByRole('button', { name: 'Cancelar' }).click();
+    await dialog.waitFor({ state: 'detached' });
+    await page.locator('#hosting [aria-haspopup="dialog"]').click();
+    await dialog.waitFor();
+    await settle('hospedagem');
+    const fromHosting = await read();
+    await dialog.getByRole('button', { name: 'Cancelar' }).click();
+    await dialog.waitFor({ state: 'detached' });
+    results.requestJourneys = { fromOther, switched, fromHosting };
+    check(
+      'solicitacao-tipos-delivery-e-hosting',
+      fromOther.options.length === 3 &&
+        fromOther.options.map((o) => o.split(':')[0]).join() === 'automacao,hospedagem,infraestrutura' &&
+        fromOther.options.every((o) => o.split(':')[2].length > 0) &&
+        !fromOther.options.some((o) => /monitor|\bAI\b|intelig/i.test(o)),
+      fromOther.options.join(' · '),
+    );
+    check(
+      'solicitacao-orientacao-por-servico',
+      fromOther.hintFor === 'automacao' &&
+        fromOther.options[0].startsWith('automacao:1') &&
+        /Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria/.test(fromOther.hint) &&
+        switched.hintFor === 'hospedagem' &&
+        /Nekkora Hosting: sob avaliação e orçamento/.test(switched.hint) &&
+        fromHosting.hintFor === 'hospedagem' &&
+        fromHosting.options[1].startsWith('hospedagem:1'),
+      `V-04 → ${fromOther.hintFor}; troca → ${switched.hintFor}; Hosting → ${fromHosting.hintFor}`,
+    );
+  }
 
   // Formulário (no diálogo): erros, foco no primeiro erro e envio desativado sem destino real
   await page.locator('#contato [aria-haspopup="dialog"]').click();

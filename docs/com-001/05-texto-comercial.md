@@ -229,7 +229,9 @@ Canal da solicitação: WhatsApp, se confirmado; senão o e-mail (publicação a
 
 Formulário: "O que você precisa?"* (Desenvolver uma nova automação · Hospedar uma automação existente · Infraestrutura e serviços relacionados; o CTA do Hosting abre com a hospedagem), Nome*, Empresa (opcional), E-mail (Opcional — só se preferir retorno por e-mail.), "Descreva o processo ou a necessidade"* — O que acontece hoje, quais sistemas envolve, com que frequência e qual resultado você espera. Até 1.000 caracteres.. Rodapé: "Cancelar" + envio; link "Como tratamos seus dados".
 
-Segunda linha da mensagem, por tipo: _Quero solicitar uma avaliação de automação._ · _Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente (Nekkora Hosting)._ · _Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting)._
+Segunda linha da mensagem, por tipo: _Quero solicitar uma avaliação de automação (Nekkora Delivery)._ · _Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente (Nekkora Hosting)._ · _Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting)._
+
+Orientação abaixo do tipo (só na tela, fora da mensagem — COM-VITRINE-001, etapa 5): Desenvolver uma nova automação: _Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria. Se tiver interesse no pacote, conte na descrição quantas automações você tem em mente; categoria e composição são confirmadas na avaliação._ · Hospedar uma automação existente: _Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade._ · Infraestrutura e serviços relacionados: _Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade._
 
 Vindo do simulador: caixa "Incluir o resumo da minha simulação na mensagem" (desmarcada) — Opcional. Você confere o texto antes de enviar; a simulação não é guardada. Na mensagem: "Simulação feita no site (estimativa, sujeita à avaliação):" + resumo.
 
