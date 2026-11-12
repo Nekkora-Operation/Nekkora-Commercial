@@ -10,10 +10,19 @@
 ## 1. Proposta e contratação
 
 1. Registrar a "Data da solicitação" (data, hora, canal, referência) — [regulamento](regulamento-campanha-lancamento.md) §4.
+   **COM-VITRINE-001 (V-02):** comparar com a data de início das novas condições para saber a tabela aplicável
+   (regulamento §7.4). Solicitação anterior: oferta anterior preservada e, havendo equivalência, **propor** a condição
+   mais favorável, registrando as duas na proposta (`precoDaAutomacao`, `condicaoMaisFavoravel`).
 2. Classificar cada automação pelo **esforço técnico estimado** (simples até 8 h; média acima de 8 até 16 h; complexa
    acima de 16 h) e escrever os fatos dos critérios complementares (regulamento §5). Contagem de sistemas ou APIs, sozinha,
    não muda a categoria. Complexa por risco excepcional: justificativa, fatos verificáveis e aviso ao cliente **antes** do
-   aceite (`classificarAutomacao`).
+   aceite (`classificarAutomacao`). **A partir da data de início (V-04):** só simples e média, com as horas como
+   referência; fora delas, avaliação individual, sem categoria pública. A faixa complexa vale só para solicitações
+   anteriores.
+2-A. **Pacotes (V-03):** montar pacotes de três da mesma categoria, enquanto houver três, e deixar o restante no preço
+   individual (`precosDaProposta`). Pacote misto só com condição particular escrita. Cada automação continua com seção
+   própria na proposta. Pagamento, desistência parcial e titularidade: contrato-base 6-A, 9-A e 14.3 (DP-01 a DP-05 em
+   aberto: **não contratar pacote** antes dessas decisões e da validação da minuta).
 3. Preencher a [proposta-modelo](proposta-modelo-delivery.md): escopo, preço, cronograma (data prevista de início conforme a
    fila, nunca antes da assinatura), dependências, critérios de aceite, Anexo de Componentes, despesas externas e a data de disponibilização
    para homologação, registrada quando ocorrer (cláusula 10).

@@ -8,6 +8,12 @@
 > [procedimento operacional](procedimento-operacional-delivery.md)). Os §1 a §9 abaixo ficam **como registro**: onde
 > divergirem do contrato-base, **prevalece o contrato-base**, e a linha está marcada "**Supersedido (CONTRACT-001)**".
 > Continua **não aprovado** juridicamente; `aprovacoes.condicoesComerciais` continua `false` (PUB-19).
+>
+> **[COM-VITRINE-001](../release/COM-VITRINE-001.md) (etapa 6, 11/11/2026):** a transição de tabelas, o pacote de três (50% + 50% por pacote,
+> cancelamento parcial e reembolso) e a titularidade no pacote estão no [contrato-base](contrato-base-delivery.md)
+> (cláusulas 6.1, 6-A, 9-A e 14.3), no [regulamento](regulamento-campanha-lancamento.md) §7 e na
+> [proposta-modelo](proposta-modelo-delivery.md). As referências deste histórico à "automação complexa" e ao preço de
+> lançamento valem só para solicitações anteriores à data de início das novas condições. Este registro não muda.
 
 > **MINUTA NÃO APROVADA.** Redação preparada na NEKKORA-COM-008-C a partir das diretrizes aprovadas pela titular na
 > COM-008-B e **revisada internamente na NEKKORA-COM-LEGAL-BASE-001 (05/11/2026)** com base no texto vigente do CDC, do

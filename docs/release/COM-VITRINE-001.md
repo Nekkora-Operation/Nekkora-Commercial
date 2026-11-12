@@ -175,7 +175,7 @@ infraestrutura sem autorização.
 | 3 | Vitrine do Delivery: sai o cartão complexo, entram "A automação é sua", o texto V-04, critérios sem complexa e regras da campanha atualizadas; tabela nova só a partir da data de início (sem retroatividade) | concluída (autorizada pela titular em 11/11/2026; registro em §10.2) |
 | 4 | Catálogo: cartões de Monitor e AI "Em preparação", Hosting mantido; componentes e tokens existentes | concluída (autorizada pela titular em 11/11/2026; registro em §10.3) |
 | 5 | Fluxos de solicitação: tipos existentes do Delivery (com interesse em pacote) e do Hosting; sem coleta nova | concluída (autorizada pela titular em 11/11/2026; registro em §10.4) |
-| 6 | Documentos: nota de transição no regulamento, condições comerciais (pacotes), anexo de componentes, proposta-modelo | — |
+| 6 | Documentos: nota de transição no regulamento, condições comerciais (pacotes), anexo de componentes, proposta-modelo | autorizada em 12/11/2026 (minutas não aprovadas; DP-01 a DP-05 registradas como propostas para análise) |
 | 7 | Reabertura de PUB-14, PUB-17 e PUB-19 na branch e PR em rascunho | autorização específica |
 
 ### 10.1 Pendências temporárias depois da etapa 1 **[!]**
@@ -299,6 +299,51 @@ tipo aplicado, a verificação continua falhando.
 quantas automações pretende e o interesse no pacote de 3, sem precisar classificar a automação; a primeira linha do
 Delivery foi aprovada e entra na revisão PUB-17. Na homologação, as esperas do diálogo e do link "Ver valores
 previstos" acompanham o estado aplicado na tela (até 1 s e 2 s), e não uma pausa fixa.
+
+### 10.5 Etapa 6 — documentação comercial (preparação local, diff apresentado à titular)
+
+**Alterações, todas aditivas e marcadas como minuta não aprovada:**
+- **Regulamento:** nota de transição; a tabela anterior, a faixa complexa e os exemplos ficam como histórico e
+  compromisso. Novo §7 com a tabela nova, quem tem direito, pacotes, compromissos anteriores (V-02) e o pós-campanha
+  (V-01, pendente).
+- **Contrato-base:** 6.1 (duas tabelas), 6-A (pacote), 9-A (cancelamento parcial) e 14.3 ("A automação é sua" e
+  titularidade no pacote).
+- **Proposta-modelo:** tabela aplicável e condição mais favorável proposta, categoria sem complexa para solicitações
+  novas, seção de pacotes, pagamento por pacote e resumo do cancelamento parcial.
+- **Anexo de Componentes:** §4, direitos de uso por tipo de componente.
+- **Procedimento operacional:** tabela pela data, classificação e montagem dos pacotes.
+- **Histórico das condições:** só uma nota de remissão.
+
+**Decisões contratuais pendentes da titular** (nenhuma tomada pelo agente; até decidir, não contratar pacote):
+
+| ID | Tema | Opções | Recomendação do agente |
+|---|---|---|---|
+| DP-01 | Vencimento da 2ª parcela do pacote | (a) a outra metade após o aceite da última automação; (b) um sexto do valor do pacote após o aceite de cada automação | (b): acompanha o aceite individual e a titularidade por automação |
+| DP-02 | Valor de referência de cada automação no pacote (reembolso, quitação e titularidade) | Pacote ÷ 3 (simples R$ 500,00; média R$ 1.166,67 + R$ 1.166,67 + R$ 1.166,66), interno e não publicado; ou outra regra | Pacote ÷ 3 |
+| DP-03 | Automações mantidas depois de cancelamento parcial | Sem recálculo (ficam no valor do pacote); ou recálculo pelo preço individual | Sem recálculo: recalcular funcionaria como penalidade, excluída pela V-03 |
+| DP-04 | Desistência de automação do pacote durante a homologação (a cl. 10 não se aplica ao pacote) | Reembolso integral do que foi pago por ela; ou outra regra a fundamentar | Até a decisão, a regra mais favorável ao cliente (reembolso integral) |
+| DP-05 | Titularidade no pacote | Por automação, após a quitação do valor de referência; ou só após a quitação do pacote inteiro | Por automação |
+
+**Diretrizes da titular de 12/11/2026**, registradas no contrato-base como **propostas para análise contratual [P]**,
+**sem aprovação definitiva**:
+
+| ID | Proposta registrada | Onde |
+|---|---|---|
+| DP-01 | Entrada de 50% do pacote; saldo proporcional ao aceite individual; nenhuma parcela de automação antes da homologação e do aceite dela | 6-A.3 |
+| DP-02 | Pacote ÷ 3 em centavos inteiros, resíduo um centavo por vez às primeiras automações na ordem da proposta; soma exata; só para contabilização, quitação e cancelamentos, sem preço público novo | 6-A.4 |
+| DP-03 | Sem recálculo retroativo; sem multa ou retenção automática | 9-A.3 |
+| DP-04 | Devolução integral do valor efetivamente pago pela automação cancelada, sem cobrar parcela dependente de aceite não ocorrido; cl. 10 não se aplica; avaliar viabilidade comercial, direitos legais e redação | 9-A.4 |
+| DP-05 | Direitos patrimoniais acordados sobre o desenvolvimento específico de cada automação após a quitação do valor alocado, com as exceções; LIC-02 pendente | 14.3 |
+
+Antes da **primeira contratação com pacote**: aprovação expressa das condições finais e avaliação jurídica proporcional
+aos riscos. As minutas não são contratos prontos para assinatura.
+
+**Continuam pendentes:** revisão por advogado(a) da minuta antes da primeira contratação; cláusula 10 não aprovada;
+LIC-02; V-01; data de início (PUB-13); aprovação da tabela (PUB-14); PUB-17 e PUB-19 (etapa 7); pacote misto (sem regra
+geral, só proposta específica).
+
+**Testes:** `scripts/testes/documentos-vitrine.test.mjs` confere que os valores do regulamento são os de
+`src/precos.ts`, que o histórico foi preservado, que nada se apresenta como aprovado e que DP-01 a DP-05 estão marcadas.
 
 **[P] Integração futura com a Nekkora Platform:** o catálogo fica tipado (identificador, nome, preço, unidade,
 disponibilidade) para ser consumido depois, sem nenhuma chamada à Platform nesta missão.

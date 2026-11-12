@@ -3,6 +3,10 @@
 > **MINUTA NÃO APROVADA. Não é parecer jurídico.** NEKKORA-COM-CONTRACT-001 (06/11/2026), diretriz **C-09** (Modelo
 > **A-R** aprovado pela titular). Integra o [contrato-base](contrato-base-delivery.md), cláusula 14. **Cada proposta
 > traz este anexo preenchido** (§3). Marcadores como no contrato-base.
+>
+> **[COM-VITRINE-001](../release/COM-VITRINE-001.md) (etapa 6, 11/11/2026):** o site apresenta o Modelo A-R como "**A automação é sua**" (V-05),
+> com as mesmas exceções. Nova §4: direitos de uso por tipo de componente. **LIC-02 continua pendente**: nenhuma
+> titularidade irrestrita de bibliotecas, frameworks ou componentes reutilizáveis é prometida.
 
 ## 1. Situação das licenças existentes — verificada em 06/11/2026
 
@@ -67,3 +71,22 @@ repositórios de clientes; credenciais e dados de um cliente nunca usados em out
 | Nekkora RPA Framework | `{{x.y.z}}` | Preexistente Nekkora | `{{titular confirmado — LIC-02}}` | Item 3 | `{{dependência}}` |
 | `{{biblioteca de terceiro}}` | `{{…}}` | Terceiro | `{{…}}` | `{{licença, ex.: MIT}}` | `{{…}}` |
 | `{{licença comercial: UiPath, Power Automate…}}` | — | Serviço de terceiro | `{{fornecedor}}` | Contratada pelo CONTRATANTE (contrato-base 4.4) | — |
+
+## 4. Direitos de uso por tipo de componente ([COM-VITRINE-001](../release/COM-VITRINE-001.md) §6) **[R]** sobre **[D]**
+
+Texto do site (V-05): *"O código-fonte, a documentação e os artefatos desenvolvidos especificamente para você e
+contratados passam a ser seus conforme o contrato e após a quitação integral. Bibliotecas, frameworks e componentes
+preexistentes da Nekkora, componentes reutilizáveis e tecnologias de terceiros continuam com seus titulares e são
+licenciados para que você possa usar, manter e executar a automação, nas condições de cada licença."*
+
+| Tipo | Titular | O que o CONTRATANTE recebe | Base |
+|---|---|---|---|
+| Código Específico, documentação e artefatos feitos para o CONTRATANTE | CONTRATANTE, após a quitação integral (no pacote: DP-05) | Titularidade | §2, item 1 |
+| Componentes preexistentes da Nekkora (ex.: Nekkora RPA Framework) | Nekkora (**LIC-02**: confirmar a cadeia de titularidade) | Licença do §2, item 3: usar, reproduzir e modificar na medida necessária para operar, manter e corrigir | §2, itens 2 e 3 |
+| Componentes reutilizáveis da Nekkora (rotinas e padrões genéricos usados em várias entregas) | Nekkora | A mesma licença do item 3, na mesma medida ⚖ (confirmar que a definição do §2, item 2 os alcança) | §2, item 3 |
+| Bibliotecas e frameworks de terceiros (código aberto) | Seus titulares | A licença do próprio titular (ex.: MIT, Apache-2.0), listada no §3 | §2, item 4 |
+| Ferramentas e serviços comerciais (UiPath, Power Automate, APIs pagas) | Fornecedor | Nada é transferido: contratação pelo CONTRATANTE | Contrato-base 4.4 |
+| Studio, Agent e Platform | Nekkora | Nada: não fazem parte da entrega | §2, item 2 |
+
+**[!]** Antes da primeira contratação que inclua componente preexistente: resolver a LIC-02 e conferir, na entrega, que
+cada linha do §3 corresponde a um tipo desta tabela.
