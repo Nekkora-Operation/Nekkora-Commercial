@@ -562,20 +562,19 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 aprovadas pela titular; faltam a data de início (PUB-13) e a autorização desta versão (PUB-18)', () => {
+test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 aprovadas pela titular; PUB-13 registrada no Dia D (12/11/2026); falta só a autorização desta versão (PUB-18)', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
   // As aprovações da V1.0.0 (PUB-17/19/09 e PUB-10/18 em 11/11/2026) continuam gravadas; PUB-09/10/18 não são
   // acusadas. Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas por impressão + registro próprio (commit
-  // cf0e733). A data de início das novas condições (PUB-13) só é registrada no dia da publicação: o portão BLOQUEIA.
+  // cf0e733). PUB-13 registrada pela titular no Dia D (12/11/2026). Sem a autorização desta versão (PUB-18), o portão BLOQUEIA.
   const saida = r.stdout + r.stderr;
   assert.notEqual(r.status, 0, 'publicação bloqueada');
   for (const id of ['PUB-09', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
-  assert.match(saida, /- PUB-13 — data de início das novas condições/);
-  assert.match(saida, /- PUB-13 — registro da data de início ausente ou divergente/);
+  assert.doesNotMatch(saida, /PUB-13 —/, 'data de início e registro conferem');
   const ids = [...new Set([...saida.matchAll(/- ((?:PUB|V)-\d+) —/g)].map((m) => m[1]))].sort();
   // PUB-18 (titular, 12/11/2026): a flag aprovacoes.publicacao herdada da v1.0.0 não autoriza esta versão
   assert.match(saida, /- PUB-18 — autorização desta versão/);
-  assert.deepEqual(ids, ['PUB-13', 'PUB-18'], 'data de início e autorização desta versão, além das de build');
+  assert.deepEqual(ids, ['PUB-18'], 'só a autorização desta versão, além das de build');
 });
 
 test('V-02. compromissos anteriores preservados; tabela da vitrine a partir da data de início; pacotes na proposta', () => {

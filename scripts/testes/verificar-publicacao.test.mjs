@@ -90,22 +90,27 @@ test('WhatsApp válido também é aceito', async () => {
   assert.equal((await gate()).code, 0);
 });
 
-test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); faltam a data de início e a autorização desta versão', async () => {
+test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); PUB-13 registrada no Dia D; falta só a autorização desta versão', async () => {
   const real = JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8'));
   setup(real);
   const r = await gate();
   // Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas (commit cf0e733, impressões conferidas no CI em Linux).
-  // A data de início (PUB-13, L-02) só é registrada no dia da publicação e a PUB-18 só para o commit homologado.
+  // PUB-13 (L-02) registrada pela titular no Dia D, 12/11/2026; a PUB-18 só vem depois, para o commit homologado.
   assert.equal(r.code, 1, r.stdout);
-  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13', 'PUB-18'], r.stdout);
+  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-18'], r.stdout);
   // PUB-18: a flag aprovacoes.publicacao herdada da v1.0.0 continua true e NÃO autoriza esta versão
   assert.equal(real.aprovacoes.publicacao, true);
   assert.match(r.stdout, /PUB-18 — autorização desta versão/);
   assert.equal(real.publicacaoAutorizada, undefined, 'autorização de publicação não preenchida');
-  assert.match(r.stdout, /PUB-13 — data de início das novas condições/);
-  assert.match(r.stdout, /PUB-13 — registro da data de início ausente ou divergente/);
-  assert.equal(real.novasCondicoes.inicio, null, 'data de início não preenchida antes da publicação');
-  assert.equal(real.$origem['novasCondicoes.inicio'], undefined, 'registro da data de início não preenchido antes da publicação');
+  assert.doesNotMatch(r.stdout, /PUB-13 —/);
+  // PUB-13: data do Dia D, registro da titular no mesmo dia, citando UMA data (a de início), sem retroatividade e com os
+  // compromissos anteriores preservados
+  assert.equal(real.novasCondicoes.inicio, '2026-11-12');
+  const registroInicio = real.$origem['novasCondicoes.inicio'];
+  assert.match(registroInicio, /^Titular, 12\/11\/2026 \(COM-VITRINE-001, PUB-13\)/);
+  assert.deepEqual(registroInicio.match(/\d{4}-\d{2}-\d{2}/g), ['2026-11-12']);
+  assert.match(registroInicio, /horário de Brasília/);
+  assert.match(registroInicio, /Compromissos comerciais anteriores preservados/);
   // as aprovações valem para o conteúdo ATUAL: cada valor aprovado é a impressão calculada agora, e o registro da
   // titular cita exatamente essa impressão, uma única vez (qualquer mudança em arquivo protegido volta a bloquear)
   const aprovadas = [
