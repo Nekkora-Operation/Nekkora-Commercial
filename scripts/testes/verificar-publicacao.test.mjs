@@ -32,6 +32,9 @@ const complete = () => ({
     'tabelaDePrecos.impressao': REGISTRO(),
     'impressoesDeConteudo.textosComerciais': REGISTRO_DE(TEXTOS),
     'impressoesDeConteudo.condicoesComerciais': REGISTRO_DE(CONDICOES),
+    // L-02 e V-01 (titular, 12/11/2026): data de início e continuidade da tabela com registro próprio (fictícios)
+    'novasCondicoes.inicio': 'Titular, 12/11/2026 (fictício): data de início das novas condições 2026-11-12, data da publicação.',
+    'tabelaDePrecos.posCampanha': REGISTRO_DE(impressaoDaTabela()),
   },
   canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
   agendamento: { url: 'https://bookings.cloud.microsoft/book/AvaliacaoInicial@empresa-ficticia.com.br/', obrigatorio: true },
@@ -43,8 +46,8 @@ const complete = () => ({
   aprovacoes: { precos: true, condicoesComerciais: true, textosComerciais: true, avisoDePrivacidade: true, agendamento: true, envioAutomatico: true, publicacao: true },
   avisoHomologacao: false,
   // COM-VITRINE-001: aprovação da tabela do código (impressão digital), data de início e disponibilidade dos serviços
-  tabelaDePrecos: { impressao: impressaoDaTabela(), posCampanha: false },
-  novasCondicoes: { inicio: '2026-11-10' },
+  tabelaDePrecos: { impressao: impressaoDaTabela(), posCampanha: true },
+  novasCondicoes: { inicio: '2026-11-12' },
   servicos: { monitor: 'em-preparacao', ai: 'em-preparacao' },
   impressoesDeConteudo: { textosComerciais: TEXTOS, condicoesComerciais: CONDICOES },
 });
@@ -86,7 +89,10 @@ test('o publicacao.json versionado: aprovações da v1.0.0 preservadas, mas a ta
   // COM-VITRINE-001: a tabela do código não tem impressão aprovada (PUB-14) e a data de início das novas condições não
   // foi definida (PUB-13) — o portão BLOQUEIA, mesmo com aprovacoes.precos === true da v1.0.0. São as únicas pendências.
   assert.equal(r.code, 1, r.stdout);
-  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19'], r.stdout);
+  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19', 'V-01'], r.stdout);
+  // L-02 e V-01: a data de início e a continuidade da tabela exigem registro próprio da titular
+  assert.match(r.stdout, /PUB-13 — registro da data de início ausente ou divergente/);
+  assert.match(r.stdout, /V-01 — tabela depois de 06\/01\/2027 sem aprovação própria/);
   assert.match(r.stdout, /PUB-14 — tabela de preços do código sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
   assert.match(r.stdout, /PUB-14 — registro da aprovação da tabela ausente ou divergente/);
   assert.match(r.stdout, /PUB-13 — data de início das novas condições/);
@@ -123,7 +129,7 @@ const cases = [
   ['LinkedIn na página inicial', (p) => (p.canais.linkedin = 'https://www.linkedin.com/'), /PUB-03/],
   ['LinkedIn de outro domínio', (p) => (p.canais.linkedin = 'https://example.com/company/x'), /PUB-03/],
   ['campanha sem datas', (p) => (p.campanhaLancamento = { inicio: null, fim: null }), /PUB-13/],
-  ['campanha encerrada', (p) => (p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), /PUB-13 — campanha já encerrada/],
+  ['campanha encerrada', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), (p.tabelaDePrecos.posCampanha = false)), /PUB-13 — campanha já encerrada/],
   ['sem razão social', (p) => (p.controlador.nome = null), /PUB-09 — controlador dos dados: razão social/],
   ['sem documento', (p) => (p.controlador.documento = null), /CNPJ ou CPF válido/],
   ['CNPJ com dígito errado', (p) => (p.controlador.documento = '11.222.333/0001-82'), /CNPJ ou CPF válido/],
@@ -175,6 +181,21 @@ const cases = [
       [`${id}: só o registro da flag da v1.0.0`, (p) => (delete p.$origem[chave], (p.$origem[`aprovacoes.${item}`] = `Titular, 11/11/2026: aprovado (commit e4bc72c).`)), registro],
     ];
   }),
+  // L-02 (titular, 12/11/2026): data de início com registro da titular, sem retroatividade
+  ['data de início sem registro da titular', (p) => delete p.$origem['novasCondicoes.inicio'], /PUB-13 — registro da data de início/],
+  ['registro citando outra data de início', (p) => (p.$origem['novasCondicoes.inicio'] = 'Titular, 12/11/2026: data de início 2026-11-13.'), /PUB-13 — registro da data de início/],
+  ['registro citando duas datas', (p) => (p.$origem['novasCondicoes.inicio'] = 'Titular, 12/11/2026: data de início 2026-11-12 (antes 2026-11-06).'), /PUB-13 — registro da data de início/],
+  ['data de início retroativa ao registro (06/11/2026)', (p) => ((p.novasCondicoes.inicio = '2026-11-06'), (p.$origem['novasCondicoes.inicio'] = 'Titular, 12/11/2026: data de início 2026-11-06.')), /PUB-13 — registro da data de início/],
+  ['registro da data de início anterior a 12/11/2026', (p) => ((p.novasCondicoes.inicio = '2026-11-11'), (p.$origem['novasCondicoes.inicio'] = 'Titular, 11/11/2026: data de início 2026-11-11.')), /PUB-13 — registro da data de início/],
+  ['registro da data de início sem a autoria da titular', (p) => (p.$origem['novasCondicoes.inicio'] = 'Equipe, 12/11/2026: data de início 2026-11-12.'), /PUB-13 — registro da data de início/],
+  ['registro da data de início com data futura', (p) => (p.$origem['novasCondicoes.inicio'] = 'Titular, 16/11/2026: data de início 2026-11-12.'), /PUB-13 — registro da data de início/],
+  // V-01 / L-04 (titular, 12/11/2026): a flag sozinha não é aprovação; vale para a tabela aprovada
+  ['V-01: flag false (a página anuncia continuidade)', (p) => (p.tabelaDePrecos.posCampanha = false), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: flag true sem registro', (p) => delete p.$origem['tabelaDePrecos.posCampanha'], /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: flag como texto "true"', (p) => (p.tabelaDePrecos.posCampanha = 'true'), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: registro citando outra tabela', (p) => (p.$origem['tabelaDePrecos.posCampanha'] = REGISTRO_DE(impressaoDaTabela({ x: 1 }))), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: registro de 11/11/2026', (p) => (p.$origem['tabelaDePrecos.posCampanha'] = REGISTRO_DE(impressaoDaTabela(), '11/11/2026')), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: registro sem a autoria da titular', (p) => (p.$origem['tabelaDePrecos.posCampanha'] = `Equipe, 12/11/2026: ${impressaoDaTabela()}.`), /V-01 — tabela depois de 06\/01\/2027/],
   // COM-VITRINE-001 §3.1: data de início das novas condições
   ['sem data de início das novas condições', (p) => (p.novasCondicoes.inicio = null), /PUB-13 — data de início das novas condições/],
   ['sem o bloco novasCondicoes', (p) => delete p.novasCondicoes, /PUB-13 — data de início das novas condições/],
@@ -182,7 +203,8 @@ const cases = [
   ['data de início antes da campanha', (p) => (p.novasCondicoes.inicio = '2026-10-31'), /PUB-13 — data de início das novas condições/],
   ['data de início inválida', (p) => (p.novasCondicoes.inicio = '10/11/2026'), /PUB-13 — data de início das novas condições/],
   // COM-VITRINE-001 §3.2 (V-01): campanha encerrada sem a aprovação da tabela pós-campanha
-  ['campanha encerrada sem tabela pós-campanha aprovada', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), (p.novasCondicoes.inicio = '2026-09-01')), /tabela pós-campanha não aprovada/],
+  ['campanha encerrada sem tabela pós-campanha aprovada', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), (p.novasCondicoes.inicio = '2026-09-01'), (p.tabelaDePrecos.posCampanha = false)), /tabela pós-campanha não aprovada/],
+  ['campanha encerrada com flag pós-campanha sem registro', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-11-13' }), delete p.$origem['tabelaDePrecos.posCampanha']), /tabela pós-campanha não aprovada/],
   ['pós-campanha como texto "true"', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), (p.novasCondicoes.inicio = '2026-09-01'), (p.tabelaDePrecos.posCampanha = 'true')), /tabela pós-campanha não aprovada/],
   // COM-VITRINE-001 §7 (V-06): Monitor e AI
   ['Monitor disponível sem aprovação', (p) => (p.servicos.monitor = 'disponivel'), /PUB-23 — servicos\.monitor/],
@@ -260,9 +282,8 @@ test('impressão: qualquer valor da tabela alterado muda a impressão (preço no
 
 test('campanha encerrada com a tabela pós-campanha aprovada (V-01): libera', async () => {
   const p = complete();
-  p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' };
-  p.novasCondicoes.inicio = '2026-09-01';
-  p.tabelaDePrecos.posCampanha = true;
+  // campanha terminada em 13/11/2026, deploy em 15/11/2026: V-01 com registro (complete) libera
+  p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-11-13' };
   setup(p);
   const r = await gate();
   assert.equal(r.code, 0, r.stdout);
@@ -280,8 +301,10 @@ test('Monitor disponível com aprovação própria: libera', async () => {
 test('data de início das novas condições no próprio dia do deploy: libera', async () => {
   const p = complete();
   p.novasCondicoes.inicio = '2026-11-15';
+  p.$origem['novasCondicoes.inicio'] = 'Titular, 15/11/2026 (fictício): data de início 2026-11-15, data da publicação.';
   setup(p);
-  assert.equal((await gate('2026-11-15')).code, 0);
+  const r = await gate('2026-11-15');
+  assert.equal(r.code, 0, r.stdout);
 });
 
 test('agendamento fora do lançamento: sem URL, libera (o botão não aparece)', async () => {

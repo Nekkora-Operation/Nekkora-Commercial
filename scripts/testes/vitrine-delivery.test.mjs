@@ -71,7 +71,9 @@ test('etapa 3. campanha: período mantido, sem "preços especiais", sem preço d
 test('etapa 3 (V-02). tabela nova só a partir da data de início das novas condições, nunca retroativa', () => {
   // a data vem só de publicacao.json (novasCondicoes.inicio), nunca do início da campanha
   assert.match(config, /export const NEW_CONDITIONS_START: string \| null = \(\(\) => \{\s*const inicio = publicacao\.novasCondicoes\?\.inicio \?\? null;/);
-  assert.match(bloco, /condition: NEW_CONDITIONS_START\s*\? `Os valores e pacotes desta tabela valem para solicitações recebidas a partir de \$\{NEW_CONDITIONS_START\}\. As recebidas antes mantêm as condições da oferta anterior\./);
+  assert.match(bloco, /condition: NEW_CONDITIONS_START\s*\? `Os valores e pacotes desta tabela valem para solicitações recebidas a partir de \$\{NEW_CONDITIONS_START\} e continuam valendo depois da campanha, até nova revisão\. As recebidas antes mantêm as condições da oferta anterior\./);
+  // V-01 (titular, 12/11/2026): o fim da campanha encerra só a comunicação promocional, não a tabela
+  assert.match(bloco, /`A campanha termina em \$\{LAUNCH_PERIOD\.end\}: depois dessa data, a faixa e estas regras deixam de aparecer, mas os valores e pacotes dos cartões continuam valendo, até nova revisão\.`/);
   assert.match(bloco, /pendingStart: 'Prévia para revisão: a data de início destes valores ainda não foi definida\.'/);
   // sem a data, a faixa diz que ela não foi definida (o portão bloqueia a publicação: PUB-13)
   assert.match(pricing, /\{!NEW_CONDITIONS_START && \(\s*<span className="launch-strip__preview" data-novas-condicoes="pendente">/);

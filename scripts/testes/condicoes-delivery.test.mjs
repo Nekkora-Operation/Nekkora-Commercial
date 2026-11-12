@@ -577,8 +577,10 @@ test('R1-30. portão de produção (execução real): tabela, textos e condiçõ
   assert.match(saida, /- PUB-14 — tabela de preços do código sem aprovação própria: impressão sha256:[0-9a-f]{64}, aprovada nenhuma/);
   assert.match(saida, /- PUB-13 — data de início das novas condições/);
   assert.match(saida, /- PUB-14 — registro da aprovação da tabela ausente ou divergente/);
-  const pubs = [...new Set([...saida.matchAll(/- (PUB-\d+) —/g)].map((m) => m[1]))].sort();
-  assert.deepEqual(pubs, ['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19'], 'só as pendências da nova vitrine, além das de build');
+  assert.match(saida, /- PUB-13 — registro da data de início ausente ou divergente/);
+  assert.match(saida, /- V-01 — tabela depois de 06\/01\/2027 sem aprovação própria/);
+  const ids = [...new Set([...saida.matchAll(/- ((?:PUB|V)-\d+) —/g)].map((m) => m[1]))].sort();
+  assert.deepEqual(ids, ['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19', 'V-01'], 'só as pendências da nova vitrine, além das de build');
 });
 
 test('V-02. compromissos anteriores preservados; tabela da vitrine a partir da data de início; pacotes na proposta', () => {

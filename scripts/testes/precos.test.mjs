@@ -99,7 +99,9 @@ test('nenhum percentual de desconto no código nem nos cartões (V-07)', () => {
 test('condição 50/50 preservada e separada do desconto (item 7); sem categoria complexa na vitrine (COM-VITRINE-001, V-04)', () => {
   const content = readFileSync(join(root, 'src/content.ts'), 'utf8');
   // Gatilhos do pagamento decididos na COM-008-B (AUD-16): aprovação/formalização e homologação/aceite formal
-  assert.match(content, /'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal'/);
+  assert.match(content, /'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal\. No pacote de 3, os percentuais incidem sobre o valor do pacote, e o vencimento do saldo é definido na proposta e no contrato'/);
+  // COM-VITRINE-001: o texto público não anuncia as propostas contratuais DP-01 a DP-05 (saldo por aceite, rateio, etc.)
+  assert.doesNotMatch(content.match(/'Pagamento de 50%[^']*'/)[0], /um sexto|1\/6|por aceite|valor de referência|centavos/i);
   // a frase do pagamento é única e nunca fala em desconto: 50/50 é condição de pagamento
   const payment = content.match(/'Pagamento de 50%[^']*'/g) ?? [];
   assert.equal(payment.length, 1);

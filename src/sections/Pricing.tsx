@@ -14,9 +14,9 @@ import { Simulator } from './Simulator';
 export function Pricing() {
   // V-04: demandas fora das categorias seguem como solicitação de automação (Delivery), pela jornada existente
   const trigger = useRequestTrigger({ demand: 'automacao' });
-  // Avaliado no carregamento da página: fora do período aprovado, só o preço padrão (COM-RELEASE-003-R1 §3.7, item 10).
+  // Avaliado no carregamento da página: fora do período aprovado, sem faixa nem regras da campanha (V-01: mesma tabela).
   const launch = isLaunchActive();
-  // Sem datas aprovadas, os preços de lançamento só aparecem como prévia de homologação — e a faixa diz isso.
+  // Sem datas aprovadas, a faixa da campanha só aparece como prévia de homologação — e diz isso.
   const preview = launch && launchState() === 'pendente';
   return (
     <section id="precos" className="section" aria-labelledby="precos-title" data-pricing="delivery">

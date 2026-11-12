@@ -453,9 +453,9 @@ titular vinculado ao valor. Nenhum campo foi preenchido ou alterado por esta mat
 | `agendamento.url`, `obrigatorio`, `dominioDoTenant` | Botão "Agendar conversa" | Validação técnica (PUB-20) + flag `aprovacoes.agendamento` | Sim, para o serviço testado | A flag não está vinculada à URL: outra URL válida passa com a flag da v1.0.0 |
 | `envioAutomatico.*` | Recebimento automático do formulário | Validação técnica (PUB-21) + flag `aprovacoes.envioAutomatico` (`false`) | Sim | Fora desta missão; continua desligado |
 | `campanhaLancamento.inicio`, `fim` | Período da campanha, selo e regras de lançamento | Validação técnica (PUB-13): datas válidas, campanha não encerrada sem V-01 | Decisão da titular de 09/11/2026 (06/11/2026 a 06/01/2027), registrada em `$origem` | **Alterar as datas não exige novo registro**: só a validação técnica as confere |
-| `novasCondicoes.inicio` | Data a partir da qual vale a tabela nova (texto e regra V-02) | Validação técnica (PUB-13): dentro da campanha e não depois de hoje | Sim (PUB-13, pendente) | **O portão não exige registro da titular para a data**, só a validade |
+| `novasCondicoes.inicio` | Data a partir da qual vale a tabela nova (texto e regra V-02) | Validação técnica (PUB-13) + **aprovação comercial (L-02, resolvida)**: registro em `$origem["novasCondicoes.inicio"]` citando a data, nunca anterior ao registro | Sim (PUB-13, pendente) | — |
 | `tabelaDePrecos.impressao` | Libera a tabela de preços do código | Aprovação comercial (PUB-14): impressão + registro em `$origem` | Sim (pendente) | — |
-| `tabelaDePrecos.posCampanha` | Permite publicar depois de 06/01/2027 (V-01) | Flag booleana no portão (PUB-13) | Sim (V-01, pendente) | **Flag sem registro nem vínculo com a tabela aprovada** |
+| `tabelaDePrecos.posCampanha` | Continuidade da tabela depois de 06/01/2027, anunciada na página (V-01) | **Aprovação comercial (L-04, resolvida)**: flag `true` + registro em `$origem["tabelaDePrecos.posCampanha"]` citando a impressão da tabela; exigida em qualquer data | Sim (V-01, pendente) | — |
 | `impressoesDeConteudo.*` | Libera textos (PUB-17) e condições (PUB-19) | Aprovação comercial: impressão + registro em `$origem` | Sim (pendente) | — |
 | `servicos.monitor`, `servicos.ai` | **Nenhum na página**: o catálogo em `src/` mostra "Em preparação" | Validação (PUB-23) + `aprovacoes.disponibilidade` para "disponivel" | Sim | Disponibilizar exige também mudar `src/` (PUB-17/19) |
 | `controlador.*`, `fornecedor.endereco`, `hospedagem.provedor` | Identificação do fornecedor e aviso de privacidade | Validação técnica (PUB-09, PUB-22, PUB-11) + flag `aprovacoes.avisoDePrivacidade` | Decisões de 04 e 05/11/2026 | A flag do aviso não está vinculada aos valores |
@@ -463,9 +463,39 @@ titular vinculado ao valor. Nenhum campo foi preenchido ou alterado por esta mat
 | `aprovacoes.*` | Flags herdadas da v1.0.0 | Exigidas, mas **não bastam** para preços, textos e condições | — | — |
 | `$origem` | Nenhum (registros) | Lido pelo portão em PUB-14, PUB-17 e PUB-19 | — | Texto livre: o portão confere data, autoria declarada e impressão citada, não a identidade de quem escreveu |
 
-**Lacunas a decidir** (nenhuma corrigida nesta etapa, sem nova funcionalidade):
+**Lacunas** (L-02 e L-04 corrigidas por decisão da titular de 12/11/2026; as demais continuam a decidir):
 - **L-01:** WhatsApp ativável só com um número válido, sem a correção do botão flutuante no celular.
-- **L-02:** `novasCondicoes.inicio` sem registro da titular.
+- ~~**L-02:** `novasCondicoes.inicio` sem registro da titular.~~ Resolvida (titular, 12/11/2026): o portão exige o registro.
 - **L-03:** `campanhaLancamento` alterável sem novo registro.
-- **L-04:** `tabelaDePrecos.posCampanha` (V-01) como flag simples.
+- ~~**L-04:** `tabelaDePrecos.posCampanha` (V-01) como flag simples.~~ Resolvida (titular, 12/11/2026): flag + registro
+  vinculado à tabela, exigidos sempre, porque a página anuncia a continuidade.
 - **L-05:** URL do agendamento e dados do aviso de privacidade sem vínculo com as flags.
+
+### 12.6 Aprovações finais — preparação (titular, 12/11/2026; nada preenchido)
+
+**Ajustes de conteúdo antes das impressões:**
+- **PUB-17:** a faixa da campanha diz que os valores continuam depois dela, até nova revisão (V-01); a regra da campanha
+  explica que o fim encerra só a comunicação promocional; comentários com aprovação antiga atualizados. Monitor e AI
+  continuam "Em preparação", sem contratação; "A automação é sua" mantém as exceções; nenhuma categoria complexa.
+- **PUB-19:** pagamento público harmonizado: no pacote de 3, os 50% + 50% incidem sobre o valor do pacote e o
+  vencimento do saldo fica para a proposta e o contrato (as propostas DP-01 a DP-05 **não** são anunciadas). Regulamento:
+  cabeçalho sem a aprovação antiga, situação de aprovação só pelo registro em `publicacao.json`, data de início = data
+  da publicação efetiva, V-01 condicionada ao registro e §7.6 dizendo o que ele **não** aprova (contratos, anexos,
+  proposta-modelo, procedimento) e que **nenhum pacote é contratado** até a aprovação contratual.
+- **Portão:** L-02 e L-04 (acima). O CI publica as três impressões no resumo do job "Validação e build".
+
+**Registros a fazer pela titular** (modelos; o portão exige que comecem por "Titular, DD/MM/AAAA" e citem UMA impressão
+ou UMA data). As impressões abaixo valem para o commit que contém este texto; qualquer mudança em arquivo protegido muda
+a impressão e exige conferência e nova aprovação.
+
+| Chave em `$origem` | Campo aprovado | Modelo do registro |
+|---|---|---|
+| `tabelaDePrecos.impressao` | `tabelaDePrecos.impressao` | "Titular, DD/MM/AAAA: aprovo a tabela da COM-VITRINE-001 — Delivery simples R$ 650, pacote de 3 R$ 1.500; média R$ 1.400, pacote de 3 R$ 3.500; Monitor R$ 75 por automação/mês e AI R$ 100 por empresa/mês como valores previstos, em preparação e sem contratação — impressão sha256:…" |
+| `tabelaDePrecos.posCampanha` | `tabelaDePrecos.posCampanha: true` | "Titular, DD/MM/AAAA: V-01 — a tabela de impressão sha256:… continua vigente depois de 06/01/2027, até nova revisão expressa; o fim da campanha encerra só a comunicação promocional." |
+| `impressoesDeConteudo.textosComerciais` | `impressoesDeConteudo.textosComerciais` | "Titular, DD/MM/AAAA: aprovo os textos comerciais da COM-VITRINE-001 (commit …), impressão sha256:…" |
+| `impressoesDeConteudo.condicoesComerciais` | `impressoesDeConteudo.condicoesComerciais` | "Titular, DD/MM/AAAA: aprovo as condições comerciais anunciadas ao público (página e regulamento da campanha), impressão sha256:…; não aprova contrato-base, anexos, proposta-modelo, procedimento nem a contratação de pacotes." |
+| `novasCondicoes.inicio` | `novasCondicoes.inicio` | "Titular, DD/MM/AAAA: data de início das novas condições AAAA-MM-DD, data da publicação efetiva da nova vitrine em produção (horário de Brasília)." — no **dia** da publicação |
+
+**Sequência:** (1) titular aprova as quatro primeiras com as impressões conferidas no CI; (2) no dia da publicação,
+registra a data de início; (3) commit, CI e homologação final nos três navegadores com essa configuração; (4) portão sem
+pendências; (5) só então a autorização PUB-18, identificando a versão e o SHA homologado.

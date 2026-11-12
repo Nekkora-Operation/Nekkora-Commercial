@@ -39,12 +39,22 @@ test('etapa 6. histórico preservado: tabela anterior, faixa complexa e exemplos
 });
 
 test('etapa 6. nada aprovado automaticamente: minutas marcadas e pendências explícitas', () => {
-  for (const [nome, t] of [['regulamento', REG], ['contrato', CONTRATO], ['proposta', PROPOSTA]]) {
+  // o regulamento é submetido a PUB-19: a aprovação só existe pelo registro em publicacao.json, nunca no próprio arquivo
+  assert.match(REG, /não fica registrada neste arquivo\. Este regulamento só vale como\s+> aprovado com a impressão de \*\*PUB-19\*\*/);
+  assert.match(REG, /Sem esse registro, ele \*\*não está aprovado\*\*/);
+  assert.match(REG, /\*\*não aprova\*\* o contrato-base, os anexos, a proposta-modelo nem o procedimento operacional, e \*\*não libera a\s+> contratação de pacotes\*\*/);
+  assert.match(secao7, /\*\*Até essa aprovação, nenhum pacote é contratado\*\*/);
+  assert.doesNotMatch(REG, /PUB-19[^\n]*aprovad[oa] (pela titular )?em \d/i);
+  for (const [nome, t] of [['contrato', CONTRATO], ['proposta', PROPOSTA]]) {
     assert.match(t, /(MINUTA|MODELO) NÃO APROVAD[AO]/, nome);
   }
   for (const dp of ['DP-01', 'DP-02', 'DP-03', 'DP-04', 'DP-05']) assert.match(CONTRATO, new RegExp(dp), dp);
-  assert.match(secao7, /V-01, pendente de aprovação comercial definitiva/);
-  assert.match(secao7, /Até a aprovação definitiva, este item \*\*não\*\* é oferta\./);
+  // V-01: a continuidade só vale com o registro da titular; sem ele, não há publicação
+  assert.match(secao7, /\*\*7\.5 Depois de 06\/01\/2027 \(V-01\)\.\*\* A tabela do §7\.1 continua valendo \*\*até nova revisão expressa\*\*/);
+  assert.match(secao7, /Vale só com a aprovação V-01 registrada pela titular \(`tabelaDePrecos\.posCampanha` e `\$origem`\);\s+sem ela, a nova vitrine não é publicada\./);
+  // o pagamento público do pacote não fixa as propostas contratuais (DP-01)
+  assert.match(secao7, /O vencimento do saldo, o cancelamento parcial e o reembolso no pacote são definidos\s+na proposta e no contrato \(§7\.6\); este regulamento não os fixa\./);
+  assert.doesNotMatch(secao7, /um sexto|1\/6 do/);
   assert.match(ANEXO, /LIC-02 continua pendente/);
   assert.doesNotMatch(CONTRATO + REG + PROPOSTA, /DP-0\d[^\n]*(aprovad[ao] pela titular|decidid[ao] pela titular)/i);
 });

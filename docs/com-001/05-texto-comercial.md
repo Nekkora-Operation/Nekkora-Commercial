@@ -88,6 +88,7 @@ Sem a data de início das novas condições: _Prévia para revisão: a data de i
 - A categoria, simples ou média, é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Vale o preço da data de recebimento da solicitação, mesmo que a proposta seja emitida depois do fim da campanha.
 - Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.
 - A proposta pode ser aceita em até 7 dias corridos da emissão.
+- A campanha termina em 06/01/2027: depois dessa data, a faixa e estas regras deixam de aparecer, mas os valores e pacotes dos cartões continuam valendo, até nova revisão.
 - Várias automações, avulsas ou em pacote: cada uma tem escopo, documentação, homologação e aceite próprios. Pedir várias juntas não muda a categoria de nenhuma.
 - Demandas que não se enquadram como simples ou média têm avaliação individual, pelos canais de contato.
 - Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.
@@ -144,7 +145,7 @@ As horas são uma referência: o enquadramento definitivo depende da avaliação
 - Desenvolvimento sob demanda, com escopo formalizado em proposta
 - Pode solicitar várias automações, avulsas ou em pacote de 3 da mesma categoria: cada uma tem escopo, documentação, homologação e aceite próprios
 - Preço aprovado por você antes do início do desenvolvimento
-- Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal
+- Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal. No pacote de 3, os percentuais incidem sobre o valor do pacote, e o vencimento do saldo é definido na proposta e no contrato
 - Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação
 - Reuniões e acompanhamento conforme as condições acordadas
 - Licenças e custos externos tratados à parte, quando aplicáveis

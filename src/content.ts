@@ -6,9 +6,10 @@
  * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
  *
  * NEKKORA-COM-008-C: textos ajustados às decisões da titular na COM-008-B (campanha, condições, várias automações,
- * licenças, homologação, Hosting, botão "Entrar" e privacidade). Aprovação interna da titular em 11/11/2026 (PUB-17,
- * PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico externo; ressalvas em publicacao.json ($origem). Qualquer
- * mudança neste texto exige nova aprovação.
+ * licenças, homologação, Hosting, botão "Entrar" e privacidade). A aprovação de 11/11/2026 (PUB-17, PUB-19 e PUB-09,
+ * commit e4bc72c) vale só para o texto da v1.0.0. COM-VITRINE-001: a aprovação deste texto não fica registrada aqui —
+ * vale a impressão de PUB-17/PUB-19 aprovada em publicacao.json, com o registro da titular em $origem
+ * (scripts/comercial/impressao-conteudo.mjs). Qualquer mudança neste arquivo muda a impressão e exige nova aprovação.
  */
 import type { IconName } from 'nekkora-lib';
 import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, NEW_CONDITIONS_START, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
@@ -175,7 +176,7 @@ export const PRICING = {
       ? `Campanha de lançamento para solicitações de avaliação recebidas de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
       : 'Campanha de lançamento.',
     condition: NEW_CONDITIONS_START
-      ? `Os valores e pacotes desta tabela valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START}. As recebidas antes mantêm as condições da oferta anterior. A proposta pode ser aceita em até 7 dias corridos da emissão.`
+      ? `Os valores e pacotes desta tabela valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START} e continuam valendo depois da campanha, até nova revisão. As recebidas antes mantêm as condições da oferta anterior. A proposta pode ser aceita em até 7 dias corridos da emissão.`
       : 'A proposta pode ser aceita em até 7 dias corridos da emissão.',
     /** Só na prévia de homologação, sem datas aprovadas: nenhuma elegibilidade antes do início oficial. */
     pendingDates: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
@@ -198,6 +199,8 @@ export const PRICING = {
             // V-03: pacotes de 3 da mesma categoria; o restante no individual; misto só por proposta específica
             'Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.',
             'A proposta pode ser aceita em até 7 dias corridos da emissão.',
+            // V-01 (titular, 12/11/2026): o fim da campanha encerra só a comunicação promocional, não a tabela
+            `A campanha termina em ${LAUNCH_PERIOD.end}: depois dessa data, a faixa e estas regras deixam de aparecer, mas os valores e pacotes dos cartões continuam valendo, até nova revisão.`,
             'Várias automações, avulsas ou em pacote: cada uma tem escopo, documentação, homologação e aceite próprios. Pedir várias juntas não muda a categoria de nenhuma.',
             // V-04: sem terceira categoria
             'Demandas que não se enquadram como simples ou média têm avaliação individual, pelos canais de contato.',
@@ -238,7 +241,9 @@ export const PRICING = {
       'Pode solicitar várias automações, avulsas ou em pacote de 3 da mesma categoria: cada uma tem escopo, documentação, homologação e aceite próprios',
       'Preço aprovado por você antes do início do desenvolvimento',
       // [CO-03] AUD-16 — 50/50 é condição de PAGAMENTO, não percentual de desconto
-      'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal',
+      // COM-VITRINE-001 (V-03): no pacote, os percentuais incidem sobre o valor do pacote; o vencimento do saldo por
+      // automação (DP-01) continua em decisão contratual e NÃO é anunciado — fica para a proposta e o contrato
+      'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal. No pacote de 3, os percentuais incidem sobre o valor do pacote, e o vencimento do saldo é definido na proposta e no contrato',
       // CONTRACT-001 (C-12): a fila não deixa o início a critério exclusivo da Nekkora (CDC art. 39, XII) — texto ALTERADO (PUB-17)
       'Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação',
       'Reuniões e acompanhamento conforme as condições acordadas',

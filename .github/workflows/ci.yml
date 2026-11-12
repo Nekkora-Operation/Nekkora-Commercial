@@ -76,6 +76,16 @@ jobs:
             node scripts/verificar-publicacao.mjs --dist dist || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      # COM-VITRINE-001 (A7): impressões recalculadas no Linux do CI, para conferir com as aprovadas pela titular
+      - name: Impressões digitais (PUB-14, PUB-17, PUB-19) recalculadas no CI
+        run: |
+          {
+            echo '## Impressões digitais'
+            echo '```'
+            echo "PUB-14 tabelaDePrecos: $(node scripts/comercial/impressao-precos.mjs | tail -n 1)"
+            node scripts/comercial/impressao-conteudo.mjs | grep -E '^PUB-1[79] '
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: commercial-dist-${{ steps.commit.outputs.commit }}

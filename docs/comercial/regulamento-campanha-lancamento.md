@@ -1,7 +1,13 @@
-# Regulamento da campanha de lançamento — Nekkora Delivery (minuta)
+# Regulamento da campanha de lançamento — Nekkora Delivery
 
-> **MINUTA NÃO APROVADA.** NEKKORA-COM-CONTRACT-001 (06/11/2026), diretriz **C-10**. Os preços são os já aprovados
-> (PUB-14) e vêm de `src/precos.ts`, sem alteração. **Datas (09/11/2026):** a titular decidiu **manter 06/11/2026 a
+> **Situação de aprovação (COM-VITRINE-001):** não fica registrada neste arquivo. Este regulamento só vale como
+> aprovado com a impressão de **PUB-19** (`impressoesDeConteudo.condicoesComerciais`) aprovada em `publicacao.json` e o
+> registro expresso da titular em `$origem`. Sem esse registro, ele **não está aprovado**. A aprovação de PUB-19
+> **não aprova** o contrato-base, os anexos, a proposta-modelo nem o procedimento operacional, e **não libera a
+> contratação de pacotes**, que depende de aprovação contratual específica (§7.6).
+>
+> **Histórico.** NEKKORA-COM-CONTRACT-001 (06/11/2026), diretriz **C-10**: os preços da tabela anterior (§2) foram
+> aprovados na v1.0.0; a tabela nova (§7) tem aprovação própria (PUB-14). **Datas (09/11/2026):** a titular decidiu **manter 06/11/2026 a
 > 06/01/2027**, o período já gravado em `publicacao.json` (§1; [registro](../release/evidencias/golive-001/decisoes-titular-2026-11-09.md)).
 > O resumo exibido no site está em `src/content.ts` (`PRICING.launch.rules`) e depende da aprovação dos textos
 > (PUB-17). Marcadores como no [contrato-base](contrato-base-delivery.md). **R1 (06/11/2026):** critérios de
@@ -21,7 +27,7 @@
 - Elas substituem a regra anterior de "dois meses a partir da publicação oficial" (COM-008-B).
 - Como a publicação ocorre depois de 06/11/2026, o período efetivo com o site no ar fica **menor que dois meses**.
 O código nunca calcula nem preenche as datas: a titular registra `campanhaLancamento.inicio/fim` em `publicacao.json`.
-O portão recusa campanha encerrada.
+O fim da campanha encerra só a comunicação promocional; a tabela do §7 continua depois dele (§7.5, V-01).
 
 ## 2. Preços
 
@@ -113,9 +119,9 @@ Com um período sintético de 01/12/2026 a 31/01/2027: e-mail recebido em 01/12 
 23:59 → lançamento; em 01/02 00:00 → padrão; recebido em 31/01, proposta emitida em 05/02 → lançamento, aceitável até
 12/02.
 
-## 7. Novas condições — [COM-VITRINE-001](../release/COM-VITRINE-001.md) (a partir da data de início) — MINUTA NÃO APROVADA
+## 7. Novas condições — [COM-VITRINE-001](../release/COM-VITRINE-001.md) (a partir da data de início)
 
-**7.1 Tabela [D]** (valores de `src/precos.ts`; aprovação própria pendente — PUB-14):
+**7.1 Tabela [D]** (valores de `src/precos.ts`, aprovados só com a impressão e o registro de PUB-14):
 
 | Categoria | Individual | Pacote de 3 (mesma categoria) | Economia do pacote |
 |---|---:|---:|---:|
@@ -127,7 +133,8 @@ tabela anterior nem acúmulo de descontos. Sem mensalidade. O site não mostra v
 
 **7.2 Quem tem direito [D], redação [R].**
 1. Solicitação de avaliação **recebida** a partir da data de início, inclusive, no horário de Brasília, provada como no
-   §4.
+   §4. A data de início é a da **publicação efetiva** da nova vitrine em produção, registrada pela titular
+   (`novasCondicoes.inicio` e `$origem`); nunca retroativa ao início da campanha.
 2. Automação classificada como **simples ou média** pelo §5 (com a nota da COM-VITRINE-001), com a justificativa na
    proposta. Demanda fora dessas categorias: **avaliação individual**, sem preço de tabela.
 3. Proposta aceitável em até **7 dias corridos** da emissão (mesma contagem do §3, item 5). Mudança de escopo posterior:
@@ -138,8 +145,9 @@ tabela anterior nem acúmulo de descontos. Sem mensalidade. O site não mostra v
    individual; com 6, dois pacotes. Regra: pacotes de três enquanto houver três, e o restante no individual.
 2. **Pacote misto** (categorias diferentes) só por proposta específica; não aparece no site nem no simulador.
 3. Cada automação do pacote tem **escopo, documentação, critérios de homologação, aceite e cronograma próprios**.
-4. Pagamento 50% + 50% **por pacote**, cancelamento parcial e reembolso: [contrato-base](contrato-base-delivery.md),
-   cláusulas **6-A** e **9-A** (pendentes de decisão e revisão — §7.6).
+4. Pagamento: 50% do valor do pacote após a aprovação da proposta e a formalização da contratação, e 50% após a
+   homologação e o aceite formal. O vencimento do saldo, o cancelamento parcial e o reembolso no pacote são definidos
+   na proposta e no contrato (§7.6); este regulamento não os fixa.
 
 **7.4 Compromissos anteriores [D] (V-02).**
 1. Solicitação recebida de 06/11/2026 até a véspera da data de início mantém a oferta anterior (§2 e §3): preço de
@@ -150,13 +158,15 @@ tabela anterior nem acúmulo de descontos. Sem mensalidade. O site não mostra v
 4. Automação complexa solicitada antes da data continua com avaliação individual (a oferta anterior não fixava preço).
 5. O levantamento das solicitações recebidas desde 06/11/2026 é da titular (e-mail e LinkedIn).
 
-**7.5 Depois de 06/01/2027 [!] — V-01, pendente de aprovação comercial definitiva.** Proposta adotada: a tabela do §7.1
-continua valendo; a comunicação promocional (faixa e regras da campanha no site) termina em 06/01/2027, sem nova data e
-sem retorno automático aos preços anteriores. Até a aprovação definitiva, este item **não** é oferta.
+**7.5 Depois de 06/01/2027 (V-01).** A tabela do §7.1 continua valendo **até nova revisão expressa**; a comunicação
+promocional (faixa e regras da campanha no site) termina em 06/01/2027, sem nova data e sem retorno automático aos
+preços anteriores. Vale só com a aprovação V-01 registrada pela titular (`tabelaDePrecos.posCampanha` e `$origem`);
+sem ela, a nova vitrine não é publicada.
 
-**7.6 Pendências deste regulamento [!]:** data de início (PUB-13); aprovação da tabela (PUB-14); V-01; redação
-contratual dos pacotes (cl. 6-A e 9-A, decisões DP-01 a DP-05 em
-[COM-VITRINE-001 §10.5](../release/COM-VITRINE-001.md)); revisão por advogado(a); aprovação dos textos do site (PUB-17).
+**7.6 O que este regulamento não aprova [!].** A redação contratual dos pacotes (contrato-base, cl. 6-A e 9-A; propostas
+DP-01 a DP-05 em [COM-VITRINE-001 §10.5](../release/COM-VITRINE-001.md)), os anexos, a proposta-modelo e o procedimento
+operacional têm aprovação própria, com avaliação jurídica. **Até essa aprovação, nenhum pacote é contratado**: a
+solicitação é recebida e avaliada, sem formalização do pacote.
 
 **7.7 Exemplos testados (`scripts/testes/condicoes-delivery.test.mjs`, teste V-02):** com data de início sintética,
 solicitação recebida antes mantém o preço de lançamento e recebe só a **sugestão** da tabela nova (não aplicada);

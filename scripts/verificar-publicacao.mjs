@@ -87,9 +87,6 @@ if (intake.endpoint != null) {
 const { inicio, fim } = pub.campanhaLancamento;
 const tabela = pub.tabelaDePrecos ?? {};
 need(iso(inicio) && iso(fim) && inicio <= fim, 'PUB-13', 'datas de início e fim da campanha de lançamento');
-// COM-VITRINE-001 §3.2 (V-01): depois do fim, a página já não mostra comunicação promocional, mas publicar depois do
-// fim exige a aprovação expressa da tabela pós-campanha; sem ela, campanha encerrada continua bloqueando.
-need(!iso(fim) || fim >= today || tabela.posCampanha === true, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today}) e tabela pós-campanha não aprovada (tabelaDePrecos.posCampanha, V-01)`);
 // COM-VITRINE-001 §3.1: data de início das novas condições, dentro da campanha e já alcançada no dia do deploy (a página
 // publicada aplica a tabela nova a partir dela; antes dela valem os compromissos da tabela anterior).
 const novas = pub.novasCondicoes?.inicio ?? null;
@@ -97,6 +94,18 @@ need(
   iso(novas) && (!iso(inicio) || novas >= inicio) && novas <= today,
   'PUB-13',
   `data de início das novas condições (novasCondicoes.inicio): a partir do início da campanha e não depois de hoje (${today})`,
+);
+// L-02 (titular, 12/11/2026): a data de início é a da publicação efetiva da nova vitrine, decidida pela titular — não
+// basta ser válida. Exige $origem["novasCondicoes.inicio"] começando por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje)
+// e citando UMA data AAAA-MM-DD, exatamente a de novasCondicoes.inicio, nunca anterior ao próprio registro (sem
+// retroatividade, por exemplo a 06/11/2026).
+const registroDoInicio = pub.$origem?.['novasCondicoes.inicio'];
+const dataDoRegistroDoInicio = dataDoRegistro(registroDoInicio);
+const datasCitadas = typeof registroDoInicio === 'string' ? [...new Set(registroDoInicio.match(/\b\d{4}-\d{2}-\d{2}\b/g) ?? [])] : [];
+need(
+  dataDoRegistroDoInicio != null && dataDoRegistroDoInicio >= '2026-11-12' && dataDoRegistroDoInicio <= today && datasCitadas.length === 1 && datasCitadas[0] === novas && iso(novas) && novas >= dataDoRegistroDoInicio,
+  'PUB-13',
+  `registro da data de início ausente ou divergente: $origem["novasCondicoes.inicio"] deve começar por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje) e citar a data ${novas ?? 'AAAA-MM-DD'} de novasCondicoes.inicio, não anterior ao registro`,
 );
 // Privacidade (§5.4)
 need(Boolean(pub.controlador.nome), 'PUB-09', 'controlador dos dados: razão social (ou nome) para o aviso de privacidade');
@@ -119,11 +128,15 @@ need(
 // $origem["tabelaDePrecos.impressao"], começando por "Titular, DD/MM/AAAA" (data válida, a partir de 11/11/2026, quando
 // a COM-VITRINE-001 foi definida, e não depois de hoje) e citando UMA impressão, exatamente a aprovada e a do código.
 // Regenerar o hash sem o registro correspondente bloqueia; os registros da v1.0.0 (outras chaves) não servem.
-/** Registro expresso da titular: "Titular, DD/MM/AAAA" (data válida, de `desde` até hoje) citando UMA impressão, que
- * tem de ser a aprovada e a calculada. Vale para PUB-14, PUB-17 e PUB-19. */
-function registroConfere(registro, aprovada, calculada, desde) {
+/** Data (AAAA-MM-DD) de um registro que começa por "Titular, DD/MM/AAAA", ou null se não começar assim ou for inválida. */
+function dataDoRegistro(registro) {
   const m = typeof registro === 'string' && /^Titular, (\d{2})\/(\d{2})\/(\d{4})\b/.exec(registro);
-  const data = m && iso(`${m[3]}-${m[2]}-${m[1]}`) && new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00Z`).getUTCDate() === Number(m[1]) ? `${m[3]}-${m[2]}-${m[1]}` : null;
+  return m && iso(`${m[3]}-${m[2]}-${m[1]}`) && new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00Z`).getUTCDate() === Number(m[1]) ? `${m[3]}-${m[2]}-${m[1]}` : null;
+}
+/** Registro expresso da titular: "Titular, DD/MM/AAAA" (data válida, de `desde` até hoje) citando UMA impressão, que
+ * tem de ser a aprovada e a calculada. Vale para PUB-14, PUB-17, PUB-19 e V-01. */
+function registroConfere(registro, aprovada, calculada, desde) {
+  const data = dataDoRegistro(registro);
   const citadas = typeof registro === 'string' ? [...new Set(registro.match(/sha256:[0-9a-f]{64}/g) ?? [])] : [];
   return data != null && data >= desde && data <= today && citadas.length === 1 && citadas[0] === aprovada && citadas[0] === calculada;
 }
@@ -132,6 +145,18 @@ need(
   'PUB-14',
   `registro da aprovação da tabela ausente ou divergente: $origem["tabelaDePrecos.impressao"] deve começar por "Titular, DD/MM/AAAA" (de 11/11/2026 até hoje) e citar a impressão aprovada ${impressao}`,
 );
+// V-01 / L-04 (titular, 12/11/2026): a página anuncia que os valores continuam depois da campanha, até nova revisão. Por
+// isso a continuidade é exigida em qualquer data, e a flag sozinha não é aprovação: posCampanha === true com o registro
+// $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela
+// aprovada (a continuidade vale para ESSA tabela; outra tabela exige nova decisão).
+const posCampanhaAprovada = tabela.posCampanha === true && registroConfere(pub.$origem?.['tabelaDePrecos.posCampanha'], tabela.impressao, impressao, '2026-11-12');
+need(
+  posCampanhaAprovada,
+  'V-01',
+  `tabela depois de 06/01/2027 sem aprovação própria: tabelaDePrecos.posCampanha true e registro em $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela ${impressao}`,
+);
+// COM-VITRINE-001 §3.2: campanha encerrada só com a V-01 aprovada (a página já não mostra comunicação promocional)
+need(!iso(fim) || fim >= today || posCampanhaAprovada, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today}) e tabela pós-campanha não aprovada (tabelaDePrecos.posCampanha, V-01)`);
 // COM-VITRINE-001 §7 (V-06): Monitor e AI só "em-preparacao" ou, com aprovação própria, "disponivel"
 for (const servico of ['monitor', 'ai']) {
   const estado = pub.servicos?.[servico] ?? null;
