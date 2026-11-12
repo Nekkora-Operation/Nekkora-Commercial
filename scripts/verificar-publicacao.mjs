@@ -186,6 +186,29 @@ for (const [item, nome, dos] of [['textosComerciais', 'textos comerciais', 'dos'
 }
 need(pub.aprovacoes.avisoDePrivacidade === true, 'PUB-09', 'aprovação do aviso de privacidade');
 need(pub.aprovacoes.publicacao === true, 'PUB-18', 'autorização expressa de publicação em produção');
+// PUB-18 (COM-VITRINE-001, titular, 12/11/2026): a flag herdada da v1.0.0 não basta. A autorização vale para UMA versão
+// (package.json) e UM commit homologado, gravados pela titular em publicacaoAutorizada e no registro
+// $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje, citando "versão X" e UM SHA de 40
+// dígitos). Sem circularidade: o registro cita o commit HOMOLOGADO, anterior ao que contém o registro; no deploy,
+// scripts/verificar-autorizacao-release.mjs confere que o commit publicado descende dele e só difere pela autorização.
+const pacote = json('package.json');
+const versao = pacote.version;
+const autorizada = pub.publicacaoAutorizada ?? {};
+const registroPub = pub.$origem?.publicacaoAutorizada;
+const dataPub = dataDoRegistro(registroPub);
+const commitsCitados = typeof registroPub === 'string' ? [...new Set(registroPub.match(/\b[0-9a-f]{40}\b/g) ?? [])] : [];
+need(
+  autorizada.versao === versao &&
+    /^[0-9a-f]{40}$/.test(autorizada.commit ?? '') &&
+    dataPub != null &&
+    dataPub >= '2026-11-12' &&
+    dataPub <= today &&
+    commitsCitados.length === 1 &&
+    commitsCitados[0] === autorizada.commit &&
+    registroPub.includes(`versão ${versao}`),
+  'PUB-18',
+  `autorização desta versão: publicacaoAutorizada { versao: "${versao}", commit: SHA homologado } e registro em $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a versão ${versao} e UM commit, o homologado (a flag aprovacoes.publicacao sozinha não autoriza)`,
+);
 need(pub.avisoHomologacao === false, 'PUB-10', 'desligar o aviso "Versão para homologação"');
 
 // Dependência da lib: tarball versionado íntegro (LIB-RELEASE-001)
@@ -201,6 +224,8 @@ if (!existsSync(releaseFile)) {
   const rel = JSON.parse(readFileSync(releaseFile, 'utf8'));
   need(rel.homologacao === false && rel.publicacao === 'publicacao.json', 'BUILD', 'artefato feito com dados de homologação (NEKKORA_PUBLICACAO)');
   need(rel.arvoreLimpa === true, 'BUILD', 'artefato gerado com alterações não commitadas');
+  // PUB-18: o artefato é da versão autorizada (a do package.json conferida acima)
+  need(rel.aplicacao === `${pacote.name}@${versao}`, 'BUILD', `artefato de outra versão (${rel.aplicacao ?? 'sem versão'}; esperado ${pacote.name}@${versao})`);
   need(rel.nekkoraLib?.integridade === lib.integridade, 'BUILD', 'artefato com outra versão da nekkora-lib');
   const policyFile = resolve('deploy/aws/politica-cabecalhos.json');
   const versioned = existsSync(policyFile) ? readFileSync(policyFile, 'utf8') : null;

@@ -27,6 +27,10 @@ const REGISTRO = (impressao = impressaoDaTabela(), data = '12/11/2026') => `Titu
 const TEXTOS = impressaoDoConteudo('textosComerciais');
 const CONDICOES = impressaoDoConteudo('condicoesComerciais');
 const REGISTRO_DE = (impressao, data = '12/11/2026') => `Titular, ${data} (fictício): conteúdo aprovado, impressão ${impressao}.`;
+// PUB-18: versão do package.json da cópia e commit homologado (fictícios)
+const VERSAO = '9.9.9-teste';
+const HOMOLOGADO = 'a'.repeat(40);
+writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'copia-de-teste', version: VERSAO }));
 const complete = () => ({
   $origem: {
     'tabelaDePrecos.impressao': REGISTRO(),
@@ -35,6 +39,8 @@ const complete = () => ({
     // L-02 e V-01 (titular, 12/11/2026): data de início e continuidade da tabela com registro próprio (fictícios)
     'novasCondicoes.inicio': 'Titular, 12/11/2026 (fictício): data de início das novas condições 2026-11-12, data da publicação.',
     'tabelaDePrecos.posCampanha': REGISTRO_DE(impressaoDaTabela()),
+    // PUB-18 (titular, 12/11/2026): autorização de UMA versão e UM commit homologado (fictícios)
+    publicacaoAutorizada: `Titular, 12/11/2026 (fictício): autorizo a publicação da versão ${VERSAO}, commit homologado ${HOMOLOGADO}.`,
   },
   canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
   agendamento: { url: 'https://bookings.cloud.microsoft/book/AvaliacaoInicial@empresa-ficticia.com.br/', obrigatorio: true },
@@ -50,8 +56,9 @@ const complete = () => ({
   novasCondicoes: { inicio: '2026-11-12' },
   servicos: { monitor: 'em-preparacao', ai: 'em-preparacao' },
   impressoesDeConteudo: { textosComerciais: TEXTOS, condicoesComerciais: CONDICOES },
+  publicacaoAutorizada: { versao: VERSAO, commit: HOMOLOGADO },
 });
-const release = () => ({ homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES });
+const release = () => ({ aplicacao: `copia-de-teste@${VERSAO}`, homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES });
 
 function setup(pub, rel = release(), { versionedPolicy = policy(), headersFile = false } = {}) {
   writeFileSync(join(dir, 'publicacao.json'), JSON.stringify(pub));
@@ -83,14 +90,18 @@ test('WhatsApp válido também é aceito', async () => {
   assert.equal((await gate()).code, 0);
 });
 
-test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); falta só a data de início', async () => {
+test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); faltam a data de início e a autorização desta versão', async () => {
   const real = JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8'));
   setup(real);
   const r = await gate();
   // Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas (commit cf0e733, impressões conferidas no CI em Linux).
-  // A data de início das novas condições (PUB-13, L-02) só é registrada no dia da publicação: é a única pendência.
+  // A data de início (PUB-13, L-02) só é registrada no dia da publicação e a PUB-18 só para o commit homologado.
   assert.equal(r.code, 1, r.stdout);
-  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13'], r.stdout);
+  assert.deepEqual([...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), ['PUB-13', 'PUB-18'], r.stdout);
+  // PUB-18: a flag aprovacoes.publicacao herdada da v1.0.0 continua true e NÃO autoriza esta versão
+  assert.equal(real.aprovacoes.publicacao, true);
+  assert.match(r.stdout, /PUB-18 — autorização desta versão/);
+  assert.equal(real.publicacaoAutorizada, undefined, 'autorização de publicação não preenchida');
   assert.match(r.stdout, /PUB-13 — data de início das novas condições/);
   assert.match(r.stdout, /PUB-13 — registro da data de início ausente ou divergente/);
   assert.equal(real.novasCondicoes.inicio, null, 'data de início não preenchida antes da publicação');
@@ -116,8 +127,8 @@ test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas 
   // Monitor e AI continuam em preparação; as flags da v1.0.0 não são acusadas nem alteradas
   assert.deepEqual(real.servicos, { monitor: 'em-preparacao', ai: 'em-preparacao' });
   assert.doesNotMatch(r.stdout, /PUB-17 — aprovação dos textos comerciais|PUB-19 — aprovação das condições comerciais/);
-  // PUB-09 (commit e4bc72c) e PUB-10/18 (commit 2fdaed6), registradas em $origem: continuam não acusadas
-  for (const id of ['PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
+  // PUB-09 (commit e4bc72c) e PUB-10 (commit 2fdaed6), registradas em $origem: continuam não acusadas
+  for (const id of ['PUB-09', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
   // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
   assert.doesNotMatch(r.stdout, /PUB-20/);
   // PUB-22: endereço comercial informado pela titular em 05/11/2026 (cartão CNPJ) — o portão não o acusa mais
@@ -158,6 +169,16 @@ const cases = [
   ['privacidade não aprovada', (p) => (p.aprovacoes.avisoDePrivacidade = false), /PUB-09 — aprovação do aviso/],
   ['publicação não autorizada', (p) => (p.aprovacoes.publicacao = false), /PUB-18/],
   ['aprovação como texto "true" (não é aprovação)', (p) => (p.aprovacoes.publicacao = 'true'), /PUB-18/],
+  // PUB-18 (titular, 12/11/2026): a flag herdada não basta; a autorização vale para UMA versão e UM commit homologado
+  ['PUB-18: só a flag, sem autorização desta versão', (p) => { delete p.publicacaoAutorizada; delete p.$origem.publicacaoAutorizada; }, /PUB-18 — autorização desta versão/],
+  ['PUB-18: autorização de outra versão', (p) => (p.publicacaoAutorizada.versao = '1.0.0'), /PUB-18 — autorização desta versão/],
+  ['PUB-18: commit que não é SHA completo', (p) => (p.publicacaoAutorizada.commit = 'a'.repeat(7)), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro cita outro commit', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace(HOMOLOGADO, 'c'.repeat(40))), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro cita dois commits', (p) => (p.$origem.publicacaoAutorizada += ` Também ${'c'.repeat(40)}.`), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro sem a versão', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace(`versão ${VERSAO}`, 'versão atual')), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro anterior a 12/11/2026 (aprovação da v1.0.0)', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace('12/11/2026', '11/11/2026')), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro com data futura', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace('12/11/2026', '16/11/2026')), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro sem "Titular, DD/MM/AAAA"', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace('Titular, 12/11/2026', 'Agente')), /PUB-18 — autorização desta versão/],
   ['aviso de homologação ligado', (p) => (p.avisoHomologacao = true), /PUB-10/],
   // COM-VITRINE-001 §9.3: a aprovação vale para UMA tabela — preço alterado sem nova aprovação bloqueia, com a flag true
   ['tabela sem impressão aprovada (flag de preços true)', (p) => (p.tabelaDePrecos.impressao = null), /PUB-14 — tabela de preços do código sem aprovação própria/],
@@ -368,6 +389,9 @@ test('bloqueia artefato de homologação, árvore suja, outra lib, CSP divergent
   for (const [rel, opts, expected] of [
     [{ ...release(), homologacao: true, publicacao: 'scripts/fixtures/publicacao-homologacao.json' }, {}, /dados de homologação/],
     [{ ...release(), arvoreLimpa: false }, {}, /não commitadas/],
+    // PUB-18: o artefato tem de ser da versão autorizada (a do package.json)
+    [{ ...release(), aplicacao: 'copia-de-teste@1.0.0' }, {}, /artefato de outra versão/],
+    [{ ...release(), aplicacao: undefined }, {}, /artefato de outra versão \(sem versão/],
     [{ ...release(), nekkoraLib: { integridade: 'sha512-outra' } }, {}, /outra versão da nekkora-lib/],
     // script inline mudou e a política versionada não acompanhou: a página quebraria no CloudFront
     [{ ...release(), cspScriptHashes: ["'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='"] }, {}, /politica-cabecalhos\.json não corresponde/],

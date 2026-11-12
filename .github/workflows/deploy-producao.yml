@@ -49,6 +49,10 @@ jobs:
           git merge-base --is-ancestor "$commit" origin/main || { echo "::error::$commit não está na main — só código revisado e integrado é publicado"; exit 1; }
           echo "commit=$commit" >> "$GITHUB_OUTPUT"
           echo "Release candidata: $REF → $commit" >> "$GITHUB_STEP_SUMMARY"
+      - name: PUB-18 — autorização da titular vinculada ao commit homologado
+        # COM-VITRINE-001: o commit publicado descende do commit homologado citado em publicacaoAutorizada e só difere
+        # dele pela própria autorização; o portão (no job de deploy) confere a versão, a data e o registro
+        run: node scripts/verificar-autorizacao-release.mjs --commit "${{ steps.ref.outputs.commit }}"
       - name: Environment "production" exige revisor e só aceita a branch main
         env:
           GH_TOKEN: ${{ github.token }}

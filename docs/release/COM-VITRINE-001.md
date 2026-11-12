@@ -522,3 +522,10 @@ da sequência está concluído; o portão bloqueia **só** pela PUB-13.
   LIC-02. A aprovação da PUB-19 cobre só as condições anunciadas ao público; a formalização de contratos de pacotes
   **não está autorizada**;
 - Monitor e AI continuam em preparação, sem contratação; Hosting continua sob avaliação.
+
+**Atualização — titular, 12/11/2026 (PUB-18, versão e transição do dia D).** Aprovados: a versão comercial `1.1.0`; a
+proteção da PUB-18 vinculada ao commit homologado H e ao commit de autorização C (portão e
+`scripts/verificar-autorizacao-release.mjs` no workflow de deploy); a opção A para o environment `production`, sem
+alterar a configuração do GitHub; e o procedimento operacional da transição comercial no dia da publicação. Detalhes,
+sequência e modelo de registro: [runbook da v1.1.0](COM-VITRINE-001-runbook-v1.1.0.md). `publicacaoAutorizada` e a
+PUB-13 continuam **sem preenchimento**.

@@ -17,17 +17,18 @@ import { ITENS, impressaoDoConteudo, listaCanonica } from '../comercial/impressa
 const root = resolve('.');
 const dir = mkdtempSync(join(tmpdir(), 'impressao-conteudo-'));
 after(() => rmSync(dir, { recursive: true, force: true }));
-for (const p of ['src', 'public', 'index.html', 'vite.config.ts', 'docs/comercial', 'vendor', 'scripts/verificar-publicacao.mjs', 'scripts/comercial', 'deploy/aws/cabecalhos.mjs']) {
+for (const p of ['package.json', 'src', 'public', 'index.html', 'vite.config.ts', 'docs/comercial', 'vendor', 'scripts/verificar-publicacao.mjs', 'scripts/comercial', 'deploy/aws/cabecalhos.mjs']) {
   cpSync(join(root, p), join(dir, p), { recursive: true });
 }
 const lib = JSON.parse(readFileSync(join(root, 'vendor/nekkora-lib.json'), 'utf8'));
 const HASHES = ["'sha256-JDd2nuaninfZZDJOM3fEvC7cCoIy0w7m1A5JfhKL6tE='"];
 mkdirSync(join(dir, 'dist'), { recursive: true });
-writeFileSync(join(dir, 'dist/release.json'), JSON.stringify({ homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES }));
+writeFileSync(join(dir, 'dist/release.json'), JSON.stringify({ aplicacao: `${JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).name}@${JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version}`, homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES }));
 writeFileSync(join(dir, 'deploy/aws/politica-cabecalhos.json'), `${JSON.stringify(responseHeadersPolicy(HASHES), null, 2)}\n`);
 
 // Conteúdo "aprovado" no teste = o da cópia, antes de qualquer alteração
 const APROVADA = { textosComerciais: impressaoDoConteudo('textosComerciais', dir), condicoesComerciais: impressaoDoConteudo('condicoesComerciais', dir) };
+const VERSAO = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;
 const reg = (i) => `Titular, 12/11/2026 (fictício): aprovado, impressão ${i}.`;
 writeFileSync(
   join(dir, 'publicacao.json'),
@@ -38,6 +39,7 @@ writeFileSync(
       'impressoesDeConteudo.condicoesComerciais': reg(APROVADA.condicoesComerciais),
       'novasCondicoes.inicio': 'Titular, 12/11/2026 (fictício): data de início 2026-11-12.',
       'tabelaDePrecos.posCampanha': reg(impressaoDaTabela()),
+      publicacaoAutorizada: `Titular, 12/11/2026 (fictício): versão ${VERSAO}, commit homologado ${'b'.repeat(40)}.`,
     },
     canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
     agendamento: { url: null, obrigatorio: false },
@@ -52,6 +54,7 @@ writeFileSync(
     novasCondicoes: { inicio: '2026-11-12' },
     servicos: { monitor: 'em-preparacao', ai: 'em-preparacao' },
     impressoesDeConteudo: APROVADA,
+    publicacaoAutorizada: { versao: VERSAO, commit: 'b'.repeat(40) },
   }),
 );
 
