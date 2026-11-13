@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { PRICE_TABLE } from '../../src/precos.ts';
+import { PREVIOUS_PRICE_TABLE } from '../../src/precos.ts';
 import {
   atendimentoDaGarantia,
   classificarAutomacao,
@@ -523,8 +523,8 @@ test('R1-25. contagem de APIs ou sistemas, sozinha, não eleva a categoria', () 
   assert.match(CONTENT, /Esforço técnico estimado/);
 });
 
-test('R1-26. preços promocionais e padrão preservados; complexa sem desconto', () => {
-  assert.deepEqual(PRICE_TABLE, { simples: { standard: 1500, launch: 1000 }, media: { standard: 3500, launch: 2800 } });
+test('R1-26. preços promocionais e padrão da oferta anterior preservados (V-02); complexa sem desconto', () => {
+  assert.deepEqual(PREVIOUS_PRICE_TABLE, { simples: { standard: 1500, launch: 1000 }, media: { standard: 3500, launch: 2800 } });
   assert.equal(precoDaAutomacao({ categoria: classificarAutomacao({ horasEstimadas: 8 }).categoria, recebidaEm: '2026-12-15T12:00:00Z', periodo: PERIODO }).centavos, 100_000);
   assert.equal(precoDaAutomacao({ categoria: classificarAutomacao({ horasEstimadas: 20 }).categoria, recebidaEm: '2026-12-15T12:00:00Z', periodo: PERIODO }).centavos, null);
 });
@@ -562,11 +562,69 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção: nenhuma pendência de aprovação no publicacao.json versionado (execução real)', () => {
+test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 aprovadas pela titular; PUB-13 registrada no Dia D (12/11/2026); sem a PUB-18 bloqueia só por ela, com a PUB-18 válida não acusa nada', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
-  // Todas as aprovações foram dadas expressamente pela titular (PUB-17/19/09 e PUB-10/18 em 11/11/2026). O portão
-  // continua exigindo cada uma (teste 14) e ainda bloqueia por artefato ausente ou árvore suja (BUILD), que dependem do build.
+  // As aprovações da V1.0.0 (PUB-17/19/09 e PUB-10/18 em 11/11/2026) continuam gravadas; PUB-09/10 não são
+  // acusadas. Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas por impressão + registro próprio (commit
+  // cf0e733). PUB-13 registrada pela titular no Dia D (12/11/2026).
   const saida = r.stdout + r.stderr;
-  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
-  if (r.status !== 0) assert.doesNotMatch(saida, /- PUB-\d+ —/, 'só pendências de build, nunca de aprovação');
+  for (const id of ['PUB-09', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
+  assert.doesNotMatch(saida, /PUB-13 —/, 'data de início e registro conferem');
+  const ids = [...new Set([...saida.matchAll(/- ((?:PUB|V)-\d+) —/g)].map((m) => m[1]))].sort();
+  // pendências de BUILD dependem do dist/ local (no CI os testes rodam antes do build); o artefato real é conferido
+  // pelo portão no job de deploy. Nenhuma outra pendência é tolerada.
+  const outras = [...saida.matchAll(/^ {2}- ([A-Z]+(?:-\d+)?) —/gm)].map((m) => m[1]).filter((id) => !/^(PUB|V)-\d+$/.test(id) && id !== 'BUILD');
+  assert.deepEqual(outras, [], saida);
+  const pub = JSON.parse(readFileSync(new URL('../../publicacao.json', import.meta.url), 'utf8'));
+  if (pub.publicacaoAutorizada === undefined) {
+    // Estado H: a flag aprovacoes.publicacao herdada da v1.0.0 não autoriza esta versão — o portão BLOQUEIA, só pela PUB-18
+    assert.notEqual(r.status, 0, 'publicação bloqueada');
+    assert.match(saida, /- PUB-18 — autorização desta versão/);
+    assert.deepEqual(ids, ['PUB-18'], 'só a autorização desta versão, além das de build');
+  } else {
+    // Estado C: autorização válida da titular — nenhuma pendência de configuração; sem pendência de build, libera
+    assert.deepEqual(ids, [], 'PUB-18 conferida pelo portão (versão, SHA completo e registro)');
+    if (!/- BUILD —/.test(saida)) {
+      assert.equal(r.status, 0, saida);
+      assert.match(saida, /Publicação liberada/);
+    }
+  }
+});
+
+test('V-02. compromissos anteriores preservados; tabela da vitrine a partir da data de início; pacotes na proposta', () => {
+  const NOVAS = { inicio: '2026-12-10' };
+  // antes da data de início: oferta anterior (lançamento), com a tabela da vitrine só como sugestão
+  const antes = precoDaAutomacao({ categoria: 'simples', recebidaEm: '2026-12-09T15:00:00Z', periodo: PERIODO, novasCondicoes: NOVAS });
+  assert.deepEqual([antes.regra, antes.centavos], ['lancamento', 100_000]);
+  assert.deepEqual(antes.condicaoMaisFavoravel, { centavos: 65_000, regra: 'tabela-vitrine', aplicada: false }, 'proposta ao cliente, nunca aplicada sozinha');
+  // a partir da data de início: tabela da vitrine; complexa em avaliação individual
+  const depois = precoDaAutomacao({ categoria: 'media', recebidaEm: '2026-12-10T03:00:00Z', periodo: PERIODO, novasCondicoes: NOVAS });
+  assert.deepEqual([depois.regra, depois.centavos], ['tabela-vitrine', 140_000]);
+  assert.equal(precoDaAutomacao({ categoria: 'complexa', recebidaEm: '2026-12-11T12:00:00Z', periodo: PERIODO, novasCondicoes: NOVAS }).regra, 'avaliacao-individual');
+  // sem a data, só a regra anterior (nenhuma sugestão)
+  const semData = precoDaAutomacao({ categoria: 'simples', recebidaEm: '2026-12-15T12:00:00Z', periodo: PERIODO });
+  assert.deepEqual([semData.regra, semData.centavos, semData.condicaoMaisFavoravel], ['lancamento', 100_000, undefined]);
+  // proposta: 4 simples + 1 média na tabela da vitrine → 1 pacote de 3 simples + 1 simples + 1 média; a anterior à parte
+  const r = precosDaProposta(
+    [
+      ...['A', 'B', 'C', 'D'].map((nome) => ({ nome, categoria: 'simples', recebidaEm: '2026-12-12T12:00:00Z' })),
+      { nome: 'E', categoria: 'media', recebidaEm: '2026-12-12T12:00:00Z' },
+      { nome: 'F', categoria: 'simples', recebidaEm: '2026-12-05T12:00:00Z' },
+    ],
+    PERIODO,
+    NOVAS,
+  );
+  assert.deepEqual(r.pacotes, [{ numero: 1, categoria: 'simples', nomes: ['A', 'B', 'C'], centavos: 150_000 }]);
+  assert.equal(r.totalCentavos, 150_000 + 65_000 + 140_000 + 100_000, 'pacote + avulsa + média + oferta anterior');
+  // categorias não se misturam: 2 simples + 1 média não formam pacote
+  const misto = precosDaProposta(
+    [
+      { nome: 'A', categoria: 'simples', recebidaEm: '2026-12-12T12:00:00Z' },
+      { nome: 'B', categoria: 'simples', recebidaEm: '2026-12-12T12:00:00Z' },
+      { nome: 'C', categoria: 'media', recebidaEm: '2026-12-12T12:00:00Z' },
+    ],
+    PERIODO,
+    NOVAS,
+  );
+  assert.deepEqual([misto.pacotes.length, misto.totalCentavos], [0, 65_000 * 2 + 140_000]);
 });

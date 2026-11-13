@@ -43,7 +43,7 @@ const NEUTRAL = /Pedimos ao navegador para abrir o WhatsApp/;
 const OVERCLAIM = /WhatsApp aberto|aberto em uma nova aba|enviad[ao] com sucesso|mensagem enviada|recebemos sua/i;
 const FORM = { name: 'Pessoa de Teste', company: 'Empresa Sintética', email: 'pessoa@exemplo.invalid', message: 'Conferimos todo dia os pagamentos do banco com o sistema financeiro, manualmente (teste de homologação).' };
 /** Mesma montagem de src/sections/Contact.tsx (buildMessage) — o teste confere o texto exato. */
-const EXPECTED = [`Olá! Sou ${FORM.name}, da ${FORM.company}.`, 'Quero solicitar uma avaliação de automação.', FORM.message, `E-mail para retorno: ${FORM.email}`].join('\n\n');
+const EXPECTED = [`Olá! Sou ${FORM.name}, da ${FORM.company}.`, 'Quero solicitar uma avaliação de automação (Nekkora Delivery).', FORM.message, `E-mail para retorno: ${FORM.email}`].join('\n\n');
 
 const CHANNEL = process.env.NEKKORA_CANAL ?? 'whatsapp';
 const SUBJECT = 'Solicitação de avaliação — Nekkora';
@@ -260,7 +260,11 @@ async function run(engine) {
   return { engine, version, waRequests: waRequests.map((r) => ({ ...r, url: r.url.slice(0, 60) + '…' })), aborted };
 }
 
-/** Vigência: antes e depois do período, só o preço padrão; durante, os preços de lançamento com o período por extenso. */
+/**
+ * Vigência (COM-VITRINE-001, V-01): a campanha controla só a comunicação promocional. Antes, durante, no último dia e
+ * depois do período os cartões mostram a MESMA tabela (individual, pacote de 3 e economia), sem valor riscado; a faixa
+ * com o período por extenso só aparece durante a campanha.
+ */
 async function campaign(engine, newContext) {
   const read = async (at) => {
     const ctx = await newContext({ width: 1280, height: 800 }, at);
@@ -268,31 +272,44 @@ async function campaign(engine, newContext) {
     await p.goto(baseUrl, { waitUntil: 'networkidle' });
     const r = await p.evaluate(() => ({
       text: document.querySelector('[data-pricing]').innerText,
-      struck: document.querySelectorAll('[data-pricing] s').length,
+      strip: document.querySelector('[data-pricing] .launch-strip')?.innerText ?? null,
+      struck: document.querySelectorAll('[data-pricing] s, [data-pricing] del').length,
       values: [...document.querySelectorAll('[data-price-tier] [data-price]')].map((e) => `${e.closest('[data-price-tier]').dataset.priceTier}:${e.dataset.price}=${e.textContent.trim()}`),
     }));
     await ctx.close();
     return r;
   };
+  // Tabela da COM-VITRINE-001, digitada de propósito (independente do código)
+  const table = [
+    'simples:individual=R$ 650',
+    'simples:pacote=R$ 1.500',
+    'simples:economia=Economia de R$ 450',
+    'media:individual=R$ 1.400',
+    'media:pacote=R$ 3.500',
+    'media:economia=Economia de R$ 700',
+  ];
+  const sameTable = (r) => JSON.stringify(r.values) === JSON.stringify(table) && r.struck === 0 && !/R\$ 1\.000|R\$ 2\.800/.test(r.text);
   const during = await read(IN_CAMPAIGN);
   check(
     engine,
     'vigencia-durante-campanha',
-    /Preços especiais de lançamento para solicitações de avaliação recebidas de 01\/11\/2026 a 31\/12\/2026\./.test(during.text) && during.struck === 2 && during.values.includes('simples:lancamento=R$ 1.000') && during.values.includes('media:lancamento=R$ 2.800'),
+    sameTable(during) && /Campanha de lançamento para solicitações de avaliação recebidas de 01\/11\/2026 a 31\/12\/2026\./.test(during.strip ?? '') &&
+      // V-01 (titular, 12/11/2026): a faixa diz que os valores continuam depois da campanha, até nova revisão
+      /valem para solicitações recebidas a partir de 10\/11\/2026 e continuam valendo depois da campanha, até nova revisão\./.test(during.strip ?? '') &&
+      !/Preços especiais|preço de lançamento/i.test(during.text),
     during.values.join(' · '),
   );
-  const standardOnly = ['simples:padrao=R$ 1.500', 'media:padrao=R$ 3.500'];
   for (const [id, at] of [
     ['vigencia-antes-do-inicio', new Date('2026-10-31T23:30:00-03:00')],
-    // 01/01/2027 00h30 em Brasília: a campanha já acabou
+    // 01/01/2027 00h30 em Brasília: a campanha já acabou — mesma tabela, sem retorno à tabela anterior (V-01)
     ['vigencia-depois-do-fim', new Date('2027-01-01T00:30:00-03:00')],
   ]) {
     const r = await read(at);
-    check(engine, id, JSON.stringify(r.values) === JSON.stringify(standardOnly) && r.struck === 0 && !/[Ll]ançamento/.test(r.text) && !/R\$ 1\.000|R\$ 2\.800|Economia/.test(r.text), r.values.join(' · '));
+    check(engine, id, sameTable(r) && r.strip === null && !/[Ll]ançamento/.test(r.text), r.values.join(' · '));
   }
   // último dia ainda vale: 31/12 às 23h30 em Brasília já é 01/01 em UTC
   const last = await read(new Date('2026-12-31T23:30:00-03:00'));
-  check(engine, 'vigencia-ultimo-dia-no-fuso-de-brasilia', last.values.includes('simples:lancamento=R$ 1.000'), last.values.join(' · '));
+  check(engine, 'vigencia-ultimo-dia-no-fuso-de-brasilia', sameTable(last) && last.strip != null, `${last.values.join(' · ')} · faixa=${last.strip ? 'presente' : 'ausente'}`);
 }
 
 /** Jornada pelo e-mail — canal da publicação atual (decisão da titular de 22/10/2026). */

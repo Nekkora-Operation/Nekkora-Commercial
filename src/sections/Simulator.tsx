@@ -1,27 +1,22 @@
 import { useId, useState, type KeyboardEvent } from 'react';
 import { Button, Card, Icon, Input, StatusRegion } from 'nekkora-lib';
 import { ScheduleButton } from '../agendamento';
-import { isLaunchActive, launchState } from '../config';
 import { SIMULATOR as S } from '../content';
-import { EMPTY_QUANTITIES, MAX_QUANTITY, PRICE_TABLE, brl, sanitizeQuantity, simulate, type CampaignState, type QuantityTier, type Simulation } from '../precos';
+import { EMPTY_QUANTITIES, MAX_QUANTITY, PRICE_TABLE, brl, sanitizeQuantity, simulate, type QuantityTier, type Simulation } from '../precos';
 import { useRequestTrigger } from '../request';
 
-type Result = { sim: Simulation; state: CampaignState };
+type Result = { sim: Simulation };
 
 /**
  * Resumo em texto da simulação: anunciado ao leitor de tela e, se o visitante quiser, levado ao formulário de
  * avaliação (NEKKORA-CALC-001 §3.8), onde ele o revisa antes de qualquer envio. Valores de src/precos.ts.
  */
-export function simulationSummary({ sim, state }: Result): string {
-  const lines = sim.lines.filter((l) => l.quantity > 0).map((l) => `- ${S.count(l.tier, l.quantity)} (${l.unitLabel} ${S.each})`);
-  if (sim.complexCount > 0) lines.push(`- ${S.count('complexa', sim.complexCount)} (${S.complexLine})`);
-  if (sim.pricedCount > 0) {
-    lines.push(`${S.estimateLabel(sim.launch, sim.partial)}: ${sim.estimateLabel}`);
-    if (sim.launch) lines.push(`${S.standardLabel}: ${sim.standardTotalLabel} · ${S.savingsLabel}: ${sim.savingsLabel} (${sim.percentLabel})`);
-  } else {
-    lines.push(S.onlyComplex);
-  }
-  lines.push(S.campaign[state]);
+export function simulationSummary({ sim }: Result): string {
+  const lines = sim.lines
+    .filter((l) => l.quantity > 0)
+    .map((l) => `- ${S.count(l.tier, l.quantity)}: ${S.composition(l.packages, l.singles, l.packageLabel, l.individualLabel)} = ${l.totalLabel}`);
+  lines.push(`${S.estimateLabel}: ${sim.estimateLabel}`);
+  if (sim.savings > 0) lines.push(`${S.individualLabel}: ${sim.individualTotalLabel} · ${S.savingsLabel}: ${sim.savingsLabel}`);
   return lines.join('\n');
 }
 
@@ -31,20 +26,19 @@ export function simulationSummary({ sim, state }: Result): string {
  * - Quantidades de 0 a MAX_QUANTITY por categoria (botões − e +, campo numérico e setas ↑/↓); nada fora disso é aceito.
  * - O resultado só aparece com "Calcular meu investimento" e some se as quantidades mudarem, até um novo cálculo:
  *   nunca há um valor desatualizado na tela.
- * - Preços de lançamento só com a campanha em vigor (ou na prévia de homologação sem datas, com aviso); fora dela, só
- *   o preço padrão. A situação é avaliada no momento do cálculo, no fuso de Brasília.
- * - Automação complexa: sem valor inventado; com ela, o total é um subtotal estimado das demais.
+ * - Tabela única (COM-VITRINE-001): o preço não depende da data; por categoria, pacotes de 3 enquanto houver 3 e o
+ *   restante no individual. Só simples e média (V-04).
  * - Nada é enviado nem guardado: o estado vive só na memória da página (sem storage, sem requisição).
  */
 export function Simulator() {
   const uid = useId();
-  const [raw, setRaw] = useState<Record<QuantityTier, string>>({ simples: '0', media: '0', complexa: '0' });
+  const [raw, setRaw] = useState<Record<QuantityTier, string>>({ simples: '0', media: '0' });
   const [result, setResult] = useState<Result | null>(null);
   const [notice, setNotice] = useState<'empty' | 'cleared' | null>(null);
   const [announcement, setAnnouncement] = useState<{ text: string; key: number }>({ text: '', key: 0 });
 
   const quantities = { ...EMPTY_QUANTITIES, ...Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, sanitizeQuantity(v)])) } as Record<QuantityTier, number>;
-  const total = quantities.simples + quantities.media + quantities.complexa;
+  const total = quantities.simples + quantities.media;
   const stale = result != null && (Object.keys(quantities) as QuantityTier[]).some((t) => quantities[t] !== result.sim.quantities[t]);
   const shown = result && !stale ? result : null;
   const summary = shown ? simulationSummary(shown) : null;
@@ -79,25 +73,21 @@ export function Simulator() {
       announce(S.empty);
       return;
     }
-    const next = { sim: simulate(quantities, isLaunchActive()), state: launchState() };
-    setRaw({ simples: String(quantities.simples), media: String(quantities.media), complexa: String(quantities.complexa) });
+    const next = { sim: simulate(quantities) };
+    setRaw({ simples: String(quantities.simples), media: String(quantities.media) });
     setResult(next);
     setNotice(null);
     announce(S.announce(simulationSummary(next).split('\n').map((l) => l.replace(/^- /, '')).join('. ')));
   };
 
   const clear = () => {
-    setRaw({ simples: '0', media: '0', complexa: '0' });
+    setRaw({ simples: '0', media: '0' });
     setResult(null);
     setNotice('cleared');
     announce(S.cleared);
   };
 
-  const unit = (tier: QuantityTier) => {
-    if (tier === 'complexa') return S.complexLine;
-    const launch = isLaunchActive();
-    return `${brl(launch ? PRICE_TABLE[tier].launch : PRICE_TABLE[tier].standard)} ${S.each}`;
-  };
+  const unit = (tier: QuantityTier) => S.unit(brl(PRICE_TABLE[tier].individual), brl(PRICE_TABLE[tier].pacote));
 
   return (
     <Card variant="raised" padding="lg" className="sim" data-simulator="">
@@ -184,59 +174,42 @@ export function Simulator() {
       {stale && <p className="sim__warning">{S.changed}</p>}
 
       {shown && (
-        <section className="sim__result" aria-labelledby={`${uid}-result`} data-sim-result={shown.state} data-sim-launch={shown.sim.launch ? 'sim' : 'nao'}>
+        <section className="sim__result" aria-labelledby={`${uid}-result`} data-sim-result="" data-sim-pacotes={shown.sim.packages}>
           <h4 id={`${uid}-result`} className="sim__result-title">
             {S.resultTitle}
           </h4>
-          <p className="sim__campaign">{S.campaign[shown.state]}</p>
           <ul className="sim__lines plain-list">
             {shown.sim.lines
               .filter((l) => l.quantity > 0)
               .map((l) => (
                 <li key={l.tier} data-sim-line={l.tier}>
                   <span>
-                    {S.count(l.tier, l.quantity)} × {l.unitLabel}
+                    {S.count(l.tier, l.quantity)}: {S.composition(l.packages, l.singles, l.packageLabel, l.individualLabel)}
                   </span>
                   <span className="sim__line-total">{l.totalLabel}</span>
                 </li>
               ))}
-            {shown.sim.complexCount > 0 && (
-              <li data-sim-line="complexa">
-                <span>{S.count('complexa', shown.sim.complexCount)}</span>
-                <span className="sim__line-total">{S.complexLine}</span>
-              </li>
-            )}
           </ul>
-          {shown.sim.pricedCount > 0 ? (
-            <dl className="sim__figures">
-              <div className="sim__figure sim__figure--main">
-                <dt>{S.estimateLabel(shown.sim.launch, shown.sim.partial)}</dt>
-                <dd data-calc="estimativa">{shown.sim.estimateLabel}</dd>
-              </div>
-              {shown.sim.launch && (
-                <>
-                  <div className="sim__figure">
-                    <dt>{S.standardLabel}</dt>
-                    <dd data-calc="padrao">{shown.sim.standardTotalLabel}</dd>
-                  </div>
-                  <div className="sim__figure">
-                    <dt>{S.savingsLabel}</dt>
-                    <dd data-calc="economia">{shown.sim.savingsLabel}</dd>
-                  </div>
-                  <div className="sim__figure">
-                    <dt>{S.percentLabel}</dt>
-                    <dd data-calc="percentual">{shown.sim.percentLabel}</dd>
-                  </div>
-                </>
-              )}
-            </dl>
-          ) : (
-            <p className="sim__partial" data-calc="sob-orcamento">
-              {S.onlyComplex}
-            </p>
-          )}
-          {shown.sim.partial && shown.sim.pricedCount > 0 && <p className="sim__partial">{S.partialNote(shown.sim.complexCount)}</p>}
-          {shown.sim.launch && shown.sim.pricedCount > 0 && <p className="sim__note">{S.savingsNote}</p>}
+          <dl className="sim__figures">
+            <div className="sim__figure sim__figure--main">
+              <dt>{S.estimateLabel}</dt>
+              <dd data-calc="estimativa">{shown.sim.estimateLabel}</dd>
+            </div>
+            {shown.sim.savings > 0 && (
+              <>
+                <div className="sim__figure">
+                  <dt>{S.individualLabel}</dt>
+                  <dd data-calc="individual">{shown.sim.individualTotalLabel}</dd>
+                </div>
+                <div className="sim__figure">
+                  <dt>{S.savingsLabel}</dt>
+                  <dd data-calc="economia">{shown.sim.savingsLabel}</dd>
+                </div>
+              </>
+            )}
+          </dl>
+          <p className="sim__note">{S.packagesRule}</p>
+          {shown.sim.savings > 0 && <p className="sim__note">{S.savingsNote}</p>}
           <p className="sim__disclaimer" data-sim-aviso="">
             <Icon name="info" size="sm" />
             <span>{S.disclaimer}</span>

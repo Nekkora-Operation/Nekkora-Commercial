@@ -15,7 +15,16 @@
     "aprovacoes.publicacao": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001): autorizada a preparação da publicação em produção da Nekkora Commercial V1, com base no commit 2fdaed6, sem Bookings, envio automático, gateway de pagamento ou contratação automática. Pendências preservadas: F5, aguardando resposta da Microsoft, e minuta contratual a validar antes da primeira contratação. A autorização não comprova conformidade jurídica nem substitui mecanismos legais exigíveis para eventuais transferências internacionais.",
     "avisoHomologacao": "Titular, 11/11/2026 (NEKKORA-COM-GOLIVE-001, PUB-10): aviso \"Versão para homologação\" desligado para a publicação da V1, com base no commit 2fdaed6.",
     "fornecedor.endereco": "NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): Decreto 7.962/2013, art. 2º, II. Endereço informado pela titular em 05/11/2026, com base no cartão CNPJ (PUB-22). Endereço de escritório virtual: identifica o fornecedor e não indica atendimento presencial.",
-    "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail."
+    "envioAutomatico": "COM-RELEASE-005 §5 (P1): backend preparado e testado só localmente; sem endpoint publicado, a jornada continua pelo e-mail.",
+    "tabelaDePrecos": "COM-VITRINE-001 §9.3 (11/11/2026): a aprovação de preços vale para UMA tabela, identificada pela impressão digital de src/precos.ts (node scripts/comercial/impressao-precos.mjs). A tabela nova (individual e pacote de 3) ainda não tem aprovação definitiva: impressao null bloqueia o deploy (PUB-14). A aprovação só vale com o registro expresso da titular na chave $origem[\"tabelaDePrecos.impressao\"] (\"Titular, DD/MM/AAAA\", a partir de 11/11/2026, citando a impressão aprovada); a impressão sozinha não libera. As aprovações de preços anteriores valem só para a tabela da v1.0.0. posCampanha (V-01, tabela contínua depois de 06/01/2027) também depende de aprovação definitiva da titular.",
+    "novasCondicoes": "COM-VITRINE-001 §3.1: data de início das novas condições (= data da publicação aprovada da atualização), definida pela titular. Antes dela valem os compromissos da tabela anterior (V-02).",
+    "servicos": "COM-VITRINE-001 §7 (V-06): Monitor e AI em preparação, sem checkout nem contratação; \"disponivel\" só com aprovação própria (aprovacoes.disponibilidade).",
+    "tabelaDePrecos.impressao": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-14, revisão da PR #21, commit cf0e733, CI aprovada e impressões conferidas em Linux): aprovo expressamente a tabela comercial da COM-VITRINE-001 — Nekkora Delivery: automação simples individual R$ 650, pacote de três simples R$ 1.500, automação média individual R$ 1.400, pacote de três médias R$ 3.500; Nekkora Monitor R$ 75 por automação/mês e Nekkora AI R$ 100 por empresa/mês como valores previstos, produtos em preparação e indisponíveis para contratação — impressão sha256:95a612f7b2528cee48fb4b043b4751d8bca66164e6cade01599832d8cc008f35.",
+    "tabelaDePrecos.posCampanha": "Titular, 12/11/2026 (COM-VITRINE-001, V-01): aprovo expressamente que a tabela comercial de impressão sha256:95a612f7b2528cee48fb4b043b4751d8bca66164e6cade01599832d8cc008f35 (PUB-14) continue vigente depois de 06/01/2027, até nova revisão comercial; o encerramento da campanha de lançamento não encerra automaticamente a validade desses preços.",
+    "impressoesDeConteudo.textosComerciais": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-17): aprovo os textos comerciais da nova vitrine correspondentes ao conteúdo homologado no commit cf0e733 — apresentação dos quatro produtos, preços e pacotes, o diferencial \"A automação é sua\", critérios comerciais, comunicação da campanha e jornadas de solicitação — impressão sha256:fa69c55dfac65645ef13a5e9387d15b8a94ce4f89d1306aa7504e6a5365d9df5.",
+    "impressoesDeConteudo.condicoesComerciais": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-19): aprovo as condições comerciais anunciadas na vitrine e no regulamento, conforme a versão homologada (commit cf0e733), impressão sha256:0b94d467bbad9aab0aee9cd3ff6c7612e42d88ae7b209fe59a4e50d3bf7577c1. Esta aprovação NÃO representa aprovação do contrato-base, anexos, proposta-modelo ou procedimento operacional; as decisões DP-01 a DP-05 e as demais condições contratuais continuam pendentes; não está autorizada a formalização de contratos de pacotes até a resolução dessas pendências.",
+    "novasCondicoes.inicio": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-13): data de início das novas condições 2026-11-12, data da publicação efetiva da nova vitrine em produção, no horário de Brasília (Dia D antecipado pela titular de 13/11 para 12/11/2026). Compromissos comerciais anteriores preservados: solicitações recebidas antes da entrada efetiva da nova vitrine no ar, inclusive as recebidas em 12/11/2026 antes desse horário, mantêm as condições anteriores e são analisadas individualmente (runbook v1.1.0, §3). Se a publicação não for concluída em 12/11/2026, esta data não vale para outro dia e deve ser revista antes de nova homologação.",
+    "publicacaoAutorizada": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-18): autorizo a publicação em produção da versão 1.1.0 da Nekkora Commercial, commit homologado 98f0d9ea2bc327770514c8a789f4ccee940f53a4 (CI 43328062798 aprovada; impressões PUB-14, PUB-17 e PUB-19 conferidas). Esta autorização vale somente para esse conteúdo e para publicação em 12/11/2026. Não autoriza a contratação de pacotes, nem a contratação de Monitor ou AI, nem altera as pendências contratuais. O merge e o deploy dependem de autorizações próprias."
   },
   "canais": {
     "whatsapp": null,
@@ -54,5 +63,24 @@
     "envioAutomatico": false,
     "publicacao": true
   },
-  "avisoHomologacao": false
+  "avisoHomologacao": false,
+  "tabelaDePrecos": {
+    "impressao": "sha256:95a612f7b2528cee48fb4b043b4751d8bca66164e6cade01599832d8cc008f35",
+    "posCampanha": true
+  },
+  "novasCondicoes": {
+    "inicio": "2026-11-12"
+  },
+  "servicos": {
+    "monitor": "em-preparacao",
+    "ai": "em-preparacao"
+  },
+  "impressoesDeConteudo": {
+    "textosComerciais": "sha256:fa69c55dfac65645ef13a5e9387d15b8a94ce4f89d1306aa7504e6a5365d9df5",
+    "condicoesComerciais": "sha256:0b94d467bbad9aab0aee9cd3ff6c7612e42d88ae7b209fe59a4e50d3bf7577c1"
+  },
+  "publicacaoAutorizada": {
+    "versao": "1.1.0",
+    "commit": "98f0d9ea2bc327770514c8a789f4ccee940f53a4"
+  }
 }

@@ -10,6 +10,8 @@ import { join, resolve } from 'node:path';
 import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { responseHeadersPolicy } from '../../deploy/aws/cabecalhos.mjs';
+import { impressaoDaTabela } from '../comercial/impressao-precos.mjs';
+import { impressaoDoConteudo } from '../comercial/impressao-conteudo.mjs';
 
 const root = resolve('.');
 const dir = mkdtempSync(join(tmpdir(), 'portao-publicacao-'));
@@ -19,7 +21,27 @@ const lib = JSON.parse(readFileSync(join(root, 'vendor/nekkora-lib.json'), 'utf8
 const HASHES = ["'sha256-JDd2nuaninfZZDJOM3fEvC7cCoIy0w7m1A5JfhKL6tE='"];
 const policy = (hashes = HASHES, origens) => `${JSON.stringify(responseHeadersPolicy(hashes, origens), null, 2)}\n`;
 
+// Registro fictício da aprovação da tabela (COM-VITRINE-001 §9.3): data e impressão aprovada citadas pela titular
+const REGISTRO = (impressao = impressaoDaTabela(), data = '12/11/2026') => `Titular, ${data} (fictício): tabela aprovada, impressão ${impressao}.`;
+// Registros fictícios das aprovações de PUB-17 e PUB-19 (COM-VITRINE-001 §12, forma b): data e impressão do conteúdo
+const TEXTOS = impressaoDoConteudo('textosComerciais');
+const CONDICOES = impressaoDoConteudo('condicoesComerciais');
+const REGISTRO_DE = (impressao, data = '12/11/2026') => `Titular, ${data} (fictício): conteúdo aprovado, impressão ${impressao}.`;
+// PUB-18: versão do package.json da cópia e commit homologado (fictícios)
+const VERSAO = '9.9.9-teste';
+const HOMOLOGADO = 'a'.repeat(40);
+writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'copia-de-teste', version: VERSAO }));
 const complete = () => ({
+  $origem: {
+    'tabelaDePrecos.impressao': REGISTRO(),
+    'impressoesDeConteudo.textosComerciais': REGISTRO_DE(TEXTOS),
+    'impressoesDeConteudo.condicoesComerciais': REGISTRO_DE(CONDICOES),
+    // L-02 e V-01 (titular, 12/11/2026): data de início e continuidade da tabela com registro próprio (fictícios)
+    'novasCondicoes.inicio': 'Titular, 12/11/2026 (fictício): data de início das novas condições 2026-11-12, data da publicação.',
+    'tabelaDePrecos.posCampanha': REGISTRO_DE(impressaoDaTabela()),
+    // PUB-18 (titular, 12/11/2026): autorização de UMA versão e UM commit homologado (fictícios)
+    publicacaoAutorizada: `Titular, 12/11/2026 (fictício): autorizo a publicação da versão ${VERSAO}, commit homologado ${HOMOLOGADO}.`,
+  },
   canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
   agendamento: { url: 'https://bookings.cloud.microsoft/book/AvaliacaoInicial@empresa-ficticia.com.br/', obrigatorio: true },
   envioAutomatico: { endpoint: null, chaveDoSiteTurnstile: null },
@@ -29,8 +51,14 @@ const complete = () => ({
   hospedagem: { provedor: 'Provedor Fictício' },
   aprovacoes: { precos: true, condicoesComerciais: true, textosComerciais: true, avisoDePrivacidade: true, agendamento: true, envioAutomatico: true, publicacao: true },
   avisoHomologacao: false,
+  // COM-VITRINE-001: aprovação da tabela do código (impressão digital), data de início e disponibilidade dos serviços
+  tabelaDePrecos: { impressao: impressaoDaTabela(), posCampanha: true },
+  novasCondicoes: { inicio: '2026-11-12' },
+  servicos: { monitor: 'em-preparacao', ai: 'em-preparacao' },
+  impressoesDeConteudo: { textosComerciais: TEXTOS, condicoesComerciais: CONDICOES },
+  publicacaoAutorizada: { versao: VERSAO, commit: HOMOLOGADO },
 });
-const release = () => ({ homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES });
+const release = () => ({ aplicacao: `copia-de-teste@${VERSAO}`, homologacao: false, publicacao: 'publicacao.json', arvoreLimpa: true, nekkoraLib: { integridade: lib.integridade }, cspScriptHashes: HASHES });
 
 function setup(pub, rel = release(), { versionedPolicy = policy(), headersFile = false } = {}) {
   writeFileSync(join(dir, 'publicacao.json'), JSON.stringify(pub));
@@ -41,9 +69,9 @@ function setup(pub, rel = release(), { versionedPolicy = policy(), headersFile =
   writeFileSync(join(dir, 'deploy/aws/politica-cabecalhos.json'), versionedPolicy);
   if (headersFile) writeFileSync(join(dir, 'dist/_headers'), "Content-Security-Policy: default-src 'self'");
 }
-const gate = () =>
+const gate = (hoje = '2026-11-15') =>
   new Promise((done) =>
-    execFile(process.execPath, [join(root, 'scripts/verificar-publicacao.mjs'), '--hoje', '2026-10-22'], { cwd: dir, encoding: 'utf8' }, (err, stdout) =>
+    execFile(process.execPath, [join(root, 'scripts/verificar-publicacao.mjs'), '--hoje', hoje], { cwd: dir, encoding: 'utf8' }, (err, stdout) =>
       done({ code: err ? err.code : 0, stdout }),
     ),
   );
@@ -62,22 +90,90 @@ test('WhatsApp válido também é aceito', async () => {
   assert.equal((await gate()).code, 0);
 });
 
-test('o publicacao.json versionado passa no portão (aprovações expressas da titular em 11/11/2026)', async () => {
-  setup(JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8')));
-  const r = await gate();
-  // PUB-17/19/09 (commit e4bc72c) e PUB-10/18 (commit 2fdaed6), registradas em $origem; com artefato limpo, liberado
-  assert.equal(r.code, 0, r.stdout);
-  for (const id of ['PUB-19', 'PUB-17', 'PUB-09', 'PUB-18', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
+test('o publicacao.json versionado: aprovações da COM-VITRINE-001 registradas pela titular (12/11/2026); PUB-13 registrada no Dia D; sem a PUB-18 bloqueia só por ela, com a PUB-18 válida libera', async () => {
+  const real = JSON.parse(readFileSync(join(root, 'publicacao.json'), 'utf8'));
+  // a cópia usa a versão REAL do package.json e um artefato dessa versão, para a PUB-18 ser conferida como no deploy
+  const versaoReal = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;
+  writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'copia-de-teste', version: versaoReal }));
+  let r;
+  try {
+    setup(real, { ...release(), aplicacao: `copia-de-teste@${versaoReal}` });
+    r = await gate();
+  } finally {
+    writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'copia-de-teste', version: VERSAO }));
+  }
+  const pendencias = [...new Set([...r.stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort();
+  // Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas (commit cf0e733, impressões conferidas no CI em Linux).
+  // PUB-13 (L-02) registrada pela titular no Dia D, 12/11/2026. A flag aprovacoes.publicacao herdada da v1.0.0
+  // continua true e, sozinha, NÃO autoriza esta versão.
+  assert.equal(real.aprovacoes.publicacao, true);
+  const autorizada = real.publicacaoAutorizada;
+  if (autorizada === undefined) {
+    // Estado H (commit homologado): sem a PUB-18, o portão bloqueia, e só por ela; nenhum registro avulso da PUB-18
+    assert.equal(r.code, 1, r.stdout);
+    assert.deepEqual(pendencias, ['PUB-18'], r.stdout);
+    assert.match(r.stdout, /PUB-18 — autorização desta versão/);
+    assert.equal(real.$origem.publicacaoAutorizada, undefined, 'registro da PUB-18 sem a autorização');
+  } else {
+    // Estado C (autorização da titular, COM-VITRINE-001, 12/11/2026): autorização completa e válida, sem campos a mais,
+    // para a versão do package.json e UM commit homologado (SHA completo), citado exatamente no registro datado
+    assert.deepEqual(Object.keys(autorizada).sort(), ['commit', 'versao'], 'só versão e commit');
+    assert.equal(autorizada.versao, versaoReal, 'versão autorizada = versão do package.json');
+    assert.match(autorizada.commit ?? '', /^[0-9a-f]{40}$/, 'SHA completo do commit homologado');
+    const registro = real.$origem.publicacaoAutorizada;
+    assert.equal(typeof registro, 'string', 'registro da titular em $origem["publicacaoAutorizada"]');
+    assert.match(registro, /^Titular, 12\/11\/2026 \(COM-VITRINE-001, PUB-18\): /);
+    assert.ok(registro.includes(`versão ${versaoReal}`), 'registro cita a versão');
+    assert.deepEqual(registro.match(/(?<![0-9a-f])[0-9a-f]{40}(?![0-9a-f])/g), [autorizada.commit], 'registro cita exatamente o SHA autorizado');
+    assert.equal(r.code, 0, r.stdout);
+    assert.deepEqual(pendencias, [], r.stdout);
+    assert.match(r.stdout, /Publicação liberada/);
+  }
+  assert.doesNotMatch(r.stdout, /PUB-13 —/);
+  // PUB-13: data do Dia D, registro da titular no mesmo dia, citando UMA data (a de início), sem retroatividade e com os
+  // compromissos anteriores preservados
+  assert.equal(real.novasCondicoes.inicio, '2026-11-12');
+  const registroInicio = real.$origem['novasCondicoes.inicio'];
+  assert.match(registroInicio, /^Titular, 12\/11\/2026 \(COM-VITRINE-001, PUB-13\)/);
+  assert.deepEqual(registroInicio.match(/\d{4}-\d{2}-\d{2}/g), ['2026-11-12']);
+  assert.match(registroInicio, /horário de Brasília/);
+  assert.match(registroInicio, /Compromissos comerciais anteriores preservados/);
+  // as aprovações valem para o conteúdo ATUAL: cada valor aprovado é a impressão calculada agora, e o registro da
+  // titular cita exatamente essa impressão, uma única vez (qualquer mudança em arquivo protegido volta a bloquear)
+  const aprovadas = [
+    ['tabelaDePrecos.impressao', real.tabelaDePrecos.impressao, impressaoDaTabela()],
+    ['tabelaDePrecos.posCampanha', real.tabelaDePrecos.impressao, impressaoDaTabela()],
+    ['impressoesDeConteudo.textosComerciais', real.impressoesDeConteudo.textosComerciais, impressaoDoConteudo('textosComerciais')],
+    ['impressoesDeConteudo.condicoesComerciais', real.impressoesDeConteudo.condicoesComerciais, impressaoDoConteudo('condicoesComerciais')],
+  ];
+  for (const [chave, aprovada, calculada] of aprovadas) {
+    assert.equal(aprovada, calculada, chave);
+    const registro = real.$origem[chave];
+    assert.match(registro, /^Titular, 12\/11\/2026 /, chave);
+    assert.deepEqual(registro.match(/sha256:[0-9a-f]{64}/g), [calculada], chave);
+  }
+  assert.equal(real.tabelaDePrecos.posCampanha, true);
+  // PUB-19 aprova só as condições anunciadas: contratos e pacotes continuam pendentes
+  assert.match(real.$origem['impressoesDeConteudo.condicoesComerciais'], /NÃO representa aprovação do contrato-base, anexos, proposta-modelo ou procedimento operacional/);
+  assert.match(real.$origem['impressoesDeConteudo.condicoesComerciais'], /DP-01 a DP-05 .* continuam pendentes; não está autorizada a formalização de contratos de pacotes/);
+  // Monitor e AI continuam em preparação; as flags da v1.0.0 não são acusadas nem alteradas
+  assert.deepEqual(real.servicos, { monitor: 'em-preparacao', ai: 'em-preparacao' });
+  assert.doesNotMatch(r.stdout, /PUB-17 — aprovação dos textos comerciais|PUB-19 — aprovação das condições comerciais/);
+  // PUB-09 (commit e4bc72c) e PUB-10 (commit 2fdaed6), registradas em $origem: continuam não acusadas
+  for (const id of ['PUB-09', 'PUB-10']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
   // PUB-20: URL oficial do Bookings válida e aprovação gravada pela titular em 05/11/2026 — o portão não a acusa mais
   assert.doesNotMatch(r.stdout, /PUB-20/);
   // PUB-22: endereço comercial informado pela titular em 05/11/2026 (cartão CNPJ) — o portão não o acusa mais
   assert.doesNotMatch(r.stdout, /PUB-22/);
 
-  assert.doesNotMatch(r.stdout, /PUB-13/);
+  assert.doesNotMatch(r.stdout, /PUB-13 — (datas de início e fim|campanha já encerrada)/);
   // sem endpoint de recebimento automático, a jornada é a do e-mail: nada a aprovar em PUB-21
   assert.doesNotMatch(r.stdout, /PUB-21/);
-  // os dados já informados pela titular passam: e-mail, LinkedIn, CNPJ, provedor e preços
-  for (const id of ['PUB-02', 'PUB-03', 'PUB-11', 'PUB-14']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
+  // Monitor e AI em preparação: nada a aprovar em PUB-23
+  assert.doesNotMatch(r.stdout, /PUB-23/);
+  // os dados já informados pela titular passam: e-mail, LinkedIn, CNPJ e provedor; a flag de preços da v1.0.0 continua
+  for (const id of ['PUB-02', 'PUB-03', 'PUB-11']) assert.doesNotMatch(r.stdout, new RegExp(`${id} —`));
+  assert.doesNotMatch(r.stdout, /PUB-14 — aprovação dos preços/);
   assert.doesNotMatch(r.stdout, /CNPJ ou CPF válido/);
 });
 
@@ -89,7 +185,7 @@ const cases = [
   ['LinkedIn na página inicial', (p) => (p.canais.linkedin = 'https://www.linkedin.com/'), /PUB-03/],
   ['LinkedIn de outro domínio', (p) => (p.canais.linkedin = 'https://example.com/company/x'), /PUB-03/],
   ['campanha sem datas', (p) => (p.campanhaLancamento = { inicio: null, fim: null }), /PUB-13/],
-  ['campanha encerrada', (p) => (p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), /PUB-13 — campanha já encerrada/],
+  ['campanha encerrada', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), (p.tabelaDePrecos.posCampanha = false)), /PUB-13 — campanha já encerrada/],
   ['sem razão social', (p) => (p.controlador.nome = null), /PUB-09 — controlador dos dados: razão social/],
   ['sem documento', (p) => (p.controlador.documento = null), /CNPJ ou CPF válido/],
   ['CNPJ com dígito errado', (p) => (p.controlador.documento = '11.222.333/0001-82'), /CNPJ ou CPF válido/],
@@ -105,7 +201,83 @@ const cases = [
   ['privacidade não aprovada', (p) => (p.aprovacoes.avisoDePrivacidade = false), /PUB-09 — aprovação do aviso/],
   ['publicação não autorizada', (p) => (p.aprovacoes.publicacao = false), /PUB-18/],
   ['aprovação como texto "true" (não é aprovação)', (p) => (p.aprovacoes.publicacao = 'true'), /PUB-18/],
+  // PUB-18 (titular, 12/11/2026): a flag herdada não basta; a autorização vale para UMA versão e UM commit homologado
+  ['PUB-18: só a flag, sem autorização desta versão', (p) => { delete p.publicacaoAutorizada; delete p.$origem.publicacaoAutorizada; }, /PUB-18 — autorização desta versão/],
+  ['PUB-18: autorização de outra versão', (p) => (p.publicacaoAutorizada.versao = '1.0.0'), /PUB-18 — autorização desta versão/],
+  ['PUB-18: commit que não é SHA completo', (p) => (p.publicacaoAutorizada.commit = 'a'.repeat(7)), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro cita outro commit', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace(HOMOLOGADO, 'c'.repeat(40))), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro cita dois commits', (p) => (p.$origem.publicacaoAutorizada += ` Também ${'c'.repeat(40)}.`), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro sem a versão', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace(`versão ${VERSAO}`, 'versão atual')), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro anterior a 12/11/2026 (aprovação da v1.0.0)', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace('12/11/2026', '11/11/2026')), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro com data futura', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace('12/11/2026', '16/11/2026')), /PUB-18 — autorização desta versão/],
+  ['PUB-18: registro sem "Titular, DD/MM/AAAA"', (p) => (p.$origem.publicacaoAutorizada = p.$origem.publicacaoAutorizada.replace('Titular, 12/11/2026', 'Agente')), /PUB-18 — autorização desta versão/],
   ['aviso de homologação ligado', (p) => (p.avisoHomologacao = true), /PUB-10/],
+  // COM-VITRINE-001 §9.3: a aprovação vale para UMA tabela — preço alterado sem nova aprovação bloqueia, com a flag true
+  ['tabela sem impressão aprovada (flag de preços true)', (p) => (p.tabelaDePrecos.impressao = null), /PUB-14 — tabela de preços do código sem aprovação própria/],
+  ['tabela aprovada diferente da do código (preço alterado)', (p) => (p.tabelaDePrecos.impressao = impressaoDaTabela({ delivery: { simples: { individual: 600, pacote: 1500 } } })), /PUB-14 — tabela de preços do código sem aprovação própria/],
+  ['sem o bloco tabelaDePrecos', (p) => delete p.tabelaDePrecos, /PUB-14 — tabela de preços do código/],
+  // Rastreabilidade (autorização da Etapa 2): a impressão sozinha não é aprovação
+  ['impressão preenchida sem registro da titular', (p) => delete p.$origem['tabelaDePrecos.impressao'], /PUB-14 — registro da aprovação da tabela ausente ou divergente/],
+  ['sem $origem', (p) => delete p.$origem, /PUB-14 — registro da aprovação da tabela/],
+  ['registro citando outra impressão', (p) => (p.$origem['tabelaDePrecos.impressao'] = REGISTRO(impressaoDaTabela({ x: 1 }))), /PUB-14 — registro da aprovação da tabela/],
+  ['registro citando duas impressões', (p) => (p.$origem['tabelaDePrecos.impressao'] = `${REGISTRO()} Antes: ${impressaoDaTabela({ x: 1 })}.`), /PUB-14 — registro da aprovação da tabela/],
+  ['registro sem data', (p) => (p.$origem['tabelaDePrecos.impressao'] = `Titular: tabela aprovada, impressão ${impressaoDaTabela()}.`), /PUB-14 — registro da aprovação da tabela/],
+  ['registro com data inexistente', (p) => (p.$origem['tabelaDePrecos.impressao'] = REGISTRO(undefined, '31/11/2026')), /PUB-14 — registro da aprovação da tabela/],
+  ['registro anterior à COM-VITRINE-001 (época da v1.0.0)', (p) => (p.$origem['tabelaDePrecos.impressao'] = REGISTRO(undefined, '05/11/2026')), /PUB-14 — registro da aprovação da tabela/],
+  ['registro com data futura', (p) => (p.$origem['tabelaDePrecos.impressao'] = REGISTRO(undefined, '16/11/2026')), /PUB-14 — registro da aprovação da tabela/],
+  ['registro sem a autoria da titular', (p) => (p.$origem['tabelaDePrecos.impressao'] = `Equipe, 12/11/2026: impressão ${impressaoDaTabela()}.`), /PUB-14 — registro da aprovação da tabela/],
+  ['registro de preços da v1.0.0 reaproveitado', (p) => (p.$origem['tabelaDePrecos.impressao'] = 'COM-RELEASE-003-R1 §3.1 (decisão interna de 22/10/2026): simples R$ 1.500 → R$ 1.000'), /PUB-14 — registro da aprovação da tabela/],
+  ['impressão em outro formato', (p) => (p.tabelaDePrecos.impressao = impressaoDaTabela().toUpperCase()), /PUB-14 — tabela de preços do código/],
+  // COM-VITRINE-001 §12 (forma b): textos (PUB-17) e condições (PUB-19) aprovados por impressão do conteúdo + registro
+  ...[['textosComerciais', 'PUB-17', TEXTOS, CONDICOES], ['condicoesComerciais', 'PUB-19', CONDICOES, TEXTOS]].flatMap(([item, id, propria, outra]) => {
+    const chave = `impressoesDeConteudo.${item}`;
+    const falta = new RegExp(`${id} — (textos|condições) comerciais sem aprovação própria`);
+    const registro = new RegExp(`${id} — registro da aprovação`);
+    return [
+      [`${id}: flag true sem impressão aprovada`, (p) => (p.impressoesDeConteudo[item] = null), falta],
+      [`${id}: sem o bloco impressoesDeConteudo`, (p) => delete p.impressoesDeConteudo, falta],
+      [`${id}: impressão aprovada de outro conteúdo (texto ou condição alterados)`, (p) => (p.impressoesDeConteudo[item] = `sha256:${'0'.repeat(64)}`), falta],
+      [`${id}: impressão do outro item no lugar desta`, (p) => (p.impressoesDeConteudo[item] = outra), falta],
+      [`${id}: impressão sem registro da titular`, (p) => delete p.$origem[chave], registro],
+      [`${id}: registro citando outra impressão`, (p) => (p.$origem[chave] = REGISTRO_DE(outra)), registro],
+      [`${id}: registro citando duas impressões`, (p) => (p.$origem[chave] = `${REGISTRO_DE(propria)} Antes: ${outra}.`), registro],
+      [`${id}: registro da época da v1.0.0 (11/11/2026)`, (p) => (p.$origem[chave] = REGISTRO_DE(propria, '11/11/2026')), registro],
+      [`${id}: registro com data futura`, (p) => (p.$origem[chave] = REGISTRO_DE(propria, '16/11/2026')), registro],
+      [`${id}: registro sem a autoria da titular`, (p) => (p.$origem[chave] = `Equipe, 12/11/2026: impressão ${propria}.`), registro],
+      [`${id}: só o registro da flag da v1.0.0`, (p) => (delete p.$origem[chave], (p.$origem[`aprovacoes.${item}`] = `Titular, 11/11/2026: aprovado (commit e4bc72c).`)), registro],
+    ];
+  }),
+  // L-02 (titular, 12/11/2026): data de início com registro da titular, sem retroatividade
+  ['data de início sem registro da titular', (p) => delete p.$origem['novasCondicoes.inicio'], /PUB-13 — registro da data de início/],
+  ['registro citando outra data de início', (p) => (p.$origem['novasCondicoes.inicio'] = 'Titular, 12/11/2026: data de início 2026-11-13.'), /PUB-13 — registro da data de início/],
+  ['registro citando duas datas', (p) => (p.$origem['novasCondicoes.inicio'] = 'Titular, 12/11/2026: data de início 2026-11-12 (antes 2026-11-06).'), /PUB-13 — registro da data de início/],
+  ['data de início retroativa ao registro (06/11/2026)', (p) => ((p.novasCondicoes.inicio = '2026-11-06'), (p.$origem['novasCondicoes.inicio'] = 'Titular, 12/11/2026: data de início 2026-11-06.')), /PUB-13 — registro da data de início/],
+  ['registro da data de início anterior a 12/11/2026', (p) => ((p.novasCondicoes.inicio = '2026-11-11'), (p.$origem['novasCondicoes.inicio'] = 'Titular, 11/11/2026: data de início 2026-11-11.')), /PUB-13 — registro da data de início/],
+  ['registro da data de início sem a autoria da titular', (p) => (p.$origem['novasCondicoes.inicio'] = 'Equipe, 12/11/2026: data de início 2026-11-12.'), /PUB-13 — registro da data de início/],
+  ['registro da data de início com data futura', (p) => (p.$origem['novasCondicoes.inicio'] = 'Titular, 16/11/2026: data de início 2026-11-12.'), /PUB-13 — registro da data de início/],
+  // V-01 / L-04 (titular, 12/11/2026): a flag sozinha não é aprovação; vale para a tabela aprovada
+  ['V-01: flag false (a página anuncia continuidade)', (p) => (p.tabelaDePrecos.posCampanha = false), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: flag true sem registro', (p) => delete p.$origem['tabelaDePrecos.posCampanha'], /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: flag como texto "true"', (p) => (p.tabelaDePrecos.posCampanha = 'true'), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: registro citando outra tabela', (p) => (p.$origem['tabelaDePrecos.posCampanha'] = REGISTRO_DE(impressaoDaTabela({ x: 1 }))), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: registro de 11/11/2026', (p) => (p.$origem['tabelaDePrecos.posCampanha'] = REGISTRO_DE(impressaoDaTabela(), '11/11/2026')), /V-01 — tabela depois de 06\/01\/2027/],
+  ['V-01: registro sem a autoria da titular', (p) => (p.$origem['tabelaDePrecos.posCampanha'] = `Equipe, 12/11/2026: ${impressaoDaTabela()}.`), /V-01 — tabela depois de 06\/01\/2027/],
+  // COM-VITRINE-001 §3.1: data de início das novas condições
+  ['sem data de início das novas condições', (p) => (p.novasCondicoes.inicio = null), /PUB-13 — data de início das novas condições/],
+  ['sem o bloco novasCondicoes', (p) => delete p.novasCondicoes, /PUB-13 — data de início das novas condições/],
+  ['data de início no futuro', (p) => (p.novasCondicoes.inicio = '2026-11-16'), /PUB-13 — data de início das novas condições/],
+  ['data de início antes da campanha', (p) => (p.novasCondicoes.inicio = '2026-10-31'), /PUB-13 — data de início das novas condições/],
+  ['data de início inválida', (p) => (p.novasCondicoes.inicio = '10/11/2026'), /PUB-13 — data de início das novas condições/],
+  // COM-VITRINE-001 §3.2 (V-01): campanha encerrada sem a aprovação da tabela pós-campanha
+  ['campanha encerrada sem tabela pós-campanha aprovada', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), (p.novasCondicoes.inicio = '2026-09-01'), (p.tabelaDePrecos.posCampanha = false)), /tabela pós-campanha não aprovada/],
+  ['campanha encerrada com flag pós-campanha sem registro', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-11-13' }), delete p.$origem['tabelaDePrecos.posCampanha']), /tabela pós-campanha não aprovada/],
+  ['pós-campanha como texto "true"', (p) => ((p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-09-30' }), (p.novasCondicoes.inicio = '2026-09-01'), (p.tabelaDePrecos.posCampanha = 'true')), /tabela pós-campanha não aprovada/],
+  // COM-VITRINE-001 §7 (V-06): Monitor e AI
+  ['Monitor disponível sem aprovação', (p) => (p.servicos.monitor = 'disponivel'), /PUB-23 — servicos\.monitor/],
+  ['AI disponível sem aprovação', (p) => (p.servicos.ai = 'disponivel'), /PUB-23 — servicos\.ai/],
+  ['AI disponível com aprovação de outro serviço', (p) => ((p.servicos.ai = 'disponivel'), (p.aprovacoes.disponibilidade = { monitor: true })), /PUB-23 — servicos\.ai/],
+  ['estado de serviço desconhecido', (p) => (p.servicos.monitor = 'contratar'), /PUB-23 — servicos\.monitor/],
+  ['sem o bloco servicos', (p) => delete p.servicos, /PUB-23/],
   // Agendamento (COM-RELEASE-005 §4.5)
   ['agendamento obrigatório sem URL', (p) => (p.agendamento.url = null), /PUB-20 — URL oficial/],
   ['Bookings de outra organização', (p) => (p.agendamento.url = 'https://outlook.office365.com/book/Vendas@outra-empresa.com.br/'), /PUB-20 — URL oficial/],
@@ -152,6 +324,54 @@ for (const [name, mutate, expected] of cases) {
     assert.match(r.stdout, expected);
   });
 }
+
+test('impressão: qualquer valor da tabela alterado muda a impressão (preço novo sem aprovação bloqueia)', async () => {
+  const { PRICE_TABLE, PACKAGE_SIZE, PLANNED_RECURRING_PRICES } = await import('../../src/precos.ts');
+  const base = { delivery: PRICE_TABLE, tamanhoDoPacote: PACKAGE_SIZE, recorrentesPrevistos: PLANNED_RECURRING_PRICES };
+  const atual = impressaoDaTabela();
+  assert.equal(impressaoDaTabela(structuredClone(base)), atual, 'a mesma tabela gera a mesma impressão');
+  const alteracoes = [
+    (t) => (t.delivery.simples.individual += 1),
+    (t) => (t.delivery.simples.pacote -= 1),
+    (t) => (t.delivery.media.individual += 100),
+    (t) => (t.delivery.media.pacote += 1),
+    (t) => (t.tamanhoDoPacote = 4),
+    (t) => (t.recorrentesPrevistos.monitor.mensal = 80),
+    (t) => (t.recorrentesPrevistos.ai.mensal = 90),
+  ];
+  for (const muda of alteracoes) {
+    const t = structuredClone(base);
+    muda(t);
+    assert.notEqual(impressaoDaTabela(t), atual, String(muda));
+  }
+});
+
+test('campanha encerrada com a tabela pós-campanha aprovada (V-01): libera', async () => {
+  const p = complete();
+  // campanha terminada em 13/11/2026, deploy em 15/11/2026: V-01 com registro (complete) libera
+  p.campanhaLancamento = { inicio: '2026-08-01', fim: '2026-11-13' };
+  setup(p);
+  const r = await gate();
+  assert.equal(r.code, 0, r.stdout);
+});
+
+test('Monitor disponível com aprovação própria: libera', async () => {
+  const p = complete();
+  p.servicos.monitor = 'disponivel';
+  p.aprovacoes.disponibilidade = { monitor: true };
+  setup(p);
+  const r = await gate();
+  assert.equal(r.code, 0, r.stdout);
+});
+
+test('data de início das novas condições no próprio dia do deploy: libera', async () => {
+  const p = complete();
+  p.novasCondicoes.inicio = '2026-11-15';
+  p.$origem['novasCondicoes.inicio'] = 'Titular, 15/11/2026 (fictício): data de início 2026-11-15, data da publicação.';
+  setup(p);
+  const r = await gate('2026-11-15');
+  assert.equal(r.code, 0, r.stdout);
+});
 
 test('agendamento fora do lançamento: sem URL, libera (o botão não aparece)', async () => {
   const p = complete();
@@ -201,6 +421,9 @@ test('bloqueia artefato de homologação, árvore suja, outra lib, CSP divergent
   for (const [rel, opts, expected] of [
     [{ ...release(), homologacao: true, publicacao: 'scripts/fixtures/publicacao-homologacao.json' }, {}, /dados de homologação/],
     [{ ...release(), arvoreLimpa: false }, {}, /não commitadas/],
+    // PUB-18: o artefato tem de ser da versão autorizada (a do package.json)
+    [{ ...release(), aplicacao: 'copia-de-teste@1.0.0' }, {}, /artefato de outra versão/],
+    [{ ...release(), aplicacao: undefined }, {}, /artefato de outra versão \(sem versão/],
     [{ ...release(), nekkoraLib: { integridade: 'sha512-outra' } }, {}, /outra versão da nekkora-lib/],
     // script inline mudou e a política versionada não acompanhou: a página quebraria no CloudFront
     [{ ...release(), cspScriptHashes: ["'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='"] }, {}, /politica-cabecalhos\.json não corresponde/],

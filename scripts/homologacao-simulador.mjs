@@ -12,8 +12,11 @@
  *     Bookings oficiais;
  *   - fixture (scripts/fixtures/publicacao-homologacao.json): datas sintéticas 01/11 a 31/12/2026 → relógio do navegador
  *     fixado antes, durante e depois da campanha;
- *   - fixtures pendentes (publicacao-homologacao-pendente*.json): campanha SEM datas → prévia promocional só com o aviso
- *     de homologação; sem ele, só o preço padrão.
+ *   - fixtures pendentes (publicacao-homologacao-pendente*.json): campanha SEM datas → faixa de prévia só com o aviso
+ *     de homologação.
+ *
+ * COM-VITRINE-001: a tabela (individual e pacote de 3) é a mesma em qualquer data (V-01); a campanha controla só a faixa
+ * promocional. Sem categoria complexa (V-04).
  *
  * O relógio de cada contexto é sempre fixado (nada depende do dia em que o runner executa). A situação esperada de cada
  * data é derivada de campaignState/todayInBrazil (src/precos.ts) sobre o publicacao.json e conferida contra a tabela
@@ -47,16 +50,20 @@ const OFFICIAL_BOOKINGS = PUBLICACAO.agendamento.url;
 const THEME_KEY = 'nekkora-commercial-tema';
 const DISCLAIMER =
   'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.';
-// Exemplo obrigatório da missão, digitado aqui de propósito (independente do código): 2 simples + 1 média
-const EXAMPLE = { estimativa: 'R$ 4.800', padrao: 'R$ 6.500', economia: 'R$ 1.700', percentual: '26,15%' };
-// O mesmo pedido fora da campanha: só o preço padrão, sem economia nem percentual
-const EXAMPLE_STANDARD = { estimativa: 'R$ 6.500' };
-const CAMPAIGN_TEXT = {
-  vigente: 'Preços de lançamento em vigor para solicitações recebidas durante a campanha.',
-  futura: 'Valores pelo preço padrão. Os preços de lançamento ainda não estão em vigor.',
-  encerrada: 'Valores pelo preço padrão. A campanha de lançamento foi encerrada.',
-  pendente: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
+// Exemplo da COM-VITRINE-001, digitado aqui de propósito (independente do código): 4 simples + 1 média →
+// 1 pacote de 3 simples + 1 simples + 1 média
+const EXAMPLE = { estimativa: 'R$ 3.550', individual: 'R$ 4.000', economia: 'R$ 450' };
+// 2 simples + 1 média: nenhum pacote (categorias não se misturam), sem economia
+const EXAMPLE_NO_PACKAGE = { estimativa: 'R$ 2.700' };
+// Cartões: a mesma tabela em qualquer data
+const TABLE = {
+  simples: { individual: 'R$ 650', pacote: 'R$ 1.500', economia: 'Economia de R$ 450' },
+  media: { individual: 'R$ 1.400', pacote: 'R$ 3.500', economia: 'Economia de R$ 700' },
 };
+const UNITS = 'R$ 650 cada · R$ 1.500 o pacote de 3,R$ 1.400 cada · R$ 3.500 o pacote de 3';
+const SUMMARY_EXAMPLE = /4 automações simples: 1 pacote de 3 \(R\$ 1\.500 cada\) \+ 1 individual \(R\$ 650 cada\) = R\$ 2\.150/;
+/** Valores da tabela anterior e do antigo exemplo: nunca podem aparecer no simulador. */
+const PREVIOUS = /R\$ 1\.000|R\$ 2\.800|R\$ 4\.800|R\$ 6\.500|26,15%|lançamento|Desconto/;
 /** Fixture sintética (01/11 a 31/12/2026): antes, durante e depois. */
 const AT = {
   vigente: new Date('2026-11-15T12:00:00-03:00'),
@@ -128,7 +135,7 @@ async function run(engine) {
     const { ctx, page, sim } = await open(prodUrl);
     const place = await page.evaluate(() => {
       const s = document.querySelector('[data-simulator]');
-      const cards = document.querySelector('#precos .cards--3');
+      const cards = document.querySelector('#precos .price-cards');
       return {
         inPricing: !!s?.closest('[data-pricing]') && !!s?.closest('#precos'),
         afterCards: !!cards && !!s && (cards.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_FOLLOWING) > 0,
@@ -139,31 +146,35 @@ async function run(engine) {
     check(engine, 'integrado-na-secao-de-precos', place.inPricing && place.afterCards && place.title === 'Simulador de Investimento — Nekkora Delivery' && place.noForm, JSON.stringify(place));
     const initial = await sim.evaluate((el) => ({
       values: [...el.querySelectorAll('[data-sim-input]')].map((i) => i.value),
+      tiers: [...el.querySelectorAll('[data-sim-tier]')].map((t) => t.dataset.simTier),
       total: el.querySelector('[data-sim-total]')?.getAttribute('data-sim-total'),
       result: !!el.querySelector('[data-sim-result]'),
       minusDisabled: [...el.querySelectorAll('[data-sim-action="diminuir"]')].every((b) => b.getAttribute('aria-disabled') === 'true'),
     }));
-    check(engine, 'inicia-com-zero', JSON.stringify(initial.values) === '["0","0","0"]' && initial.total === '0' && !initial.result && initial.minusDisabled, JSON.stringify(initial));
+    check(engine, 'inicia-com-zero-so-simples-e-media', JSON.stringify(initial.values) === '["0","0"]' && initial.tiers.join() === 'simples,media' && initial.total === '0' && !initial.result && initial.minusDisabled, JSON.stringify(initial));
     await shot(sim, 'simulador-inicial-producao');
-    // Campanha vigente (produção, 15/11/2026): o exemplo obrigatório com os preços de lançamento
-    await plus(sim, 'simples', 2);
+    await plus(sim, 'simples', 4);
     await plus(sim, 'media');
     await calc(sim);
     const f = await figures(sim);
-    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
-    check(engine, 'calculo-exemplo-obrigatorio', JSON.stringify(f) === JSON.stringify(EXAMPLE) && res.state === 'vigente' && res.launch === 'sim', `${res.state}: ${JSON.stringify(f)}`);
-    check(engine, 'aviso-de-transparencia', res.text.includes(DISCLAIMER) && /não é uma economia operacional comprovada/.test(res.text), 'texto obrigatório e economia comercial ≠ operacional');
-    // 19. Consistência com os cartões: o preço unitário de cada linha é o do cartão
+    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ packages: e.dataset.simPacotes, text: e.innerText }));
+    check(engine, 'calculo-exemplo-com-pacote', JSON.stringify(f) === JSON.stringify(EXAMPLE) && res.packages === '1' && !PREVIOUS.test(res.text), `${JSON.stringify(f)} · pacotes=${res.packages}`);
+    check(engine, 'aviso-de-transparencia', res.text.includes(DISCLAIMER) && /não é uma economia operacional comprovada/.test(res.text) && /Categorias diferentes não se misturam em um pacote/.test(res.text), 'texto obrigatório, economia comercial ≠ operacional e regra dos pacotes');
+    // 19. Consistência com os cartões: os valores de cada categoria são os do cartão
     const cards = await page.evaluate(() => ({
-      simples: document.querySelector('[data-price-tier="simples"] [data-price="lancamento"]')?.textContent.trim(),
-      media: document.querySelector('[data-price-tier="media"] [data-price="lancamento"]')?.textContent.trim(),
+      table: Object.fromEntries([...document.querySelectorAll('[data-price-tier]')].map((el) => [el.dataset.priceTier, Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.dataset.price, v.textContent.trim()]))])),
       lines: [...document.querySelectorAll('[data-sim-line]')].map((l) => `${l.dataset.simLine}:${l.innerText.replace(/\s+/g, ' ')}`),
       units: [...document.querySelectorAll('[data-sim-tier] .sim__tier-unit')].map((u) => u.textContent.trim()),
     }));
+    const t = cards.table;
     check(
       engine,
       'consistente-com-os-cartoes',
-      cards.units[0] === `${cards.simples} cada` && cards.units[1] === `${cards.media} cada` && cards.lines[0].includes(`× ${cards.simples}`) && cards.lines[1].includes(`× ${cards.media}`),
+      cards.units[0] === `${t.simples?.individual} cada · ${t.simples?.pacote} o pacote de 3` &&
+        cards.units[1] === `${t.media?.individual} cada · ${t.media?.pacote} o pacote de 3` &&
+        cards.lines[0].includes(`(${t.simples?.pacote} cada)`) &&
+        cards.lines[0].includes(`(${t.simples?.individual} cada)`) &&
+        cards.lines[1].includes(`(${t.media?.individual} cada)`),
       `${cards.units.join(' · ')} | ${cards.lines.join(' · ')}`,
     );
     // Caminhos após a simulação: Bookings oficial em nova aba, sem opener/Referer; avaliação abre o formulário.
@@ -177,15 +188,15 @@ async function run(engine) {
     }
     const status = await page.locator('[data-testid="status-simulador"]').innerText();
     check(engine, 'resultado-anunciado-em-regiao-viva', /Resultado da simulação atualizado\./.test(status) && (await page.locator('[data-testid="status-simulador"]').getAttribute('role')) === 'status', status.slice(0, 120));
-    await shot(sim, 'simulador-vigente-producao');
+    await shot(sim, 'simulador-com-pacote-producao');
     await ctx.close();
   }
 
   // Campanha real (publicacao.json): véspera, primeiro dia, vigente, último dia e dia seguinte ------------------------
+  // A tabela não muda com a data (V-01): só a faixa promocional aparece ou não.
   for (const d of PROD_DATES) {
     const promo = d.state === 'vigente';
     const { ctx, page, sim } = await open(prodUrl, { at: d.at });
-    // Cartões: com a campanha, padrão riscado + lançamento + percentual + economia; fora dela, só o padrão, sem desconto
     const cards = await page.evaluate(() => {
       const block = document.querySelector('[data-pricing]');
       return {
@@ -197,141 +208,104 @@ async function run(engine) {
         preview: !!block.querySelector('[data-campanha="pendente"]'),
       };
     });
-    const cardsOk = promo
-      ? JSON.stringify(cards.table.simples) === JSON.stringify({ padrao: 'R$ 1.500', lancamento: 'R$ 1.000', percentual: '−33,33%', economia: 'Economia de R$ 500' }) &&
-        JSON.stringify(cards.table.media) === JSON.stringify({ padrao: 'R$ 3.500', lancamento: 'R$ 2.800', percentual: '−20%', economia: 'Economia de R$ 700' }) &&
-        cards.struck.join() === 'R$ 1.500,R$ 3.500' &&
-        !!cards.strip?.includes(PROD_PERIOD) &&
-        !cards.preview
-      : JSON.stringify(cards.table) === JSON.stringify({ simples: { padrao: 'R$ 1.500' }, media: { padrao: 'R$ 3.500' }, complexa: {} }) && cards.struck.length === 0 && cards.strip === null && !cards.preview;
+    const cardsOk = JSON.stringify(cards.table) === JSON.stringify(TABLE) && cards.struck.length === 0 && !cards.preview && (promo ? !!cards.strip?.includes(PROD_PERIOD) : cards.strip === null);
     check(engine, `producao-${d.id}:cartoes`, cardsOk, `${JSON.stringify(cards.table)} · riscados=${cards.struck.join(',') || 'nenhum'} · faixa=${cards.strip ?? 'ausente'}`);
-    // Simulador: R$ 6.500 → R$ 4.800 só na campanha; fora dela, R$ 6.500 como preço padrão
-    await plus(sim, 'simples', 2);
+    await plus(sim, 'simples', 4);
     await plus(sim, 'media');
     await calc(sim);
     const f = await figures(sim);
-    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
-    const units = (await sim.locator('.sim__tier-unit').allInnerTexts()).slice(0, 2); // simples e média (a complexa é sob orçamento)
+    const text = await sim.locator('[data-sim-result]').innerText();
+    const units = await sim.locator('.sim__tier-unit').allInnerTexts();
     const label = await sim.locator('.sim__figure--main dt').innerText();
-    const simOk = promo
-      ? res.state === 'vigente' &&
-        res.launch === 'sim' &&
-        JSON.stringify(f) === JSON.stringify(EXAMPLE) &&
-        label === 'Investimento estimado com preços de lançamento' &&
-        units.join() === 'R$ 1.000 cada,R$ 2.800 cada' &&
-        res.text.includes(CAMPAIGN_TEXT.vigente)
-      : res.state === d.state &&
-        res.launch === 'nao' &&
-        JSON.stringify(f) === JSON.stringify(EXAMPLE_STANDARD) &&
-        label === 'Investimento estimado' &&
-        units.join() === 'R$ 1.500 cada,R$ 3.500 cada' &&
-        res.text.includes(CAMPAIGN_TEXT[d.state]) &&
-        !/R\$ 4\.800|R\$ 1\.700|26,15%|R\$ 1\.000|R\$ 2\.800|Economia|Desconto|lançamento em vigor|Prévia/.test(res.text);
-    check(engine, `producao-${d.id}:simulador`, simOk, `${res.state}/${res.launch} · ${label}: ${JSON.stringify(f)} · ${units.join(' · ')}`);
-    // Resumo levado ao formulário: os mesmos valores do estado da campanha
+    const simOk = JSON.stringify(f) === JSON.stringify(EXAMPLE) && label === 'Investimento estimado' && units.join() === UNITS && !PREVIOUS.test(text);
+    check(engine, `producao-${d.id}:simulador`, simOk, `${label}: ${JSON.stringify(f)} · ${units.join(' · ')}`);
+    // Resumo levado ao formulário: os mesmos valores em qualquer data
     await sim.locator('[data-sim-result]').getByRole('link', { name: 'Solicitar avaliação' }).click();
     const dialog = page.getByRole('dialog');
     await dialog.waitFor();
     const offer = dialog.locator('[data-testid="resumo-simulacao"] pre');
     await offer.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
     const summary = (await offer.count()) ? await offer.innerText() : '';
-    const summaryOk = promo
-      ? /2 automações simples \(R\$ 1\.000 cada\)/.test(summary) && /R\$ 4\.800/.test(summary) && /R\$ 6\.500/.test(summary)
-      : /2 automações simples \(R\$ 1\.500 cada\)/.test(summary) && /1 automação média \(R\$ 3\.500 cada\)/.test(summary) && /Investimento estimado: R\$ 6\.500/.test(summary) && summary.includes(CAMPAIGN_TEXT[d.state]) && !/R\$ 4\.800|R\$ 1\.000|R\$ 2\.800|Economia|com preços de lançamento/.test(summary);
+    const summaryOk = SUMMARY_EXAMPLE.test(summary) && /1 automação média: 1 individual \(R\$ 1\.400 cada\) = R\$ 1\.400/.test(summary) && /Investimento estimado: R\$ 3\.550/.test(summary) && /Economia com pacotes: R\$ 450/.test(summary) && !PREVIOUS.test(summary);
     check(engine, `producao-${d.id}:resumo-do-formulario`, summaryOk, summary.replace(/\n/g, ' / ').slice(0, 200));
     await page.keyboard.press('Escape');
     await shot(sim, `simulador-producao-${d.id}`);
     await ctx.close();
   }
 
-  // 12. Datas pendentes (fixtures sem datas): prévia só com o aviso de homologação; sem ele, só o preço padrão ------
-  {
-    const { ctx, page, sim } = await open(pendingUrl, { at: AT.pendente });
-    await plus(sim, 'simples', 2);
+  // 12. Datas pendentes (fixtures sem datas): faixa de prévia só com o aviso de homologação; preços sempre os mesmos ---
+  for (const [id, url, withNotice] of [
+    ['datas-pendentes-previa-com-aviso', pendingUrl, true],
+    ['datas-pendentes-sem-aviso-sem-faixa', pendingNoNoticeUrl, false],
+  ]) {
+    const { ctx, page, sim } = await open(url, { at: AT.pendente });
+    await plus(sim, 'simples', 4);
     await plus(sim, 'media');
     await calc(sim);
     const f = await figures(sim);
-    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
-    const strip = await page.locator('[data-pricing] [data-campanha="pendente"]').count();
-    check(
-      engine,
-      'datas-pendentes-previa-sem-elegibilidade',
-      res.state === 'pendente' && res.launch === 'sim' && JSON.stringify(f) === JSON.stringify(EXAMPLE) && res.text.includes(CAMPAIGN_TEXT.pendente) && strip === 1,
-      `${res.state}/${res.launch} · ${JSON.stringify(f)} · aviso de prévia nos cartões=${strip}`,
-    );
-    await shot(sim, 'simulador-pendente-previa');
-    await ctx.close();
-  }
-  {
-    const { ctx, page, sim } = await open(pendingNoNoticeUrl, { at: AT.pendente });
-    await plus(sim, 'simples', 2);
-    await plus(sim, 'media');
-    await calc(sim);
-    const f = await figures(sim);
-    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
+    const text = await sim.locator('[data-sim-result]').innerText();
     const cards = await page.evaluate(() => ({
       struck: document.querySelectorAll('[data-pricing] [data-price-tier] s').length,
-      launch: document.querySelectorAll('[data-pricing] [data-price="lancamento"], [data-pricing] [data-price="percentual"], [data-pricing] [data-price="economia"]').length,
+      preview: document.querySelectorAll('[data-pricing] [data-campanha="pendente"]').length,
       strip: !!document.querySelector('[data-pricing] .launch-strip'),
     }));
     check(
       engine,
-      'datas-pendentes-sem-aviso-so-preco-padrao',
-      res.state === 'pendente' && res.launch === 'nao' && JSON.stringify(f) === JSON.stringify(EXAMPLE_STANDARD) && !/R\$ 4\.800|Economia|Desconto/.test(res.text) && cards.struck === 0 && cards.launch === 0 && !cards.strip,
-      `${res.state}/${res.launch} · ${JSON.stringify(f)} · ${JSON.stringify(cards)}`,
+      id,
+      JSON.stringify(f) === JSON.stringify(EXAMPLE) && !PREVIOUS.test(text) && cards.struck === 0 && (withNotice ? cards.preview === 1 && cards.strip : cards.preview === 0 && !cards.strip),
+      `${JSON.stringify(f)} · ${JSON.stringify(cards)}`,
     );
+    if (withNotice) await shot(sim, 'simulador-pendente-previa');
     await ctx.close();
   }
 
-  // 9–11. Estados da campanha com datas (fixture) -------------------------------------------------------------------
+  // 9–11. Estados da campanha com datas (fixture): a mesma tabela antes, durante e depois ------------------------------
   for (const state of ['vigente', 'futura', 'encerrada']) {
     const { ctx, sim } = await open(fixtureUrl, { at: AT[state] });
-    await plus(sim, 'simples', 2);
+    await plus(sim, 'simples', 4);
     await plus(sim, 'media');
     await calc(sim);
     const f = await figures(sim);
-    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ state: e.dataset.simResult, launch: e.dataset.simLaunch, text: e.innerText }));
+    const text = await sim.locator('[data-sim-result]').innerText();
     const units = await sim.locator('.sim__tier-unit').allInnerTexts();
-    if (state === 'vigente') {
-      check(engine, 'campanha-vigente-precos-de-lancamento', res.state === 'vigente' && res.launch === 'sim' && JSON.stringify(f) === JSON.stringify(EXAMPLE) && units[0] === 'R$ 1.000 cada', JSON.stringify(f));
-    } else {
-      check(
-        engine,
-        `campanha-${state}-so-preco-padrao`,
-        res.state === state && res.launch === 'nao' && JSON.stringify(f) === JSON.stringify({ estimativa: 'R$ 6.500' }) && !/Economia|Desconto|lançamento em vigor|R\$ 1\.000|R\$ 2\.800/.test(res.text) && units[0] === 'R$ 1.500 cada',
-        `${JSON.stringify(f)} · ${res.text.split('\n')[1]}`,
-      );
-    }
+    check(engine, `campanha-${state}-mesma-tabela`, JSON.stringify(f) === JSON.stringify(EXAMPLE) && units.join() === UNITS && !PREVIOUS.test(text), JSON.stringify(f));
     await shot(sim, `simulador-${state}`);
     await ctx.close();
   }
 
-  // 8, 13, 14. Complexas, proteção de entradas, teclado, recalcular, limpar --------------------------------------------
+  // 8, 13, 14. Sem complexa, sem pacote misto, seis médias, proteção de entradas, teclado, recalcular, limpar -----------
   {
     const { ctx, page, sim } = await open(fixtureUrl);
-    // só complexas: nenhum valor
-    await plus(sim, 'complexa', 2);
-    await calc(sim);
-    let f = await figures(sim);
-    let text = await sim.locator('[data-sim-result]').innerText();
-    check(engine, 'so-complexas-sem-valor-inventado', JSON.stringify(f) === JSON.stringify({ 'sob-orcamento': 'Automações complexas têm orçamento individual, definido na avaliação. Por isso, esta simulação não mostra um valor.' }) && !/R\$/.test(text), text.split('\n').slice(1, 4).join(' · '));
-    await shot(sim, 'simulador-so-complexas');
-    // recalcular: mudar a quantidade esconde o resultado até novo cálculo (nunca um valor desatualizado)
+    const noComplex = await sim.evaluate((el) => ({ tier: el.querySelectorAll('[data-sim-tier="complexa"], [data-sim-input="complexa"]').length, text: /complexa|sob orçamento/i.test(el.innerText) }));
+    check(engine, 'sem-campo-complexa', noComplex.tier === 0 && !noComplex.text, JSON.stringify(noComplex));
+    // 2 simples + 1 média: categorias diferentes não formam pacote
     await plus(sim, 'simples', 2);
     await plus(sim, 'media');
+    await calc(sim);
+    let f = await figures(sim);
+    let res = await sim.locator('[data-sim-result]').evaluate((e) => ({ packages: e.dataset.simPacotes, text: e.innerText }));
+    check(engine, 'sem-pacote-misto', JSON.stringify(f) === JSON.stringify(EXAMPLE_NO_PACKAGE) && res.packages === '0' && !/Economia com pacotes/.test(res.text), `${JSON.stringify(f)} · pacotes=${res.packages}`);
+    await shot(sim, 'simulador-sem-pacote');
+    // recalcular: mudar a quantidade esconde o resultado até novo cálculo (nunca um valor desatualizado)
+    await plus(sim, 'simples', 2);
     const staleShown = await sim.locator('[data-sim-result]').count();
     const staleNote = await sim.locator('.sim__warning', { hasText: 'As quantidades mudaram.' }).count();
     await calc(sim);
     f = await figures(sim);
-    text = await sim.locator('[data-sim-result]').innerText();
-    check(engine, 'alterar-e-recalcular', staleShown === 0 && staleNote === 1 && f.estimativa === 'R$ 4.800', `resultado oculto após mudança=${staleShown === 0}; aviso=${staleNote}`);
+    check(engine, 'alterar-e-recalcular', staleShown === 0 && staleNote === 1 && JSON.stringify(f) === JSON.stringify(EXAMPLE), `resultado oculto após mudança=${staleShown === 0}; aviso=${staleNote}`);
+    // seis médias: dois pacotes (V-03)
+    await sim.getByRole('button', { name: 'Limpar simulação' }).click();
+    await plus(sim, 'media', 6);
+    await calc(sim);
+    f = await figures(sim);
+    res = await sim.locator('[data-sim-result]').evaluate((e) => ({ packages: e.dataset.simPacotes, text: e.innerText }));
     check(
       engine,
-      'complexas-com-outras-subtotal-estimado',
-      /Subtotal estimado com preços de lançamento/.test(text) && /não é o preço completo da contratação/.test(text) && /2 automações complexas\s+sob orçamento individual/.test(text),
-      text.match(/As automações complexas[^.]*\./)?.[0],
+      'pacotes-seis-medias-dois-pacotes',
+      JSON.stringify(f) === JSON.stringify({ estimativa: 'R$ 7.000', individual: 'R$ 8.400', economia: 'R$ 1.400' }) && res.packages === '2' && /6 automações médias: 2 pacotes de 3 \(R\$ 3\.500 cada\)/.test(res.text),
+      `${JSON.stringify(f)} · pacotes=${res.packages}`,
     );
-    await shot(sim, 'simulador-misto-com-complexas');
+    await shot(sim, 'simulador-seis-medias');
     // entradas inválidas: digitação e colagem
     const input = sim.locator('[data-sim-input="simples"]');
     const typed = [];
@@ -360,7 +334,7 @@ async function run(engine) {
     await calc(sim);
     // visível no simulador (a região viva, oculta, também anuncia o mesmo texto)
     const empty = await sim.locator('.sim__warning', { hasText: 'Selecione ao menos uma automação para calcular.' }).count();
-    check(engine, 'limpar-e-calcular-vazio', JSON.stringify(cleared.values) === '["0","0","0"]' && !cleared.result && empty === 1, JSON.stringify(cleared));
+    check(engine, 'limpar-e-calcular-vazio', JSON.stringify(cleared.values) === '["0","0"]' && !cleared.result && empty === 1, JSON.stringify(cleared));
     // teclado: botões por Enter/Espaço, setas no campo, Enter calcula — sem mouse
     await sim.locator('[data-sim-tier="simples"] [data-sim-action="aumentar"]').focus();
     await page.keyboard.press('Enter');
@@ -379,19 +353,19 @@ async function run(engine) {
       return false;
     });
     const spin = await sim.locator('[data-sim-input="media"]').evaluate((el) => ({ role: el.getAttribute('role'), now: el.getAttribute('aria-valuenow'), max: el.getAttribute('aria-valuemax'), name: el.getAttribute('aria-labelledby') && document.getElementById(el.getAttribute('aria-labelledby'))?.textContent }));
-    check(engine, 'teclado-completo', f.estimativa === 'R$ 4.800' && ring && spin.role === 'spinbutton' && spin.now === '1' && spin.max === '20' && spin.name === 'Automações médias', `${JSON.stringify(f)} · foco visível=${ring} · ${JSON.stringify(spin)}`);
+    check(engine, 'teclado-completo', JSON.stringify(f) === JSON.stringify(EXAMPLE_NO_PACKAGE) && ring && spin.role === 'spinbutton' && spin.now === '1' && spin.max === '20' && spin.name === 'Automações médias', `${JSON.stringify(f)} · foco visível=${ring} · ${JSON.stringify(spin)}`);
     // Tab percorre os controles do simulador em ordem e com foco visível
     await sim.locator('[data-sim-tier="simples"] [data-sim-action="diminuir"]').focus();
     const order = [];
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 8; i++) {
       order.push(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') || document.activeElement?.getAttribute('data-sim-input') || document.activeElement?.textContent?.trim()));
       await page.keyboard.press('Tab');
     }
     check(
       engine,
       'ordem-de-tab',
-      JSON.stringify(order.slice(0, 11)) ===
-        JSON.stringify(['Diminuir automações simples', 'simples', 'Aumentar automações simples', 'Diminuir automações médias', 'media', 'Aumentar automações médias', 'Diminuir automações complexas', 'complexa', 'Aumentar automações complexas', 'Limpar simulação', 'Calcular meu investimento']),
+      JSON.stringify(order) ===
+        JSON.stringify(['Diminuir automações simples', 'simples', 'Aumentar automações simples', 'Diminuir automações médias', 'media', 'Aumentar automações médias', 'Limpar simulação', 'Calcular meu investimento']),
       order.join(' → '),
     );
     await ctx.close();
@@ -408,9 +382,8 @@ async function run(engine) {
     const before = await page.evaluate(() => ({ local: Object.keys(localStorage), session: Object.keys(sessionStorage), cookie: document.cookie }));
     const requests = [];
     page.on('request', (r) => requests.push(r.url()));
-    await plus(sim, 'simples', 2);
+    await plus(sim, 'simples', 4);
     await plus(sim, 'media');
-    await plus(sim, 'complexa');
     await calc(sim);
     await sim.locator('[data-sim-result]').waitFor();
     const after = await page.evaluate(async () => ({
@@ -446,7 +419,7 @@ async function run(engine) {
     const { ctx, page, sim } = await open(prodUrl);
     const requests = [];
     page.on('request', (r) => requests.push(r.url()));
-    await plus(sim, 'simples', 2);
+    await plus(sim, 'simples', 4);
     await plus(sim, 'media');
     await calc(sim);
     await sim.locator('[data-sim-result]').getByRole('link', { name: 'Solicitar avaliação' }).click();
@@ -460,7 +433,7 @@ async function run(engine) {
     check(
       engine,
       'formulario-recebe-resumo-opcional',
-      offered.visible && !offered.checked && /2 automações simples \(R\$ 1\.000 cada\)/.test(offered.text) && /1 automação média \(R\$ 2\.800 cada\)/.test(offered.text) && /R\$ 4\.800/.test(offered.text),
+      offered.visible && !offered.checked && SUMMARY_EXAMPLE.test(offered.text) && /Investimento estimado: R\$ 3\.550/.test(offered.text) && !PREVIOUS.test(offered.text),
       `desmarcado por padrão=${!offered.checked}`,
     );
     await shot(dialog, 'formulario-com-resumo-da-simulacao');
@@ -478,7 +451,7 @@ async function run(engine) {
     check(
       engine,
       'resumo-so-com-a-escolha-e-revisado-antes',
-      without && /Simulação feita no site \(estimativa, sujeita à avaliação\):\n- 2 automações simples/.test(msg) && decodeURIComponent(mailto).includes('Simulação feita no site') && requests.length === 0,
+      without && /Simulação feita no site \(estimativa, sujeita à avaliação\):\n- 4 automações simples/.test(msg) && decodeURIComponent(mailto).includes('Simulação feita no site') && requests.length === 0,
       `sem marcar: ausente=${without}; marcado: na mensagem e no mailto; requisições=${requests.length}`,
     );
     await shot(dialog, 'formulario-confirmacao-com-simulacao');
@@ -491,6 +464,11 @@ async function run(engine) {
     await page.locator('#hosting [aria-haspopup="dialog"]').click();
     const dialog = page.getByRole('dialog');
     await dialog.waitFor();
+    // o tipo é aplicado por efeito logo depois da abertura: espera o ESTADO aplicado (até 1 s), sem espera fixa; se não
+    // aplicar no prazo, a verificação hosting-formulario-adequado falha explicitamente (tipoAplicado=false)
+    const tipoAplicado = await page
+      .waitForFunction(() => document.querySelector('[role="dialog"] [data-dica-servico]')?.getAttribute('data-dica-servico') === 'hospedagem', null, { timeout: 1000 })
+      .then(() => true, () => false);
     const checked = await dialog.getByRole('radio', { name: 'Hospedar uma automação existente' }).isChecked();
     // fechado e reaberto por outro CTA (sem tipo), a escolha continua
     await page.keyboard.press('Escape');
@@ -508,8 +486,8 @@ async function run(engine) {
     check(
       engine,
       'hosting-formulario-adequado',
-      checked && /hospedagem de uma automação existente/.test(description) && /Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente \(Nekkora Hosting\)\./.test(msg),
-      `hospedagem marcada=${checked}`,
+      tipoAplicado && checked && /hospedagem de uma automação existente/.test(description) && /Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente \(Nekkora Hosting\)\./.test(msg),
+      `tipo aplicado em até 1 s=${tipoAplicado}; hospedagem marcada=${checked}`,
     );
     await shot(dialog, 'formulario-hosting');
     await ctx.close();

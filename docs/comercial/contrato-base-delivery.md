@@ -13,6 +13,17 @@
 > **Alterações da titular de 09/11/2026:** sem espera obrigatória para o início (cl. 3.1) e nova regra de desistência
 > durante a homologação, com reembolso de 50% do valor pago (cl. 10). As duas estão sujeitas à revisão jurídica.
 >
+> **[COM-VITRINE-001](../release/COM-VITRINE-001.md) (etapa 6, 11/11/2026), MINUTA NÃO APROVADA:** cláusula 6.1 atualizada (duas tabelas), nova
+> **cláusula 6-A** (pacote de três), nova **cláusula 9-A** (cancelamento parcial do pacote) e item **14.3** (titularidade
+> no pacote). Diretrizes da titular (V-02, V-03, V-05) **[D]**; redação e opções **[R]**; decisões em aberto **DP-01 a
+> DP-05** ([COM-VITRINE-001 §10.5](../release/COM-VITRINE-001.md)). A cláusula 10 continua **não aprovada** e **não se
+> aplica aos pacotes**. Esta minuta deve ser validada **antes da primeira contratação**.
+>
+> **Diretrizes da titular de 12/11/2026 para DP-01 a DP-05:** registradas abaixo como **propostas para análise
+> contratual**, marcadas **[P]**. **Não são aprovação definitiva** e esta minuta **não é contrato pronto para
+> assinatura**. Antes da primeira contratação com pacote: aprovação expressa das condições finais e avaliação jurídica
+> proporcional aos riscos.
+>
 > **Hierarquia (R1, [R] ⚖):** (1) norma obrigatória; (2) **condição particular da proposta** que indique expressamente
 > a cláusula deste contrato que altera, desde que não reduza direito legal; (3) [Anexo B2B](anexo-b2b-delivery.md),
 > **só quando validamente aplicável** e só nos temas que lista; (4) este contrato-base; (5) termo de garantia e Anexo de
@@ -22,7 +33,8 @@
 > conflita com norma, a norma prevalece e o conflito está no [relatório §4](../release/NEKKORA-COM-CONTRACT-001.md).
 >
 > Marcadores: **[D]** diretriz da titular · **[R]** redação proposta pelo agente · **[N]** norma conferida no texto
-> oficial · **[I]** interpretação do agente · **⚖** exige parecer jurídico · **[!]** decisão ou evidência ainda pendente.
+> oficial · **[I]** interpretação do agente · **⚖** exige parecer jurídico · **[!]** decisão ou evidência ainda pendente · **[P]** proposta da titular para análise
+> contratual, ainda não aprovada.
 >
 > Documentos ligados: [proposta-modelo](proposta-modelo-delivery.md) · [termo de garantia](termo-garantia-delivery.md) ·
 > [Anexo de Componentes](anexo-componentes-delivery.md) · [Anexo B2B](anexo-b2b-delivery.md) ·
@@ -123,7 +135,9 @@ solicitações (não existem).
 
 6.1 **[D]** Preço por automação, definido na proposta. Na campanha, conforme o
 [regulamento](regulamento-campanha-lancamento.md). Os valores da tabela oficial (`src/precos.ts`) não são alterados por
-este contrato.
+este contrato. **[D] (COM-VITRINE-001, V-02)** Solicitação recebida **antes** da data de início das novas condições:
+tabela anterior (regulamento §2 e §3), com a condição mais favorável apenas **proposta** quando houver equivalência;
+recebida **a partir** dela: preço individual ou de pacote (cláusula 6-A) da tabela nova (regulamento §7).
 
 6.2 **[D]** **50% na contratação** e **50% após a homologação e o aceite formal** (cláusula 8). **[D]** Cada parcela
 vence em **5 dias úteis** da cobrança, com a **data de vencimento escrita na cobrança**.
@@ -132,6 +146,46 @@ vence em **5 dias úteis** da cobrança, com a **data de vencimento escrita na c
 o torna exigível: durante a homologação, vale a cláusula 10, sem cobrança adicional.
 
 6.4 Meio: Pix para a conta da Nekkora. ⚖ **[!]** Nota fiscal e tributos: pendente (JUR-01).
+
+## Cláusula 6-A — Pacote de três automações (COM-VITRINE-001, V-03) — MINUTA NÃO APROVADA
+
+6-A.1 **[D]** O pacote reúne **três automações da mesma categoria**, pelo preço do pacote da tabela vigente na data da
+solicitação. É avulso: sem mensalidade, renovação ou compromisso de novas contratações.
+
+6-A.2 **[D]** Cada automação do pacote tem **escopo, documentação, critérios de aceite, cronograma, homologação e aceite
+próprios** (cláusulas 4, 5, 7 e 8). O pacote não transforma as três em uma automação só nem muda a categoria de
+nenhuma.
+
+6-A.3 **[D]** Pagamento **50% + 50% por pacote**. A 1ª parcela é **50% do preço do pacote**, na contratação (6.2).
+⚖ **[!] DP-01 — vencimento da 2ª parcela:**
+- **(a)** 50% do preço do pacote depois do aceite formal da **última** automação do pacote; ou
+- **(b) [R] recomendada:** a 2ª parcela dividida em **três frações iguais** (1/6 do preço do pacote cada), cada uma
+  depois do aceite formal da respectiva automação.
+
+A opção (b) acompanha o aceite individual (6-A.2) e a titularidade por automação (14.3). Em qualquer opção, o silêncio
+não torna nada exigível (6.3).
+
+**[P] Proposta para análise (DP-01, 12/11/2026), não aprovada:** entrada de 50% do valor do pacote e saldo cobrado
+proporcionalmente ao aceite individual de cada uma das três automações (direção da opção b). A parcela de uma automação
+**não é cobrada antes da homologação e do aceite formal dela**. O saldo de cada automação é o seu valor de referência
+(6-A.4) menos a parte da entrada alocada a ela, pela mesma regra de centavos.
+
+6-A.4 **[R]** ⚖ **[!] DP-02 — valor de referência de cada automação no pacote:** preço do pacote ÷ 3, para reembolso,
+quitação e titularidade. Simples: R$ 500,00. Média: R$ 1.166,67, R$ 1.166,67 e R$ 1.166,66, para fechar R$ 3.500,00.
+É valor contratual interno e **não é preço publicado** (o site não mostra valor unitário no pacote — V-07).
+
+**[P] Proposta para análise (DP-02, 12/11/2026), não aprovada:** o valor do pacote, em **centavos inteiros**, é
+dividido por três; cada automação recebe o quociente inteiro e o resíduo (0, 1 ou 2 centavos) vai, um centavo por vez,
+às primeiras automações na ordem da proposta. A soma é **exatamente** o preço contratado. A entrada é alocada pela mesma
+regra. Exemplos: simples, referência R$ 500,00 cada, entrada R$ 250,00 e saldo R$ 250,00 cada; média, referência
+R$ 1.166,67, R$ 1.166,67 e R$ 1.166,66, entrada R$ 583,34, R$ 583,33 e R$ 583,33, saldo R$ 583,33, R$ 583,34 e
+R$ 583,33. Os valores de referência servem só para contabilização, quitação e cancelamentos, **não criam preço
+público** novo.
+
+6-A.5 **[D]** Com 4 ou 5 automações da mesma categoria: um pacote e as demais no preço individual; com 6, dois pacotes.
+**Pacote misto** (categorias diferentes) só por **proposta específica**, com preço e regras escritos nela.
+
+6-A.6 **[D]** O pacote não se acumula com outro desconto nem com o preço de lançamento da tabela anterior.
 
 ## Cláusula 7 — Desenvolvimento, testes e disponibilização (C-05)
 
@@ -197,6 +251,32 @@ Nekkora, a qualquer título).
 comprovante da devolução enviado ao CONTRATANTE. **[N]** No exercício válido do direito de arrependimento, a devolução
 é **imediata** e monetariamente atualizada (CDC art. 49, parágrafo único): prevalece sempre o prazo legal mais favorável.
 **[R]** O prazo operacional de 5 dias úteis **não autoriza postergar** uma restituição que a lei exige de imediato.
+
+## Cláusula 9-A — Cancelamento parcial do pacote (COM-VITRINE-001, V-03) — MINUTA NÃO APROVADA
+
+9-A.1 **[D]** O CONTRATANTE pode desistir de uma ou mais automações do pacote, conforme as regras abaixo, **sem
+penalidade nem retenção automática**.
+
+9-A.2 **[R]** Automação do pacote ainda **não** concluída e formalmente disponibilizada para homologação: vale a
+cláusula 9 **por automação**. O CONTRATANTE recebe o reembolso integral do que pagou à Nekkora atribuível a ela, ou
+seja, a parte da 1ª parcela proporcional ao valor de referência (6-A.4) e, se já paga, a fração da 2ª. Prazo: 9.4.
+
+9-A.3 **[R]** ⚖ **[!] DP-03 — automações mantidas:** proposta **sem recálculo**. As automações que continuam no
+contrato, ou que já foram aceitas, ficam pelo valor de referência do pacote e não passam ao preço individual. Recalcular
+funcionaria como penalidade, que a diretriz V-03 exclui.
+**[P] Proposta para análise (DP-03, 12/11/2026), não aprovada:** sem recálculo retroativo das automações que permanecem
+e sem multa ou retenção automática.
+
+9-A.4 **[D]** A **cláusula 10** (retenção de 50% durante a homologação) **não se aplica** a automações de pacote.
+⚖ **[!] DP-04 — desistência de automação do pacote durante a homologação:** regra a definir. **[R]** Até a decisão,
+aplica-se a regra mais favorável ao CONTRATANTE: reembolso integral do que foi pago atribuível a ela, como em 9-A.2.
+**[P] Proposta para análise (DP-04, 12/11/2026), não aprovada:** devolução integral do valor efetivamente pago
+relativo à automação cancelada, sem cobrança de parcela que dependa de aceite não ocorrido. A cláusula 10 não se aplica.
+⚖ Antes de qualquer contratação, avaliar a viabilidade comercial, os direitos legais aplicáveis e a redação.
+
+9-A.5 **[R]** O direito legal de arrependimento (cláusula 3) alcança o pacote inteiro e prevalece sobre esta cláusula.
+
+9-A.6 **[R]** Cancelamento por defeito, descumprimento ou atraso da Nekkora segue a cláusula 11, por automação.
 
 ## Cláusula 10 — Desistência durante a homologação (C-04) ⚖ ponto crítico
 
@@ -305,6 +385,19 @@ ou informações confidenciais.
 
 14.2 **[R]** Antes da quitação, a automação só é usada para homologação. Na desistência antes da conclusão (cláusula 9)
 ou durante a homologação (cláusula 10), nada é entregue e nenhum direito é transferido.
+
+14.3 **[D] (V-05)** "A automação é sua": o Código Específico passa ao CONTRATANTE conforme este contrato e **após a
+quitação integral**, preservadas as exceções do item 14.1. Nenhum direito irrestrito sobre bibliotecas, frameworks,
+componentes reutilizáveis ou tecnologias de terceiros; **LIC-02** continua pendente.
+⚖ **[!] DP-05 — titularidade no pacote:**
+- **(a) [R] recomendada:** por automação, depois da quitação do valor de referência dela (6-A.4), com a fração da
+  2ª parcela da opção (b) de DP-01;
+- **(b)** só depois da quitação do pacote inteiro.
+
+**[P] Proposta para análise (DP-05, 12/11/2026), não aprovada:** transferência dos direitos patrimoniais acordados
+sobre o **desenvolvimento específico de cada automação** depois da quitação do seu valor alocado (6-A.4), preservadas
+as exceções de componentes preexistentes, reutilizáveis, de código aberto e licenciados por terceiros (14.1 e Anexo de
+Componentes). **LIC-02** continua pendente até demonstrar os direitos necessários sobre os componentes usados.
 
 ## Cláusula 15 — Atraso no pagamento (C-11)
 

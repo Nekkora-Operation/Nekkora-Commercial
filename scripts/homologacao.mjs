@@ -15,8 +15,8 @@
  * Situação da campanha (NEKKORA-COM-RELEASE-FIX-001): derivada do publicacao.json que o artefato servido declara
  * (release.json → "publicacao") e de campaignState/todayInBrazil (src/precos.ts), na data do relógio do navegador —
  * fixado em NEKKORA_DATA ou, sem ela, no instante em que a homologação começa (sem virar o dia no meio da execução).
- * Com preços promocionais (vigente, ou pendente como prévia de homologação), exige o preço padrão riscado, o percentual,
- * a economia e a condição da campanha; sem eles (futura, encerrada), exige o preço padrão e a AUSÊNCIA de tudo isso.
+ * Desde a COM-VITRINE-001 a campanha controla só a comunicação promocional (faixa, condição e regras): os preços —
+ * individual, pacote de 3 e economia — são os mesmos em qualquer data, sem valor riscado nem percentual.
  *
  * Saída: capturas (JPEG), resultados.json e resumo.md na pasta indicada. Código de saída 1 se alguma verificação
  * falhar. Nenhuma requisição sai do localhost: tudo que tentar sair é bloqueado e registrado.
@@ -66,26 +66,25 @@ const FORBIDDEN = [
 ];
 
 /**
- * Tabela oficial (COM-RELEASE-003-R1 §3.1, COM-RELEASE-005 §3.2), digitada aqui de propósito — independente do código —
- * e conferida contra src/precos.ts (a fonte da página) antes de qualquer navegador abrir: se o código mudar, a
- * homologação falha em vez de aceitar o novo valor.
+ * Tabela da COM-VITRINE-001 §3 (individual, pacote de 3 e economia contra três individuais), digitada aqui de propósito
+ * — independente do código — e conferida contra src/precos.ts (a fonte da página) antes de qualquer navegador abrir: se
+ * o código mudar, a homologação falha em vez de aceitar o novo valor. Vale em qualquer data (V-01).
  */
 const OFFICIAL_PRICES = {
-  simples: { padrao: 'R$ 1.500', lancamento: 'R$ 1.000', percentual: '−33,33%', economia: 'Economia de R$ 500' },
-  media: { padrao: 'R$ 3.500', lancamento: 'R$ 2.800', percentual: '−20%', economia: 'Economia de R$ 700' },
-  complexa: {},
+  simples: { individual: 'R$ 650', pacote: 'R$ 1.500', economia: 'Economia de R$ 450' },
+  media: { individual: 'R$ 1.400', pacote: 'R$ 3.500', economia: 'Economia de R$ 700' },
 };
 const fromSource = Object.fromEntries(
   ['simples', 'media'].map((t) => {
     const f = priceFacts(t);
-    return [t, { padrao: f.standardLabel, lancamento: f.launchLabel, percentual: `−${f.percentLabel}`, economia: `Economia de ${f.savingsLabel}` }];
+    return [t, { individual: f.individualLabel, pacote: f.packageLabel, economia: `Economia de ${f.savingsLabel}` }];
   }),
 );
-if (JSON.stringify({ ...fromSource, complexa: {} }) !== JSON.stringify(OFFICIAL_PRICES)) {
+if (JSON.stringify(fromSource) !== JSON.stringify(OFFICIAL_PRICES)) {
   throw new Error(`src/precos.ts diverge da tabela oficial: ${JSON.stringify(fromSource)}`);
 }
-/** Fora da campanha, cada cartão mostra só o preço padrão oficial — mesmo valor da tabela acima, sem desconto. */
-const STANDARD_ONLY = { simples: { padrao: OFFICIAL_PRICES.simples.padrao }, media: { padrao: OFFICIAL_PRICES.media.padrao }, complexa: {} };
+/** Valores da tabela ANTERIOR (lançamento 06/11/2026): nunca podem aparecer nos cartões. */
+const PREVIOUS_LABELS = ['R$ 1.000', 'R$ 2.800'];
 
 // Situação da campanha no artefato servido: o release.json diz com qual publicacao.json o build foi feito.
 const release = await fetch(new URL('release.json', baseUrl), { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
@@ -95,12 +94,13 @@ const DATA = process.env.NEKKORA_DATA || null;
 if (DATA != null && !/^\d{4}-\d{2}-\d{2}$/.test(DATA)) throw new Error(`NEKKORA_DATA inválida: ${DATA}`);
 const NOW = DATA ? new Date(`${DATA}T12:00:00-03:00`) : new Date();
 const CAMPAIGN = campaignState(publicacao.campanhaLancamento, todayInBrazil(NOW));
-// Preços promocionais: só com a campanha vigente — ou, sem datas aprovadas, como prévia de um build com aviso de
-// homologação (o portão scripts/verificar-publicacao.mjs recusa publicar sem datas, PUB-13).
+// Comunicação promocional (faixa e regras): só com a campanha vigente — ou, sem datas aprovadas, como prévia de um build
+// com aviso de homologação (o portão scripts/verificar-publicacao.mjs recusa publicar sem datas, PUB-13). Os preços não
+// dependem disso.
 const PROMO = CAMPAIGN === 'vigente' || (CAMPAIGN === 'pendente' && publicacao.avisoHomologacao === true);
 const toBr = (iso) => iso.split('-').reverse().join('/');
 const PERIOD = CAMPAIGN === 'pendente' ? null : `de ${toBr(publicacao.campanhaLancamento.inicio)} a ${toBr(publicacao.campanhaLancamento.fim)}`;
-const CAMPAIGN_LABEL = `campanha ${CAMPAIGN} em ${todayInBrazil(NOW)}${PROMO ? ' — preços promocionais' : ' — só preço padrão'}`;
+const CAMPAIGN_LABEL = `campanha ${CAMPAIGN} em ${todayInBrazil(NOW)}${PROMO ? ' — com comunicação promocional' : ' — sem comunicação promocional'}`;
 console.log(`Campanha (${release.publicacao}): ${CAMPAIGN_LABEL}`);
 
 /** Valores do bloco de preços como aparecem na tela (data-price) e o estilo do preço padrão riscado. */
@@ -125,15 +125,9 @@ const readRenderedPrices = (page) =>
     };
   });
 
-/** Verificação dos preços conforme a campanha: com promoção, o esperado; sem promoção, a ausência do desconto. */
-const expectRendered = (shown) =>
-  PROMO
-    ? JSON.stringify(shown.table) === JSON.stringify(OFFICIAL_PRICES)
-    : JSON.stringify(shown.table) === JSON.stringify(STANDARD_ONLY);
-const expectStruck = (shown) =>
-  PROMO
-    ? shown.struck.length === 2 && shown.struck.every((s) => s.lineThrough && s.visible) && shown.struck.map((s) => s.text).join() === `${OFFICIAL_PRICES.simples.padrao},${OFFICIAL_PRICES.media.padrao}`
-    : shown.struck.length === 0 && shown.anyStruck.length === 0;
+/** Os mesmos preços em qualquer situação da campanha (V-01), sem nenhum valor riscado (V-07). */
+const expectRendered = (shown) => JSON.stringify(shown.table) === JSON.stringify(OFFICIAL_PRICES);
+const expectStruck = (shown) => shown.struck.length === 0 && shown.anyStruck.length === 0;
 
 const results = { baseUrl, navegador: ENGINE, campanha: { estado: CAMPAIGN, data: todayInBrazil(NOW), promocional: PROMO, publicacao: release.publicacao }, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
 const check = (id, ok, detail) => {
@@ -189,18 +183,17 @@ for (const theme of THEMES) {
     const file = `pagina-${theme}-${vp.name}-${vp.width}.jpg`;
     await page.screenshot({ path: path.join(outDir, file), fullPage: true, type: 'jpeg', quality: 72 });
     results.screenshots.push(file);
-    // Preços efetivamente renderizados em cada tema e largura (COM-RELEASE-005 §3.5): valores, percentuais e economia
-    // lidos da tela e comparados com a tabela oficial; com promoção, o preço padrão precisa aparecer riscado, e sem
-    // ela nenhum valor pode aparecer riscado.
+    // Preços efetivamente renderizados em cada tema e largura (COM-RELEASE-005 §3.5): individual, pacote e economia
+    // lidos da tela e comparados com a tabela oficial; nenhum valor pode aparecer riscado.
     const shown = await readRenderedPrices(page);
     check(`precos-renderizados:${theme}:${vp.name}`, expectRendered(shown), `${CAMPAIGN_LABEL}: ${JSON.stringify(shown.table)}`);
-    check(`precos-padrao-riscado:${theme}:${vp.name}`, expectStruck(shown), PROMO ? JSON.stringify(shown.struck) : `nenhum valor riscado esperado; riscados: ${JSON.stringify(shown.anyStruck)}`);
+    check(`precos-sem-valor-riscado:${theme}:${vp.name}`, expectStruck(shown), `riscados: ${JSON.stringify(shown.anyStruck)}`);
     // Conferência visual dos preços (COM-RELEASE-003 §11.2, COM-RELEASE-005 §3.5): os três cartões, em cada tema, no
     // celular, no tablet e no desktop
     if (vp.name !== 'wide') {
       const cards = `precos-${theme}-${vp.name}.png`;
       // a barra fixa do topo cobriria o primeiro cartão no recorte: escondida só nesta captura
-      await page.locator('#precos .cards--3').screenshot({ path: path.join(outDir, cards), style: 'header, nav { visibility: hidden !important; }' });
+      await page.locator('#precos .price-cards').screenshot({ path: path.join(outDir, cards), style: 'header, nav { visibility: hidden !important; }' });
       results.screenshots.push(cards);
     }
     if (vp.name === 'desktop') {
@@ -377,7 +370,9 @@ await block('funcionais', async () => {
     return {
       blocks: document.querySelectorAll('[data-pricing]').length,
       // Regras da campanha da COM-008-B: vale a solicitação; aceite da proposta em até 7 dias corridos
-      condition: /Valem para automações simples e médias solicitadas durante a campanha/.test(text) && /aceita em até 7 dias corridos da emissão/.test(text) && /A automação complexa tem orçamento individual/.test(text),
+      // COM-VITRINE-001 (etapa 3): faixa da campanha sem "preços especiais"; a tabela nova a partir da data de início (V-02)
+      condition: /Campanha de lançamento para solicitações de avaliação recebidas/.test(text) && /aceita em até 7 dias corridos da emissão/.test(text) && !/Preços especiais|preço de lançamento/i.test(text),
+      newConditionsPending: !!block?.querySelector('[data-novas-condicoes="pendente"]'),
       confirmedInProposal: /fica registrada na proposta/.test(text),
       licenses: /não estão incluídos nos valores acima/.test(text),
       // Tabela oficial da COM-RELEASE-003-R1 §3.1, lida do que está NA TELA (data-price de cada valor)
@@ -387,9 +382,17 @@ await block('funcionais', async () => {
           Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.getAttribute('data-price'), v.textContent.trim()])),
         ]),
       ),
-      complexa: /Automação complexa[\s\S]*?Sob orçamento[\s\S]*?orçamento individual/.test(text),
+      // COM-VITRINE-001 (V-04): sem categoria complexa, sem "sob orçamento" e sem a faixa acima de 16 horas; demandas fora
+      // das modalidades pelos canais gerais. Lido por textContent (inclui as regras recolhidas).
+      semComplexa: !/complexa|sob orçamento|acima de 16 horas/i.test(block?.textContent ?? '') && (block?.querySelectorAll('[data-price-tier]').length ?? 0) === 2,
+      outrasDemandas: /Não encontrou uma modalidade adequada à sua necessidade\? Entre em contato com nossa equipe para uma avaliação individual\./.test(block?.querySelector('[data-outras-demandas]')?.textContent ?? '') && !!block?.querySelector('[data-outras-demandas] a, [data-outras-demandas] button'),
+      // COM-VITRINE-001 (V-05): "A automação é sua", com a quitação integral e as exceções
+      titularidade: (() => {
+        const t = block?.querySelector('[data-nota="titularidade"]')?.textContent ?? '';
+        return /A automação é sua/.test(t) && /após a quitação integral/.test(t) && /componentes preexistentes da Nekkora/.test(t) && /tecnologias de terceiros continuam com seus titulares/.test(t);
+      })(),
       criteria: ['Esforço técnico estimado', 'Quantidade de sistemas', 'Complexidade das integrações', 'Regras de negócio', 'Volume de processamento', 'Exigências de infraestrutura', 'Necessidade de licenciamento'].every((c) => text.includes(c)),
-      conditions: /50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal/.test(text) && /cada uma tem categoria, escopo, preço e aceite próprios/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
+      conditions: /50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal/.test(text) && /cada uma tem escopo, documentação, homologação e aceite próprios/.test(text) && /Preço aprovado por você antes do início/.test(text) && /organizadas em fila/.test(text) && /Licenças e custos externos tratados à parte/.test(text),
       srLabels: [...(block?.querySelectorAll('.price .nk-visually-hidden') ?? [])].map((e) => e.textContent.trim()),
       // Elementos da campanha (src/sections/Pricing.tsx): faixa de lançamento, prévia sem datas, economia e percentual
       launchStrip: block?.querySelector('.launch-strip')?.innerText.replace(/\s+/g, ' ').trim() ?? null,
@@ -403,14 +406,20 @@ await block('funcionais', async () => {
     };
   });
   results.pricing = pricing;
-  const campaignCondition = /Valem para automações simples e médias solicitadas durante a campanha/;
+  const campaignCondition = /Campanha de lançamento para solicitações/;
+  // COM-VITRINE-001 (V-02): data de início das novas condições do build (nunca o início da campanha)
+  const NOVAS = typeof publicacao.novasCondicoes?.inicio === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(publicacao.novasCondicoes.inicio) ? publicacao.novasCondicoes.inicio.split('-').reverse().join('/') : null;
+  const startOk = NOVAS
+    ? !pricing.newConditionsPending && (!PROMO || pricing.launchStrip.includes(`valem para solicitações recebidas a partir de ${NOVAS}`))
+    : !PROMO || pricing.newConditionsPending;
   check('precos-so-no-bloco-de-precos', pricing.blocks === 1 && hits.filter((h) => h.pricing).length > 0, `${pricing.blocks} bloco(s) data-pricing`);
   // Com promoção: condição da campanha, período aprovado (ou o aviso de prévia sem datas). Sem promoção: nenhuma faixa
   // nem condição de campanha. Em todos os casos: registro na proposta e licenças à parte.
   const conditionsOk = PROMO
     ? pricing.condition &&
       !!pricing.launchStrip &&
-      (CAMPAIGN === 'pendente' ? pricing.previewNotice : pricing.launchStrip.includes(PERIOD) && !pricing.previewNotice)
+      (CAMPAIGN === 'pendente' ? pricing.previewNotice : pricing.launchStrip.includes(PERIOD) && !pricing.previewNotice) &&
+      startOk
     : pricing.launchStrip === null && !pricing.previewNotice && !campaignCondition.test(pricing.cardsText) && !/aceita em até 7 dias corridos/.test(pricing.cardsText);
   // C-10: com a campanha em vigor e datas aprovadas, as regras completas estão no bloco de preços; fora dela, não aparecem
   const rulesOk =
@@ -420,28 +429,30 @@ await block('funcionais', async () => {
         /Vale a data de recebimento da solicitação/.test(pricing.campaignRules) &&
         /mesmo que a proposta seja emitida depois do fim da campanha/.test(pricing.campaignRules) &&
         /aceita em até 7 dias corridos da emissão/.test(pricing.campaignRules) &&
-        /sem desconto automático/.test(pricing.campaignRules)
+        /Pacote com categorias diferentes só por proposta específica/.test(pricing.campaignRules) &&
+        /não se enquadram como simples ou média têm avaliação individual/.test(pricing.campaignRules) &&
+        (NOVAS ? pricing.campaignRules.includes(`recebidas a partir de ${NOVAS}, inclusive`) : /ainda não definida/.test(pricing.campaignRules))
       : pricing.campaignRules === null;
   check('campanha-regras-completas', rulesOk, pricing.campaignRules ? pricing.campaignRules.slice(0, 160) : 'ausentes');
   check(
     'precos-com-condicoes-visiveis',
     conditionsOk && pricing.confirmedInProposal && pricing.licenses,
-    `${CAMPAIGN_LABEL}; faixa: ${pricing.launchStrip ?? 'ausente'}; proposta=${pricing.confirmedInProposal}; licenças=${pricing.licenses}`,
+    `${CAMPAIGN_LABEL}; faixa: ${pricing.launchStrip ?? 'ausente'}; início das novas condições: ${NOVAS ?? 'pendente'}; proposta=${pricing.confirmedInProposal}; licenças=${pricing.licenses}`,
   );
+  check('vitrine-sem-categoria-complexa', pricing.semComplexa, `${Object.keys(pricing.table).join(', ')}`);
+  check('vitrine-outras-demandas-canais-gerais', pricing.outrasDemandas, 'texto V-04 e link para a solicitação');
+  check('vitrine-a-automacao-e-sua', pricing.titularidade, 'nota V-05 com quitação integral e exceções');
   check(
     'precos-tabela-oficial',
-    (PROMO ? JSON.stringify(pricing.table) === JSON.stringify(OFFICIAL_PRICES) : JSON.stringify(pricing.table) === JSON.stringify(STANDARD_ONLY)) && pricing.complexa,
+    JSON.stringify(pricing.table) === JSON.stringify(OFFICIAL_PRICES),
     `${CAMPAIGN_LABEL}: ${JSON.stringify(pricing.table)}`,
   );
-  // Nenhum percentual de desconto fora da tabela (ex.: o "−50%" de um build antigo — COM-RELEASE-005 §3.1); fora da
-  // campanha, nenhum percentual de desconto
+  // Nenhum percentual de desconto nos cartões (V-07; ex.: o "−50%" de um build antigo — COM-RELEASE-005 §3.1)
   const badges = await page.$$eval('[data-pricing] .nk-badge', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim()).filter((t) => /%/.test(t)));
   check(
-    'precos-sem-percentual-inconsistente',
-    PROMO
-      ? badges.length === 2 && badges.every((b) => /−(33,33|20)%$/.test(b))
-      : badges.length === 0 && pricing.percentNodes === 0 && !/[−-]\s?\d+(?:,\d+)?\s?%/.test(pricing.cardsText),
-    PROMO ? badges.join(' | ') : `sem percentual esperado; selos com %: ${badges.join(' | ') || 'nenhum'}; data-price="percentual": ${pricing.percentNodes}`,
+    'precos-sem-percentual',
+    badges.length === 0 && pricing.percentNodes === 0 && !/[−-]\s?\d+(?:,\d+)?\s?%/.test(pricing.cardsText),
+    `selos com %: ${badges.join(' | ') || 'nenhum'}; data-price="percentual": ${pricing.percentNodes}`,
   );
   // O artefato servido é o do código em disco (COM-RELEASE-005 §3.3): commit do release.json = HEAD do repositório
   {
@@ -498,27 +509,98 @@ await block('funcionais', async () => {
         : `URL do Bookings não configurada: ${scheduling.buttons} botão(ões), ${scheduling.links} link(s)`,
     );
   }
-  // Coerência matemática do que é exibido: economia = padrão − lançamento; percentual = economia / padrão (2 casas, truncado)
+  // Coerência matemática do que é exibido: economia = 3 × individual − pacote; sem preço de lançamento nem tabela anterior
   const num = (s) => Number(String(s).replace(/[^\d,]/g, '').replace(',', '.'));
-  const coherent = PROMO
-    ? ['simples', 'media'].every((t) => {
-        const v = pricing.table[t] ?? {};
-        const saved = num(v.padrao) - num(v.lancamento);
-        return saved === num(v.economia) && Math.floor((saved / num(v.padrao)) * 10000) / 100 === num(v.percentual);
-      })
-    : // Sem campanha: o valor exibido é o padrão oficial, sem economia, sem preço de lançamento nem unidade promocional
-      ['simples', 'media'].every((t) => pricing.table[t]?.padrao === OFFICIAL_PRICES[t].padrao && pricing.table[t]?.lancamento === undefined) &&
-      pricing.economyNodes === 0 &&
-      !/Economia de R\$|preço de lançamento|Preço especial de lançamento/i.test(pricing.cardsText) &&
-      !pricing.cardsText.includes(OFFICIAL_PRICES.simples.lancamento) &&
-      !pricing.cardsText.includes(OFFICIAL_PRICES.media.lancamento);
-  check(
-    'precos-descontos-coerentes',
-    coherent,
-    PROMO ? 'economia = padrão − lançamento; percentual = economia ÷ padrão' : `${CAMPAIGN_LABEL}: preço padrão oficial, sem economia nem preço de lançamento (economia: ${pricing.economyNodes} nó(s))`,
-  );
+  const coherent =
+    ['simples', 'media'].every((t) => {
+      const v = pricing.table[t] ?? {};
+      return num(v.individual) * 3 - num(v.pacote) === num(v.economia) && num(v.pacote) < num(v.individual) * 3;
+    }) &&
+    !/preço de lançamento|Preço especial de lançamento|Preço padrão/i.test(pricing.cardsText) &&
+    PREVIOUS_LABELS.every((l) => !pricing.cardsText.includes(l));
+  check('precos-pacote-coerente', coherent, `${CAMPAIGN_LABEL}: economia = 3 × individual − pacote; sem a tabela anterior nos cartões`);
   check('precos-criterios-de-categoria', pricing.criteria);
   check('condicoes-comerciais-visiveis', pricing.conditions);
+  // COM-VITRINE-001 (etapa 4, V-06): catálogo dos quatro serviços com o estado de cada um; Monitor e AI em preparação,
+  // sem contratação (nenhum botão, checkout, assinatura ou formulário próprio) e sem valor fora do bloco de preços
+  const catalog = await page.evaluate(() => {
+    const sec = document.querySelector('#solucoes');
+    const cards = [...(sec?.querySelectorAll('.offer-card') ?? [])].map((c) => ({
+      name: c.querySelector('h3')?.textContent.trim(),
+      stage: c.querySelector('.nk-badge')?.textContent.replace(/\s+/g, ' ').trim(),
+      links: [...c.querySelectorAll('a')].map((a) => a.getAttribute('href')),
+      text: c.innerText,
+    }));
+    const planned = document.querySelector('[data-pricing] [data-servicos-previstos]');
+    return {
+      cards,
+      solutionsText: sec?.innerText ?? '',
+      plannedInPricing: !!planned,
+      plannedPrices: Object.fromEntries([...(planned?.querySelectorAll('[data-preco-previsto]') ?? [])].map((e) => [e.dataset.precoPrevisto, `${e.textContent.trim()} ${e.nextElementSibling?.textContent.trim() ?? ''}`.trim()])),
+      plannedText: planned?.innerText ?? '',
+      plannedActions: planned?.querySelectorAll('a, button, form, input').length ?? -1,
+    };
+  });
+  results.catalog = catalog;
+  const EXPECTED_CATALOG = [
+    ['Nekkora Delivery', 'Contratação assistida'],
+    ['Nekkora Monitor', 'Em preparação'],
+    ['Nekkora AI', 'Em preparação'],
+    ['Nekkora Hosting', 'Sob avaliação e orçamento'],
+  ];
+  check(
+    'catalogo-quatro-servicos',
+    JSON.stringify(catalog.cards.map((c) => [c.name, c.stage])) === JSON.stringify(EXPECTED_CATALOG),
+    catalog.cards.map((c) => `${c.name}: ${c.stage}`).join(' · '),
+  );
+  const preparing = catalog.cards.filter((c) => c.stage === 'Em preparação');
+  check(
+    'catalogo-monitor-ai-sem-contratacao',
+    preparing.length === 2 &&
+      preparing.every((c) => c.links.length === 1 && c.links[0] === '#servicos-em-preparacao' && /Ainda não disponível para contratação/.test(c.text)) &&
+      !/contrat(e|ar) agora|assin(e|ar|atura ativa)|checkout|comprar|teste grátis|lista de espera/i.test(catalog.solutionsText + catalog.plannedText) &&
+      catalog.plannedActions === 0,
+    preparing.map((c) => `${c.name} → ${c.links.join(',')}`).join(' · '),
+  );
+  check(
+    'catalogo-valores-previstos-no-bloco-de-precos',
+    catalog.plannedInPricing &&
+      JSON.stringify(catalog.plannedPrices) === JSON.stringify({ monitor: 'R$ 75 por automação/mês, previsto', ai: 'R$ 100 por empresa/mês, previsto' }) &&
+      /Valores e condições definitivos dependem da disponibilização comercial\./.test(catalog.plannedText) &&
+      !/R\$/.test(catalog.solutionsText),
+    JSON.stringify(catalog.plannedPrices),
+  );
+  // Autorização da etapa 4 (item 2): "Ver valores previstos" leva à área "Serviços em preparação" — pelo teclado
+  // (foco no link + Enter), conferindo o endereço e a área visível na tela. Numa aba própria do mesmo contexto, para não
+  // mudar o foco nem o ponto de partida da navegação por Tab da página principal (primeiro-tab-pular-conteudo).
+  {
+    const tab = await page.context().newPage();
+    for (const name of ['Nekkora Monitor', 'Nekkora AI']) {
+      await tab.goto(new URL('/', page.url()).href, { waitUntil: 'networkidle' });
+      const link = tab.locator('#solucoes .offer-card', { has: tab.getByRole('heading', { name, exact: true }) }).getByRole('link', { name: 'Ver valores previstos' });
+      await link.focus();
+      const focused = await link.evaluate((a) => document.activeElement === a);
+      await tab.keyboard.press('Enter');
+      // espera o estado efetivo (endereço e área na tela), até 2 s; sem ele, a verificação falha
+      await tab
+        .waitForFunction(() => {
+          const r = document.querySelector('#servicos-em-preparacao')?.getBoundingClientRect();
+          return location.hash === '#servicos-em-preparacao' && !!r && r.top < innerHeight && r.bottom > 0;
+        }, null, { timeout: 2000 })
+        .catch(() => {});
+      const landed = await tab.evaluate(() => {
+        const el = document.querySelector('#servicos-em-preparacao');
+        const r = el?.getBoundingClientRect();
+        return { hash: location.hash, visible: !!r && r.top < innerHeight && r.bottom > 0, title: el?.querySelector('h3')?.textContent };
+      });
+      check(
+        `catalogo-link-valores-previstos:${name === 'Nekkora AI' ? 'ai' : 'monitor'}`,
+        focused && landed.hash === '#servicos-em-preparacao' && landed.visible && landed.title === 'Serviços em preparação',
+        `foco=${focused} ${JSON.stringify(landed)}`,
+      );
+    }
+    await tab.close();
+  }
   // Delivery: tecnologias citadas sem promessa de compatibilidade universal
   const delivery = await page.locator('#solucoes').innerText();
   check(
@@ -548,11 +630,10 @@ await block('funcionais', async () => {
     supplier || 'sem identificação no rodapé',
   );
   check(
-    'precos-leitura-do-valor-riscado',
-    // Sem campanha não há valor riscado: nenhum "Preço padrão:/Preço especial de lançamento:/Desconto de" para o leitor
-    JSON.stringify(pricing.srLabels) ===
-      JSON.stringify(PROMO ? ['Preço padrão:', 'Preço especial de lançamento:', 'Desconto de', 'Preço padrão:', 'Preço especial de lançamento:', 'Desconto de'] : []),
-    pricing.srLabels.join(' | ') || `nenhum rótulo de valor riscado (${CAMPAIGN_LABEL})`,
+    'precos-sem-rotulos-de-valor-riscado',
+    // Sem valor riscado: nenhum "Preço padrão:/Preço especial de lançamento:/Desconto de" para o leitor de tela
+    pricing.srLabels.length === 0,
+    pricing.srLabels.join(' | ') || 'nenhum rótulo de valor riscado',
   );
 
   // Produtos internos não aparecem como obrigatórios/disponíveis: cada menção fica em bloco marcado
@@ -667,6 +748,53 @@ await block('funcionais', async () => {
     others.push(`${sec}=${ok}`);
   }
   check('dialogo-ctas-de-precos-hosting-contato', others.every((o) => o.endsWith('true')), `${others.join('; ')} (fechado por "Cancelar")`);
+  // COM-VITRINE-001 (etapa 5): jornadas reais do Delivery e do Hosting no mesmo diálogo, pelos canais existentes. Só três
+  // tipos (nenhum de Monitor ou AI); a orientação do serviço muda com o tipo e fica fora da mensagem (sem coleta nova).
+  {
+    const read = () =>
+      dialog.evaluate((d) => ({
+        options: [...d.querySelectorAll('input[name="tipo-solicitacao"]')].map((i) => `${i.value}:${i.checked ? 1 : 0}:${((i.labels && i.labels[0]) || i.closest('label'))?.textContent.trim() ?? ''}`),
+        hint: d.querySelector('[data-dica-servico]')?.textContent.trim() ?? '',
+        hintFor: d.querySelector('[data-dica-servico]')?.getAttribute('data-dica-servico'),
+      }));
+    // O tipo pedido pelo CTA é aplicado num efeito logo depois da primeira pintura do diálogo: espera até 1 s por ele
+    // (sem ele, a verificação falha do mesmo jeito)
+    const settle = (want) => page.waitForFunction((w) => document.querySelector('[role="dialog"] [data-dica-servico]')?.getAttribute('data-dica-servico') === w, want, { timeout: 1000 }).catch(() => {});
+    await page.locator('#precos [aria-haspopup="dialog"]').click();
+    await dialog.waitFor();
+    await settle('automacao');
+    const fromOther = await read();
+    await dialog.getByRole('radio', { name: 'Hospedar uma automação existente' }).check();
+    const switched = await read();
+    await dialog.getByRole('button', { name: 'Cancelar' }).click();
+    await dialog.waitFor({ state: 'detached' });
+    await page.locator('#hosting [aria-haspopup="dialog"]').click();
+    await dialog.waitFor();
+    await settle('hospedagem');
+    const fromHosting = await read();
+    await dialog.getByRole('button', { name: 'Cancelar' }).click();
+    await dialog.waitFor({ state: 'detached' });
+    results.requestJourneys = { fromOther, switched, fromHosting };
+    check(
+      'solicitacao-tipos-delivery-e-hosting',
+      fromOther.options.length === 3 &&
+        fromOther.options.map((o) => o.split(':')[0]).join() === 'automacao,hospedagem,infraestrutura' &&
+        fromOther.options.every((o) => o.split(':')[2].length > 0) &&
+        !fromOther.options.some((o) => /monitor|\bAI\b|intelig/i.test(o)),
+      fromOther.options.join(' · '),
+    );
+    check(
+      'solicitacao-orientacao-por-servico',
+      fromOther.hintFor === 'automacao' &&
+        fromOther.options[0].startsWith('automacao:1') &&
+        /Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria/.test(fromOther.hint) &&
+        switched.hintFor === 'hospedagem' &&
+        /Nekkora Hosting: sob avaliação e orçamento/.test(switched.hint) &&
+        fromHosting.hintFor === 'hospedagem' &&
+        fromHosting.options[1].startsWith('hospedagem:1'),
+      `V-04 → ${fromOther.hintFor}; troca → ${switched.hintFor}; Hosting → ${fromHosting.hintFor}`,
+    );
+  }
 
   // Formulário (no diálogo): erros, foco no primeiro erro e envio desativado sem destino real
   await page.locator('#contato [aria-haspopup="dialog"]').click();

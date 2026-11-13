@@ -1,44 +1,69 @@
 /**
- * Tabela oficial de preços do Nekkora Delivery (COM-RELEASE-003-R1, decisão da titular de 22/10/2026) [PR-01] [PR-02].
+ * Tabela de preços do Nekkora Delivery — COM-VITRINE-001 (diretrizes da titular de 11/11/2026; aprovação definitiva
+ * pendente: PUB-14, docs/release/COM-VITRINE-001.md §11).
  *
- * Fonte única dos números: a página, os testes (scripts/testes/precos.test.mjs) e a homologação leem os valores
- * daqui, e a economia e o percentual são CALCULADOS — nunca digitados — para não divergirem da tabela. Automação
- * complexa não tem número: fica sob orçamento, sem desconto automático [PR-03].
+ * Fonte única dos números: a página, os testes (scripts/testes/precos.test.mjs e simulador.test.mjs) e a homologação
+ * leem os valores daqui, e a economia do pacote é CALCULADA — nunca digitada — para não divergir da tabela.
+ *
+ * - Preço por automação (individual) ou por pacote de 3 automações da MESMA categoria; nenhuma mensalidade.
+ * - A economia do pacote é sempre contra três unidades individuais desta tabela, nunca contra a tabela anterior.
+ * - A tabela vale durante a campanha e depois dela (V-01): a data não muda o preço; a campanha só controla a comunicação
+ *   promocional. Não existe retorno automático aos preços anteriores.
+ * - Automação complexa não faz parte da vitrine (V-04): não há preço, pacote nem campo para ela.
  *
  * Sem imports: o arquivo é carregado direto pelo Node nos testes (type stripping).
  */
 export const PRICE_TABLE = {
+  simples: { individual: 650, pacote: 1500 },
+  media: { individual: 1400, pacote: 3500 },
+} as const;
+
+/** Quantidade de automações da mesma categoria em um pacote (V-03). */
+export const PACKAGE_SIZE = 3;
+
+export type PricedTier = keyof typeof PRICE_TABLE;
+
+/**
+ * Preços previstos dos serviços recorrentes (V-06), exibidos só com o estado "Em preparação": sem checkout, assinatura
+ * ou contratação. Valores e condições definitivos dependem da disponibilização comercial.
+ */
+export const PLANNED_RECURRING_PRICES = {
+  monitor: { mensal: 75, unidade: 'automação' },
+  ai: { mensal: 100, unidade: 'empresa' },
+} as const;
+
+/**
+ * Tabela ANTERIOR (campanha de lançamento, aprovada em 22/10/2026), mantida só para os compromissos já assumidos:
+ * solicitações recebidas de 06/11/2026 até a véspera do início das novas condições conservam o preço de lançamento
+ * (V-02; scripts/comercial/regras-delivery.mjs). NÃO é exibida na página.
+ */
+export const PREVIOUS_PRICE_TABLE = {
   simples: { standard: 1500, launch: 1000 },
   media: { standard: 3500, launch: 2800 },
 } as const;
 
-export type PricedTier = keyof typeof PRICE_TABLE;
-
-/** R$ 1.500 — inteiro, separador de milhar com ponto, sem centavos (como no mockup). */
+/** brl(1500) → "R$" + 1.500: inteiro, separador de milhar com ponto, sem centavos (como no mockup). */
 export const brl = (n: number) => `R$ ${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 
-/**
- * Percentual de desconto truncado em duas casas (33,333…% → 33,33%): o arredondamento nunca anuncia um desconto
- * maior que o real.
- */
-export const discountPercent = (standard: number, launch: number) => Math.floor(((standard - launch) / standard) * 10000) / 100;
-
-/** 33,33% · 20% — vírgula decimal, sem zeros à direita. */
-export const percentLabel = (p: number) => `${String(p).replace('.', ',')}%`;
-
+/** Valores de um cartão: individual, pacote de 3, três individuais e a economia do pacote (calculada). */
 export function priceFacts(tier: PricedTier) {
-  const { standard, launch } = PRICE_TABLE[tier];
-  const percent = discountPercent(standard, launch);
+  const { individual, pacote } = PRICE_TABLE[tier];
+  const threeIndividual = individual * PACKAGE_SIZE;
   return {
-    standard,
-    launch,
-    savings: standard - launch,
-    percent,
-    standardLabel: brl(standard),
-    launchLabel: brl(launch),
-    savingsLabel: brl(standard - launch),
-    percentLabel: percentLabel(percent),
+    individual,
+    package: pacote,
+    threeIndividual,
+    savings: threeIndividual - pacote,
+    individualLabel: brl(individual),
+    packageLabel: brl(pacote),
+    threeIndividualLabel: brl(threeIndividual),
+    savingsLabel: brl(threeIndividual - pacote),
   };
+}
+
+/** Quantas automações viram pacote e quantas ficam no preço individual: pacotes de 3 enquanto houver 3 (V-03). */
+export function composePackages(quantity: number) {
+  return { packages: Math.floor(quantity / PACKAGE_SIZE), singles: quantity % PACKAGE_SIZE };
 }
 
 /** Data de hoje (AAAA-MM-DD) no fuso de Brasília — a campanha vale por datas do calendário brasileiro. */
@@ -46,22 +71,12 @@ export const todayInBrazil = (now: Date = new Date()) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
 
 /**
- * A campanha de lançamento está em vigor? Com as datas aprovadas (PUB-13), só entre o início e o fim, inclusive;
- * fora do período a página mostra apenas o preço padrão. Sem datas, a página mantém os preços de lançamento para
- * revisão — e scripts/verificar-publicacao.mjs bloqueia a publicação até as datas existirem.
- */
-export function launchActive(period: { inicio: string | null; fim: string | null }, today: string): boolean {
-  const { inicio, fim } = period;
-  if (inicio == null || fim == null) return true;
-  return inicio <= today && today <= fim;
-}
-
-/**
- * Situação da campanha de lançamento (NEKKORA-COM-008-C §3.6), comparando datas AAAA-MM-DD do fuso de Brasília:
- *   'pendente'  datas não aprovadas (PUB-13): preços de lançamento só como prévia de homologação; o portão bloqueia;
- *   'futura'    antes do início: só o preço padrão (nenhum desconto ainda disponível);
+ * Situação da campanha de lançamento (NEKKORA-COM-008-C §3.6), comparando datas AAAA-MM-DD do fuso de Brasília. Desde
+ * a COM-VITRINE-001 controla só a comunicação promocional (faixa e regras), nunca o preço:
+ *   'pendente'  datas não aprovadas (PUB-13): o portão bloqueia a publicação;
+ *   'futura'    antes do início;
  *   'vigente'   do início ao fim, inclusive;
- *   'encerrada' depois do fim: só o preço padrão.
+ *   'encerrada' depois do fim.
  */
 export type CampaignState = 'pendente' | 'futura' | 'vigente' | 'encerrada';
 
@@ -73,15 +88,15 @@ export function campaignState(period: { inicio: string | null; fim: string | nul
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
-/* Simulador de investimento (NEKKORA-CALC-001)                                                                     */
+/* Simulador de investimento (NEKKORA-CALC-001, COM-VITRINE-001 §8)                                                 */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 /** Quantidade máxima por categoria na simulação. Acima disso, a conversa é direta com a Nekkora. */
 export const MAX_QUANTITY = 20;
 
-export type Quantities = { simples: number; media: number; complexa: number };
-export type QuantityTier = keyof Quantities;
-export const EMPTY_QUANTITIES: Quantities = { simples: 0, media: 0, complexa: 0 };
+export type Quantities = Record<PricedTier, number>;
+export type QuantityTier = PricedTier;
+export const EMPTY_QUANTITIES: Quantities = { simples: 0, media: 0 };
 
 /**
  * Quantidade válida a partir do que o visitante digitou (ou de qualquer valor): só inteiros de 0 a MAX_QUANTITY.
@@ -96,52 +111,50 @@ export function sanitizeQuantity(value: unknown): number {
   return Math.min(n, MAX_QUANTITY);
 }
 
-export const sanitizeQuantities = (q: Partial<Record<QuantityTier, unknown>>): Quantities => ({
-  simples: sanitizeQuantity(q.simples),
-  media: sanitizeQuantity(q.media),
-  complexa: sanitizeQuantity(q.complexa),
-});
-
 const PRICED_TIERS = Object.keys(PRICE_TABLE) as PricedTier[];
 
+export const sanitizeQuantities = (q: Partial<Record<string, unknown>>): Quantities => ({
+  simples: sanitizeQuantity(q.simples),
+  media: sanitizeQuantity(q.media),
+});
+
 /**
- * Resultado da simulação. Só as categorias com preço (simples e média) entram nos totais; a complexa fica sob
- * orçamento, sem valor inventado. Com ela, o total é um SUBTOTAL ESTIMADO (`partial`), nunca o preço completo.
- *
- * Com a campanha em vigor (`launch`), o investimento é o de lançamento; a economia é a diferença entre os preços
- * comerciais (padrão − lançamento), não uma economia operacional, e o percentual equivalente é calculado sobre o
- * total calculável, truncado em duas casas para não superestimar o benefício. Sem campanha: só o preço padrão.
+ * Resultado da simulação: por categoria, pacotes de 3 enquanto houver 3 e o restante no preço individual (V-03); sem
+ * pacote misto. A economia é a diferença entre o total no preço individual e o total com pacotes — uma diferença entre
+ * preços comerciais da mesma tabela, nunca economia operacional. Qualquer outra entrada (inclusive "complexa") é
+ * ignorada: a vitrine não tem essa categoria.
  */
-export function simulate(input: Partial<Record<QuantityTier, unknown>>, launch: boolean) {
+export function simulate(input: Partial<Record<string, unknown>>) {
   const quantities = sanitizeQuantities(input);
   const lines = PRICED_TIERS.map((tier) => {
-    const unit = launch ? PRICE_TABLE[tier].launch : PRICE_TABLE[tier].standard;
+    const { individual, pacote } = PRICE_TABLE[tier];
     const quantity = quantities[tier];
-    return { tier, quantity, unit, unitLabel: brl(unit), total: quantity * unit, totalLabel: brl(quantity * unit) };
+    const { packages, singles } = composePackages(quantity);
+    const total = packages * pacote + singles * individual;
+    return {
+      tier,
+      quantity,
+      packages,
+      singles,
+      individualLabel: brl(individual),
+      packageLabel: brl(pacote),
+      total,
+      totalLabel: brl(total),
+    };
   });
-  const standardTotal = PRICED_TIERS.reduce((s, t) => s + quantities[t] * PRICE_TABLE[t].standard, 0);
-  const launchTotal = PRICED_TIERS.reduce((s, t) => s + quantities[t] * PRICE_TABLE[t].launch, 0);
-  const pricedCount = quantities.simples + quantities.media;
-  const estimate = launch ? launchTotal : standardTotal;
-  const savings = launch ? standardTotal - launchTotal : 0;
-  const percent = launch && standardTotal > 0 ? discountPercent(standardTotal, launchTotal) : 0;
+  const individualTotal = PRICED_TIERS.reduce((s, t) => s + quantities[t] * PRICE_TABLE[t].individual, 0);
+  const estimate = lines.reduce((s, l) => s + l.total, 0);
   return {
     quantities,
-    total: pricedCount + quantities.complexa,
-    pricedCount,
-    complexCount: quantities.complexa,
-    /** Há automação complexa: o valor é o subtotal estimado das demais, não o preço completo da contratação. */
-    partial: quantities.complexa > 0,
-    launch,
+    total: quantities.simples + quantities.media,
+    packages: lines.reduce((s, l) => s + l.packages, 0),
     lines,
-    standardTotal,
-    standardTotalLabel: brl(standardTotal),
+    individualTotal,
+    individualTotalLabel: brl(individualTotal),
     estimate,
     estimateLabel: brl(estimate),
-    savings,
-    savingsLabel: brl(savings),
-    percent,
-    percentLabel: percentLabel(percent),
+    savings: individualTotal - estimate,
+    savingsLabel: brl(individualTotal - estimate),
   };
 }
 

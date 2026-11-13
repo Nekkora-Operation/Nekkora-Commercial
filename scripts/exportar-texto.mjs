@@ -20,8 +20,13 @@ await vite.close();
 const { CONTACT_COPY: K, PRICING: P } = c;
 // Cabeçalho conforme as aprovações reais da configuração usada (publicacao.json ou NEKKORA_PUBLICACAO)
 const { readFileSync } = await import('node:fs');
-const APROVACOES = JSON.parse(readFileSync(path.resolve(root, process.env.NEKKORA_PUBLICACAO ?? 'publicacao.json'), 'utf8')).aprovacoes;
-const APROVADO = !process.env.NEKKORA_PUBLICACAO && APROVACOES.textosComerciais && APROVACOES.condicoesComerciais && APROVACOES.avisoDePrivacidade;
+const PUBLICACAO = JSON.parse(readFileSync(path.resolve(root, process.env.NEKKORA_PUBLICACAO ?? 'publicacao.json'), 'utf8'));
+const APROVACOES = PUBLICACAO.aprovacoes;
+// COM-VITRINE-001 §12 (forma b): as flags herdadas da v1.0.0 não bastam; o conteúdo atual precisa das impressões aprovadas
+const { impressaoDoConteudo } = await import('./comercial/impressao-conteudo.mjs');
+const IMPRESSOES = ['textosComerciais', 'condicoesComerciais'].every((i) => PUBLICACAO.impressoesDeConteudo?.[i] === impressaoDoConteudo(i));
+const FLAGS = APROVACOES.textosComerciais && APROVACOES.condicoesComerciais && APROVACOES.avisoDePrivacidade;
+const APROVADO = !process.env.NEKKORA_PUBLICACAO && FLAGS && IMPRESSOES;
 
 const L = [];
 const h = (t) => L.push('', `## ${t}`, '');
@@ -32,10 +37,15 @@ L.push(
   '# Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)',
   '',
   ...(APROVADO
-    ? ['> **Aprovado internamente** pela titular em 11/11/2026 (PUB-17, PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico',
-       '> externo. Pendências registradas em `publicacao.json` ($origem) e em docs/release/NEKKORA-COM-GOLIVE-001-pre-liberacao.md.']
-    : ['> **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,',
-       '> condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.']),
+    ? ['> **Textos e condições públicas aprovados internamente** pela titular para este conteúdo (impressões de PUB-17 e',
+       '> PUB-19 e registros em `publicacao.json` $origem), sem parecer jurídico externo. **Não é autorização de',
+       '> publicação** (PUB-13 e PUB-18 têm registros próprios) nem aprova contrato-base, anexos, proposta-modelo,',
+       '> procedimento ou as propostas DP-01 a DP-05: a contratação de pacotes segue bloqueada.']
+    : FLAGS && !process.env.NEKKORA_PUBLICACAO
+      ? ['> **Em revisão (COM-VITRINE-001).** Textos e condições alterados depois da aprovação da v1.0.0; sem aprovação',
+         '> própria (impressões de PUB-17 e PUB-19: `node scripts/comercial/impressao-conteudo.mjs`).']
+      : ['> **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,',
+         '> condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.']),
   '',
   `> Gerado por \`npm run texto\` a partir de [\`src/content.ts\`](${rel('src/content.ts')}). Não edite este arquivo: altere`,
   `> o \`content.ts\` (e a [matriz de alegações](${rel('docs/com-001/03-matriz-alegacoes.md')}), se a mudança afetar uma promessa) e gere de novo.`,
@@ -60,34 +70,32 @@ L.push('', c.SOLUTIONS.note);
 
 h('3. Preços (bloco data-pricing)');
 header(P);
-L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Valor (campanha em vigor) | Fora da campanha |', '|---|---|---|---|');
+L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', `Sem a data de início das novas condições: _${P.launch.pendingStart}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Individual | Pacote de 3 |', '|---|---|---|---|');
 for (const t of P.tiers) {
-  const value = t.price
-    ? `~~${t.price.standardLabel}~~ **${t.price.launchLabel}** −${t.price.percentLabel} · ${P.savings(t.price.savingsLabel)} — ${P.launchUnit}`
-    : `**${t.negotiated.label}** — ${t.negotiated.unit}`;
-  const outside = t.price ? `**${t.price.standardLabel}** — ${P.unit}` : `**${t.negotiated.label}**`;
-  L.push(`| ${t.title} | ${t.fit} | ${value} | ${outside} |`);
+  const individual = `**${t.price.individualLabel}** — ${P.unit}`;
+  const pack = `**${t.price.packageLabel}** — ${P.packageUnit} · ${P.savings(t.price.savingsLabel)} ${P.savingsBasis}`;
+  L.push(`| ${t.title} | ${t.fit} | ${individual} | ${pack} |`);
 }
-L.push('', `Leitor de tela: "${P.srFrom} <preço padrão>", "${P.srTo} <preço de lançamento>", "${P.srPercent} <percentual>". Valores de src/precos.ts.`);
+L.push('', `${P.other.text} — link "${P.other.cta}" (abre a solicitação de avaliação).`);
+L.push('', 'Os valores são os mesmos em qualquer data (COM-VITRINE-001, V-01); a campanha controla só a faixa e as regras. Valores de src/precos.ts.');
 const Sm = c.SIMULATOR;
 L.push('', `### ${Sm.title} (NEKKORA-CALC-001 — logo abaixo dos cartões)`, '', Sm.description, '');
-L.push(`Controles: ${Sm.tiers.map((t) => t.label).join(' · ')} — botões "${Sm.decrease('…')}" / "${Sm.increase('…')}", campo numérico (0 a 20), "${Sm.max(20)}"`);
+L.push(`Controles: ${Sm.tiers.map((t) => t.label).join(' · ')} — botões "${Sm.decrease('…')}" / "${Sm.increase('…')}", campo numérico (0 a 20), rótulo "${Sm.unit('<individual>', '<pacote>')}", "${Sm.max(20)}"`);
 L.push('', `Barra: "${Sm.total(3)}" · botões "${Sm.clear}" e "${Sm.calculate}". Sem seleção: _${Sm.empty}_ Mudou depois de calcular: _${Sm.changed}_`);
-L.push('', `**${Sm.resultTitle}** — linhas "2 automações simples × <preço>", depois:`);
-list([
-  `"${Sm.estimateLabel(false, false)}" / "${Sm.estimateLabel(true, false)}" / "${Sm.estimateLabel(false, true)}" / "${Sm.estimateLabel(true, true)}"`,
-  `Com a campanha em vigor: "${Sm.standardLabel}", "${Sm.savingsLabel}", "${Sm.percentLabel}" — ${Sm.savingsNote}`,
-  `Com complexa: ${Sm.partialNote(1)} Só complexas: ${Sm.onlyComplex}`,
-  ...Object.entries(Sm.campaign).map(([k, v]) => `Campanha ${k}: ${v}`),
-]);
+L.push('', `**${Sm.resultTitle}** — linhas "4 automações simples: ${Sm.composition(1, 1, '<pacote>', '<individual>')}", depois:`);
+list([`"${Sm.estimateLabel}"`, `Com pacote: "${Sm.individualLabel}" e "${Sm.savingsLabel}" — ${Sm.savingsNote}`, Sm.packagesRule]);
 L.push('', `> ${Sm.disclaimer}`, '', `${Sm.next}: "${Sm.schedule}" (Microsoft Bookings, nova aba) · "${Sm.request}" (abre o formulário; o resumo da simulação é opcional)`);
-L.push('', `**${Sm.help.title}** ${Sm.help.text} ${Sm.help.link} (link para os critérios).`, '', 'Exemplo de homologação: 2 simples + 1 média → padrão R$ 6.500; lançamento R$ 4.800; economia R$ 1.700; 26,15% (truncado).');
+L.push('', `**${Sm.help.title}** ${Sm.help.text} ${Sm.help.link} (link para os critérios).`, '', 'Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.500) + 1 simples (R$ 650) + 1 média (R$ 1.400) = R$ 3.550; sem pacotes R$ 4.000; economia R$ 450.');
 L.push('');
 list(P.notes.map((n) => `**${n.title}** — ${n.text}`));
 L.push('', `**${P.criteria.title}**`, '');
 list(P.criteria.items);
 L.push('', P.criteria.note, '', `**${P.conditions.title}**`, '');
 list(P.conditions.items);
+const Ps = c.PLANNED_SERVICES;
+L.push('', `**${Ps.title}** (COM-VITRINE-001, V-06 — dentro do bloco de preços, sem contratação):`, '');
+list(Ps.items.map((s) => `${s.name} — _${Ps.status}_ — **${s.price}** ${s.unit}`));
+L.push('', `${Ps.notice} ${Ps.note}`);
 L.push('', P.hostingNote);
 
 h('4. Como funciona');
@@ -111,6 +119,7 @@ L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (abre o diá
 L.push('', `Diálogo **${K.dialogTitle}** — ${K.dialogDescription}`, '', `Canal da solicitação: WhatsApp, se confirmado; senão o e-mail (publicação atual: e-mail). Sem canal: _${K.pendingCaption}_`);
 L.push('', `Formulário: "${K.demand.legend}"* (${K.demand.options.map((o) => o.label).join(' · ')}; o CTA do Hosting abre com a hospedagem), Nome*, Empresa (opcional), E-mail (${K.emailHint}), "${K.messageLabel}"* — ${K.processHint}. Rodapé: "Cancelar" + envio; link "${K.privacyLink}".`);
 L.push('', `Segunda linha da mensagem, por tipo: ${K.demand.options.map((o) => `_${o.line}_`).join(' · ')}`);
+L.push('', `Orientação abaixo do tipo (só na tela, fora da mensagem — COM-VITRINE-001, etapa 5): ${K.demand.options.map((o) => `${o.label}: _${K.demandHints[o.value]}_`).join(' · ')}`);
 L.push('', `Vindo do simulador: caixa "${K.simulation.include}" (desmarcada) — ${K.simulation.hint} Na mensagem: "${K.simulation.heading}" + resumo.`);
 L.push('', `Modo demonstração: botão "${K.demoSubmit}"; nota "${K.demoNote}"; resultado **${K.demoResult.title}** — ${K.demoResult.text}`);
 for (const [label, f] of [['Pelo e-mail (publicação atual)', K.email], ['Pelo WhatsApp (quando houver número confirmado)', K.whatsapp]]) {

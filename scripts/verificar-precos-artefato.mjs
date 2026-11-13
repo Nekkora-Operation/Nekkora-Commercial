@@ -9,7 +9,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { PRICE_TABLE } from '../src/precos.ts';
+import { PREVIOUS_PRICE_TABLE, PRICE_TABLE } from '../src/precos.ts';
 
 const argv = process.argv.slice(2);
 const dist = resolve(argv.includes('--dist') ? argv[argv.indexOf('--dist') + 1] : 'dist');
@@ -34,9 +34,15 @@ const check = (id, ok, detail) => {
   console.log(`${ok ? 'OK  ' : 'FALHA'} ${id} — ${detail}`);
 };
 
-for (const [tier, { standard, launch }] of Object.entries(PRICE_TABLE)) {
+// COM-VITRINE-001: individual e pacote de 3, iguais aos de src/precos.ts
+for (const [tier, { individual, pacote }] of Object.entries(PRICE_TABLE)) {
+  const found = minified(individual).some((i) => minified(pacote).some((p) => bundle.includes(`individual:${i},pacote:${p}}`)));
+  check(`tabela-no-bundle:${tier}`, found, `individual ${individual}, pacote ${pacote}`);
+}
+// A tabela anterior só rege compromissos já assumidos (scripts/comercial/regras-delivery.mjs): nunca vai para a página
+for (const [tier, { standard, launch }] of Object.entries(PREVIOUS_PRICE_TABLE)) {
   const found = minified(standard).some((s) => minified(launch).some((l) => bundle.includes(`standard:${s},launch:${l}}`)));
-  check(`tabela-no-bundle:${tier}`, found, `standard ${standard}, launch ${launch}`);
+  check(`tabela-anterior-fora-do-bundle:${tier}`, !found, found ? `standard ${standard}, launch ${launch} no bundle` : 'ausente');
 }
 // O sinal de menos tipográfico (U+2212) é o dos selos de desconto; o hífen aparece em CSS/JS (rootMargin '-35%').
 const literals = [...bundle.matchAll(/−\s?\d+(?:[.,]\d+)?\s?%/g)].map((m) => m[0]);

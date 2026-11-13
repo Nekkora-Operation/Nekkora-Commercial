@@ -65,6 +65,19 @@ texto renderizado e falha se aparecerem fora de um bloco de exclusão.
 | D-04 | Serviços independentes, sem pacote obrigatório | comprovada | Hero ("Sem pacote obrigatório") | Coerente com PR-03/CO-07: não há "pacotes" na complexa (AUD-07) |
 | D-05 | Ferramenta escolhida pelo processo, não por plataforma própria | comprovada | **Não aparece** (seção "Diferenciais" removida) | Deriva de A-08 + C-02 |
 
+## Monitor e AI (COM-VITRINE-001, etapa 4 — V-06)
+
+| ID | Alegação | Status | Onde aparece | Condição / restrição |
+|---|---|---|---|---|
+| MO-01 | Nekkora Monitor: acompanhamento das execuções de automações, contratação independente do Delivery, sem mínimo de automações, para automações próprias ou de terceiros conforme as integrações suportadas | condicional | Soluções (cartão "Em preparação") | Sempre com "Em preparação" e "Ainda não disponível para contratação" |
+| MO-02 | Valor previsto R$ 75 por automação/mês | condicional | Bloco de preços ("Serviços em preparação") | Só dentro de `data-pricing`, com "previsto" e o aviso "Valores e condições definitivos dependem da disponibilização comercial." |
+| MO-03 | Monitor disponível, contratável ou com assinatura ativa | **pendente** | — | Depende de condições próprias da cobrança recorrente e de `aprovacoes.disponibilidade.monitor` (PUB-23) |
+| MO-04 | Monitoramento contínuo, 24 horas, SLA ou alta disponibilidade | proibida | — | X-05..X-08 continuam valendo |
+| AI-01 | Nekkora AI: recursos de inteligência artificial para a empresa, contratação independente; limites de uso e tratamento de dados definidos antes da disponibilização | condicional | Soluções (cartão "Em preparação") | Sempre com "Em preparação" e "Ainda não disponível para contratação" |
+| AI-02 | Valor previsto R$ 100 por empresa/mês | condicional | Bloco de preços ("Serviços em preparação") | Como MO-02 |
+| AI-03 | AI disponível ou contratável | **pendente** | — | Análise de privacidade própria (provedores, transferência internacional, art. 33 da LGPD), limites homologados e `aprovacoes.disponibilidade.ai` (PUB-23) |
+| AI-04 | Resultados, precisão, economia ou produtividade da AI | proibida | — | X-03, X-11 |
+
 ## Produtos internos
 
 | ID | Alegação | Status | Onde aparece | Condição / restrição |
@@ -135,7 +148,7 @@ Exibidas no bloco `data-pricing` ("Condições comerciais"). Nenhuma vira promes
 | X-05 | SLA | proibida | Listado em "Não incluído automaticamente" |
 | X-06 | Atendimento 24 horas | proibida | Listado em "Não incluído automaticamente" |
 | X-07 | Alta disponibilidade | proibida | Listado em "Não incluído automaticamente" |
-| X-08 | Monitoramento contínuo incluído | proibida | Monitoramento só como componente opcional do Hosting |
+| X-08 | Monitoramento contínuo incluído | proibida | Monitoramento só como componente opcional do Hosting; o Nekkora Monitor aparece só "Em preparação" (MO-01..MO-04) |
 | X-09 | Sustentação, evolução, suporte ou infraestrutura incluídos no desenvolvimento | proibida | Listado em "Não incluído automaticamente". **CONTRACT-001 (C-07):** a garantia contratual de correção de defeitos **passou a ser padrão** (em termo escrito, além das legais) e saiu desta lista; "120 dias" nunca é anunciado |
 | X-10 | Depoimentos, clientes, cases, logos de clientes | proibida | Não usado |
 | X-11 | Números de execução, taxas de sucesso, indicadores | proibida | Painel do hero com "156 / 98,1% / 3/3" removido |

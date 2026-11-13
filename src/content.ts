@@ -6,13 +6,14 @@
  * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
  *
  * NEKKORA-COM-008-C: textos ajustados às decisões da titular na COM-008-B (campanha, condições, várias automações,
- * licenças, homologação, Hosting, botão "Entrar" e privacidade). Aprovação interna da titular em 11/11/2026 (PUB-17,
- * PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico externo; ressalvas em publicacao.json ($origem). Qualquer
- * mudança neste texto exige nova aprovação.
+ * licenças, homologação, Hosting, botão "Entrar" e privacidade). A aprovação de 11/11/2026 (PUB-17, PUB-19 e PUB-09,
+ * commit e4bc72c) vale só para o texto da v1.0.0. COM-VITRINE-001: a aprovação deste texto não fica registrada aqui —
+ * vale a impressão de PUB-17/PUB-19 aprovada em publicacao.json, com o registro da titular em $origem
+ * (scripts/comercial/impressao-conteudo.mjs). Qualquer mudança neste arquivo muda a impressão e exige nova aprovação.
  */
 import type { IconName } from 'nekkora-lib';
-import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
-import { priceFacts, type CampaignState } from './precos';
+import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, NEW_CONDITIONS_START, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
+import { PLANNED_RECURRING_PRICES, brl, priceFacts } from './precos';
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
@@ -38,15 +39,18 @@ export const HERO = {
 /* ------------------------------------------------------------------ */
 /* Soluções                                                           */
 /* ------------------------------------------------------------------ */
+// COM-VITRINE-001 (etapa 4, V-06): catálogo dos quatro serviços, com o estado de cada um. Delivery com contratação
+// assistida; Hosting sob avaliação e orçamento; Monitor e AI em preparação, sem contratação, checkout ou assinatura.
+// Valores previstos de Monitor e AI só no bloco de preços (data-pricing, X-01). Textos NOVOS (PUB-17).
 export const SOLUTIONS = {
   eyebrow: 'Soluções',
-  title: 'Duas ofertas. Você escolhe o arranjo.',
+  title: 'Quatro serviços. Cada um contratado de forma independente.',
   cards: [
     {
       id: 'delivery',
       number: '01',
       name: 'Nekkora Delivery',
-      stage: 'Sob proposta',
+      stage: 'Contratação assistida',
       stageTone: 'accent' as const,
       variant: 'raised' as const,
       summary: 'Desenvolvimento de automações por demanda.', // [A-01]
@@ -66,11 +70,48 @@ export const SOLUTIONS = {
       href: '#precos',
       cta: 'Conhecer o Delivery',
     },
+    // [MO-01..MO-04] Monitor: em preparação; sem contratação nem promessa de disponibilidade (V-06)
+    {
+      id: 'monitor',
+      number: '02',
+      name: 'Nekkora Monitor',
+      stage: 'Em preparação',
+      stageTone: 'info' as const,
+      // fundo liso: o selo suave sobre o gradiente do "raised" ficava no limite do contraste (4,27–4,54:1)
+      variant: 'surface' as const,
+      summary: 'Acompanhamento das execuções de automações.',
+      items: [
+        'Contratação independente do Delivery, sem número mínimo de automações',
+        'Para automações da Nekkora ou de terceiros, conforme as integrações suportadas',
+        'Ainda não disponível para contratação',
+      ],
+      href: '#servicos-em-preparacao',
+      cta: 'Ver valores previstos',
+    },
+    // [AI-01..AI-04] AI: em preparação; limites de uso e tratamento de dados definidos antes da disponibilização (V-06)
+    {
+      id: 'ai',
+      number: '03',
+      name: 'Nekkora AI',
+      stage: 'Em preparação',
+      stageTone: 'info' as const,
+      // fundo liso: o selo suave sobre o gradiente do "raised" ficava no limite do contraste (4,27–4,54:1)
+      variant: 'surface' as const,
+      summary: 'Recursos de inteligência artificial para a sua empresa.',
+      items: [
+        'Contratação independente dos demais serviços',
+        'Limites de uso e tratamento de dados definidos antes da disponibilização',
+        'Ainda não disponível para contratação',
+      ],
+      href: '#servicos-em-preparacao',
+      cta: 'Ver valores previstos',
+    },
     {
       id: 'hosting',
-      number: '02',
+      number: '04',
       name: 'Nekkora Hosting',
-      stage: 'Em avaliação de viabilidade',
+      // COM-VITRINE-001 (etapa 4): sob avaliação e orçamento, como hoje (H-02 continua pendente)
+      stage: 'Sob avaliação e orçamento',
       stageTone: 'info' as const,
       variant: 'raised' as const,
       summary: 'Infraestrutura e serviços associados à execução de automações.', // [H-01]
@@ -84,7 +125,24 @@ export const SOLUTIONS = {
     },
   ],
   // [C-01] [C-02]
-  note: 'Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.',
+  // COM-VITRINE-001 (etapa 4): Monitor e AI ainda não podem ser contratados — texto ALTERADO (PUB-17)
+  note: 'Delivery e Hosting podem ser contratados separadamente ou em conjunto; Monitor e AI estão em preparação e ainda não podem ser contratados. Nenhum deles exige o uso de produtos próprios da Nekkora.',
+};
+
+/**
+ * Serviços em preparação (COM-VITRINE-001 §7, V-06): valores PREVISTOS de Monitor e AI, dentro do bloco data-pricing,
+ * com o aviso aprovado. Sem botão de contratação, checkout, assinatura ou lista de espera (nova coleta mudaria o aviso de
+ * privacidade, PUB-09): o interesse segue pelos canais gerais. Valores de src/precos.ts (PLANNED_RECURRING_PRICES).
+ */
+export const PLANNED_SERVICES = {
+  title: 'Serviços em preparação',
+  status: 'Em preparação',
+  notice: 'Valores e condições definitivos dependem da disponibilização comercial.',
+  note: 'Ainda não disponíveis para contratação. Para saber mais, fale com a Nekkora pelos canais de contato.',
+  items: [
+    { id: 'monitor' as const, name: 'Nekkora Monitor', price: brl(PLANNED_RECURRING_PRICES.monitor.mensal), unit: 'por automação/mês, previsto' },
+    { id: 'ai' as const, name: 'Nekkora AI', price: brl(PLANNED_RECURRING_PRICES.ai.mensal), unit: 'por empresa/mês, previsto' },
+  ],
 };
 
 /* ------------------------------------------------------------------ */
@@ -99,7 +157,8 @@ export const PRICING = {
   eyebrow: 'Preços · Nekkora Delivery',
   title: 'Quanto custa uma automação',
   // [PR-01] [PR-06]
-  description: 'Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
+  // COM-VITRINE-001 (etapa 3): por automação ou pacote de 3 da mesma categoria, sem mensalidade — texto ALTERADO (PUB-17)
+  description: 'Valores por automação ou por pacote de 3 automações da mesma categoria, sem mensalidade. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
   // [PR-02] Preços especiais de lançamento (COM-RELEASE-003-R1): nunca um percentual único para todas as categorias —
   // cada preço mostra a própria economia. Com as datas da campanha em publicacao.json (PUB-13), o período aparece por
   // extenso e a página só mostra os preços de lançamento dentro dele (config.ts, isLaunchActive); sem as datas, só como
@@ -107,15 +166,22 @@ export const PRICING = {
   // [PR-07] Regras aprovadas na COM-008-B (AUD-04, AUD-06); período mantido pela titular em 09/11/2026 (06/11/2026 a
   // 06/01/2027, no lugar dos dois meses a partir da publicação oficial); vale a data da
   // SOLICITAÇÃO; proposta com prazo de aceite de 7 dias corridos; preço individual por automação.
+  // COM-VITRINE-001 (etapa 3, §2 e §3.1): o período da campanha é mantido (06/11/2026 a 06/01/2027), sem "preços
+  // especiais" nem comparação com a tabela anterior. A tabela nova vale a partir da data de início das novas condições
+  // (V-02) — nunca retroativamente desde o início da campanha. Sem a data, a faixa diz que ela não foi definida.
+  // Textos ALTERADOS, pendentes de nova aprovação (PUB-17, reabertura na etapa 7).
   launch: {
     badge: 'Lançamento',
     text: LAUNCH_PERIOD
-      ? `Preços especiais de lançamento para solicitações de avaliação recebidas de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
-      : 'Preços especiais de lançamento.',
-    condition:
-      'Valem para automações simples e médias solicitadas durante a campanha, conforme a categoria definida na avaliação. A proposta pode ser aceita em até 7 dias corridos da emissão. A automação complexa tem orçamento individual.',
+      ? `Campanha de lançamento para solicitações de avaliação recebidas de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
+      : 'Campanha de lançamento.',
+    condition: NEW_CONDITIONS_START
+      ? `Os valores e pacotes desta tabela valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START} e continuam valendo depois da campanha, até nova revisão. As recebidas antes mantêm as condições da oferta anterior. A proposta pode ser aceita em até 7 dias corridos da emissão.`
+      : 'A proposta pode ser aceita em até 7 dias corridos da emissão.',
     /** Só na prévia de homologação, sem datas aprovadas: nenhuma elegibilidade antes do início oficial. */
     pendingDates: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
+    /** Sem a data de início das novas condições (PUB-13): a tabela não é apresentada como já vigente. */
+    pendingStart: 'Prévia para revisão: a data de início destes valores ainda não foi definida.',
     // NEKKORA-COM-CONTRACT-001 (C-10): regras completas e acessíveis da campanha (CDC arts. 30 e 31; Decreto 7.962/2013,
     // art. 2º, V). Texto NOVO, pendente da aprovação da titular (PUB-17). Só aparece com as datas aprovadas e a campanha
     // em vigor; sem datas, não há regra a anunciar. Regulamento: docs/comercial/regulamento-campanha-lancamento.md.
@@ -125,10 +191,19 @@ export const PRICING = {
           items: [
             `Período: solicitações de avaliação recebidas pela Nekkora de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}, inclusive, no horário de Brasília.`,
             `Vale a data de recebimento da solicitação: e-mail recebido em ${CHANNELS.email ?? 'nosso e-mail comercial'}${BOOKINGS_URL ? ', reserva criada no Microsoft Bookings' : ''}${CHANNELS.linkedin ? ' ou mensagem recebida na página da Nekkora no LinkedIn' : ''}. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.`,
-            'O preço de lançamento vale para automações simples e médias, por automação, conforme os cartões acima. A automação complexa tem orçamento individual, sem desconto automático.',
-            'A categoria é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Solicitação recebida no período, de automação simples ou média, tem o preço de lançamento da categoria, mesmo que a proposta seja emitida depois do fim da campanha.',
+            // V-02: a tabela nova vale a partir da data de início; os compromissos anteriores são preservados
+            NEW_CONDITIONS_START
+              ? `Os valores e pacotes dos cartões acima valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START}, inclusive. Solicitações recebidas antes dessa data mantêm as condições da oferta anterior; quando o escopo e a modalidade forem equivalentes, propomos a condição mais favorável, sem alterar proposta já aceita sem o seu acordo.`
+              : 'Os valores e pacotes dos cartões acima valem a partir da data de início das novas condições, ainda não definida. Solicitações recebidas antes dela mantêm as condições da oferta anterior.',
+            'A categoria, simples ou média, é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Vale o preço da data de recebimento da solicitação, mesmo que a proposta seja emitida depois do fim da campanha.',
+            // V-03: pacotes de 3 da mesma categoria; o restante no individual; misto só por proposta específica
+            'Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.',
             'A proposta pode ser aceita em até 7 dias corridos da emissão.',
-            'Várias automações: cada uma tem categoria e preço próprios. Pedir várias juntas não muda a categoria de nenhuma.',
+            // V-01 (titular, 12/11/2026): o fim da campanha encerra só a comunicação promocional, não a tabela
+            `A campanha termina em ${LAUNCH_PERIOD.end}: depois dessa data, a faixa e estas regras deixam de aparecer, mas os valores e pacotes dos cartões continuam valendo, até nova revisão.`,
+            'Várias automações, avulsas ou em pacote: cada uma tem escopo, documentação, homologação e aceite próprios. Pedir várias juntas não muda a categoria de nenhuma.',
+            // V-04: sem terceira categoria
+            'Demandas que não se enquadram como simples ou média têm avaliação individual, pelos canais de contato.',
             'Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.',
             'Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.',
           ],
@@ -140,7 +215,8 @@ export const PRICING = {
     title: 'O que define a categoria',
     items: [
       // CONTRACT-001-R1 (C-10): parâmetro principal aprovado pela titular — texto NOVO (PUB-17). Regulamento §5.
-      'Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas; complexa acima de 16 horas ou com risco excepcional justificado na proposta',
+      // COM-VITRINE-001 (V-04, etapa 3): só simples e média na vitrine — texto ALTERADO (PUB-17)
+      'Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas',
       'Quantidade de sistemas envolvidos',
       'Complexidade das integrações',
       'Regras de negócio e exceções',
@@ -149,7 +225,9 @@ export const PRICING = {
       'Necessidade de licenciamento',
     ],
     // CONTRACT-001-R1 (C-10): os perfis dos cartões são exemplos; nenhuma contagem isolada define a categoria — texto ALTERADO (PUB-17)
-    note: 'Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta. Os demais critérios fundamentam a estimativa de esforço, e os perfis dos cartões são exemplos típicos.',
+    // COM-VITRINE-001 (V-04, etapa 3) — texto ALTERADO (PUB-17)
+    // Titular, 11/11/2026 (autorização da etapa 3, item 4): as horas são referência; nenhuma classificação garantida só por elas
+    note: 'As horas são uma referência: o enquadramento definitivo depende da avaliação técnica e dos demais critérios, e nenhuma categoria é garantida só pela quantidade de horas. A avaliação indica a categoria antes de qualquer proposta, e os perfis dos cartões são exemplos típicos. Se a demanda não se enquadrar como simples ou média, a avaliação é individual.',
   },
   // [CO-01..CO-08] — modelo de atendimento (NEKKORA-RELEASE-001 §5.5) com as condições da COM-008-B; nada aqui promete
   // prazo, resultado ou disponibilidade. Minuta das cláusulas: docs/comercial/condicoes-comerciais-minuta.md (não
@@ -159,10 +237,13 @@ export const PRICING = {
     items: [
       'Desenvolvimento sob demanda, com escopo formalizado em proposta',
       // [CO-07] AUD-07/AUD-13 — contratar várias automações juntas não as transforma em uma complexa
-      'Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios',
+      // COM-VITRINE-001 (V-03, etapa 3): avulsas ou em pacote — texto ALTERADO (PUB-17/PUB-19)
+      'Pode solicitar várias automações, avulsas ou em pacote de 3 da mesma categoria: cada uma tem escopo, documentação, homologação e aceite próprios',
       'Preço aprovado por você antes do início do desenvolvimento',
       // [CO-03] AUD-16 — 50/50 é condição de PAGAMENTO, não percentual de desconto
-      'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal',
+      // COM-VITRINE-001 (V-03): no pacote, os percentuais incidem sobre o valor do pacote; o vencimento do saldo por
+      // automação (DP-01) continua em decisão contratual e NÃO é anunciado — fica para a proposta e o contrato
+      'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal. No pacote de 3, os percentuais incidem sobre o valor do pacote, e o vencimento do saldo é definido na proposta e no contrato',
       // CONTRACT-001 (C-12): a fila não deixa o início a critério exclusivo da Nekkora (CDC art. 39, XII) — texto ALTERADO (PUB-17)
       'Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação',
       'Reuniões e acompanhamento conforme as condições acordadas',
@@ -193,26 +274,30 @@ export const PRICING = {
       variant: 'raised' as const,
       price: { tier: 'media' as const, ...priceFacts('media') },
     },
-    {
-      overline: 'Complexa',
-      title: 'Automação complexa',
-      // AUD-07: contratar várias automações juntas não as torna complexas
-      fit: 'Processos ponta a ponta ou com várias integrações por API.',
-      variant: 'outlined' as const,
-      // [PR-03] — sem desconto automático: o valor depende do dimensionamento e da aprovação comercial
-      negotiated: { label: 'Sob orçamento', unit: 'dimensionada na avaliação · orçamento individual' },
-      cta: 'Solicitar avaliação',
-    },
   ],
+  // COM-VITRINE-001 (V-04, etapa 3): só simples e média; sem terceira categoria. Demandas fora das modalidades seguem
+  // pelos canais gerais, com avaliação individual — texto NOVO aprovado como diretriz pela titular (11/11/2026, PUB-17).
+  other: {
+    text: 'Não encontrou uma modalidade adequada à sua necessidade? Entre em contato com nossa equipe para uma avaliação individual.',
+    cta: 'Falar com a equipe',
+  },
+  // COM-VITRINE-001 (V-07): preço individual, valor total do pacote de 3 e economia total calculada; sem valor
+  // unitário dentro do pacote e sem comparação com a tabela anterior. Valores de src/precos.ts (priceFacts).
   unit: 'por automação',
-  launchUnit: 'por automação · preço de lançamento',
-  /** "Economia de <valor>" — o valor economizado (padrão − lançamento), ao lado do percentual. */
+  packageUnit: 'pacote de 3 automações da mesma categoria',
+  /** "Economia de <valor>" — 3 × individual − pacote, calculada em src/precos.ts. */
   savings: (label: string) => `Economia de ${label}`,
-  /** Rótulos lidos por leitor de tela: o valor riscado não é anunciado como riscado, então cada valor diz o que é. */
-  srFrom: 'Preço padrão:',
-  srTo: 'Preço especial de lançamento:',
-  srPercent: 'Desconto de',
+  savingsBasis: 'em relação a 3 automações individuais',
   notes: [
+    {
+      icon: 'code' as IconName,
+      tone: 'success' as const,
+      // COM-VITRINE-001 (V-05, etapa 3): titularidade do desenvolvimento específico após a quitação integral, com as
+      // exceções (componentes preexistentes e de terceiros). Coerente com o Modelo A-R do anexo de componentes; sem
+      // titularidade irrestrita de bibliotecas e frameworks (LIC-02 pendente). Texto NOVO (PUB-17).
+      title: 'A automação é sua',
+      text: 'O código-fonte, a documentação e os artefatos desenvolvidos especificamente para você e contratados passam a ser seus conforme o contrato e após a quitação integral. Bibliotecas, frameworks e componentes preexistentes da Nekkora, componentes reutilizáveis e tecnologias de terceiros continuam com seus titulares e são licenciados para que você possa usar, manter e executar a automação, nas condições de cada licença.',
+    },
     {
       icon: 'studio' as IconName,
       tone: 'accent' as const,
@@ -236,23 +321,25 @@ export const PRICING = {
 /* Simulador de investimento — dentro do bloco data-pricing           */
 /* ------------------------------------------------------------------ */
 /**
- * NEKKORA-CALC-001. Valores sempre de src/precos.ts (simulate): nada aqui tem número de preço ou percentual. Sem ROI,
- * horas economizadas ou classificação automática da automação: a categoria é confirmada na avaliação [PR-06] [X-03].
- * A economia exibida é a diferença entre os preços comerciais, nunca economia operacional [PR-08].
+ * NEKKORA-CALC-001 e COM-VITRINE-001 §8. Valores sempre de src/precos.ts (simulate): nada aqui tem número de preço ou
+ * percentual. Sem ROI, horas economizadas ou classificação automática da automação: a categoria é confirmada na
+ * avaliação [PR-06] [X-03]. A economia exibida é a diferença entre o preço individual e o preço do pacote da mesma
+ * tabela, nunca economia operacional [PR-08]. Sem categoria complexa (V-04).
  */
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 export const SIMULATOR = {
   title: 'Simulador de Investimento — Nekkora Delivery',
-  description: 'Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento. Sem cadastro: nada do que você seleciona é enviado ou guardado.',
+  description: 'Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento, com pacotes de 3 quando houver. Sem cadastro: nada do que você seleciona é enviado ou guardado.',
   tiers: [
     { tier: 'simples' as const, label: 'Automações simples', one: 'automação simples', many: 'automações simples' },
     { tier: 'media' as const, label: 'Automações médias', one: 'automação média', many: 'automações médias' },
-    { tier: 'complexa' as const, label: 'Automações complexas', one: 'automação complexa', many: 'automações complexas' },
   ],
   decrease: (label: string) => `Diminuir ${label.toLowerCase()}`,
   increase: (label: string) => `Aumentar ${label.toLowerCase()}`,
   max: (n: number) => `Até ${n} por categoria. Para mais, fale com a Nekkora.`,
   total: (n: number) => `Total selecionado: ${plural(n, 'automação', 'automações')}`,
+  /** "<individual> cada · <pacote> o pacote de 3" — rótulo de cada categoria, com os valores de src/precos.ts. */
+  unit: (individual: string, pack: string) => `${individual} cada · ${pack} o pacote de 3`,
   calculate: 'Calcular meu investimento',
   clear: 'Limpar simulação',
   empty: 'Selecione ao menos uma automação para calcular.',
@@ -265,28 +352,20 @@ export const SIMULATOR = {
   },
   resultTitle: 'Resultado da simulação',
   /** "2 automações simples" — para o resumo. */
-  count: (tier: 'simples' | 'media' | 'complexa', n: number) => {
+  count: (tier: 'simples' | 'media', n: number) => {
     const t = SIMULATOR.tiers.find((x) => x.tier === tier)!;
     return plural(n, t.one, t.many);
   },
-  estimateLabel: (launch: boolean, partial: boolean) =>
-    partial ? (launch ? 'Subtotal estimado com preços de lançamento' : 'Subtotal estimado') : launch ? 'Investimento estimado com preços de lançamento' : 'Investimento estimado',
-  standardLabel: 'Pelo preço padrão',
-  savingsLabel: 'Economia promocional',
-  percentLabel: 'Desconto equivalente sobre o total calculável',
-  each: 'cada',
-  complexLine: 'sob orçamento individual',
-  partialNote: (n: number) =>
-    `${n === 1 ? 'A automação complexa exige' : 'As automações complexas exigem'} orçamento individual e não ${n === 1 ? 'entra' : 'entram'} no valor acima, que não é o preço completo da contratação.`,
-  onlyComplex: 'Automações complexas têm orçamento individual, definido na avaliação. Por isso, esta simulação não mostra um valor.',
-  savingsNote: 'A economia é a diferença entre o preço padrão e o preço de lançamento das categorias selecionadas — não é uma economia operacional comprovada.',
-  /** Por situação da campanha (src/precos.ts, campaignState). */
-  campaign: {
-    vigente: 'Preços de lançamento em vigor para solicitações recebidas durante a campanha.',
-    pendente: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
-    futura: 'Valores pelo preço padrão. Os preços de lançamento ainda não estão em vigor.',
-    encerrada: 'Valores pelo preço padrão. A campanha de lançamento foi encerrada.',
-  } satisfies Record<CampaignState, string>,
+  /** "1 pacote de 3 (<pacote> cada) + 1 individual (<individual> cada)" — composição de uma categoria (V-03). */
+  composition: (packages: number, singles: number, pack: string, individual: string) =>
+    [packages > 0 ? `${plural(packages, 'pacote de 3', 'pacotes de 3')} (${pack} cada)` : null, singles > 0 ? `${plural(singles, 'individual', 'individuais')} (${individual} cada)` : null]
+      .filter(Boolean)
+      .join(' + '),
+  estimateLabel: 'Investimento estimado',
+  individualLabel: 'Sem pacotes, no preço individual',
+  savingsLabel: 'Economia com pacotes',
+  packagesRule: 'Pacotes de 3 automações da mesma categoria; o que sobra fica no preço individual. Categorias diferentes não se misturam em um pacote.',
+  savingsNote: 'A economia é a diferença entre o preço individual e o preço do pacote das categorias selecionadas — não é uma economia operacional comprovada.',
   // Texto obrigatório (NEKKORA-CALC-001 §3.7)
   disclaimer:
     'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.',
@@ -402,7 +481,8 @@ export const CONTACT_COPY = {
   demand: {
     legend: 'O que você precisa?',
     options: [
-      { value: 'automacao', label: 'Desenvolver uma nova automação', line: 'Quero solicitar uma avaliação de automação.' },
+      // COM-VITRINE-001 (etapa 5): a primeira linha identifica o serviço, como já fazem as do Hosting — texto ALTERADO (PUB-17)
+      { value: 'automacao', label: 'Desenvolver uma nova automação', line: 'Quero solicitar uma avaliação de automação (Nekkora Delivery).' },
       {
         value: 'hospedagem',
         label: 'Hospedar uma automação existente',
@@ -414,6 +494,17 @@ export const CONTACT_COPY = {
         line: 'Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting).',
       },
     ],
+  },
+  /**
+   * COM-VITRINE-001 (etapa 5): orientação por serviço, só na tela (não entra na mensagem nem cria campo novo). O interesse
+   * em pacote vai na descrição, com as palavras do visitante, ou no resumo do simulador. Monitor e AI não são tipos de
+   * solicitação (em preparação). Textos NOVOS (PUB-17).
+   */
+  demandHints: {
+    automacao:
+      'Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria. Se tiver interesse no pacote, conte na descrição quantas automações você tem em mente; categoria e composição são confirmadas na avaliação.',
+    hospedagem: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
+    infraestrutura: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
   },
   messageLabel: 'Descreva o processo ou a necessidade',
   processHint: 'O que acontece hoje, quais sistemas envolve, com que frequência e qual resultado você espera. Até 1.000 caracteres.',

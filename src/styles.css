@@ -54,6 +54,11 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: max(40px, 5%); align-items: center; }
 .split__visual { position: relative; display: flex; justify-content: center; }
 
+/* COM-VITRINE-001 (V-06): serviços em preparação, no bloco de preços */
+.planned__list { gap: 12px; }
+.planned__item { display: flex; flex-direction: column; gap: 6px; }
+.planned__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.planned__price strong { font-size: var(--nk-font-size-xl); }
 .center-note { margin: 0; text-align: center; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
 
 /* ---------- Hero (centralizado) ---------- */
@@ -149,7 +154,8 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .price__row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
 .price__value { font-size: clamp(1.8rem, 1.2rem + 1.4vw, 2.4rem); font-weight: 700; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; color: var(--nk-color-text); }
 .price__savings { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
-.price__negotiated { font-size: 1.6rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--nk-color-text); }
+.price__package { font-size: var(--nk-font-size-sm); color: var(--nk-color-text-secondary); }
+.price__package strong { font-size: var(--nk-font-size-xl); font-weight: 700; color: var(--nk-color-text); white-space: nowrap; }
 .price__unit { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
 
 /* NEKKORA-COM-CONTRACT-001 (C-10): regras completas da campanha, recolhíveis, com foco visível */
@@ -249,6 +255,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 
 /* Diálogo "Solicitar avaliação" (modelo C, etapa 2) */
 .request__body, .request__form, .contact__done { display: flex; flex-direction: column; gap: 16px; }
+.request__hint { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.5; color: var(--nk-color-text-secondary); }
 .request__pending { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.5; color: var(--nk-color-text-secondary); }
 .request__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; }
 .request .nk-dialog__footer { flex-direction: column; align-items: stretch; gap: 12px; }

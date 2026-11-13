@@ -15,6 +15,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { responseHeadersPolicy } from '../deploy/aws/cabecalhos.mjs';
 import { isBookingsUrl } from '../src/agendamento-url.js';
+import { impressaoDaTabela } from './comercial/impressao-precos.mjs';
+import { ITENS, impressaoDoConteudo } from './comercial/impressao-conteudo.mjs';
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -83,8 +85,28 @@ if (intake.endpoint != null) {
 }
 // Campanha (§4.4, COM-RELEASE-003-R1)
 const { inicio, fim } = pub.campanhaLancamento;
+const tabela = pub.tabelaDePrecos ?? {};
 need(iso(inicio) && iso(fim) && inicio <= fim, 'PUB-13', 'datas de início e fim da campanha de lançamento');
-need(!iso(fim) || fim >= today, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today})`);
+// COM-VITRINE-001 §3.1: data de início das novas condições, dentro da campanha e já alcançada no dia do deploy (a página
+// publicada aplica a tabela nova a partir dela; antes dela valem os compromissos da tabela anterior).
+const novas = pub.novasCondicoes?.inicio ?? null;
+need(
+  iso(novas) && (!iso(inicio) || novas >= inicio) && novas <= today,
+  'PUB-13',
+  `data de início das novas condições (novasCondicoes.inicio): a partir do início da campanha e não depois de hoje (${today})`,
+);
+// L-02 (titular, 12/11/2026): a data de início é a da publicação efetiva da nova vitrine, decidida pela titular — não
+// basta ser válida. Exige $origem["novasCondicoes.inicio"] começando por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje)
+// e citando UMA data AAAA-MM-DD, exatamente a de novasCondicoes.inicio, nunca anterior ao próprio registro (sem
+// retroatividade, por exemplo a 06/11/2026).
+const registroDoInicio = pub.$origem?.['novasCondicoes.inicio'];
+const dataDoRegistroDoInicio = dataDoRegistro(registroDoInicio);
+const datasCitadas = typeof registroDoInicio === 'string' ? [...new Set(registroDoInicio.match(/\b\d{4}-\d{2}-\d{2}\b/g) ?? [])] : [];
+need(
+  dataDoRegistroDoInicio != null && dataDoRegistroDoInicio >= '2026-11-12' && dataDoRegistroDoInicio <= today && datasCitadas.length === 1 && datasCitadas[0] === novas && iso(novas) && novas >= dataDoRegistroDoInicio,
+  'PUB-13',
+  `registro da data de início ausente ou divergente: $origem["novasCondicoes.inicio"] deve começar por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje) e citar a data ${novas ?? 'AAAA-MM-DD'} de novasCondicoes.inicio, não anterior ao registro`,
+);
 // Privacidade (§5.4)
 need(Boolean(pub.controlador.nome), 'PUB-09', 'controlador dos dados: razão social (ou nome) para o aviso de privacidade');
 need(isTaxId(pub.controlador.documento), 'PUB-09', 'controlador dos dados: CNPJ ou CPF válido (dígitos verificadores)');
@@ -94,10 +116,99 @@ need(typeof pub.fornecedor?.endereco === 'string' && pub.fornecedor.endereco.tri
 need(Boolean(pub.hospedagem.provedor), 'PUB-11', 'provedor de hospedagem citado no aviso de privacidade');
 // Aprovações da titular — preços e condições são decisões separadas (COM-RELEASE-003-R1 §3.5)
 need(pub.aprovacoes.precos === true, 'PUB-14', 'aprovação dos preços');
+// COM-VITRINE-001 §9.3: a aprovação vale para UMA tabela. A impressão aprovada tem de ser a da tabela do código; sem ela
+// (ou com outra), bloqueia mesmo com aprovacoes.precos === true — nenhum preço novo usa aprovação anterior.
+const impressao = impressaoDaTabela();
+need(
+  tabela.impressao === impressao,
+  'PUB-14',
+  `tabela de preços do código sem aprovação própria: impressão ${impressao}, aprovada ${tabela.impressao ?? 'nenhuma'} (node scripts/comercial/impressao-precos.mjs)`,
+);
+// Rastreabilidade: só a impressão não é aprovação. Exige o registro expresso da titular em
+// $origem["tabelaDePrecos.impressao"], começando por "Titular, DD/MM/AAAA" (data válida, a partir de 11/11/2026, quando
+// a COM-VITRINE-001 foi definida, e não depois de hoje) e citando UMA impressão, exatamente a aprovada e a do código.
+// Regenerar o hash sem o registro correspondente bloqueia; os registros da v1.0.0 (outras chaves) não servem.
+/** Data (AAAA-MM-DD) de um registro que começa por "Titular, DD/MM/AAAA", ou null se não começar assim ou for inválida. */
+function dataDoRegistro(registro) {
+  const m = typeof registro === 'string' && /^Titular, (\d{2})\/(\d{2})\/(\d{4})\b/.exec(registro);
+  return m && iso(`${m[3]}-${m[2]}-${m[1]}`) && new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00Z`).getUTCDate() === Number(m[1]) ? `${m[3]}-${m[2]}-${m[1]}` : null;
+}
+/** Registro expresso da titular: "Titular, DD/MM/AAAA" (data válida, de `desde` até hoje) citando UMA impressão, que
+ * tem de ser a aprovada e a calculada. Vale para PUB-14, PUB-17, PUB-19 e V-01. */
+function registroConfere(registro, aprovada, calculada, desde) {
+  const data = dataDoRegistro(registro);
+  const citadas = typeof registro === 'string' ? [...new Set(registro.match(/sha256:[0-9a-f]{64}/g) ?? [])] : [];
+  return data != null && data >= desde && data <= today && citadas.length === 1 && citadas[0] === aprovada && citadas[0] === calculada;
+}
+need(
+  registroConfere(pub.$origem?.['tabelaDePrecos.impressao'], tabela.impressao, impressao, '2026-11-11'),
+  'PUB-14',
+  `registro da aprovação da tabela ausente ou divergente: $origem["tabelaDePrecos.impressao"] deve começar por "Titular, DD/MM/AAAA" (de 11/11/2026 até hoje) e citar a impressão aprovada ${impressao}`,
+);
+// V-01 / L-04 (titular, 12/11/2026): a página anuncia que os valores continuam depois da campanha, até nova revisão. Por
+// isso a continuidade é exigida em qualquer data, e a flag sozinha não é aprovação: posCampanha === true com o registro
+// $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela
+// aprovada (a continuidade vale para ESSA tabela; outra tabela exige nova decisão).
+const posCampanhaAprovada = tabela.posCampanha === true && registroConfere(pub.$origem?.['tabelaDePrecos.posCampanha'], tabela.impressao, impressao, '2026-11-12');
+need(
+  posCampanhaAprovada,
+  'V-01',
+  `tabela depois de 06/01/2027 sem aprovação própria: tabelaDePrecos.posCampanha true e registro em $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela ${impressao}`,
+);
+// COM-VITRINE-001 §3.2: campanha encerrada só com a V-01 aprovada (a página já não mostra comunicação promocional)
+need(!iso(fim) || fim >= today || posCampanhaAprovada, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today}) e tabela pós-campanha não aprovada (tabelaDePrecos.posCampanha, V-01)`);
+// COM-VITRINE-001 §7 (V-06): Monitor e AI só "em-preparacao" ou, com aprovação própria, "disponivel"
+for (const servico of ['monitor', 'ai']) {
+  const estado = pub.servicos?.[servico] ?? null;
+  need(
+    estado === 'em-preparacao' || (estado === 'disponivel' && pub.aprovacoes.disponibilidade?.[servico] === true),
+    'PUB-23',
+    `servicos.${servico}: "em-preparacao", ou "disponivel" só com aprovacoes.disponibilidade.${servico} (homologado, sem contratação fictícia)`,
+  );
+}
 need(pub.aprovacoes.condicoesComerciais === true, 'PUB-19', 'aprovação das condições comerciais (50/50, fila, reuniões, licenças, garantia e aceite)');
 need(pub.aprovacoes.textosComerciais === true, 'PUB-17', 'aprovação dos textos comerciais');
+// COM-VITRINE-001 §12 (titular, 12/11/2026, forma b): a flag herdada da v1.0.0 não basta. Cada aprovação vale para UM
+// conteúdo: a impressão calculada dos arquivos (scripts/comercial/impressao-conteudo.mjs) tem de ser a aprovada em
+// impressoesDeConteudo.<item>, com o registro expresso da titular em $origem["impressoesDeConteudo.<item>"], a partir
+// de 12/11/2026. As flags não mudam; os registros da v1.0.0 (outras chaves) não servem.
+const impressoesAprovadas = pub.impressoesDeConteudo ?? {};
+for (const [item, nome, dos] of [['textosComerciais', 'textos comerciais', 'dos'], ['condicoesComerciais', 'condições comerciais', 'das']]) {
+  const { id } = ITENS[item];
+  const calculada = impressaoDoConteudo(item);
+  const aprovada = impressoesAprovadas[item] ?? null;
+  need(aprovada === calculada, id, `${nome} sem aprovação própria: impressão ${calculada}, aprovada ${aprovada ?? 'nenhuma'} (node scripts/comercial/impressao-conteudo.mjs)`);
+  need(
+    registroConfere(pub.$origem?.[`impressoesDeConteudo.${item}`], aprovada, calculada, '2026-11-12'),
+    id,
+    `registro da aprovação ${dos} ${nome} ausente ou divergente: $origem["impressoesDeConteudo.${item}"] deve começar por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje) e citar a impressão aprovada ${calculada}`,
+  );
+}
 need(pub.aprovacoes.avisoDePrivacidade === true, 'PUB-09', 'aprovação do aviso de privacidade');
 need(pub.aprovacoes.publicacao === true, 'PUB-18', 'autorização expressa de publicação em produção');
+// PUB-18 (COM-VITRINE-001, titular, 12/11/2026): a flag herdada da v1.0.0 não basta. A autorização vale para UMA versão
+// (package.json) e UM commit homologado, gravados pela titular em publicacaoAutorizada e no registro
+// $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje, citando "versão X" e UM SHA de 40
+// dígitos). Sem circularidade: o registro cita o commit HOMOLOGADO, anterior ao que contém o registro; no deploy,
+// scripts/verificar-autorizacao-release.mjs confere que o commit publicado descende dele e só difere pela autorização.
+const pacote = json('package.json');
+const versao = pacote.version;
+const autorizada = pub.publicacaoAutorizada ?? {};
+const registroPub = pub.$origem?.publicacaoAutorizada;
+const dataPub = dataDoRegistro(registroPub);
+const commitsCitados = typeof registroPub === 'string' ? [...new Set(registroPub.match(/\b[0-9a-f]{40}\b/g) ?? [])] : [];
+need(
+  autorizada.versao === versao &&
+    /^[0-9a-f]{40}$/.test(autorizada.commit ?? '') &&
+    dataPub != null &&
+    dataPub >= '2026-11-12' &&
+    dataPub <= today &&
+    commitsCitados.length === 1 &&
+    commitsCitados[0] === autorizada.commit &&
+    registroPub.includes(`versão ${versao}`),
+  'PUB-18',
+  `autorização desta versão: publicacaoAutorizada { versao: "${versao}", commit: SHA homologado } e registro em $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a versão ${versao} e UM commit, o homologado (a flag aprovacoes.publicacao sozinha não autoriza)`,
+);
 need(pub.avisoHomologacao === false, 'PUB-10', 'desligar o aviso "Versão para homologação"');
 
 // Dependência da lib: tarball versionado íntegro (LIB-RELEASE-001)
@@ -113,6 +224,8 @@ if (!existsSync(releaseFile)) {
   const rel = JSON.parse(readFileSync(releaseFile, 'utf8'));
   need(rel.homologacao === false && rel.publicacao === 'publicacao.json', 'BUILD', 'artefato feito com dados de homologação (NEKKORA_PUBLICACAO)');
   need(rel.arvoreLimpa === true, 'BUILD', 'artefato gerado com alterações não commitadas');
+  // PUB-18: o artefato é da versão autorizada (a do package.json conferida acima)
+  need(rel.aplicacao === `${pacote.name}@${versao}`, 'BUILD', `artefato de outra versão (${rel.aplicacao ?? 'sem versão'}; esperado ${pacote.name}@${versao})`);
   need(rel.nekkoraLib?.integridade === lib.integridade, 'BUILD', 'artefato com outra versão da nekkora-lib');
   const policyFile = resolve('deploy/aws/politica-cabecalhos.json');
   const versioned = existsSync(policyFile) ? readFileSync(policyFile, 'utf8') : null;

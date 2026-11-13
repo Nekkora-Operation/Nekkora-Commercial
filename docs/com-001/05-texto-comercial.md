@@ -1,7 +1,9 @@
 # Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)
 
-> **Aprovado internamente** pela titular em 11/11/2026 (PUB-17, PUB-19 e PUB-09, commit e4bc72c), sem parecer jurídico
-> externo. Pendências registradas em `publicacao.json` ($origem) e em docs/release/NEKKORA-COM-GOLIVE-001-pre-liberacao.md.
+> **Textos e condições públicas aprovados internamente** pela titular para este conteúdo (impressões de PUB-17 e
+> PUB-19 e registros em `publicacao.json` $origem), sem parecer jurídico externo. **Não é autorização de
+> publicação** (PUB-13 e PUB-18 têm registros próprios) nem aprova contrato-base, anexos, proposta-modelo,
+> procedimento ou as propostas DP-01 a DP-05: a contratação de pacotes segue bloqueada.
 
 > Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere
 > o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.
@@ -22,9 +24,9 @@ CTAs: "Solicitar avaliação" · "Ver como funciona"
 
 ## 2. Soluções
 
-**Soluções** — Duas ofertas. Você escolhe o arranjo.
+**Soluções** — Quatro serviços. Cada um contratado de forma independente.
 
-### 01 · Nekkora Delivery · _Sob proposta_
+### 01 · Nekkora Delivery · _Contratação assistida_
 
 Desenvolvimento de automações por demanda.
 
@@ -36,7 +38,27 @@ Tecnologias, conforme o caso: Python · UiPath · Power Automate · Integraçõe
 
 Link: "Conhecer o Delivery" (#precos)
 
-### 02 · Nekkora Hosting · _Em avaliação de viabilidade_
+### 02 · Nekkora Monitor · _Em preparação_
+
+Acompanhamento das execuções de automações.
+
+- Contratação independente do Delivery, sem número mínimo de automações
+- Para automações da Nekkora ou de terceiros, conforme as integrações suportadas
+- Ainda não disponível para contratação
+
+Link: "Ver valores previstos" (#servicos-em-preparacao)
+
+### 03 · Nekkora AI · _Em preparação_
+
+Recursos de inteligência artificial para a sua empresa.
+
+- Contratação independente dos demais serviços
+- Limites de uso e tratamento de dados definidos antes da disponibilização
+- Ainda não disponível para contratação
+
+Link: "Ver valores previstos" (#servicos-em-preparacao)
+
+### 04 · Nekkora Hosting · _Sob avaliação e orçamento_
 
 Infraestrutura e serviços associados à execução de automações.
 
@@ -46,53 +68,55 @@ Infraestrutura e serviços associados à execução de automações.
 
 Link: "Entender o Hosting" (#hosting)
 
-Delivery e Hosting podem ser contratados separadamente ou em conjunto. Nenhum deles exige o uso de produtos próprios da Nekkora.
+Delivery e Hosting podem ser contratados separadamente ou em conjunto; Monitor e AI estão em preparação e ainda não podem ser contratados. Nenhum deles exige o uso de produtos próprios da Nekkora.
 
 ## 3. Preços (bloco data-pricing)
 
 **Preços · Nekkora Delivery** — Quanto custa uma automação
 
-Valores por automação. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
+Valores por automação ou por pacote de 3 automações da mesma categoria, sem mensalidade. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
 
-> **Lançamento** — Preços especiais de lançamento para solicitações de avaliação recebidas de 06/11/2026 a 06/01/2027. Valem para automações simples e médias solicitadas durante a campanha, conforme a categoria definida na avaliação. A proposta pode ser aceita em até 7 dias corridos da emissão. A automação complexa tem orçamento individual.
+> **Lançamento** — Campanha de lançamento para solicitações de avaliação recebidas de 06/11/2026 a 06/01/2027. A proposta pode ser aceita em até 7 dias corridos da emissão.
 
 Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial._
+
+Sem a data de início das novas condições: _Prévia para revisão: a data de início destes valores ainda não foi definida._
 
 **Regras da campanha de lançamento** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):
 
 - Período: solicitações de avaliação recebidas pela Nekkora de 06/11/2026 a 06/01/2027, inclusive, no horário de Brasília.
 - Vale a data de recebimento da solicitação: e-mail recebido em contato@nekkora.com ou mensagem recebida na página da Nekkora no LinkedIn. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.
-- O preço de lançamento vale para automações simples e médias, por automação, conforme os cartões acima. A automação complexa tem orçamento individual, sem desconto automático.
-- A categoria é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Solicitação recebida no período, de automação simples ou média, tem o preço de lançamento da categoria, mesmo que a proposta seja emitida depois do fim da campanha.
+- Os valores e pacotes dos cartões acima valem a partir da data de início das novas condições, ainda não definida. Solicitações recebidas antes dela mantêm as condições da oferta anterior.
+- A categoria, simples ou média, é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Vale o preço da data de recebimento da solicitação, mesmo que a proposta seja emitida depois do fim da campanha.
+- Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.
 - A proposta pode ser aceita em até 7 dias corridos da emissão.
-- Várias automações: cada uma tem categoria e preço próprios. Pedir várias juntas não muda a categoria de nenhuma.
+- A campanha termina em 06/01/2027: depois dessa data, a faixa e estas regras deixam de aparecer, mas os valores e pacotes dos cartões continuam valendo, até nova revisão.
+- Várias automações, avulsas ou em pacote: cada uma tem escopo, documentação, homologação e aceite próprios. Pedir várias juntas não muda a categoria de nenhuma.
+- Demandas que não se enquadram como simples ou média têm avaliação individual, pelos canais de contato.
 - Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.
 - Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.
 
-| Faixa | Para | Valor (campanha em vigor) | Fora da campanha |
+| Faixa | Para | Individual | Pacote de 3 |
 |---|---|---|---|
-| Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | ~~R$ 1.500~~ **R$ 1.000** −33,33% · Economia de R$ 500 — por automação · preço de lançamento | **R$ 1.500** — por automação |
-| Automação média | Mais de um sistema, validações, tratamento de exceções e relatórios. | ~~R$ 3.500~~ **R$ 2.800** −20% · Economia de R$ 700 — por automação · preço de lançamento | **R$ 3.500** — por automação |
-| Automação complexa | Processos ponta a ponta ou com várias integrações por API. | **Sob orçamento** — dimensionada na avaliação · orçamento individual | **Sob orçamento** |
+| Automação simples | Um sistema ou planilha, regras diretas, poucas exceções. | **R$ 650** — por automação | **R$ 1.500** — pacote de 3 automações da mesma categoria · Economia de R$ 450 em relação a 3 automações individuais |
+| Automação média | Mais de um sistema, validações, tratamento de exceções e relatórios. | **R$ 1.400** — por automação | **R$ 3.500** — pacote de 3 automações da mesma categoria · Economia de R$ 700 em relação a 3 automações individuais |
 
-Leitor de tela: "Preço padrão: <preço padrão>", "Preço especial de lançamento: <preço de lançamento>", "Desconto de <percentual>". Valores de src/precos.ts.
+Não encontrou uma modalidade adequada à sua necessidade? Entre em contato com nossa equipe para uma avaliação individual. — link "Falar com a equipe" (abre a solicitação de avaliação).
+
+Os valores são os mesmos em qualquer data (COM-VITRINE-001, V-01); a campanha controla só a faixa e as regras. Valores de src/precos.ts.
 
 ### Simulador de Investimento — Nekkora Delivery (NEKKORA-CALC-001 — logo abaixo dos cartões)
 
-Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento. Sem cadastro: nada do que você seleciona é enviado ou guardado.
+Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento, com pacotes de 3 quando houver. Sem cadastro: nada do que você seleciona é enviado ou guardado.
 
-Controles: Automações simples · Automações médias · Automações complexas — botões "Diminuir …" / "Aumentar …", campo numérico (0 a 20), "Até 20 por categoria. Para mais, fale com a Nekkora."
+Controles: Automações simples · Automações médias — botões "Diminuir …" / "Aumentar …", campo numérico (0 a 20), rótulo "<individual> cada · <pacote> o pacote de 3", "Até 20 por categoria. Para mais, fale com a Nekkora."
 
 Barra: "Total selecionado: 3 automações" · botões "Limpar simulação" e "Calcular meu investimento". Sem seleção: _Selecione ao menos uma automação para calcular._ Mudou depois de calcular: _As quantidades mudaram. Clique em "Calcular meu investimento" para atualizar a estimativa._
 
-**Resultado da simulação** — linhas "2 automações simples × <preço>", depois:
-- "Investimento estimado" / "Investimento estimado com preços de lançamento" / "Subtotal estimado" / "Subtotal estimado com preços de lançamento"
-- Com a campanha em vigor: "Pelo preço padrão", "Economia promocional", "Desconto equivalente sobre o total calculável" — A economia é a diferença entre o preço padrão e o preço de lançamento das categorias selecionadas — não é uma economia operacional comprovada.
-- Com complexa: A automação complexa exige orçamento individual e não entra no valor acima, que não é o preço completo da contratação. Só complexas: Automações complexas têm orçamento individual, definido na avaliação. Por isso, esta simulação não mostra um valor.
-- Campanha vigente: Preços de lançamento em vigor para solicitações recebidas durante a campanha.
-- Campanha pendente: Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.
-- Campanha futura: Valores pelo preço padrão. Os preços de lançamento ainda não estão em vigor.
-- Campanha encerrada: Valores pelo preço padrão. A campanha de lançamento foi encerrada.
+**Resultado da simulação** — linhas "4 automações simples: 1 pacote de 3 (<pacote> cada) + 1 individual (<individual> cada)", depois:
+- "Investimento estimado"
+- Com pacote: "Sem pacotes, no preço individual" e "Economia com pacotes" — A economia é a diferença entre o preço individual e o preço do pacote das categorias selecionadas — não é uma economia operacional comprovada.
+- Pacotes de 3 automações da mesma categoria; o que sobra fica no preço individual. Categorias diferentes não se misturam em um pacote.
 
 > Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.
 
@@ -100,14 +124,15 @@ Próximo passo: "Agendar uma conversa" (Microsoft Bookings, nova aba) · "Solici
 
 **Não sabe a categoria da sua automação?** A categoria depende de sistemas, integrações, regras, volume e licenças, e é confirmada na avaliação. Na dúvida, solicite uma avaliação ou veja o que define a categoria (link para os critérios).
 
-Exemplo de homologação: 2 simples + 1 média → padrão R$ 6.500; lançamento R$ 4.800; economia R$ 1.700; 26,15% (truncado).
+Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.500) + 1 simples (R$ 650) + 1 média (R$ 1.400) = R$ 3.550; sem pacotes R$ 4.000; economia R$ 450.
 
+- **A automação é sua** — O código-fonte, a documentação e os artefatos desenvolvidos especificamente para você e contratados passam a ser seus conforme o contrato e após a quitação integral. Bibliotecas, frameworks e componentes preexistentes da Nekkora, componentes reutilizáveis e tecnologias de terceiros continuam com seus titulares e são licenciados para que você possa usar, manter e executar a automação, nas condições de cada licença.
 - **Como chegamos a esses valores** — Trabalhamos com processos padronizados e ferramentas internas de documentação e desenvolvimento. Isso nos permite oferecer estes valores sem retirar etapas: documentação, desenvolvimento, testes e homologação continuam no escopo.
 - **Licenças e infraestrutura** — Indicamos na proposta as licenças e os serviços de terceiros necessários (UiPath, Power Automate, APIs pagas); em regra, a contratação é do cliente, e esses custos não estão incluídos nos valores acima. A automação pode rodar na infraestrutura do próprio cliente ou, se contratado à parte, no Nekkora Hosting.
 
 **O que define a categoria**
 
-- Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas; complexa acima de 16 horas ou com risco excepcional justificado na proposta
+- Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas
 - Quantidade de sistemas envolvidos
 - Complexidade das integrações
 - Regras de negócio e exceções
@@ -115,19 +140,26 @@ Exemplo de homologação: 2 simples + 1 média → padrão R$ 6.500; lançamento
 - Exigências de infraestrutura
 - Necessidade de licenciamento
 
-Nem todo processo é simples ou médio: a avaliação indica a categoria antes de qualquer proposta. Os demais critérios fundamentam a estimativa de esforço, e os perfis dos cartões são exemplos típicos.
+As horas são uma referência: o enquadramento definitivo depende da avaliação técnica e dos demais critérios, e nenhuma categoria é garantida só pela quantidade de horas. A avaliação indica a categoria antes de qualquer proposta, e os perfis dos cartões são exemplos típicos. Se a demanda não se enquadrar como simples ou média, a avaliação é individual.
 
 **Condições comerciais**
 
 - Desenvolvimento sob demanda, com escopo formalizado em proposta
-- Pode solicitar várias automações: cada uma tem categoria, escopo, preço e aceite próprios
+- Pode solicitar várias automações, avulsas ou em pacote de 3 da mesma categoria: cada uma tem escopo, documentação, homologação e aceite próprios
 - Preço aprovado por você antes do início do desenvolvimento
-- Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal
+- Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal. No pacote de 3, os percentuais incidem sobre o valor do pacote, e o vencimento do saldo é definido na proposta e no contrato
 - Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação
 - Reuniões e acompanhamento conforme as condições acordadas
 - Licenças e custos externos tratados à parte, quando aplicáveis
 - Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados
 - Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei
+
+**Serviços em preparação** (COM-VITRINE-001, V-06 — dentro do bloco de preços, sem contratação):
+
+- Nekkora Monitor — _Em preparação_ — **R$ 75** por automação/mês, previsto
+- Nekkora AI — _Em preparação_ — **R$ 100** por empresa/mês, previsto
+
+Valores e condições definitivos dependem da disponibilização comercial. Ainda não disponíveis para contratação. Para saber mais, fale com a Nekkora pelos canais de contato.
 
 Hosting tem avaliação e proposta próprias.
 
@@ -200,7 +232,9 @@ Canal da solicitação: WhatsApp, se confirmado; senão o e-mail (publicação a
 
 Formulário: "O que você precisa?"* (Desenvolver uma nova automação · Hospedar uma automação existente · Infraestrutura e serviços relacionados; o CTA do Hosting abre com a hospedagem), Nome*, Empresa (opcional), E-mail (Opcional — só se preferir retorno por e-mail.), "Descreva o processo ou a necessidade"* — O que acontece hoje, quais sistemas envolve, com que frequência e qual resultado você espera. Até 1.000 caracteres.. Rodapé: "Cancelar" + envio; link "Como tratamos seus dados".
 
-Segunda linha da mensagem, por tipo: _Quero solicitar uma avaliação de automação._ · _Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente (Nekkora Hosting)._ · _Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting)._
+Segunda linha da mensagem, por tipo: _Quero solicitar uma avaliação de automação (Nekkora Delivery)._ · _Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente (Nekkora Hosting)._ · _Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting)._
+
+Orientação abaixo do tipo (só na tela, fora da mensagem — COM-VITRINE-001, etapa 5): Desenvolver uma nova automação: _Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria. Se tiver interesse no pacote, conte na descrição quantas automações você tem em mente; categoria e composição são confirmadas na avaliação._ · Hospedar uma automação existente: _Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade._ · Infraestrutura e serviços relacionados: _Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade._
 
 Vindo do simulador: caixa "Incluir o resumo da minha simulação na mensagem" (desmarcada) — Opcional. Você confere o texto antes de enviar; a simulação não é guardada. Na mensagem: "Simulação feita no site (estimativa, sujeita à avaliação):" + resumo.
 
