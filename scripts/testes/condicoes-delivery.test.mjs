@@ -576,7 +576,15 @@ test('R1-30. portão de produção (execução real): tabela, textos e condiçõ
   const outras = [...saida.matchAll(/^ {2}- ([A-Z]+(?:-\d+)?) —/gm)].map((m) => m[1]).filter((id) => !/^(PUB|V)-\d+$/.test(id) && id !== 'BUILD');
   assert.deepEqual(outras, [], saida);
   const pub = JSON.parse(readFileSync(new URL('../../publicacao.json', import.meta.url), 'utf8'));
-  if (pub.publicacaoAutorizada === undefined) {
+  const versao = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version;
+  // PUB-17/PUB-19 valem para UM conteúdo: com o conteúdo novo (NEKKORA-COM-CANAIS-001) sem aprovação, o portão acusa as
+  // duas e a PUB-18, e nada mais de configuração
+  const conteudoAprovado = !/- PUB-1[79] —/.test(saida);
+  if (!conteudoAprovado) {
+    assert.notEqual(r.status, 0, 'publicação bloqueada');
+    assert.deepEqual(ids, ['PUB-17', 'PUB-18', 'PUB-19'], 'conteúdo novo sem aprovação e sem autorização desta versão');
+    assert.ok(pub.publicacaoAutorizada?.versao !== versao, 'autorização desta versão só depois da aprovação do conteúdo');
+  } else if (pub.publicacaoAutorizada === undefined || pub.publicacaoAutorizada.versao !== versao) {
     // Estado H: a flag aprovacoes.publicacao herdada da v1.0.0 não autoriza esta versão — o portão BLOQUEIA, só pela PUB-18
     assert.notEqual(r.status, 0, 'publicação bloqueada');
     assert.match(saida, /- PUB-18 — autorização desta versão/);

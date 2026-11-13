@@ -12,7 +12,7 @@
  * (scripts/comercial/impressao-conteudo.mjs). Qualquer mudança neste arquivo muda a impressão e exige nova aprovação.
  */
 import type { IconName } from 'nekkora-lib';
-import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, NEW_CONDITIONS_START, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
+import { CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, NEW_CONDITIONS_START, SUPPLIER_ADDRESS, whatsappDisplay } from './config';
 import { PLANNED_RECURRING_PRICES, brl, priceFacts } from './precos';
 
 /* ------------------------------------------------------------------ */
@@ -26,7 +26,8 @@ export const HERO = {
   lead:
     'Automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. ' +
     'Infraestrutura para executá-las, sujeita a avaliação. Cada serviço contratado de forma independente.',
-  primaryCta: 'Solicitar avaliação',
+  // NEKKORA-COM-CANAIS-001: abre a conversa no WhatsApp (sem formulário)
+  primaryCta: 'Fale com um analista',
   secondaryCta: 'Ver como funciona',
   // [D-01] [D-02] [D-04]
   points: [
@@ -138,7 +139,9 @@ export const PLANNED_SERVICES = {
   title: 'Serviços em preparação',
   status: 'Em preparação',
   notice: 'Valores e condições definitivos dependem da disponibilização comercial.',
-  note: 'Ainda não disponíveis para contratação. Para saber mais, fale com a Nekkora pelos canais de contato.',
+  note: 'Ainda não disponíveis para contratação.',
+  // NEKKORA-COM-CANAIS-001: pedido de informação para quando estiverem disponíveis — nunca contratação
+  ask: (name: string) => `Quero receber informações sobre o ${name}`,
   items: [
     { id: 'monitor' as const, name: 'Nekkora Monitor', price: brl(PLANNED_RECURRING_PRICES.monitor.mensal), unit: 'por automação/mês, previsto' },
     { id: 'ai' as const, name: 'Nekkora AI', price: brl(PLANNED_RECURRING_PRICES.ai.mensal), unit: 'por empresa/mês, previsto' },
@@ -190,7 +193,10 @@ export const PRICING = {
           title: 'Regras da campanha de lançamento',
           items: [
             `Período: solicitações de avaliação recebidas pela Nekkora de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}, inclusive, no horário de Brasília.`,
-            `Vale a data de recebimento da solicitação: e-mail recebido em ${CHANNELS.email ?? 'nosso e-mail comercial'}${BOOKINGS_URL ? ', reserva criada no Microsoft Bookings' : ''}${CHANNELS.linkedin ? ' ou mensagem recebida na página da Nekkora no LinkedIn' : ''}. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.`,
+            // NEKKORA-COM-CANAIS-001 — PROPOSTA pendente de aprovação da titular (regulamento, PUB-19): o WhatsApp passa a ser
+            // o canal público; e-mail e LinkedIn continuam valendo para o que for recebido por eles (nada é retirado de quem
+            // já escreveu). O Bookings sai: não há mais agendamento público.
+            `Vale a data de recebimento da solicitação: mensagem recebida no WhatsApp da Nekkora${CHANNELS.whatsapp ? ` (${whatsappDisplay()})` : ''}${CHANNELS.email ? `, e-mail recebido em ${CHANNELS.email}` : ''}${CHANNELS.linkedin ? ' ou mensagem recebida na página da Nekkora no LinkedIn' : ''}. Abrir o WhatsApp pelo site não basta: vale a mensagem efetivamente recebida. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.`,
             // V-02: a tabela nova vale a partir da data de início; os compromissos anteriores são preservados
             NEW_CONDITIONS_START
               ? `Os valores e pacotes dos cartões acima valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START}, inclusive. Solicitações recebidas antes dessa data mantêm as condições da oferta anterior; quando o escopo e a modalidade forem equivalentes, propomos a condição mais favorável, sem alterar proposta já aceita sem o seu acordo.`
@@ -370,8 +376,9 @@ export const SIMULATOR = {
   disclaimer:
     'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.',
   next: 'Próximo passo',
-  schedule: 'Agendar uma conversa',
-  request: 'Solicitar avaliação',
+  // NEKKORA-COM-CANAIS-001: a simulação segue na mensagem inicial do WhatsApp, que o visitante revisa antes de enviar
+  request: 'Conversar sobre esta simulação',
+  whatsappIntro: 'Fiz esta simulação na página:',
   /** Anúncio para leitores de tela (região viva), sem mover o foco. */
   announce: (summary: string) => `Resultado da simulação atualizado. ${summary}`,
 };
@@ -465,168 +472,25 @@ export const TRANSPARENCY = {
 /* ------------------------------------------------------------------ */
 export const CONTACT_COPY = {
   title: 'Vamos olhar o seu processo de perto?',
-  description: 'A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.',
-  cta: 'Solicitar avaliação',
-  // Alternativa sem formulário (§5.4): canais diretos, sem preencher nada no site
-  directTitle: 'Prefere falar direto?',
-  // [K-01..K-03] pendentes
-  pendingCaption: 'Canais oficiais em definição · formulário em modo de demonstração',
-  // Diálogo "Solicitar avaliação" (modelo C, etapa 2)
-  dialogTitle: 'Solicitar avaliação',
-  // AUD-25 (F.6): o diálogo serve a quem quer uma automação nova e a quem precisa de hospedagem ou infraestrutura
-  dialogDescription:
-    'Conte o que você precisa: uma automação nova, a hospedagem de uma automação existente ou infraestrutura e serviços relacionados. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.',
-  formTitle: 'Formulário de solicitação',
-  /** Tipo de solicitação (COM-008-C §8). A primeira linha da mensagem diz qual é; o CTA do Hosting já abre com a hospedagem. */
-  demand: {
-    legend: 'O que você precisa?',
-    options: [
-      // COM-VITRINE-001 (etapa 5): a primeira linha identifica o serviço, como já fazem as do Hosting — texto ALTERADO (PUB-17)
-      { value: 'automacao', label: 'Desenvolver uma nova automação', line: 'Quero solicitar uma avaliação de automação (Nekkora Delivery).' },
-      {
-        value: 'hospedagem',
-        label: 'Hospedar uma automação existente',
-        line: 'Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente (Nekkora Hosting).',
-      },
-      {
-        value: 'infraestrutura',
-        label: 'Infraestrutura e serviços relacionados',
-        line: 'Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting).',
-      },
-    ],
-  },
-  /**
-   * COM-VITRINE-001 (etapa 5): orientação por serviço, só na tela (não entra na mensagem nem cria campo novo). O interesse
-   * em pacote vai na descrição, com as palavras do visitante, ou no resumo do simulador. Monitor e AI não são tipos de
-   * solicitação (em preparação). Textos NOVOS (PUB-17).
-   */
-  demandHints: {
-    automacao:
-      'Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria. Se tiver interesse no pacote, conte na descrição quantas automações você tem em mente; categoria e composição são confirmadas na avaliação.',
-    hospedagem: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
-    infraestrutura: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
-  },
-  messageLabel: 'Descreva o processo ou a necessidade',
-  processHint: 'O que acontece hoje, quais sistemas envolve, com que frequência e qual resultado você espera. Até 1.000 caracteres.',
-  /**
-   * Resumo do simulador (NEKKORA-CALC-001 §3.8): só entra na mensagem se o visitante marcar a opção, e aparece na
-   * etapa de confirmação antes de qualquer envio. Nada é guardado.
-   */
-  simulation: {
-    include: 'Incluir o resumo da minha simulação na mensagem',
-    hint: 'Opcional. Você confere o texto antes de enviar; a simulação não é guardada.',
-    heading: 'Simulação feita no site (estimativa, sujeita à avaliação):',
-  },
-  emailHint: 'Opcional — só se preferir retorno por e-mail.',
-  privacyLink: 'Como tratamos seus dados',
-  orForm: 'ou preencha o formulário',
-  // [K-05]
-  demoNote: 'Modo de demonstração: nenhum dado é enviado ou armazenado.',
-  demoSubmit: 'Revisar solicitação',
-  reviewSubmit: 'Revisar mensagem',
-  // Etapa "Confirmar solicitação" (§5.2/§5.3) — textos comuns aos dois canais
-  review: {
-    title: 'Confirme a sua solicitação',
-    back: 'Voltar e editar',
-    copy: 'Copiar mensagem',
-    copied: 'Mensagem copiada.',
-    copyFailed: 'Não foi possível copiar automaticamente — selecione o texto da mensagem acima.',
-    manual: 'Se o WhatsApp não abrir, copie a mensagem e envie para',
-    email: 'Prefere e-mail? Escreva para',
-  },
-  /** Jornada pelo WhatsApp — só com número confirmado em publicacao.json (PUB-01). */
-  whatsapp: {
-    direct: 'Falar diretamente pelo WhatsApp',
-    note: 'Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página.',
-    intro: 'Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.',
-    transfer:
-      'Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — tipo de solicitação, nome, empresa, e-mail, descrição e, se você o incluiu, o resumo da simulação, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.',
-    open: 'Abrir no WhatsApp',
-    // Nunca afirmar abertura nem envio: com noopener o navegador não informa se a aba foi criada (D-18).
-    requested: {
-      title: 'Pedimos ao navegador para abrir o WhatsApp',
-      text: 'Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.',
-    },
-    again: 'Abrir conversa no WhatsApp',
-  },
-  /** Jornada pelo e-mail — canal da publicação enquanto não houver WhatsApp (decisão da titular, 22/10/2026) [K-02]. */
-  email: {
-    direct: 'Escrever diretamente por e-mail',
-    note: 'Na próxima etapa você confere a mensagem antes de abrir o seu aplicativo de e-mail. Nada é armazenado nesta página.',
-    intro: 'Esta é a mensagem que será aberta no seu aplicativo de e-mail, endereçada à Nekkora. Confira antes de continuar.',
-    transfer:
-      'Ao continuar, o seu aplicativo de e-mail é aberto com esta mensagem — tipo de solicitação, nome, empresa, e-mail, descrição e, se você o incluiu, o resumo da simulação, como estão acima. Ela só chega à Nekkora se você a enviar pelo aplicativo. Esta página não guarda o que você digitou.',
-    open: 'Abrir no e-mail',
-    // A página não sabe se algum aplicativo de e-mail abriu: diz só o que pediu ao navegador (mesma regra da D-18).
-    requested: {
-      title: 'Pedimos ao navegador para abrir o seu aplicativo de e-mail',
-      text: 'Se nenhum aplicativo abriu, copie a mensagem e envie para o endereço abaixo. A mensagem só é enviada quando você a enviar pelo seu e-mail.',
-    },
-    again: 'Abrir no e-mail novamente',
-    manual: 'Se o aplicativo de e-mail não abrir, copie a mensagem e envie para',
-  },
-  /**
-   * Recebimento automático (COM-RELEASE-005 §5.7) — só com o endpoint do backend em publicacao.json. "Recebida" só
-   * com a confirmação do servidor; na falha, os dados ficam no formulário e o e-mail aparece como alternativa.
-   */
-  api: {
-    note: 'Na próxima etapa você confere os dados antes de enviar.',
-    emailHint: 'Obrigatório — é por ele que respondemos.',
-    emailRequired: 'Informe um e-mail para recebermos e respondermos a sua solicitação, como nome@empresa.com.',
-    intro: 'Confira os dados abaixo. Eles serão enviados à Nekkora quando você tocar em "Enviar solicitação".',
-    transfer:
-      'Ao enviar, tipo de solicitação, nome, empresa, e-mail, descrição e, se incluído, o resumo da simulação vão para a Nekkora por um serviço da AWS, que entrega a solicitação na caixa de e-mail comercial. Só usamos os dados para responder e preparar a avaliação.',
-    challenge: 'Verificação de segurança automática (Cloudflare Turnstile) para evitar envios por robôs.',
-    challengeWaiting: 'Aguardando a verificação de segurança…',
-    challengeUnavailable: 'A verificação de segurança não carregou. Você pode tentar de novo ou usar o e-mail abaixo.',
-    send: 'Enviar solicitação',
-    sending: 'Enviando…',
-    sendingStatus: 'Enviando a solicitação. Aguarde a confirmação.',
-    received: {
-      title: 'Solicitação recebida',
-      text: (protocolo: string) => `Protocolo ${protocolo}. Vamos responder pelo e-mail informado. A solicitação inicia uma avaliação — não é uma contratação.`,
-    },
-    failed: {
-      title: 'A solicitação não foi enviada',
-      rede: 'Não conseguimos falar com o servidor. Confira a sua conexão e tente de novo — os dados continuam aqui.',
-      limite: 'Recebemos muitas solicitações em pouco tempo. Tente de novo mais tarde ou use o e-mail abaixo.',
-      desafio: 'Não foi possível confirmar a verificação de segurança. Faça a verificação de novo e tente enviar.',
-      indisponivel: 'O envio não foi concluído por uma falha temporária. Os dados continuam aqui: tente de novo em instantes ou use o e-mail abaixo.',
-      recusada: 'Não foi possível enviar esta solicitação. Revise os dados ou escreva diretamente para o e-mail abaixo.',
-    },
-    retry: 'Tentar novamente',
-    alternative: 'Se preferir, envie a mesma mensagem pelo seu e-mail para',
-    openEmail: 'Abrir no e-mail',
-  },
-  demoResult: {
-    title: 'Solicitação validada — envio desativado nesta versão',
-    text: 'Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.',
-  },
+  description: 'A conversa inicia uma avaliação — não é uma contratação e não gera compromisso.',
+  // NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): o WhatsApp é o único canal público de atendimento comercial
+  cta: 'Fale com um analista',
+  note: 'A conversa abre no WhatsApp com uma mensagem sugerida, que você pode editar. Nada é enviado até você tocar em enviar.',
+  // LinkedIn e Instagram: redes institucionais, não canais de atendimento
+  socialTitle: 'Acompanhe a Nekkora',
+  pendingCaption: 'Canal de atendimento em definição',
 };
 
 /* ------------------------------------------------------------------ */
 /* Agendamento — Microsoft Bookings (COM-RELEASE-005 §4)              */
 /* ------------------------------------------------------------------ */
-/**
- * Só aparece com a URL oficial do Bookings em publicacao.json. Duração, plataforma e antecedência são configuradas no
- * Bookings e não são prometidas aqui antes de confirmadas. A página nunca diz que a reunião foi marcada: quem confirma
- * é o Bookings.
- */
-export const SCHEDULE = {
-  cta: 'Agendar conversa',
-  /** Completa o nome acessível do botão (o destino abre em outra aba). */
-  srExternal: '(abre o Microsoft Bookings em outra aba)',
-  note: 'Escolha um horário na agenda da Nekkora, no Microsoft Bookings. A conversa só fica marcada quando o Bookings confirmar.',
-  dialogPrompt: 'Prefere conversar antes?',
-};
-
 /* ------------------------------------------------------------------ */
 /* Barra de navegação                                                 */
 /* ------------------------------------------------------------------ */
 /*
- * Botão "Entrar" (modelo C, etapa 2): OCULTO por decisão da titular na COM-008-B (AUD-26, PUB-16) enquanto não houver
- * área de clientes. Cadastro, autenticação e área do cliente ficam para a futura Nekkora Platform
- * (docs/roadmap/NEKKORA-PLATFORM-POLITICAS-BACKLOG.md), não para o Commercial.
+ * Botão "Entrar": NEKKORA-COM-CANAIS-001 (titular, 12/11/2026) substitui a decisão da COM-008-B (AUD-26, PUB-16) de
+ * ocultá-lo. Ele leva a https://platform.nekkora.com/entrar (PLATFORM_LOGIN_URL, em config.ts); cadastro, autenticação e
+ * área do cliente são da Nekkora Platform, não do Commercial (App.tsx).
  */
 
 /* ------------------------------------------------------------------ */
@@ -640,77 +504,39 @@ export const SCHEDULE = {
 // AUD-33: razão social e CNPJ vêm de publicacao.json (ambos informados pela titular em 04/11/2026); sem o nome, o
 // aviso usa "a Nekkora" e mostra só o CNPJ
 const controller = `${DATA_CONTROLLER.name ?? 'a Nekkora'}${DATA_CONTROLLER.document ? ` (CNPJ ${DATA_CONTROLLER.document})` : ''}`;
-const viaApi = REQUEST_CHANNEL === 'api';
 /**
- * Minuta revisada na COM-RELEASE-005 §6 (envio automático e Microsoft Bookings). Cada item descreve o que acontece DE
- * FATO na configuração publicada: sem endpoint, o formulário não envia nada; sem a URL do Bookings, o item do
- * agendamento não aparece. Bases legais por finalidade (LGPD, art. 7º) documentadas em
- * docs/release/COM-RELEASE-005-privacidade.md — submetida à titular para aprovação (PUB-09).
+ * NEKKORA-COM-CANAIS-001 — PROPOSTA pendente de aprovação da titular (PUB-09): a página não tem formulário, envio por
+ * e-mail, envio automático nem agendamento; o atendimento é pelo WhatsApp, aberto pelo próprio visitante. O aviso
+ * descreve só isso. O e-mail continua como canal dos direitos do titular, ao lado do WhatsApp, e na identificação do
+ * fornecedor (rodapé, Decreto 7.962/2013). Revisões anteriores (COM-RELEASE-005 §6, golive-001) ficam no histórico.
  */
+/** Canais dos direitos do titular (LGPD, art. 18): WhatsApp e e-mail, quando confirmados. */
+const rightsChannels = [CHANNELS.whatsapp && `pelo WhatsApp ${whatsappDisplay()}`, CHANNELS.email && `pelo e-mail ${CHANNELS.email}`].filter(Boolean).join(' ou ');
+
 export const PRIVACY = {
   eyebrow: 'Privacidade',
   title: 'Como tratamos seus dados',
   description: `Responsável pelos dados pessoais desta página: ${controller}.`,
   items: [
-    viaApi
-      ? {
-          icon: 'send' as IconName,
-          title: 'O que o formulário envia',
-          // [PV-05] — envio automático: só depois da confirmação; o que é guardado e por quanto tempo
-          text: `Só quando você toca em "Enviar solicitação": nome, e-mail, empresa (se informada) e a descrição do processo vão para um serviço da Nekkora na ${HOSTING_PROVIDER ?? 'nuvem'}, que entrega a solicitação na caixa comercial ${CHANNELS.email ?? 'da Nekkora'} (Microsoft 365). O serviço não guarda o conteúdo: mantém por 24 horas só um código técnico do pedido, para não receber a mesma solicitação duas vezes.`,
-        }
-      : {
-          icon: 'shield' as IconName,
-          title: 'O formulário não envia nada',
-          text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
-        },
-    // [PV-02] — o item descreve o canal que a jornada usa de fato (WhatsApp ou e-mail; REQUEST_CHANNEL em config.ts)
-    ...(viaApi
-      ? []
-      : [
-          REQUEST_CHANNEL === 'email'
-            ? {
-                icon: 'mail' as IconName,
-                title: 'O que vai para o e-mail',
-                text: `Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a ${CHANNELS.email}. Ela só é enviada se você a enviar pelo aplicativo.`,
-              }
-            : {
-                icon: 'whatsapp' as IconName,
-                title: 'O que vai para o WhatsApp',
-                text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
-              },
-        ]),
-    // [PV-06] — agendamento: só com a URL oficial do Bookings; o Bookings armazena a reserva
-    ...(BOOKINGS_URL
-      ? [
-          {
-            icon: 'calendar' as IconName,
-            title: 'Agendamento pelo Microsoft Bookings',
-            // AUD-38 (F.8): a conversa é pelo Microsoft Teams
-            text: 'Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para confirmar e lembrar o horário e realizar a conversa pelo Microsoft Teams. Não informe senhas, credenciais nem documentos sigilosos.',
-          },
-          // [PV-11] NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): SEM gravação comercial nesta fase (diretriz da titular na
-          // missão). Substitui o texto da COM-PRIVACY-001 ("pode ser gravada"): o aviso descreve só o tratamento que de
-          // fato ocorre (LGPD, art. 6º, VI, e art. 9º). Gravar no futuro exige base legal definida (JUR-10), novo texto e
-          // nova aprovação da titular.
-          {
-            icon: 'headset' as IconName,
-            title: 'Conversa sem gravação',
-            text: 'Nesta fase, a Nekkora não grava as conversas comerciais pelo Microsoft Teams. Se isso mudar, este aviso será atualizado antes, e a gravação só acontecerá com aviso prévio.',
-          },
-        ]
-      : []),
+    {
+      icon: 'shield' as IconName,
+      title: 'Sem formulário nem envio automático',
+      // Ajuste da titular (13/11/2026): sem afirmação absoluta de que a página não coleta dados — o acesso envolve dados
+      // técnicos de navegação e os registros de acesso descritos no item "Registros de acesso"
+      text: 'Esta página não tem formulário, cadastro nem envio automático de solicitações comerciais. O simulador de investimento funciona só no seu navegador e não guarda nem envia o que você seleciona. Como em qualquer site, o acesso envolve dados técnicos de navegação, tratados pelo provedor de hospedagem e guardados nos registros de acesso descritos abaixo.',
+    },
+    // [PV-02] — o canal de atendimento é o WhatsApp, aberto pelo visitante
+    {
+      icon: 'whatsapp' as IconName,
+      title: 'Conversa pelo WhatsApp',
+      text: 'Os botões de atendimento abrem o WhatsApp, serviço da Meta, em outra aba, com uma mensagem sugerida — e, se você vier do simulador, o resumo da simulação. Você pode editar ou apagar a mensagem: ela só chega à Nekkora se você tocar em enviar. Depois disso, seu número, seu nome de perfil e o que você escrever na conversa são usados pela Nekkora para responder. O WhatsApp segue os termos e a política de privacidade da Meta.',
+    },
     {
       icon: 'eye' as IconName,
       title: 'Sem cookies nem rastreamento',
-      // [PV-03] AUD-43: o escopo é esta página; o Bookings segue as regras da Microsoft
-      text:
-        'Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro); o simulador de investimento não guarda nem envia o que você seleciona. Fontes e imagens vêm do próprio site.' +
-        (BOOKINGS_URL ? ' O Microsoft Bookings, para onde leva o botão "Agendar conversa", segue as regras da Microsoft.' : '') +
-        // [PV-07] — o desafio antiautomação é de terceiro e só carrega na confirmação do envio
-        (LEAD_API?.turnstileSiteKey
-          ? ' Na confirmação do envio, uma verificação de segurança da Cloudflare (Turnstile) analisa sinais técnicos do navegador para impedir envios por robôs.'
-          : ''),
+      // [PV-03] AUD-43: o escopo é esta página; WhatsApp, redes sociais e a Platform seguem regras próprias. Ajuste da
+      // titular (13/11/2026): a Platform é citada só como destino do botão "Entrar"
+      text: 'Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site. O WhatsApp, o LinkedIn e o Instagram seguem regras próprias. O botão "Entrar" leva à Nekkora Platform, uma aplicação separada, que também segue regras próprias.',
     },
     {
       icon: 'server' as IconName,
@@ -727,15 +553,14 @@ export const PRIVACY = {
       // própria e não estão nestes registros. A base da guarda (art. 7º, II) ficou numa frase própria.
       text:
         `${HOSTING_PROVIDER ? `A ${HOSTING_PROVIDER}, que hospeda este site,` : 'O provedor de hospedagem'} processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.` +
-        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. A guarda cumpre uma obrigação legal (LGPD, art. 7º, II). Pela lei, a disponibilização desses registros a terceiros depende de ordem judicial (Marco Civil da Internet, art. 10, §1º, e art. 15, §3º). Autoridades podem pedir que eles sejam guardados por mais tempo (art. 15, §2º), mas o acesso continua dependendo de ordem judicial. Os registros não contêm dados cadastrais, como nome ou endereço, que seguem regras legais próprias (art. 10, §3º).' +
-        (viaApi ? ' Para limitar abusos, o serviço de solicitações conta envios por endereço IP sem guardar o endereço (só um código derivado dele), por até 2 dias.' : ''),
+        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. A guarda cumpre uma obrigação legal (LGPD, art. 7º, II). Pela lei, a disponibilização desses registros a terceiros depende de ordem judicial (Marco Civil da Internet, art. 10, §1º, e art. 15, §3º). Autoridades podem pedir que eles sejam guardados por mais tempo (art. 15, §2º), mas o acesso continua dependendo de ordem judicial. Os registros não contêm dados cadastrais, como nome ou endereço, que seguem regras legais próprias (art. 10, §3º).',
     },
     // [PV-09] AUD-39: prazos aprovados na COM-008-B. A eliminação é feita pela Nekkora (não há rotina automática): o texto
     // descreve o prazo, não uma execução automática
     {
       icon: 'clock' as IconName,
       title: 'Por quanto tempo guardamos',
-      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante.${BOOKINGS_URL ? ' Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento.' : ''} Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
+      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante. Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
     },
     // [PV-10] AUD-40: transferência internacional. Revisão interna de 10/11/2026 (sem parecer externo): o texto diz só o
     // que foi verificado e não cita nenhum mecanismo do art. 33 que não esteja comprovado (JUR-07). Fatos: site e logs
@@ -745,7 +570,7 @@ export const PRIVACY = {
     {
       icon: 'link' as IconName,
       title: 'Onde os dados são processados',
-      text: `Os arquivos deste site e os registros de acesso ficam armazenados ${HOSTING_PROVIDER ? `na ${HOSTING_PROVIDER}` : 'no provedor de hospedagem'}, na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países.${BOOKINGS_URL ? ' A localização das reservas do Microsoft Bookings e das reuniões pelo Teams não foi confirmada e pode ser fora do Brasil.' : ''}`,
+      text: `Os arquivos deste site e os registros de acesso ficam armazenados ${HOSTING_PROVIDER ? `na ${HOSTING_PROVIDER}` : 'no provedor de hospedagem'}, na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países. As conversas pelo WhatsApp passam pelos servidores da Meta, que podem estar fora do Brasil.`,
     },
     // [PV-08] COM-008-B §9: base legal ≠ ciência da política ≠ consentimento. Revisão interna de 10/11/2026 (sem parecer
     // externo): aplica a redação já proposta na privacidade-minuta §2 (LEGAL-BASE-001), em que o representante de empresa
@@ -756,7 +581,7 @@ export const PRIVACY = {
     {
       icon: 'user' as IconName,
       title: 'Uso e seus direitos',
-      text: `Usamos os dados que você nos envia só para responder à solicitação${BOOKINGS_URL ? ', realizar a conversa agendada' : ''} e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18)${CHANNELS.email ? `, pelo e-mail ${CHANNELS.email}` : ', pelos canais de contato desta página'}.`,
+      text: `Usamos os dados que você nos envia só para responder à sua mensagem e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18)${rightsChannels ? `, ${rightsChannels}` : ', pelos canais de contato desta página'}.`,
     },
   ],
 };

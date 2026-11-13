@@ -16,6 +16,7 @@ const rel = (alvo) => path.relative(path.dirname(out), path.join(root, alvo)).sp
 const { createServer } = await import('vite');
 const vite = await createServer({ root, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' });
 const c = await vite.ssrLoadModule('/src/content.ts');
+const { WHATSAPP_MESSAGES } = await vite.ssrLoadModule('/src/config.ts');
 await vite.close();
 const { CONTACT_COPY: K, PRICING: P } = c;
 // Cabeçalho conforme as aprovações reais da configuração usada (publicacao.json ou NEKKORA_PUBLICACAO)
@@ -84,7 +85,7 @@ L.push(`Controles: ${Sm.tiers.map((t) => t.label).join(' · ')} — botões "${S
 L.push('', `Barra: "${Sm.total(3)}" · botões "${Sm.clear}" e "${Sm.calculate}". Sem seleção: _${Sm.empty}_ Mudou depois de calcular: _${Sm.changed}_`);
 L.push('', `**${Sm.resultTitle}** — linhas "4 automações simples: ${Sm.composition(1, 1, '<pacote>', '<individual>')}", depois:`);
 list([`"${Sm.estimateLabel}"`, `Com pacote: "${Sm.individualLabel}" e "${Sm.savingsLabel}" — ${Sm.savingsNote}`, Sm.packagesRule]);
-L.push('', `> ${Sm.disclaimer}`, '', `${Sm.next}: "${Sm.schedule}" (Microsoft Bookings, nova aba) · "${Sm.request}" (abre o formulário; o resumo da simulação é opcional)`);
+L.push('', `> ${Sm.disclaimer}`, '', `${Sm.next}: "${Sm.request}" (abre o WhatsApp em outra aba com a mensagem do Delivery, "${Sm.whatsappIntro}" e o resumo da simulação; o visitante revisa antes de enviar)`);
 L.push('', `**${Sm.help.title}** ${Sm.help.text} ${Sm.help.link} (link para os critérios).`, '', 'Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.500) + 1 simples (R$ 650) + 1 média (R$ 1.400) = R$ 3.550; sem pacotes R$ 4.000; economia R$ 450.');
 L.push('');
 list(P.notes.map((n) => `**${n.title}** — ${n.text}`));
@@ -114,32 +115,21 @@ for (const key of ['defined', 'excluded', 'dependencies']) {
   list(c.TRANSPARENCY[key].items);
 }
 
-h('7. Contato');
-L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (abre o diálogo)`, '', `Sem canais confirmados: _${K.pendingCaption}_`);
-L.push('', `Diálogo **${K.dialogTitle}** — ${K.dialogDescription}`, '', `Canal da solicitação: WhatsApp, se confirmado; senão o e-mail (publicação atual: e-mail). Sem canal: _${K.pendingCaption}_`);
-L.push('', `Formulário: "${K.demand.legend}"* (${K.demand.options.map((o) => o.label).join(' · ')}; o CTA do Hosting abre com a hospedagem), Nome*, Empresa (opcional), E-mail (${K.emailHint}), "${K.messageLabel}"* — ${K.processHint}. Rodapé: "Cancelar" + envio; link "${K.privacyLink}".`);
-L.push('', `Segunda linha da mensagem, por tipo: ${K.demand.options.map((o) => `_${o.line}_`).join(' · ')}`);
-L.push('', `Orientação abaixo do tipo (só na tela, fora da mensagem — COM-VITRINE-001, etapa 5): ${K.demand.options.map((o) => `${o.label}: _${K.demandHints[o.value]}_`).join(' · ')}`);
-L.push('', `Vindo do simulador: caixa "${K.simulation.include}" (desmarcada) — ${K.simulation.hint} Na mensagem: "${K.simulation.heading}" + resumo.`);
-L.push('', `Modo demonstração: botão "${K.demoSubmit}"; nota "${K.demoNote}"; resultado **${K.demoResult.title}** — ${K.demoResult.text}`);
-for (const [label, f] of [['Pelo e-mail (publicação atual)', K.email], ['Pelo WhatsApp (quando houver número confirmado)', K.whatsapp]]) {
-  L.push('', `### ${label}`, '', `Link direto: "${f.direct}" + divisor "${K.orForm}". Botão: "${K.reviewSubmit}"; nota "${f.note}"`);
-  L.push('', `Etapa de confirmação: **${K.review.title}** — ${f.intro}`, '', `> **Antes de continuar** — ${f.transfer}`, '', `Botões: "${K.review.back}" · "${f.open}". Alternativas: "${K.review.copy}"${f === K.email ? `; "${f.manual} <e-mail>"` : `; "${K.review.manual} <número>"; "${K.review.email} <e-mail>"`}.`);
-  L.push('', `- Após abrir: **${f.requested.title}** — ${f.requested.text}`, `- Link manual (sempre): "${f.again}"`);
-}
-L.push('', `Canais diretos (sem formulário): "${K.directTitle}"`);
-
-h('7b. Envio automático e agendamento (COM-RELEASE-005 — só com endpoint e URL do Bookings confirmados)');
-const A = K.api;
-L.push(`Precedência: envio automático (se houver endpoint) → WhatsApp → e-mail. Um único mecanismo de envio por vez.`);
-L.push('', `Formulário: E-mail obrigatório — "${A.emailHint}" (erro: "${A.emailRequired}"). Nota: "${A.note}"`);
-L.push('', `Confirmação: **${K.review.title}** — ${A.intro}`, '', `> **Antes de enviar** — ${A.transfer}`, '', `Desafio: "${A.challenge}" · aguardando: "${A.challengeWaiting}" · indisponível: "${A.challengeUnavailable}"`);
-L.push('', `Botões: "${K.review.back}" · "${A.send}" (durante o envio: "${A.sending}"; leitor de tela: "${A.sendingStatus}")`);
-L.push('', `- Recebida (só com a confirmação do servidor): **${A.received.title}** — ${A.received.text('NK-XXXXXXXX')}`);
-L.push(`- Falha: **${A.failed.title}**`);
-list(Object.entries(A.failed).filter(([k]) => k !== 'title').map(([k, v]) => `_${k}_: ${v}`));
-L.push('', `Ações na falha: "${A.retry}" (não aparece quando a solicitação é recusada) · "${A.alternative} <e-mail>" · "${A.openEmail}" · "${K.review.copy}"`);
-L.push('', `**Agendamento** — botão "${c.SCHEDULE.cta}" (nome acessível: "${c.SCHEDULE.cta} ${c.SCHEDULE.srExternal}") no topo e no contato; no diálogo: "${c.SCHEDULE.dialogPrompt} ${c.SCHEDULE.cta}". Nota no contato: "${c.SCHEDULE.note}"`);
+h('7. Contato e atendimento (NEKKORA-COM-CANAIS-001 — só WhatsApp)');
+const W = WHATSAPP_MESSAGES;
+L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (abre o WhatsApp em outra aba) — ${K.note}`, '', `Sem número confirmado: _${K.pendingCaption}_`);
+L.push('', `Redes institucionais: "${K.socialTitle}" — LinkedIn · Instagram.`);
+L.push('', 'Sem formulário, sem envio por e-mail, sem envio automático e sem agendamento (Microsoft Bookings).');
+L.push('', 'Botão flutuante (canto inferior direito, ícone do WhatsApp): "Fale com um analista" — some no celular enquanto o contato está na tela; sem pulso nem indicador de disponibilidade.');
+L.push('', 'Mensagens iniciais sugeridas (o visitante pode editar; nada é enviado sem ele):');
+list([
+  `Geral (topo, contato e botão flutuante): _${W.geral}_`,
+  `Delivery (outras demandas e simulador): _${W.delivery}_`,
+  `Hosting: _${W.hosting}_`,
+  `Monitor ("${c.PLANNED_SERVICES.ask('Nekkora Monitor')}"): _${W.monitor}_`,
+  `AI ("${c.PLANNED_SERVICES.ask('Nekkora AI')}"): _${W.ai}_`,
+]);
+L.push('');
 
 h('7a. Privacidade');
 header(c.PRIVACY);
@@ -147,7 +137,7 @@ L.push('');
 list(c.PRIVACY.items.map((i) => `**${i.title}** — ${i.text}`));
 
 h('8. Barra de navegação');
-L.push('Links: Soluções · Preços · Como funciona · Hosting · Transparência. Sem botão "Entrar": oculto enquanto não houver área de clientes (COM-008-B, AUD-26).');
+L.push('Links: Soluções · Preços · Como funciona · Hosting · Transparência. Botão "Entrar" → https://platform.nekkora.com/entrar, na mesma aba (NEKKORA-COM-CANAIS-001; no celular, dentro do menu). A Commercial não autentica.');
 
 h('9. Rodapé');
 list(['© Nekkora. Todos os direitos reservados.', `Link "${c.FOOTER.privacy}"`, `${c.FOOTER.preview} (enquanto publicacao.json mantiver avisoHomologacao)`, c.FOOTER.signature]);

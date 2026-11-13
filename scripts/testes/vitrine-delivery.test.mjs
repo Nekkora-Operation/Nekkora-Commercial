@@ -42,8 +42,8 @@ test('etapa 3. critérios: simples até 8 horas e média acima de 8 até 16 hora
 
 test('etapa 3 (V-04). demandas fora das modalidades: texto aprovado, canais gerais, sem terceira categoria', () => {
   assert.match(bloco, /text: 'Não encontrou uma modalidade adequada à sua necessidade\? Entre em contato com nossa equipe para uma avaliação individual\.'/);
-  // o link abre a mesma solicitação de avaliação dos demais botões (canais gerais: e-mail e LinkedIn)
-  assert.match(pricing, /<p className="center-note other-demand" data-outras-demandas>[\s\S]*?<Link arrow \{\.\.\.trigger\}>[\s\S]*?PRICING\.other\.cta/);
+  // NEKKORA-COM-CANAIS-001: o link abre o WhatsApp (único canal de atendimento) com a mensagem do Delivery
+  assert.match(pricing, /<p className="center-note other-demand" data-outras-demandas>[\s\S]*?<WhatsappLink context="delivery">\{PRICING\.other\.cta\}<\/WhatsappLink>/);
 });
 
 test('etapa 3 (V-05). "A automação é sua": após a quitação integral, com as exceções e sem titularidade irrestrita', () => {

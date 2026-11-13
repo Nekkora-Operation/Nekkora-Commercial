@@ -58,6 +58,8 @@ test('transferência internacional: possível tratamento no exterior informado, 
   const item = content.slice(i, content.indexOf('\n    },', i));
   assert.match(item, /parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos/);
   assert.match(item, /região de São Paulo/);
-  assert.match(item, /Bookings e das reuniões pelo Teams não foi confirmada/, 'Bookings e Teams fora do E3: não são dados como no Brasil');
+  // NEKKORA-COM-CANAIS-001: sem Bookings nem Teams; o WhatsApp (Meta) não é dado como no Brasil
+  assert.match(item, /As conversas pelo WhatsApp passam pelos servidores da Meta, que podem estar fora do Brasil\./);
+  assert.doesNotMatch(item, /Bookings|Teams/);
   assert.doesNotMatch(item, /cláusulas[- ]padrão|CPC|país(es)? adequado|art\. 33|garantid[ao]s? (pel[ao]s?|por) contrato/i);
 });

@@ -1,15 +1,14 @@
 import { useId, useState, type KeyboardEvent } from 'react';
 import { Button, Card, Icon, Input, StatusRegion } from 'nekkora-lib';
-import { ScheduleButton } from '../agendamento';
 import { SIMULATOR as S } from '../content';
 import { EMPTY_QUANTITIES, MAX_QUANTITY, PRICE_TABLE, brl, sanitizeQuantity, simulate, type QuantityTier, type Simulation } from '../precos';
-import { useRequestTrigger } from '../request';
+import { WhatsappButton } from '../whatsapp';
 
 type Result = { sim: Simulation };
 
 /**
- * Resumo em texto da simulação: anunciado ao leitor de tela e, se o visitante quiser, levado ao formulário de
- * avaliação (NEKKORA-CALC-001 §3.8), onde ele o revisa antes de qualquer envio. Valores de src/precos.ts.
+ * Resumo em texto da simulação: anunciado ao leitor de tela e levado à mensagem inicial do WhatsApp
+ * (NEKKORA-COM-CANAIS-001), onde o visitante a revisa e edita antes de enviar. Valores de src/precos.ts.
  */
 export function simulationSummary({ sim }: Result): string {
   const lines = sim.lines
@@ -42,7 +41,6 @@ export function Simulator() {
   const stale = result != null && (Object.keys(quantities) as QuantityTier[]).some((t) => quantities[t] !== result.sim.quantities[t]);
   const shown = result && !stale ? result : null;
   const summary = shown ? simulationSummary(shown) : null;
-  const requestTrigger = useRequestTrigger({ simulation: summary });
 
   const announce = (text: string) => setAnnouncement((a) => ({ text, key: a.key + 1 }));
 
@@ -217,10 +215,10 @@ export function Simulator() {
           <div className="sim__next">
             <span className="sim__next-label">{S.next}</span>
             <div className="sim__actions">
-              <ScheduleButton size="md" label={S.schedule} />
-              <Button rightIcon="arrow-right" {...requestTrigger}>
+              {/* NEKKORA-COM-CANAIS-001: a simulação vai junto da mensagem do Delivery; nada é enviado sem o visitante */}
+              <WhatsappButton context="delivery" extra={summary && `${S.whatsappIntro}\n${summary}`}>
                 {S.request}
-              </Button>
+              </WhatsappButton>
             </div>
           </div>
         </section>

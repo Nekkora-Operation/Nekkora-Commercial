@@ -215,7 +215,6 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .sim__help strong { color: var(--nk-color-text); }
 /* Cor do texto, sublinhado: o acento sobre o cartão elevado ficava abaixo de 4,5:1 (contraste-por-pixels) */
 .sim__help a { color: var(--nk-color-text); text-decoration: underline; text-underline-offset: 2px; }
-.request__simulation { display: flex; flex-direction: column; gap: 8px; }
 
 /* ---------- Hosting: faixa pôster ---------- */
 .hosting-band { padding-block: clamp(56px, 8vw, 96px); background: var(--poster-band); color: #fff; scroll-margin-top: 72px; }
@@ -249,50 +248,28 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .contact__lead { margin: 0; max-width: 40em; font-size: var(--nk-font-size-lg); line-height: 1.6; color: var(--nk-color-text-secondary); }
 .contact__caption { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
 .contact__channels { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 20px; }
-.contact__form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 /* text-secondary (não muted): o aviso é informativo e precisa de contraste AA */
 .contact__note { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
 
-/* Diálogo "Solicitar avaliação" (modelo C, etapa 2) */
-.request__body, .request__form, .contact__done { display: flex; flex-direction: column; gap: 16px; }
-.request__hint { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.5; color: var(--nk-color-text-secondary); }
-.request__pending { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.5; color: var(--nk-color-text-secondary); }
-.request__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; }
-.request .nk-dialog__footer { flex-direction: column; align-items: stretch; gap: 12px; }
-.request__note { text-align: center; }
-/* Etapa de confirmação (COM-RELEASE-002): a mensagem exata que vai para o WhatsApp */
-.request__step-title { margin: 0; font-size: var(--nk-font-size-lg); font-weight: 600; color: var(--nk-color-text); }
-.request__message {
-  margin: 0; padding: 12px 14px; max-height: 220px; overflow: auto; min-width: 0;
-  white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--nk-font-family); font-size: var(--nk-font-size-sm); line-height: 1.55;
-  color: var(--nk-color-text); background: var(--nk-color-surface-sunken); border: 1px solid var(--nk-color-border); border-radius: var(--nk-radius-md);
-}
-.request__manual { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-.request__manual .contact__note { margin: 0; }
-.request__number { white-space: nowrap; color: var(--nk-color-text); }
 .contact__direct { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 /* Tecnologias do Delivery */
 .tech { display: flex; flex-direction: column; gap: 8px; }
 .tech__label { font-size: var(--nk-font-size-xs); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--nk-color-text-secondary); }
 .tech__list { display: flex; flex-wrap: wrap; gap: 6px; }
 .tech__note { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
-.contact__done:focus { outline: none; }
-.contact__done > .nk-button { align-self: flex-start; }
-/* Dois caminhos de contato (COM-RELEASE-005 §4.4): "Solicitar avaliação" e "Agendar conversa" lado a lado */
+/* Contato (NEKKORA-COM-CANAIS-001): o WhatsApp como único CTA de atendimento */
 .contact__ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.contact__schedule-note { margin: 0; max-width: 36em; }
-.request__schedule { margin: 0; }
-.request__actions > :only-child { grid-column: 1 / -1; }
-.request__actions--start { display: flex; flex-wrap: wrap; width: auto; }
-/* Envio automático: desafio e armadilha para robôs (fora da tela, fora da ordem de foco) */
-.request__challenge-box { display: flex; flex-direction: column; gap: 8px; }
-.request__challenge-box .contact__note { margin: 0; }
-.request__challenge:empty { display: none; }
-.request__trap { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 
 /* ---------- Botão flutuante ---------- */
-/* No celular, some enquanto o contato está na tela (o bloco de contato já tem WhatsApp e o formulário fica livre). */
+/* NEKKORA-COM-CANAIS-001: "Fale com um analista" — ícone e texto lado a lado. Verde do WhatsApp escurecido para o texto
+   branco passar de 4,5:1 (#1f9d55 da lib dá 3,49:1); altura de 52 px; área segura vem da lib (env(safe-area-inset-*)). */
+.fab--label { --nk-fab-bg: #157a3f; width: auto; height: 52px; padding: 0 20px 0 16px; border-radius: 999px; }
+.fab__text { font-size: var(--nk-font-size-sm); font-weight: 600; line-height: 1; white-space: nowrap; }
+/* No celular, some enquanto o contato está na tela (o bloco de contato já tem o mesmo botão). */
 .fab--tucked { opacity: 0; transform: translateY(16px) scale(0.9); pointer-events: none; }
+/* Espaço para o botão flutuante não cobrir o fim da página — em QUALQUER largura: no desktop ele cobria a
+   identificação do fornecedor no rodapé (homologação flutuante-nao-cobre-o-rodape). 52 px + 24 px de margem + folga. */
+.page--fab .footer { padding-bottom: 96px; }
 
 /* ---------- Footer ---------- */
 .footer { padding-block: 28px; background: var(--nk-color-bg); }
@@ -308,14 +285,8 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 }
 @media (max-width: 640px) {
   .wrap { padding-inline: 16px; }
-  .contact__form-grid { grid-template-columns: minmax(0, 1fr); }
-  /* diálogo: ações empilhadas, a principal em cima (como o rodapé do Dialog da lib abaixo de 480 px) */
-  .request__actions { grid-template-columns: minmax(0, 1fr); }
-  .request__actions > :last-child { order: -1; }
   .hero__ctas > *, .contact__ctas > * { flex: 1 1 100%; }
   .sim__actions, .sim__actions > * { flex: 1 1 100%; }
   .sim__result { padding: 16px; }
   .hosting-band__visual { display: none; }
-  /* espaço para o botão flutuante (só existe com WhatsApp confirmado) não cobrir o fim da página */
-  .page--fab .footer { padding-bottom: 96px; }
 }

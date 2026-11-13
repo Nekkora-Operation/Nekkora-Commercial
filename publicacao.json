@@ -1,7 +1,7 @@
 {
   "$comentario": "Dados que só a titular pode confirmar. Enquanto um valor for null/false, a página não faz a afirmação correspondente e scripts/verificar-publicacao.mjs bloqueia o deploy de produção. Veja docs/release/COM-RELEASE-PENDENCIAS.md.",
   "$origem": {
-    "canais": "Titular, 22/10/2026 (COM-RELEASE-003): por enquanto só LinkedIn e e-mail; WhatsApp e Instagram ficam de fora.",
+    "canais": "Titular, 12/11/2026 (NEKKORA-COM-CANAIS-001): o WhatsApp 5511917724200 passa a ser o único canal público de atendimento comercial; LinkedIn https://www.linkedin.com/company/nekkora mantido e Instagram https://www.instagram.com/nekkora.br/ adicionado, ambos como redes institucionais; formulário, envio por e-mail e Microsoft Bookings saem da página pública; o e-mail contato@nekkora.com continua só para obrigações administrativas, identificação do fornecedor e privacidade (direitos do titular), sem botão comercial. Registro aprovado pela titular em 13/11/2026. Substitui a decisão de 22/10/2026 (COM-RELEASE-003: por enquanto só LinkedIn e e-mail; WhatsApp e Instagram ficam de fora).",
     "controlador.documento": "Titular, 22/10/2026 (COM-RELEASE-003). Dígitos verificadores conferidos.",
     "controlador.nome": "Titular, 04/11/2026 (commit 337449b): razão social informada.",
     "campanhaLancamento": "Titular, 04/11/2026 (commit 337449b): 06/11/2026 a 06/01/2027 (fuso de Brasília).",
@@ -27,10 +27,10 @@
     "publicacaoAutorizada": "Titular, 12/11/2026 (COM-VITRINE-001, PUB-18): autorizo a publicação em produção da versão 1.1.0 da Nekkora Commercial, commit homologado 98f0d9ea2bc327770514c8a789f4ccee940f53a4 (CI 43328062798 aprovada; impressões PUB-14, PUB-17 e PUB-19 conferidas). Esta autorização vale somente para esse conteúdo e para publicação em 12/11/2026. Não autoriza a contratação de pacotes, nem a contratação de Monitor ou AI, nem altera as pendências contratuais. O merge e o deploy dependem de autorizações próprias."
   },
   "canais": {
-    "whatsapp": null,
+    "whatsapp": "5511917724200",
     "email": "contato@nekkora.com",
     "linkedin": "https://www.linkedin.com/company/nekkora",
-    "instagram": null
+    "instagram": "https://www.instagram.com/nekkora.br/"
   },
   "agendamento": {
     "url": null,

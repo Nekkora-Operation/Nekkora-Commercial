@@ -1,11 +1,9 @@
-import { Button, Icon, Logo } from 'nekkora-lib';
+import { Icon, Logo } from 'nekkora-lib';
 import { HOSTING } from '../content';
-import { useRequestTrigger } from '../request';
+import { WhatsappButton } from '../whatsapp';
 
 /** Faixa pôster em acento sólido (modelo C). Texto branco sobre --nk-solid-accent; no Sakura Dark, tom mais fechado. */
 export function Hosting() {
-  // AUD-25: o diálogo abre com "Hospedar uma automação existente" marcado (o visitante pode trocar)
-  const trigger = useRequestTrigger({ demand: 'hospedagem' });
   return (
     <section id="hosting" className="hosting-band" aria-labelledby="hosting-title">
       <div className="wrap split">
@@ -22,9 +20,10 @@ export function Hosting() {
             </span>
           </p>
           <div>
-            <Button size="lg" pill rightIcon="arrow-right" className="hosting-band__cta" {...trigger}>
+            {/* NEKKORA-COM-CANAIS-001: conversa no WhatsApp com a mensagem de hospedagem (o visitante pode editá-la) */}
+            <WhatsappButton context="hosting" size="lg" pill className="hosting-band__cta">
               {HOSTING.cta}
-            </Button>
+            </WhatsappButton>
           </div>
         </div>
         <div className="split__visual hosting-band__visual" aria-hidden="true">

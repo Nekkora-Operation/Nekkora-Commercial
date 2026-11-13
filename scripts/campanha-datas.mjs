@@ -78,8 +78,8 @@ const REGRAS = [
     so: h,
   })),
   { arquivo: 'scripts/homologacao-simulador.mjs', n: 1, de: (a) => `de ${br(a.inicio)} a ${br(a.fim)}`, para: (n) => `de ${br(n.inicio)} a ${br(n.fim)}` },
-  { arquivo: 'scripts/homologacao-canais.mjs', n: 1, de: (a) => `IN_CAMPAIGN = new Date('${a.meio}T12:00`, para: (n) => `IN_CAMPAIGN = new Date('${n.meio}T12:00` },
-  { arquivo: 'scripts/homologacao-leads.mjs', n: 1, de: (a) => `IN_CAMPAIGN = new Date('${a.meio}T12:00`, para: (n) => `IN_CAMPAIGN = new Date('${n.meio}T12:00` },
+  // NEKKORA-COM-CANAIS-001: scripts/homologacao-canais.mjs deriva as datas da campanha do publicacao.json do build servido
+  // (release.json) — nada a trocar; scripts/homologacao-leads.mjs saiu (sem formulário, Bookings nem envio automático).
   { arquivo: '.github/workflows/ci.yml', n: 1, de: (a) => `for d in ${a.vespera} ${a.meio} ${a.seguinte}; do`, para: (n) => `for d in ${n.vespera} ${n.meio} ${n.seguinte}; do` },
   { arquivo: '.github/workflows/ci.yml', n: 1, de: (a) => `(${br(a.inicio)} a ${br(a.fim)})`, para: (n) => `(${br(n.inicio)} a ${br(n.fim)})` },
 ];

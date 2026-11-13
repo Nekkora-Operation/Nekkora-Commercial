@@ -4,14 +4,14 @@
  * Os dados que só a titular pode confirmar (canais, campanha, controlador dos dados, hospedagem e aprovações) ficam em
  * `publicacao.json`, na raiz — fonte única lida também por scripts/verificar-publicacao.mjs, que bloqueia o deploy de
  * produção enquanto algum item obrigatório estiver pendente. Enquanto um valor for `null` — ou não passar na validação
- * abaixo — a página não faz a afirmação correspondente: o canal não aparece como link, o botão flutuante de WhatsApp não
- * é exibido e o formulário funciona em modo de demonstração (valida, mas não envia nada).
+ * abaixo — a página não faz a afirmação correspondente: o canal não aparece como link e o botão flutuante e os CTAs de
+ * WhatsApp não são exibidos. NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): o WhatsApp é o único canal público de
+ * atendimento comercial; a página não tem formulário, envio por e-mail nem agendamento pelo Microsoft Bookings.
  *
  * Builds de homologação trocam o arquivo por scripts/fixtures/publicacao-homologacao.json (dados sintéticos) com
  * NEKKORA_PUBLICACAO — veja vite.config.ts.
  */
 import publicacao from '@publicacao';
-import { isBookingsUrl } from './agendamento-url.js';
 import { campaignState, todayInBrazil, type CampaignState } from './precos';
 
 /** WhatsApp com DDI + DDD, só dígitos. E-mail. URLs de perfil (não a página inicial da rede). */
@@ -22,7 +22,21 @@ export const CONTACT: { whatsappNumber: string | null; email: string | null; ins
   linkedin: publicacao.canais.linkedin,
 };
 
-export const WHATSAPP_MESSAGE = 'Olá! Quero solicitar uma avaliação com a Nekkora.';
+/**
+ * Mensagens iniciais sugeridas para o WhatsApp (NEKKORA-COM-CANAIS-001): o visitante pode editá-las na conversa, e nada
+ * é enviado sem que ele toque em enviar. Monitor e AI estão em preparação: a mensagem pede informação, nunca contratação.
+ */
+export const WHATSAPP_MESSAGES = {
+  geral: 'Olá! Gostaria de conversar com um analista da Nekkora.',
+  delivery: 'Olá! Tenho interesse em desenvolver automações com a Nekkora.',
+  hosting: 'Olá! Tenho interesse em hospedagem de automações com a Nekkora e gostaria de saber como funciona a avaliação de viabilidade.',
+  monitor: 'Olá! Gostaria de receber informações sobre o Nekkora Monitor quando ele estiver disponível.',
+  ai: 'Olá! Gostaria de receber informações sobre o Nekkora AI quando ele estiver disponível.',
+} as const;
+export type WhatsappContext = keyof typeof WHATSAPP_MESSAGES;
+
+/** Acesso de clientes (NEKKORA-COM-CANAIS-001): a Commercial só leva à Nekkora Platform; não autentica ninguém. */
+export const PLATFORM_LOGIN_URL = 'https://platform.nekkora.com/entrar';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -50,78 +64,14 @@ export const CHANNELS = {
 
 export const hasAnyChannel = Object.values(CHANNELS).some((c) => c != null);
 
-export const whatsappUrl = (message: string = WHATSAPP_MESSAGE) =>
+export const whatsappUrl = (message: string = WHATSAPP_MESSAGES.geral) =>
   CHANNELS.whatsapp ? `https://wa.me/${CHANNELS.whatsapp}?text=${encodeURIComponent(message)}` : null;
 
-const EMAIL_DOMAIN = CHANNELS.email ? CHANNELS.email.split('@')[1] : null;
-
-/**
- * "Agendar conversa" (COM-RELEASE-005 §4): só com a URL oficial e válida do Bookings em publicacao.json — regra única em
- * agendamento-url.js, a mesma do portão de publicação (NEKKORA-COM-007: bookings.cloud.microsoft). Sem ela, o
- * botão não aparece — a página não apresenta o agendamento como disponível nem aponta para um endereço inexistente.
- * O Bookings é quem confirma a reserva: a página nunca afirma que uma reunião foi agendada.
- */
-export const BOOKINGS_URL: string | null = isBookingsUrl(publicacao.agendamento.url, {
-  emailDomain: EMAIL_DOMAIN,
-  tenantDomain: publicacao.agendamento.dominioDoTenant ?? null,
-})
-  ? publicacao.agendamento.url
-  : null;
-
-/** Caminho do contrato da API de solicitações (COM-RELEASE-005 §5.4). */
-export const LEAD_API_PATH = '/v1/commercial/requests';
-
-/**
- * Endpoint do recebimento automático (COM-RELEASE-005 §5): https e o caminho do contrato. http só para o servidor
- * local da homologação (127.0.0.1/localhost) — o portão de publicação exige https.
- */
-export function isLeadApiEndpoint(u: string | null): u is string {
-  if (u == null) return false;
-  try {
-    const url = new URL(u);
-    const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname);
-    return (url.protocol === 'https:' || local) && url.username === '' && url.search === '' && url.hash === '' && url.pathname === LEAD_API_PATH;
-  } catch {
-    return false;
-  }
-}
-
-/** Chave pública do Cloudflare Turnstile (desafio antiautomação, §5.5). Não é segredo: a chave secreta fica no backend. */
-const isTurnstileSiteKey = (k: string | null): k is string => k != null && /^[0-9a-zA-Z_-]{10,64}$/.test(k);
-
-/**
- * Recebimento automático: ativo só com endpoint válido. A chave do desafio é opcional no código (homologação local) e
- * obrigatória no portão de publicação.
- */
-export const LEAD_API = isLeadApiEndpoint(publicacao.envioAutomatico.endpoint)
-  ? { endpoint: publicacao.envioAutomatico.endpoint, turnstileSiteKey: isTurnstileSiteKey(publicacao.envioAutomatico.chaveDoSiteTurnstile) ? publicacao.envioAutomatico.chaveDoSiteTurnstile : null }
-  : null;
-
-/**
- * Canal da jornada "Solicitar avaliação", em ordem de precedência — um único mecanismo de envio ativo por vez
- * (COM-RELEASE-005 §5.8):
- *   1. 'api': recebimento automático (a página envia ao backend e só confirma o recebimento com a resposta dele);
- *   2. 'whatsapp': mensagem aberta no WhatsApp, quando houver número confirmado;
- *   3. 'email': mensagem aberta no aplicativo de e-mail do visitante (mailto) — o canal atual;
- *   null: modo de demonstração.
- * Com a API ativa, o e-mail continua só como alternativa de contato na falha do envio, nunca como segundo envio.
- * Decisão da titular em 22/10/2026: por enquanto só e-mail e LinkedIn (sem WhatsApp).
- */
-export const REQUEST_CHANNEL: 'api' | 'whatsapp' | 'email' | null = LEAD_API ? 'api' : CHANNELS.whatsapp ? 'whatsapp' : CHANNELS.email ? 'email' : null;
-
-export const EMAIL_SUBJECT = 'Solicitação de avaliação — Nekkora';
-
-/** mailto com assunto e, se houver, corpo. Quebras de linha como CRLF (RFC 6068). */
-export const mailtoUrl = (body?: string) =>
-  CHANNELS.email
-    ? `mailto:${CHANNELS.email}?subject=${encodeURIComponent(EMAIL_SUBJECT)}${body ? `&body=${encodeURIComponent(body.replace(/\r?\n/g, '\r\n'))}` : ''}`
-    : null;
-
-/** Número do WhatsApp para digitar à mão (alternativa quando o link não abre): +55 11 91234-5678. */
+/** Número do WhatsApp por extenso (aviso de privacidade): +55 (11) 91772-4200. */
 export const whatsappDisplay = (n: string | null = CHANNELS.whatsapp) => {
   if (!n) return null;
   const m = /^(\d{2})(\d{2})(\d{4,5})(\d{4})$/.exec(n);
-  return m ? `+${m[1]} ${m[2]} ${m[3]}-${m[4]}` : `+${n}`;
+  return m ? `+${m[1]} (${m[2]}) ${m[3]}-${m[4]}` : `+${n}`;
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;

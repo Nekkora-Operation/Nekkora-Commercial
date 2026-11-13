@@ -14,7 +14,6 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { responseHeadersPolicy } from '../deploy/aws/cabecalhos.mjs';
-import { isBookingsUrl } from '../src/agendamento-url.js';
 import { impressaoDaTabela } from './comercial/impressao-precos.mjs';
 import { ITENS, impressaoDoConteudo } from './comercial/impressao-conteudo.mjs';
 
@@ -58,31 +57,20 @@ function isTaxId(doc) {
   return cnpj([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === n[12] && cnpj([6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === n[13];
 }
 
-// Canais (COM-RELEASE-002 §5.1). Decisão da titular (22/10/2026): e-mail e LinkedIn obrigatórios; WhatsApp opcional.
-need(pub.canais.whatsapp == null || isWhatsapp(pub.canais.whatsapp), 'PUB-01', 'WhatsApp: DDI+DDD+número, só dígitos, ou null (opcional)');
-need(isEmail(pub.canais.email), 'PUB-02', 'e-mail comercial');
+// Canais. NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): o WhatsApp é o ÚNICO canal público de atendimento comercial
+// (obrigatório); LinkedIn (obrigatório) e Instagram (opcional) são redes institucionais. O e-mail continua obrigatório:
+// identificação do fornecedor no rodapé (Decreto 7.962/2013, art. 2º) e canal dos direitos do titular (LGPD, art. 18).
+need(isWhatsapp(pub.canais.whatsapp), 'PUB-01', 'WhatsApp comercial: DDI+DDD+número, só dígitos (único canal público de atendimento)');
+need(isEmail(pub.canais.email), 'PUB-02', 'e-mail da empresa (identificação do fornecedor e direitos do titular)');
 need(isProfile(pub.canais.linkedin) && /linkedin\.com$/i.test(new URL(pub.canais.linkedin ?? 'https://x/').hostname.replace(/^www\./, '')), 'PUB-03', 'página oficial do LinkedIn (URL de perfil)');
-need(pub.canais.instagram == null || isProfile(pub.canais.instagram), 'PUB-03', 'Instagram: URL de perfil ou null (opcional)');
-// Agendamento — Microsoft Bookings (COM-RELEASE-005 §4.5, NEKKORA-COM-007). A MESMA função de src/config.ts
-// (src/agendamento-url.js), em modo de produção: recusa também domínios de exemplo. Obrigatório quando faz parte do
-// lançamento; a titular confirma que testou a página oficial.
-const emailDomain = isEmail(pub.canais.email) ? pub.canais.email.split('@')[1].toLowerCase() : null;
-const isBookings = (u) => isBookingsUrl(u, { emailDomain, tenantDomain: pub.agendamento?.dominioDoTenant ?? null, producao: true });
+need(pub.canais.instagram == null || (isProfile(pub.canais.instagram) && /instagram\.com$/i.test(new URL(pub.canais.instagram).hostname.replace(/^www\./, ''))), 'PUB-03', 'Instagram: URL de perfil do instagram.com ou null (opcional)');
+// Agendamento (Microsoft Bookings) e recebimento automático: a página pública não tem agendamento, formulário nem envio
+// automático (NEKKORA-COM-CANAIS-001). Qualquer URL do Bookings ou endpoint de envio — válido ou não — bloqueia: a página
+// não usaria esses dados, e reativá-los exige nova decisão da titular, código e aviso de privacidade revistos.
 const booking = pub.agendamento ?? { url: null, obrigatorio: false };
-need(booking.url == null ? booking.obrigatorio !== true : isBookings(booking.url), 'PUB-20', 'URL oficial da página do Microsoft Bookings (https://bookings.cloud.microsoft/book/<caixa>@<domínio da Nekkora>/)');
-need(booking.url == null || pub.aprovacoes.agendamento === true, 'PUB-20', 'confirmação da titular: serviço do Bookings configurado e página oficial testada');
-// Recebimento automático (COM-RELEASE-005 §5): opcional; se houver endpoint, só https, com desafio e aprovação.
+need(booking.url == null && booking.obrigatorio !== true, 'PUB-20', 'Microsoft Bookings fora da página pública: agendamento.url null e obrigatorio false (NEKKORA-COM-CANAIS-001)');
 const intake = pub.envioAutomatico ?? { endpoint: null, chaveDoSiteTurnstile: null };
-if (intake.endpoint != null) {
-  let okEndpoint = false;
-  try {
-    const u = new URL(intake.endpoint);
-    okEndpoint = u.protocol === 'https:' && u.pathname === '/v1/commercial/requests' && u.search === '' && u.username === '';
-  } catch {}
-  need(okEndpoint, 'PUB-21', 'endpoint do recebimento automático: https://…/v1/commercial/requests');
-  need(typeof intake.chaveDoSiteTurnstile === 'string' && /^[0-9a-zA-Z_-]{10,64}$/.test(intake.chaveDoSiteTurnstile) && !/^[123]x0{20}[AB]{2}$/.test(intake.chaveDoSiteTurnstile), 'PUB-21', 'chave do site do Turnstile (não a chave de teste da Cloudflare)');
-  need(pub.aprovacoes.envioAutomatico === true, 'PUB-21', 'autorização do recebimento automático (backend publicado e homologado na AWS)');
-}
+need(intake.endpoint == null && intake.chaveDoSiteTurnstile == null, 'PUB-21', 'envio automático fora da página pública (sem formulário): envioAutomatico.endpoint e chaveDoSiteTurnstile null (NEKKORA-COM-CANAIS-001)');
 // Campanha (§4.4, COM-RELEASE-003-R1)
 const { inicio, fim } = pub.campanhaLancamento;
 const tabela = pub.tabelaDePrecos ?? {};
@@ -197,17 +185,21 @@ const autorizada = pub.publicacaoAutorizada ?? {};
 const registroPub = pub.$origem?.publicacaoAutorizada;
 const dataPub = dataDoRegistro(registroPub);
 const commitsCitados = typeof registroPub === 'string' ? [...new Set(registroPub.match(/\b[0-9a-f]{40}\b/g) ?? [])] : [];
+// NEKKORA-COM-CANAIS-001 (titular, 13/11/2026): sem autorização retroativa — a PUB-18 não pode ser anterior às aprovações
+// do conteúdo que ela publica (registros da PUB-17 e da PUB-19)
+const datasDoConteudo = ['textosComerciais', 'condicoesComerciais'].map((item) => dataDoRegistro(pub.$origem?.[`impressoesDeConteudo.${item}`]));
 need(
   autorizada.versao === versao &&
     /^[0-9a-f]{40}$/.test(autorizada.commit ?? '') &&
     dataPub != null &&
     dataPub >= '2026-11-12' &&
     dataPub <= today &&
+    datasDoConteudo.every((d) => d != null && dataPub >= d) &&
     commitsCitados.length === 1 &&
     commitsCitados[0] === autorizada.commit &&
     registroPub.includes(`versão ${versao}`),
   'PUB-18',
-  `autorização desta versão: publicacaoAutorizada { versao: "${versao}", commit: SHA homologado } e registro em $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a versão ${versao} e UM commit, o homologado (a flag aprovacoes.publicacao sozinha não autoriza)`,
+  `autorização desta versão: publicacaoAutorizada { versao: "${versao}", commit: SHA homologado } e registro em $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje, não anterior às aprovações da PUB-17 e da PUB-19) citando a versão ${versao} e UM commit, o homologado (a flag aprovacoes.publicacao sozinha não autoriza)`,
 );
 need(pub.avisoHomologacao === false, 'PUB-10', 'desligar o aviso "Versão para homologação"');
 

@@ -1,7 +1,7 @@
-import { Badge, Card, Icon, IconBox, Link, SectionHeader } from 'nekkora-lib';
+import { Badge, Card, Icon, IconBox, SectionHeader } from 'nekkora-lib';
 import { NEW_CONDITIONS_START, isLaunchActive, launchState } from '../config';
 import { PLANNED_SERVICES, PRICING } from '../content';
-import { useRequestTrigger } from '../request';
+import { WhatsappLink } from '../whatsapp';
 import { Simulator } from './Simulator';
 
 /**
@@ -12,8 +12,6 @@ import { Simulator } from './Simulator';
  * modalidades seguem pelos canais gerais, com avaliação individual, sem terceira categoria.
  */
 export function Pricing() {
-  // V-04: demandas fora das categorias seguem como solicitação de automação (Delivery), pela jornada existente
-  const trigger = useRequestTrigger({ demand: 'automacao' });
   // Avaliado no carregamento da página: fora do período aprovado, sem faixa nem regras da campanha (V-01: mesma tabela).
   const launch = isLaunchActive();
   // Sem datas aprovadas, a faixa da campanha só aparece como prévia de homologação — e diz isso.
@@ -85,9 +83,8 @@ export function Pricing() {
         {/* COM-VITRINE-001 (V-04): demandas fora das modalidades, pelos canais gerais — sem terceira categoria */}
         <p className="center-note other-demand" data-outras-demandas>
           {PRICING.other.text}{' '}
-          <Link arrow {...trigger}>
-            {PRICING.other.cta}
-          </Link>
+          {/* NEKKORA-COM-CANAIS-001: pelo WhatsApp, com a mensagem do Delivery */}
+          <WhatsappLink context="delivery">{PRICING.other.cta}</WhatsappLink>
         </p>
         {/* NEKKORA-CALC-001: logo abaixo dos cartões, no mesmo bloco data-pricing (preços só aparecem aqui) */}
         <Simulator />
@@ -147,6 +144,15 @@ export function Pricing() {
           </ul>
           <p className="poster-tile__text" data-aviso-previstos>
             {PLANNED_SERVICES.notice} {PLANNED_SERVICES.note}
+          </p>
+          {/* NEKKORA-COM-CANAIS-001: pedido de informação para quando estiverem disponíveis — nunca contratação */}
+          <p className="poster-tile__text planned__ask">
+            {PLANNED_SERVICES.items.map((s, i) => (
+              <span key={s.id}>
+                {i > 0 && ' · '}
+                <WhatsappLink context={s.id}>{PLANNED_SERVICES.ask(s.name)}</WhatsappLink>
+              </span>
+            ))}
           </p>
         </div>
         <p className="center-note">{PRICING.hostingNote}</p>
