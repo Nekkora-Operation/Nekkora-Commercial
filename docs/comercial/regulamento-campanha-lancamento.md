@@ -59,8 +59,8 @@ O fim da campanha encerra só a comunicação promocional; a tabela do §7 conti
 
 ## 4. Prova da data de recebimento **[R]**
 
-> **NEKKORA-COM-CANAIS-001 — PROPOSTA pendente de conferência da titular (PUB-19), 12 e 13/11/2026.** Aprovada
-> conceitualmente em 13/11/2026; não vale como PUB-19 aprovada até a conferência do texto definitivo e da impressão.
+> **NEKKORA-COM-CANAIS-001 — regra aprovada editorialmente pela titular em 13/11/2026 (PUB-19).** O registro
+> definitivo da PUB-19, com a impressão correspondente, será feito à parte, em `publicacao.json`.
 >
 > - **WhatsApp:** único canal promovido na vitrine para novas solicitações comerciais.
 > - **E-mail e LinkedIn:** a vitrine não os usa como formulário nem como botão comercial, mas uma solicitação ainda pode
