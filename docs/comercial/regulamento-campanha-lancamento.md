@@ -59,12 +59,26 @@ O fim da campanha encerra só a comunicação promocional; a tabela do §7 conti
 
 ## 4. Prova da data de recebimento **[R]**
 
+> **NEKKORA-COM-CANAIS-001 — regra aprovada editorialmente pela titular em 13/11/2026 (PUB-19).** O registro
+> definitivo da PUB-19, com a impressão correspondente, será feito à parte, em `publicacao.json`.
+>
+> - **WhatsApp:** único canal promovido na vitrine para novas solicitações comerciais.
+> - **E-mail e LinkedIn:** a vitrine não os usa como formulário nem como botão comercial, mas uma solicitação ainda pode
+>   chegar por eles e vale pela data em que for recebida.
+> - **Microsoft Bookings e envio automático:** indisponíveis na nova vitrine. As linhas abaixo continuam valendo para as
+>   solicitações e compromissos já recebidos por eles; nada desse histórico é apagado.
+>
+> **Abrir o WhatsApp não é solicitação.** O clique no site só abre o aplicativo com uma mensagem sugerida, que o
+> visitante pode editar ou não enviar. Vale a mensagem **efetivamente recebida** na conversa, com data e hora
+> verificáveis. A vigência da campanha, os preços e os compromissos anteriores não mudam.
+
 | Canal | Evidência | Observação |
 |---|---|---|
-| E-mail `contato@nekkora.com` | Data e hora de recebimento no servidor do Microsoft 365 (cabeçalho `Received`), no horário de Brasília | Vale o recebimento, não o clique no site nem a data de escrita. Não apagar a mensagem antes do fim do prazo de aceite |
-| Microsoft Bookings | Data de **criação** da reserva (notificação e histórico) | Não a data da reunião |
-| LinkedIn | Data e hora da mensagem recebida | Captura ou exportação ao emitir a proposta |
-| Envio automático (inativo) | Protocolo do backend | Só após PUB-21 |
+| WhatsApp `+55 (11) 91772-4200` (único canal promovido na vitrine, NEKKORA-COM-CANAIS-001) | Data e hora da mensagem recebida na conversa, no horário de Brasília | Vale o recebimento, não o clique no site, a abertura do aplicativo nem a data de escrita. Captura ou exportação da conversa, com data e hora visíveis, ao emitir a proposta; não apagar a conversa antes do fim do prazo de aceite |
+| E-mail `contato@nekkora.com` (sem botão na vitrine; vale o que chegar por ele) | Data e hora de recebimento no servidor do Microsoft 365 (cabeçalho `Received`), no horário de Brasília | Vale o recebimento, não o clique no site nem a data de escrita. Não apagar a mensagem antes do fim do prazo de aceite |
+| Microsoft Bookings (indisponível na vitrine desde a NEKKORA-COM-CANAIS-001; vale para o histórico) | Data de **criação** da reserva (notificação e histórico) | Não a data da reunião |
+| LinkedIn (rede institucional; vale o que chegar por ele) | Data e hora da mensagem recebida | Captura ou exportação ao emitir a proposta |
+| Envio automático (indisponível na vitrine: sem formulário) | Protocolo do backend | Vale para o histórico; nenhuma solicitação nova chega por ele |
 
 A proposta registra "Data da solicitação" com data, hora, canal e referência (OPS-03). Na dúvida perto da virada do
 último dia, vale o registro do servidor.

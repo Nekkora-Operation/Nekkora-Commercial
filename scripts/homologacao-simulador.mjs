@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Homologação do Simulador de Investimento (NEKKORA-CALC-001) e do formulário de avaliação (NEKKORA-COM-008-C §8) em
+ * Homologação do Simulador de Investimento (NEKKORA-CALC-001) e da conversa pelo WhatsApp que ele abre
+ * (NEKKORA-COM-CANAIS-001, titular, 12/11/2026 — substitui o formulário de avaliação da NEKKORA-COM-008-C §8) em
  * navegador real (Playwright: Chromium, Firefox, WebKit).
  *
  * Uso (builds servidos como no CloudFront — veja .github/workflows/ci.yml):
@@ -8,8 +9,8 @@
  *     [<url da fixture pendente> <url da fixture pendente sem aviso>]
  *
  *   - produção (publicacao.json real): campanha aprovada de 06/11/2026 a 06/01/2027 (NEKKORA-COM-RELEASE-FIX-001) →
- *     relógio do navegador fixado na véspera, no primeiro dia, durante, no último dia e no dia seguinte; e-mail e
- *     Bookings oficiais;
+ *     relógio do navegador fixado na véspera, no primeiro dia, durante, no último dia e no dia seguinte; WhatsApp oficial,
+ *     sem Bookings;
  *   - fixture (scripts/fixtures/publicacao-homologacao.json): datas sintéticas 01/11 a 31/12/2026 → relógio do navegador
  *     fixado antes, durante e depois da campanha;
  *   - fixtures pendentes (publicacao-homologacao-pendente*.json): campanha SEM datas → faixa de prévia só com o aviso
@@ -22,8 +23,9 @@
  * data é derivada de campaignState/todayInBrazil (src/precos.ts) sobre o publicacao.json e conferida contra a tabela
  * explícita da missão.
  *
- * Nada sai do localhost: qualquer outra requisição é abortada e reprova. Nenhum formulário é enviado: a jornada para na
- * etapa de confirmação, antes de abrir o e-mail ou o WhatsApp.
+ * Nada sai do localhost: qualquer outra requisição é abortada e reprova. A aba do WhatsApp aberta pelo CTA do resultado
+ * ("Conversar sobre esta simulação") é respondida por uma página local de teste — o wa.me real nunca é acessado. A página
+ * não tem formulário nem diálogo: a simulação só segue, como texto editável, na mensagem inicial do WhatsApp.
  */
 import { createRequire } from 'node:module';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -46,7 +48,33 @@ const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 mkdirSync(outDir, { recursive: true });
 
 const PUBLICACAO = JSON.parse(readFileSync('publicacao.json', 'utf8'));
-const OFFICIAL_BOOKINGS = PUBLICACAO.agendamento.url;
+/**
+ * Mensagens do WhatsApp (NEKKORA-COM-CANAIS-001), digitadas de propósito — iguais a WHATSAPP_MESSAGES (src/config.ts) e
+ * SIMULATOR.whatsappIntro (src/content.ts), conferidas contra o código-fonte antes de qualquer navegador abrir.
+ */
+const MSG_DELIVERY = 'Olá! Tenho interesse em desenvolver automações com a Nekkora.';
+const MSG_HOSTING = 'Olá! Tenho interesse em hospedagem de automações com a Nekkora e gostaria de saber como funciona a avaliação de viabilidade.';
+const SIM_INTRO = 'Fiz esta simulação na página:';
+if (!readFileSync('src/config.ts', 'utf8').includes(`delivery: '${MSG_DELIVERY}'`) || !readFileSync('src/config.ts', 'utf8').includes(`hosting: '${MSG_HOSTING}'`)) {
+  throw new Error('src/config.ts: mensagens do WhatsApp divergem da homologação');
+}
+if (!readFileSync('src/content.ts', 'utf8').includes(`whatsappIntro: '${SIM_INTRO}'`)) throw new Error('src/content.ts: whatsappIntro diverge da homologação');
+/** Resumo do exemplo (4 simples + 1 média) como vai para o WhatsApp — digitado de propósito. */
+const SUMMARY_LINES = [
+  '- 4 automações simples: 1 pacote de 3 (R$ 1.500 cada) + 1 individual (R$ 650 cada) = R$ 2.150',
+  '- 1 automação média: 1 individual (R$ 1.400 cada) = R$ 1.400',
+  'Investimento estimado: R$ 3.550',
+  'Sem pacotes, no preço individual: R$ 4.000 · Economia com pacotes: R$ 450',
+];
+/** Texto (parâmetro text) de um link wa.me para o número da publicação; null se for outro destino. */
+const waText = (href, number) => {
+  try {
+    const u = new URL(href);
+    return u.origin === 'https://wa.me' && u.pathname === `/${number}` ? u.searchParams.get('text').replace(/ /g, ' ') : null;
+  } catch {
+    return null;
+  }
+};
 const THEME_KEY = 'nekkora-commercial-tema';
 const DISCLAIMER =
   'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.';
@@ -101,6 +129,7 @@ const shots = [];
 async function run(engine) {
   const browser = await playwright[engine].launch();
   const external = [];
+  const waTabs = [];
   const errors = [];
   /** Contexto isolado com relógio fixo; tema opcional; toda requisição fora do localhost é abortada e registrada. */
   async function open(url, { at = AT.vigente, viewport = { width: 1280, height: 900 }, theme = null } = {}) {
@@ -111,6 +140,11 @@ async function run(engine) {
     await ctx.route('**/*', (route) => {
       const u = route.request().url();
       if (u.startsWith(origin) || u.startsWith('data:') || u.startsWith('blob:')) return route.continue();
+      // Aba do WhatsApp aberta por um CTA: página LOCAL de teste (nada sai da máquina), registrada à parte
+      if (u.startsWith('https://wa.me/')) {
+        waTabs.push({ url: u, referer: route.request().headers()['referer'] ?? null });
+        return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: '<!doctype html><meta charset="utf-8"><title>wa.me (página de teste local)</title>' });
+      }
       external.push(u);
       return route.abort();
     });
@@ -129,6 +163,36 @@ async function run(engine) {
   const plus = (sim, tier, times = 1) => Array.from({ length: times }).reduce((p) => p.then(() => sim.locator(`[data-sim-tier="${tier}"] [data-sim-action="aumentar"]`).click()), Promise.resolve());
   const calc = (sim) => sim.getByRole('button', { name: 'Calcular meu investimento' }).click();
   const figures = (sim) => sim.evaluate((el) => Object.fromEntries([...el.querySelectorAll('[data-calc]')].map((e) => [e.dataset.calc, e.textContent.trim()])));
+  /** CTA do resultado ("Conversar sobre esta simulação"): destino, isolamento e o texto que vai para o WhatsApp. */
+  const simCta = (sim) =>
+    sim.locator('[data-sim-result]').evaluate((r) => {
+      const a = r.querySelector('a[data-whatsapp]');
+      return {
+        count: r.querySelectorAll('a[data-whatsapp]').length,
+        dialogTriggers: r.querySelectorAll('[aria-haspopup]').length,
+        ctx: a?.getAttribute('data-whatsapp') ?? null,
+        href: a?.getAttribute('href') ?? '',
+        target: a?.getAttribute('target'),
+        rel: a?.getAttribute('rel') ?? '',
+        label: a?.textContent.replace(/\s+/g, ' ').trim() ?? '',
+      };
+    });
+  /** Clica num link do WhatsApp e espera a aba nova (local): nenhum diálogo, nenhuma requisição da página. */
+  async function clickWa(page, locator) {
+    const before = waTabs.length;
+    const requests = [];
+    const onRequest = (r) => requests.push(r.url());
+    page.on('request', onRequest);
+    const popupPromise = page.waitForEvent('popup', { timeout: 8000 }).catch(() => null);
+    await locator.click();
+    const popup = await popupPromise;
+    if (popup) await popup.waitForLoadState('load').catch(() => {});
+    page.off('request', onRequest);
+    const dialogs = await page.evaluate(() => document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open], form').length);
+    if (popup) await popup.close();
+    const tab = waTabs.slice(before).at(-1) ?? null;
+    return { popup: !!popup, tab, dialogs, requests };
+  }
 
   // 1. Integração, estado inicial e consistência com os cartões (produção) -------------------------------------------
   {
@@ -177,15 +241,14 @@ async function run(engine) {
         cards.lines[1].includes(`(${t.media?.individual} cada)`),
       `${cards.units.join(' · ')} | ${cards.lines.join(' · ')}`,
     );
-    // Caminhos após a simulação: Bookings oficial em nova aba, sem opener/Referer; avaliação abre o formulário.
-    // V1 inicial sem Bookings (agendamento.url null, titular, 10/11/2026): o link não pode existir nem citar agendamento.
-    if (OFFICIAL_BOOKINGS) {
-      const bookings = await sim.locator('[data-sim-result] a[data-agendar]').evaluate((a) => ({ href: a.getAttribute('href'), target: a.target, rel: a.rel, text: a.textContent }));
-      check(engine, 'agendar-uma-conversa-bookings-oficial', bookings.href === OFFICIAL_BOOKINGS && bookings.target === '_blank' && /noopener/.test(bookings.rel) && /noreferrer/.test(bookings.rel) && /Agendar uma conversa/.test(bookings.text), JSON.stringify(bookings));
-    } else {
-      const semAgenda = await sim.locator('[data-sim-result]').evaluate((e) => ({ links: e.querySelectorAll('a[data-agendar], a[href*="bookings"], a[href*="/book/"]').length, text: /Agendar|Bookings|Teams/.test(e.innerText) }));
-      check(engine, 'sem-bookings-nenhum-link-de-agendamento', semAgenda.links === 0 && !semAgenda.text, JSON.stringify(semAgenda));
-    }
+    // Caminho após a simulação: só a conversa pelo WhatsApp (NEKKORA-COM-CANAIS-001). Sem agendamento (Bookings saiu da
+    // página pública) nem formulário: nenhum link de agendamento, nenhum botão que abra diálogo.
+    const semAgenda = await sim.locator('[data-sim-result]').evaluate((e) => ({
+      links: e.querySelectorAll('a[data-agendar], a[href*="bookings"], a[href*="/book/"], a[href^="mailto:"]').length,
+      text: /Agendar|Bookings|Teams/.test(e.innerText),
+      dialogTriggers: e.querySelectorAll('[aria-haspopup]').length,
+    }));
+    check(engine, 'sem-bookings-nenhum-link-de-agendamento', semAgenda.links === 0 && !semAgenda.text && semAgenda.dialogTriggers === 0, JSON.stringify(semAgenda));
     const status = await page.locator('[data-testid="status-simulador"]').innerText();
     check(engine, 'resultado-anunciado-em-regiao-viva', /Resultado da simulação atualizado\./.test(status) && (await page.locator('[data-testid="status-simulador"]').getAttribute('role')) === 'status', status.slice(0, 120));
     await shot(sim, 'simulador-com-pacote-producao');
@@ -219,16 +282,13 @@ async function run(engine) {
     const label = await sim.locator('.sim__figure--main dt').innerText();
     const simOk = JSON.stringify(f) === JSON.stringify(EXAMPLE) && label === 'Investimento estimado' && units.join() === UNITS && !PREVIOUS.test(text);
     check(engine, `producao-${d.id}:simulador`, simOk, `${label}: ${JSON.stringify(f)} · ${units.join(' · ')}`);
-    // Resumo levado ao formulário: os mesmos valores em qualquer data
-    await sim.locator('[data-sim-result]').getByRole('link', { name: 'Solicitar avaliação' }).click();
-    const dialog = page.getByRole('dialog');
-    await dialog.waitFor();
-    const offer = dialog.locator('[data-testid="resumo-simulacao"] pre');
-    await offer.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
-    const summary = (await offer.count()) ? await offer.innerText() : '';
-    const summaryOk = SUMMARY_EXAMPLE.test(summary) && /1 automação média: 1 individual \(R\$ 1\.400 cada\) = R\$ 1\.400/.test(summary) && /Investimento estimado: R\$ 3\.550/.test(summary) && /Economia com pacotes: R\$ 450/.test(summary) && !PREVIOUS.test(summary);
-    check(engine, `producao-${d.id}:resumo-do-formulario`, summaryOk, summary.replace(/\n/g, ' / ').slice(0, 200));
-    await page.keyboard.press('Escape');
+    // Resumo levado à mensagem do WhatsApp (NEKKORA-COM-CANAIS-001; antes, ao formulário): os mesmos valores em qualquer
+    // data, depois da mensagem do Delivery
+    const cta = await simCta(sim);
+    const message = waText(cta.href, PUBLICACAO.canais.whatsapp) ?? '';
+    const summaryOk =
+      cta.count === 1 && cta.ctx === 'delivery' && message === `${MSG_DELIVERY}\n\n${SIM_INTRO}\n${SUMMARY_LINES.join('\n')}` && SUMMARY_EXAMPLE.test(message) && !PREVIOUS.test(message);
+    check(engine, `producao-${d.id}:resumo-no-whatsapp`, summaryOk, message.replace(/\n/g, ' / ').slice(0, 220) || `CTA: ${JSON.stringify(cta)}`);
     await shot(sim, `simulador-producao-${d.id}`);
     await ctx.close();
   }
@@ -414,82 +474,73 @@ async function run(engine) {
     await ctx.close();
   }
 
-  // 18. Integração com o formulário de avaliação (produção: e-mail) -------------------------------------------------
+  // 18. Conversa pelo WhatsApp a partir da simulação (NEKKORA-COM-CANAIS-001; substitui a integração com o formulário):
+  // a mensagem do Delivery leva o resumo do resultado MOSTRADO; o visitante a revisa e edita no WhatsApp — a página não
+  // envia nada, e um resultado desatualizado nunca vira mensagem
   {
     const { ctx, page, sim } = await open(prodUrl);
-    const requests = [];
-    page.on('request', (r) => requests.push(r.url()));
     await plus(sim, 'simples', 4);
     await plus(sim, 'media');
     await calc(sim);
-    await sim.locator('[data-sim-result]').getByRole('link', { name: 'Solicitar avaliação' }).click();
-    const dialog = page.getByRole('dialog');
-    await dialog.waitFor();
-    const offer = dialog.locator('[data-testid="resumo-simulacao"]');
-    // o resumo entra no diálogo logo depois da abertura (efeito do React): espera o bloco antes de ler
-    await offer.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
-    const box = offer.getByRole('checkbox');
-    const offered = { visible: await offer.isVisible(), checked: await box.isChecked(), text: await offer.locator('pre').innerText() };
+    const f = await figures(sim);
+    const cta = await simCta(sim);
+    const message = waText(cta.href, PUBLICACAO.canais.whatsapp) ?? '';
+    const summary = message.startsWith(`${MSG_DELIVERY}\n\n${SIM_INTRO}\n`) ? message.slice(`${MSG_DELIVERY}\n\n${SIM_INTRO}\n`.length) : '';
     check(
       engine,
-      'formulario-recebe-resumo-opcional',
-      offered.visible && !offered.checked && SUMMARY_EXAMPLE.test(offered.text) && /Investimento estimado: R\$ 3\.550/.test(offered.text) && !PREVIOUS.test(offered.text),
-      `desmarcado por padrão=${!offered.checked}`,
+      'whatsapp-recebe-resumo-da-simulacao',
+      cta.count === 1 &&
+        cta.ctx === 'delivery' &&
+        cta.dialogTriggers === 0 &&
+        cta.label.startsWith('Conversar sobre esta simulação') &&
+        cta.target === '_blank' &&
+        /\bnoopener\b/.test(cta.rel) &&
+        /\bnoreferrer\b/.test(cta.rel) &&
+        summary === SUMMARY_LINES.join('\n') &&
+        // coerente com o resultado na tela
+        summary.includes(`Investimento estimado: ${f.estimativa}`) &&
+        summary.includes(`Sem pacotes, no preço individual: ${f.individual}`) &&
+        summary.includes(`Economia com pacotes: ${f.economia}`),
+      `"${cta.label}" → ${message.replace(/\n/g, ' / ').slice(0, 200)} · tela=${JSON.stringify(f)}`,
     );
-    await shot(dialog, 'formulario-com-resumo-da-simulacao');
-    const form = dialog.locator('form');
-    await form.getByLabel(/^Nome/).fill('Pessoa de Teste');
-    await form.getByLabel(/Descreva o processo/).fill('Conciliação manual diária entre banco e sistema financeiro (teste).');
-    await dialog.locator('button[type="submit"]').click();
-    let msg = await dialog.locator('[data-testid="mensagem-solicitacao"]').innerText();
-    const without = !/Simulação feita no site/.test(msg);
-    await dialog.getByRole('button', { name: 'Voltar e editar' }).click();
-    await dialog.locator('[data-testid="resumo-simulacao"]').getByRole('checkbox').check();
-    await dialog.locator('button[type="submit"]').click();
-    msg = await dialog.locator('[data-testid="mensagem-solicitacao"]').innerText();
-    const mailto = await dialog.getByRole('link', { name: 'Abrir no e-mail' }).getAttribute('href');
+    const r = await clickWa(page, sim.locator('[data-sim-result] a[data-whatsapp]'));
     check(
       engine,
-      'resumo-so-com-a-escolha-e-revisado-antes',
-      without && /Simulação feita no site \(estimativa, sujeita à avaliação\):\n- 4 automações simples/.test(msg) && decodeURIComponent(mailto).includes('Simulação feita no site') && requests.length === 0,
-      `sem marcar: ausente=${without}; marcado: na mensagem e no mailto; requisições=${requests.length}`,
+      'resumo-vai-so-na-mensagem-sem-envio',
+      r.popup && r.tab != null && waText(r.tab.url, PUBLICACAO.canais.whatsapp) === message && r.tab.referer == null && r.dialogs === 0 && r.requests.length === 0,
+      `aba wa.me (local)=${r.popup}; mesma mensagem=${r.tab != null && waText(r.tab.url, PUBLICACAO.canais.whatsapp) === message}; Referer=${r.tab?.referer ?? 'ausente'}; diálogos/formulários=${r.dialogs}; requisições da página=${r.requests.length}`,
     );
-    await shot(dialog, 'formulario-confirmacao-com-simulacao');
+    await shot(sim.locator('[data-sim-result]'), 'simulador-resultado-whatsapp');
+    // quantidade alterada: o resultado (e o CTA com o resumo) some até novo cálculo
+    await plus(sim, 'simples');
+    const stale = await sim.locator('a[data-whatsapp]').count();
+    check(engine, 'sem-resumo-desatualizado-no-whatsapp', stale === 0, `CTA com resumo depois de mudar a quantidade: ${stale}`);
     await ctx.close();
   }
 
-  // AUD-25. Hosting: o diálogo abre com a hospedagem marcada e a mensagem diz o tipo de solicitação --------------------
+  // AUD-25. Hosting: o CTA abre a conversa com a mensagem de hospedagem (NEKKORA-COM-CANAIS-001; substitui o diálogo com
+  // o tipo "hospedagem" marcado) — nenhum diálogo nem formulário na página
   {
     const { ctx, page } = await open(prodUrl);
-    await page.locator('#hosting [aria-haspopup="dialog"]').click();
-    const dialog = page.getByRole('dialog');
-    await dialog.waitFor();
-    // o tipo é aplicado por efeito logo depois da abertura: espera o ESTADO aplicado (até 1 s), sem espera fixa; se não
-    // aplicar no prazo, a verificação hosting-formulario-adequado falha explicitamente (tipoAplicado=false)
-    const tipoAplicado = await page
-      .waitForFunction(() => document.querySelector('[role="dialog"] [data-dica-servico]')?.getAttribute('data-dica-servico') === 'hospedagem', null, { timeout: 1000 })
-      .then(() => true, () => false);
-    const checked = await dialog.getByRole('radio', { name: 'Hospedar uma automação existente' }).isChecked();
-    // fechado e reaberto por outro CTA (sem tipo), a escolha continua
-    await page.keyboard.press('Escape');
-    await dialog.waitFor({ state: 'detached' });
-    await page.locator('#inicio [aria-haspopup="dialog"]').click();
-    await dialog.waitFor();
-    const hostingKept = await dialog.getByRole('radio', { name: 'Hospedar uma automação existente' }).isChecked();
-    check(engine, 'tipo-escolhido-preservado-ao-reabrir', hostingKept, 'reaberto pelo topo, a escolha anterior continua');
-    const description = await dialog.evaluate((d) => (d.getAttribute('aria-describedby') ?? '').split(' ').map((id) => document.getElementById(id)?.textContent ?? '').join(' '));
-    const form = dialog.locator('form');
-    await form.getByLabel(/^Nome/).fill('Pessoa de Teste');
-    await form.getByLabel(/Descreva o processo/).fill('Temos um robô em Python que roda num computador do escritório (teste).');
-    await dialog.locator('button[type="submit"]').click();
-    const msg = await dialog.locator('[data-testid="mensagem-solicitacao"]').innerText();
+    const hosting = await page.locator('#hosting a[data-whatsapp]').evaluate((a) => ({ ctx: a.dataset.whatsapp, href: a.getAttribute('href'), haspopup: a.getAttribute('aria-haspopup'), target: a.getAttribute('target'), rel: a.getAttribute('rel') ?? '' }));
+    const page0 = await page.evaluate(() => ({ forms: document.querySelectorAll('form').length, triggers: document.querySelectorAll('[aria-haspopup="dialog"]').length }));
+    const r = await clickWa(page, page.locator('#hosting a[data-whatsapp]'));
     check(
       engine,
-      'hosting-formulario-adequado',
-      tipoAplicado && checked && /hospedagem de uma automação existente/.test(description) && /Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente \(Nekkora Hosting\)\./.test(msg),
-      `tipo aplicado em até 1 s=${tipoAplicado}; hospedagem marcada=${checked}`,
+      'hosting-whatsapp-adequado',
+      hosting.ctx === 'hosting' &&
+        hosting.haspopup == null &&
+        waText(hosting.href, PUBLICACAO.canais.whatsapp) === MSG_HOSTING &&
+        hosting.target === '_blank' &&
+        /\bnoreferrer\b/.test(hosting.rel) &&
+        r.popup &&
+        waText(r.tab?.url ?? '', PUBLICACAO.canais.whatsapp) === MSG_HOSTING &&
+        r.dialogs === 0 &&
+        r.requests.length === 0 &&
+        page0.forms === 0 &&
+        page0.triggers === 0,
+      `mensagem="${waText(hosting.href, PUBLICACAO.canais.whatsapp)}"; aba=${r.popup}; diálogos/formulários=${r.dialogs}; formulários na página=${page0.forms}; botões de diálogo=${page0.triggers}`,
     );
-    await shot(dialog, 'formulario-hosting');
     await ctx.close();
   }
 
@@ -504,7 +555,7 @@ writeFileSync(path.join(outDir, 'resultados.json'), JSON.stringify({ prodUrl, fi
 writeFileSync(
   path.join(outDir, 'resumo.md'),
   [
-    `# Homologação do simulador e do formulário — ${new Date().toISOString()}`,
+    `# Homologação do simulador e da conversa pelo WhatsApp — ${new Date().toISOString()}`,
     '',
     `${checks.length} verificações · ${failed.length} falha(s) · ${engineList}`,
     '',

@@ -1,11 +1,8 @@
 import { Badge, Button } from 'nekkora-lib';
-import { ScheduleButton } from '../agendamento';
-import { BOOKINGS_URL } from '../config';
 import { HERO } from '../content';
-import { useRequestTrigger } from '../request';
+import { WhatsappButton } from '../whatsapp';
 
 export function Hero() {
-  const trigger = useRequestTrigger();
   return (
     <section id="inicio" className="hero" aria-labelledby="hero-title">
       <div className="wrap hero__center">
@@ -17,18 +14,13 @@ export function Hero() {
         </h1>
         <p className="hero__lead">{HERO.lead}</p>
         <div className="hero__ctas">
-          <Button size="lg" pill rightIcon="arrow-right" {...trigger}>
+          {/* NEKKORA-COM-CANAIS-001: atendimento só pelo WhatsApp (sem formulário nem agendamento) */}
+          <WhatsappButton context="geral" size="lg" pill>
             {HERO.primaryCta}
+          </WhatsappButton>
+          <Button size="lg" pill variant="secondary" href="#como-funciona">
+            {HERO.secondaryCta}
           </Button>
-          {/* Dois caminhos de contato (COM-RELEASE-005 §4.4): com o Bookings configurado, "Agendar conversa" ocupa o
-              lugar de "Ver como funciona" (que continua no menu); sem ele, nada muda. */}
-          {BOOKINGS_URL ? (
-            <ScheduleButton />
-          ) : (
-            <Button size="lg" pill variant="secondary" href="#como-funciona">
-              {HERO.secondaryCta}
-            </Button>
-          )}
         </div>
         <ul className="hero__pillars plain-list" aria-label="Princípios da contratação">
           {HERO.points.map((p) => (

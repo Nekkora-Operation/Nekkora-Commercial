@@ -18,15 +18,21 @@
  * Desde a COM-VITRINE-001 a campanha controla só a comunicação promocional (faixa, condição e regras): os preços —
  * individual, pacote de 3 e economia — são os mesmos em qualquer data, sem valor riscado nem percentual.
  *
+ * NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): o WhatsApp é o único canal público de atendimento comercial. A página
+ * não tem formulário, diálogo de solicitação, link mailto nem agendamento (Bookings) — e a homologação comprova a
+ * ausência; o "Entrar" leva à Nekkora Platform (nunca seguido aqui). A jornada do WhatsApp em detalhe (mensagens, botão
+ * flutuante, redes institucionais) está em scripts/homologacao-canais.mjs.
+ *
  * Saída: capturas (JPEG), resultados.json e resumo.md na pasta indicada. Código de saída 1 se alguma verificação
- * falhar. Nenhuma requisição sai do localhost: tudo que tentar sair é bloqueado e registrado.
+ * falhar. Nenhuma requisição sai do localhost: tudo que tentar sair é bloqueado e registrado (as abas do wa.me abertas
+ * pelos CTAs são respondidas por uma página local de teste).
  */
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { campaignState, priceFacts, todayInBrazil } from '../src/precos.ts';
-import { BOOKINGS_HOSTS } from '../src/agendamento-url.js';
+import { BOOKINGS_HOSTS } from './comercial/agendamento-url.mjs';
 
 const [, , baseUrl = 'http://localhost:4173/', outDir = 'docs/com-001/evidencias/depois'] = process.argv;
 const modules = process.env.NEKKORA_PW_MODULES;
@@ -86,6 +92,15 @@ if (JSON.stringify(fromSource) !== JSON.stringify(OFFICIAL_PRICES)) {
 /** Valores da tabela ANTERIOR (lançamento 06/11/2026): nunca podem aparecer nos cartões. */
 const PREVIOUS_LABELS = ['R$ 1.000', 'R$ 2.800'];
 
+/**
+ * NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): destino do "Entrar" (Nekkora Platform, mesma aba) — digitado aqui de
+ * propósito, igual a PLATFORM_LOGIN_URL de src/config.ts — e frases que mandariam o visitante enviar a solicitação por
+ * e-mail (a jornada por e-mail saiu da página; o e-mail fica só como identificação do fornecedor e canal dos direitos).
+ */
+const PLATFORM_LOGIN_URL = 'https://platform.nekkora.com/entrar';
+if (!readFileSync('src/config.ts', 'utf8').includes(`PLATFORM_LOGIN_URL = '${PLATFORM_LOGIN_URL}'`)) throw new Error('src/config.ts: PLATFORM_LOGIN_URL diverge da homologação');
+const EMAIL_INSTRUCTION = /(?:envie|mande|escreva|solicite|peça|abra)[^.]{0,60}\b(?:por|pelo|no) e-mail|aplicativo de e-mail|Escrever diretamente por e-mail|Abrir no e-mail/i;
+
 // Situação da campanha no artefato servido: o release.json diz com qual publicacao.json o build foi feito.
 const release = await fetch(new URL('release.json', baseUrl), { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
 if (!release?.publicacao) throw new Error(`release.json ausente ou sem "publicacao" em ${baseUrl}`);
@@ -99,6 +114,11 @@ const CAMPAIGN = campaignState(publicacao.campanhaLancamento, todayInBrazil(NOW)
 // dependem disso.
 const PROMO = CAMPAIGN === 'vigente' || (CAMPAIGN === 'pendente' && publicacao.avisoHomologacao === true);
 const toBr = (iso) => iso.split('-').reverse().join('/');
+/** Número do WhatsApp por extenso, como a página o escreve (+55 (11) 91772-4200) — regras da campanha e aviso de privacidade. */
+const WHATSAPP_DISPLAY = (() => {
+  const m = /^(\d{2})(\d{2})(\d{4,5})(\d{4})$/.exec(publicacao.canais.whatsapp ?? '');
+  return m ? `+${m[1]} (${m[2]}) ${m[3]}-${m[4]}` : null;
+})();
 const PERIOD = CAMPAIGN === 'pendente' ? null : `de ${toBr(publicacao.campanhaLancamento.inicio)} a ${toBr(publicacao.campanhaLancamento.fim)}`;
 const CAMPAIGN_LABEL = `campanha ${CAMPAIGN} em ${todayInBrazil(NOW)}${PROMO ? ' — com comunicação promocional' : ' — sem comunicação promocional'}`;
 console.log(`Campanha (${release.publicacao}): ${CAMPAIGN_LABEL}`);
@@ -129,7 +149,7 @@ const readRenderedPrices = (page) =>
 const expectRendered = (shown) => JSON.stringify(shown.table) === JSON.stringify(OFFICIAL_PRICES);
 const expectStruck = (shown) => shown.struck.length === 0 && shown.anyStruck.length === 0;
 
-const results = { baseUrl, navegador: ENGINE, campanha: { estado: CAMPAIGN, data: todayInBrazil(NOW), promocional: PROMO, publicacao: release.publicacao }, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], fonts: new Set() };
+const results = { baseUrl, navegador: ENGINE, campanha: { estado: CAMPAIGN, data: todayInBrazil(NOW), promocional: PROMO, publicacao: release.publicacao }, startedAt: new Date().toISOString(), checks: [], screenshots: [], axe: {}, console: [], blocked: [], whatsappAbas: [], fonts: new Set() };
 const check = (id, ok, detail) => {
   results.checks.push({ id, ok: !!ok, detail });
   console.log(`${ok ? 'OK  ' : 'FALHA'} ${id}${detail ? ` — ${typeof detail === 'string' ? detail : JSON.stringify(detail)}` : ''}`);
@@ -160,6 +180,12 @@ async function newPage(viewport, theme) {
     // Fonte Inter: vem da nekkora-lib 0.2.0 (dist/fonts) e é servida pelo próprio site — registrada à parte.
     if (url.startsWith(local) && /\.woff2(\?|$)/.test(url)) results.fonts.add(new URL(url).pathname.replace(/-[\w-]{8}\.woff2$/, '.woff2'));
     if (url.startsWith(local) || url.startsWith('data:') || url.startsWith('blob:')) return route.continue();
+    // Aba aberta por um CTA do WhatsApp (ctas-abrem-whatsapp-sem-dialogo): respondida por uma página LOCAL de teste,
+    // registrada à parte — o wa.me real nunca é acessado
+    if (url.startsWith('https://wa.me/')) {
+      results.whatsappAbas.push(url);
+      return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: '<!doctype html><meta charset="utf-8"><title>wa.me (página de teste local)</title><h1>wa.me — página de teste local</h1>' });
+    }
     // Qualquer outra origem (inclusive Google Fonts, que a lib usava antes da 0.2.0) é bloqueada e reprova a homologação.
     results.blocked.push(url);
     return route.abort();
@@ -232,7 +258,9 @@ async function measureContrastByPixels(page, selectors) {
     if (!box || box.width < 2 || box.height < 2) continue;
     // Elemento redondo (ex.: número da etapa): amostra só o miolo, sem os cantos fora do círculo.
     if (info.round) box = { x: box.x + box.width * 0.2, y: box.y + box.height * 0.2, width: box.width * 0.6, height: box.height * 0.6 };
-    const png = await page.screenshot({ clip: box });
+    // O botão flutuante (fixo, NEKKORA-COM-CANAIS-001) fica por cima do conteúdo perto da borda inferior: escondido só
+    // nesta captura, para medir o texto contra o PRÓPRIO fundo (o contraste do botão é medido em homologacao-canais.mjs)
+    const png = await page.screenshot({ clip: box, style: '.nk-fab { visibility: hidden !important; }' });
     await el.evaluate((node) => {
       node.style.color = node.dataset.nkPrevColor ?? '';
       node.querySelectorAll('*').forEach((c) => c.style.removeProperty('color'));
@@ -336,13 +364,32 @@ await block('funcionais', async () => {
   const external = await page.$$eval('a[href]', (els) => els.map((a) => a.getAttribute('href')).filter((h) => !h.startsWith('#')));
   results.externalLinks = external;
   const contactsConfigured = await page.evaluate(() => document.querySelector('[data-contact-status]')?.getAttribute('data-contact-status'));
-  // mailto só com canal confirmado e domínio real (nada de .invalid/.example/.test)
-  const fakeMail = (h) => /^mailto:/.test(h) && (contactsConfigured !== 'configurado' || /@[^?]+\.(invalid|example|test)(\?|$)/i.test(h));
-  const fake = external.filter((h) => /wa\.me\/0*$|wa\.me\/55?0{8,}|instagram\.com\/?$|linkedin\.com\/?$/.test(h) || fakeMail(h));
+  const fake = external.filter((h) => /wa\.me\/0*(\?|$)|wa\.me\/55?0{8,}|instagram\.com\/?$|linkedin\.com\/?$/.test(h));
   results.contactStatus = contactsConfigured;
   check('sem-destinos-provisorios', fake.length === 0, `links externos: ${external.length ? external.join(' | ') : 'nenhum'}; status contato=${contactsConfigured}`);
+  // NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): sem jornada por e-mail — nenhum link mailto em lugar nenhum da página.
+  // O e-mail continua só como texto (identificação do fornecedor no rodapé e canal dos direitos no aviso de privacidade).
+  const mailto = external.filter((h) => /^mailto:/i.test(h));
+  check('sem-link-mailto', mailto.length === 0, mailto.length ? mailto.join(' | ') : 'nenhum link mailto');
   const fab = await page.$('.nk-fab, [class*="floating"]');
   check('sem-whatsapp-flutuante-provisorio', contactsConfigured === 'configurado' || !fab, fab ? 'botão flutuante presente' : 'ausente');
+  // Atendimento só pelo WhatsApp: todos os CTAs (data-whatsapp) levam ao número da publicação servida, em outra aba, sem
+  // opener e sem Referer, nos cinco contextos (a mensagem exata de cada um é conferida em scripts/homologacao-canais.mjs)
+  {
+    const number = publicacao.canais.whatsapp;
+    const ctas = await page.$$eval('[data-whatsapp]', (els) =>
+      els.map((a) => ({ ctx: a.getAttribute('data-whatsapp'), href: a.getAttribute('href') ?? '', target: a.getAttribute('target'), rel: a.getAttribute('rel') ?? '', where: a.closest('section')?.id ?? (a.classList.contains('nk-fab') ? 'flutuante' : '?') })),
+    );
+    results.whatsappCtas = ctas;
+    const where = ctas.map((c) => `${c.where}:${c.ctx}`).join(',');
+    check(
+      'atendimento-so-pelo-whatsapp',
+      contactsConfigured === 'configurado' &&
+        where === 'inicio:geral,precos:delivery,precos:monitor,precos:ai,hosting:hosting,contato:geral,flutuante:geral' &&
+        ctas.every((c) => c.href.startsWith(`https://wa.me/${number}?text=`) && c.target === '_blank' && /\bnoopener\b/.test(c.rel) && /\bnoreferrer\b/.test(c.rel)),
+      `${where} → wa.me/${number}`,
+    );
+  }
 
   // Alegações proibidas fora das listas de exclusão
   const hits = await page.evaluate((patterns) => {
@@ -385,7 +432,11 @@ await block('funcionais', async () => {
       // COM-VITRINE-001 (V-04): sem categoria complexa, sem "sob orçamento" e sem a faixa acima de 16 horas; demandas fora
       // das modalidades pelos canais gerais. Lido por textContent (inclui as regras recolhidas).
       semComplexa: !/complexa|sob orçamento|acima de 16 horas/i.test(block?.textContent ?? '') && (block?.querySelectorAll('[data-price-tier]').length ?? 0) === 2,
-      outrasDemandas: /Não encontrou uma modalidade adequada à sua necessidade\? Entre em contato com nossa equipe para uma avaliação individual\./.test(block?.querySelector('[data-outras-demandas]')?.textContent ?? '') && !!block?.querySelector('[data-outras-demandas] a, [data-outras-demandas] button'),
+      // NEKKORA-COM-CANAIS-001: o caminho é o WhatsApp com a mensagem do Delivery (nenhum botão de diálogo)
+      outrasDemandas:
+        /Não encontrou uma modalidade adequada à sua necessidade\? Entre em contato com nossa equipe para uma avaliação individual\./.test(block?.querySelector('[data-outras-demandas]')?.textContent ?? '') &&
+        block?.querySelectorAll('[data-outras-demandas] a, [data-outras-demandas] button').length === 1 &&
+        !!block?.querySelector('[data-outras-demandas] a[data-whatsapp="delivery"]'),
       // COM-VITRINE-001 (V-05): "A automação é sua", com a quitação integral e as exceções
       titularidade: (() => {
         const t = block?.querySelector('[data-nota="titularidade"]')?.textContent ?? '';
@@ -431,6 +482,12 @@ await block('funcionais', async () => {
         /aceita em até 7 dias corridos da emissão/.test(pricing.campaignRules) &&
         /Pacote com categorias diferentes só por proposta específica/.test(pricing.campaignRules) &&
         /não se enquadram como simples ou média têm avaliação individual/.test(pricing.campaignRules) &&
+        // NEKKORA-COM-CANAIS-001: a data de recebimento vale pelos canais da Nekkora — WhatsApp, e-mail e LinkedIn
+        pricing.campaignRules.includes(`mensagem recebida no WhatsApp da Nekkora (${WHATSAPP_DISPLAY})`) &&
+        pricing.campaignRules.includes(`e-mail recebido em ${publicacao.canais.email}`) &&
+        /mensagem recebida na página da Nekkora no LinkedIn/.test(pricing.campaignRules) &&
+        // abrir o WhatsApp pelo site não é recebimento (ajuste da titular, 13/11/2026)
+        /Abrir o WhatsApp pelo site não basta: vale a mensagem efetivamente recebida\./.test(pricing.campaignRules) &&
         (NOVAS ? pricing.campaignRules.includes(`recebidas a partir de ${NOVAS}, inclusive`) : /ainda não definida/.test(pricing.campaignRules))
       : pricing.campaignRules === null;
   check('campanha-regras-completas', rulesOk, pricing.campaignRules ? pricing.campaignRules.slice(0, 160) : 'ausentes');
@@ -440,7 +497,7 @@ await block('funcionais', async () => {
     `${CAMPAIGN_LABEL}; faixa: ${pricing.launchStrip ?? 'ausente'}; início das novas condições: ${NOVAS ?? 'pendente'}; proposta=${pricing.confirmedInProposal}; licenças=${pricing.licenses}`,
   );
   check('vitrine-sem-categoria-complexa', pricing.semComplexa, `${Object.keys(pricing.table).join(', ')}`);
-  check('vitrine-outras-demandas-canais-gerais', pricing.outrasDemandas, 'texto V-04 e link para a solicitação');
+  check('vitrine-outras-demandas-canais-gerais', pricing.outrasDemandas, 'texto V-04 e link do WhatsApp (contexto delivery)');
   check('vitrine-a-automacao-e-sua', pricing.titularidade, 'nota V-05 com quitação integral e exceções');
   check(
     'precos-tabela-oficial',
@@ -477,8 +534,9 @@ await block('funcionais', async () => {
       `release.json=${served?.commit?.slice(0, 7) ?? 'ausente'}; HEAD=${head?.slice(0, 7) ?? `git indisponível${gitRequired ? ' (obrigatório no CI)' : ''}: ${gitError}`}; rodapé=${footer ?? 'sem aviso de homologação'}`,
     );
   }
-  // Agendamento (COM-RELEASE-005 §4.5, NEKKORA-COM-007): sem URL oficial do Bookings, nenhum botão nem link de
-  // agendamento; com ela, todos apontam para a mesma página oficial, em nova aba, sem opener e sem Referer
+  // Sem agendamento (NEKKORA-COM-CANAIS-001; antes COM-RELEASE-005 §4.5): o Microsoft Bookings saiu da página pública —
+  // nenhum link para qualquer host do Bookings (BOOKINGS_HOSTS), nenhum "Agendar" em botão, link ou texto, nenhum marcador
+  // data-agendamento/data-agendar
   {
     const scheduling = await page.evaluate((hosts) => {
       const isBookings = (href) => {
@@ -488,25 +546,19 @@ await block('funcionais', async () => {
           return false;
         }
       };
-      const links = [...document.querySelectorAll('a[href]')].filter((a) => isBookings(a.getAttribute('href')) || /bookings/i.test(a.getAttribute('href')));
+      const links = [...document.querySelectorAll('a[href]')].filter((a) => isBookings(a.getAttribute('href')) || /bookings|\/book\//i.test(a.getAttribute('href')));
       return {
-        buttons: [...document.querySelectorAll('a, button')].filter((e) => /Agendar conversa/i.test(e.textContent ?? '')).length,
-        links: links.length,
-        hrefs: [...new Set(links.map((a) => a.getAttribute('href')))],
-        isolated: links.every((a) => a.target === '_blank' && /\bnoopener\b/.test(a.rel) && /\bnoreferrer\b/.test(a.rel)),
-        status: document.querySelector('[data-agendamento]')?.getAttribute('data-agendamento') ?? null,
+        links: links.map((a) => a.getAttribute('href')),
+        controls: [...document.querySelectorAll('a, button, [role="button"]')].filter((e) => /agendar/i.test(`${e.textContent ?? ''} ${e.getAttribute('aria-label') ?? ''}`)).length,
+        text: /\bagendar\b|agende/i.test(document.body.textContent ?? ''),
+        markers: document.querySelectorAll('[data-agendamento], [data-agendar]').length,
       };
     }, BOOKINGS_HOSTS);
     results.agendamento = scheduling;
-    const configured = scheduling.status === 'configurado';
     check(
-      'agendamento-conforme-configuracao',
-      configured
-        ? scheduling.buttons >= 2 && scheduling.links === scheduling.buttons && scheduling.hrefs.length === 1 && scheduling.isolated
-        : scheduling.buttons === 0 && scheduling.links === 0,
-      configured
-        ? `${scheduling.buttons} botão(ões) para ${scheduling.hrefs.join(', ')}; nova aba sem opener e sem Referer: ${scheduling.isolated ? 'sim' : 'NÃO'}`
-        : `URL do Bookings não configurada: ${scheduling.buttons} botão(ões), ${scheduling.links} link(s)`,
+      'sem-agendamento-bookings',
+      scheduling.links.length === 0 && scheduling.controls === 0 && !scheduling.text && scheduling.markers === 0,
+      `links do Bookings: ${scheduling.links.join(', ') || 'nenhum'}; controles "Agendar": ${scheduling.controls}; texto "Agendar": ${scheduling.text}; marcadores: ${scheduling.markers}`,
     );
   }
   // Coerência matemática do que é exibido: economia = 3 × individual − pacote; sem preço de lançamento nem tabela anterior
@@ -538,7 +590,10 @@ await block('funcionais', async () => {
       plannedInPricing: !!planned,
       plannedPrices: Object.fromEntries([...(planned?.querySelectorAll('[data-preco-previsto]') ?? [])].map((e) => [e.dataset.precoPrevisto, `${e.textContent.trim()} ${e.nextElementSibling?.textContent.trim() ?? ''}`.trim()])),
       plannedText: planned?.innerText ?? '',
-      plannedActions: planned?.querySelectorAll('a, button, form, input').length ?? -1,
+      // NEKKORA-COM-CANAIS-001: a única ação permitida é pedir informações pelo WhatsApp (um link por serviço, contexto
+      // monitor/ai); nenhum botão, formulário, campo ou outro link
+      plannedActions: planned ? [...planned.querySelectorAll('a, button, form, input, select, textarea')].filter((e) => !(e.matches('a[data-whatsapp="monitor"], a[data-whatsapp="ai"]'))).length : -1,
+      plannedAsks: [...(planned?.querySelectorAll('a[data-whatsapp]') ?? [])].map((a) => `${a.getAttribute('data-whatsapp')}:${a.querySelector('.nk-link__label')?.firstChild?.textContent.trim() ?? a.textContent.trim()}`),
     };
   });
   results.catalog = catalog;
@@ -561,6 +616,13 @@ await block('funcionais', async () => {
       !/contrat(e|ar) agora|assin(e|ar|atura ativa)|checkout|comprar|teste grátis|lista de espera/i.test(catalog.solutionsText + catalog.plannedText) &&
       catalog.plannedActions === 0,
     preparing.map((c) => `${c.name} → ${c.links.join(',')}`).join(' · '),
+  );
+  // Pedido de informação (não contratação) pelo WhatsApp, só para os dois serviços em preparação
+  check(
+    'catalogo-monitor-ai-so-pedido-de-informacao',
+    JSON.stringify(catalog.plannedAsks) === JSON.stringify(['monitor:Quero receber informações sobre o Nekkora Monitor', 'ai:Quero receber informações sobre o Nekkora AI']) &&
+      !catalog.plannedAsks.some((a) => /contrat|assin|compr/i.test(a)),
+    catalog.plannedAsks.join(' · ') || 'nenhum pedido de informação',
   );
   check(
     'catalogo-valores-previstos-no-bloco-de-precos',
@@ -607,11 +669,20 @@ await block('funcionais', async () => {
     'delivery-tecnologias-com-ressalva',
     ['Python', 'UiPath', 'Power Automate', 'Integrações via API'].every((t) => delivery.includes(t)) && /viabilidade com cada sistema é confirmada na avaliação/.test(delivery),
   );
-  // Privacidade: seção própria, link no rodapé e no formulário
+  // Privacidade: seção própria e link no rodapé. NEKKORA-COM-CANAIS-001: sem formulário nem envio automático (sem dizer
+  // que a página "não coleta dados": o acesso envolve dados técnicos e registros de acesso — ajuste da titular), a
+  // conversa pelo WhatsApp descrita, e os direitos pelo WhatsApp ou pelo e-mail (só texto: nenhum mailto)
   const privacy = await page.locator('#privacidade').innerText();
   check(
     'privacidade-visivel',
-    /O que vai para o (WhatsApp|e-mail)/.test(privacy) && /Sem cookies nem rastreamento/.test(privacy) && (await page.locator('footer a[href="#privacidade"]').count()) === 1,
+    /Conversa pelo WhatsApp/.test(privacy) &&
+      /não tem formulário, cadastro nem envio automático de solicitações comerciais/.test(privacy) &&
+      /o acesso envolve dados técnicos de navegação/.test(privacy) &&
+      !/não coleta/i.test(privacy) &&
+      privacy.includes(`pelo WhatsApp ${WHATSAPP_DISPLAY} ou pelo e-mail ${publicacao.canais.email}`) &&
+      /Sem cookies nem rastreamento/.test(privacy) &&
+      (await page.locator('#privacidade a[href^="mailto:"]').count()) === 0 &&
+      (await page.locator('footer a[href="#privacidade"]').count()) === 1,
     privacy.split('\n').slice(0, 2).join(' · '),
   );
   // NEKKORA-COM-LEGAL-BASE-001: sem gravação comercial nesta fase — o aviso não pode dizer que a conversa é gravada
@@ -642,7 +713,10 @@ await block('funcionais', async () => {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       if (/\b(Studio|Platform|Agent)\b/.test(n.textContent ?? '')) {
-        out.push({ text: n.textContent.trim().slice(0, 160), marked: !!n.parentElement?.closest('[data-internal-products]') });
+        // NEKKORA-COM-CANAIS-001: o aviso de privacidade cita a Nekkora Platform como DESTINO do botão "Entrar" (aplicação
+        // separada, regras próprias) — única menção aceita fora do bloco marcado, e só nessa frase
+        const linkDestination = !!n.parentElement?.closest('#privacidade') && /O botão "Entrar" leva à Nekkora Platform, uma aplicação separada/.test(n.textContent ?? '');
+        out.push({ text: n.textContent.trim().slice(0, 160), marked: !!n.parentElement?.closest('[data-internal-products]') || linkDestination, linkDestination });
       }
     }
     return out;
@@ -701,152 +775,214 @@ await block('funcionais', async () => {
   check('alternancia-de-tema-persiste', afterToggle === 'sakura-dark' && afterReload === 'sakura-dark', `${afterToggle} → recarregado: ${afterReload}`);
   await toggle.click();
 
-  // Botão "Entrar": oculto enquanto não houver área de clientes (COM-008-B, AUD-26) — nenhum botão, link nem texto
-  // "Entrar", "Login" ou "Área do cliente" na página (barra e menu do celular)
+  // Sem formulário, diálogo nem envio (NEKKORA-COM-CANAIS-001, titular, 12/11/2026 — substitui as verificações do diálogo
+  // "Solicitar avaliação" e do formulário): nenhum campo de dado pessoal. Os únicos campos são as quantidades do simulador.
   {
-    const login = await page.evaluate(() =>
-      [...document.querySelectorAll('a, button, [role="button"], [role="link"]')]
-        .map((e) => `${e.textContent ?? ''} ${e.getAttribute('aria-label') ?? ''}`.trim())
-        .filter((t) => /^entrar\b|\blogin\b|área do cliente|acesso de clientes/i.test(t)),
+    const absent = await page.evaluate(
+      (instr) => ({
+        forms: document.querySelectorAll('form').length,
+        fields: [...document.querySelectorAll('input, textarea, select')].filter((e) => !e.matches('[data-sim-input]')).map((e) => `${e.tagName.toLowerCase()}[${e.getAttribute('type') ?? ''}]`),
+        dialogs: document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog').length,
+        triggers: document.querySelectorAll('[aria-haspopup="dialog"], [aria-haspopup="true"]').length,
+        remnants: document.querySelectorAll('.contact__done, [data-testid="mensagem-solicitacao"], [data-testid="status-desafio"], [data-dica-servico], .cf-turnstile, iframe').length,
+        requestButtons: [...document.querySelectorAll('button')].filter((b) => /Solicitar avaliação|Revisar mensagem|Enviar solicitação/i.test(b.textContent ?? '')).length,
+        emailInstruction: (document.body.textContent ?? '').replace(/\s+/g, ' ').match(new RegExp(instr.source, instr.flags))?.[0] ?? null,
+      }),
+      { source: EMAIL_INSTRUCTION.source, flags: EMAIL_INSTRUCTION.flags },
     );
-    check('entrar-oculto-sem-area-de-clientes', login.length === 0, login.length ? login.join(' | ') : 'nenhum controle de acesso de clientes');
+    results.semFormulario = absent;
+    check(
+      'sem-formulario-nem-dialogo-de-solicitacao',
+      absent.forms === 0 && absent.fields.length === 0 && absent.dialogs === 0 && absent.triggers === 0 && absent.remnants === 0 && absent.requestButtons === 0,
+      JSON.stringify(absent),
+    );
+    check('sem-instrucao-de-envio-por-email', absent.emailInstruction === null, absent.emailInstruction ?? 'nenhuma instrução para enviar a solicitação por e-mail');
   }
-
-  // Diálogo "Solicitar avaliação": aberto pelos CTAs, foco dentro, Esc fecha e devolve o foco ao botão que abriu
-  const triggers = await page.$$eval('[aria-haspopup="dialog"]', (els) => els.map((e) => `${e.closest('section')?.id}: ${e.textContent.trim()}`));
-  results.dialogTriggers = triggers;
-  check('dialogo-aberto-pelos-ctas', triggers.length === 4, triggers.join(' | '));
-  const dialog = page.getByRole('dialog');
-  const heroCta = page.locator('#inicio [aria-haspopup="dialog"]');
-  await heroCta.focus();
-  await page.keyboard.press('Enter');
-  await dialog.waitFor();
-  const opened = await page.evaluate(() => ({ focusInside: !!document.activeElement?.closest('[role="dialog"]'), hash: location.hash }));
-  check('dialogo-abre-com-foco-dentro', opened.focusInside && opened.hash === '', JSON.stringify(opened));
-  const dialogText = await dialog.innerText();
-  // Publicação atual: só e-mail e LinkedIn (decisão da titular, 22/10/2026) — nenhum WhatsApp, atalho de e-mail presente
-  const mailDirect = await dialog.locator('a[href^="mailto:"]').count();
-  check(
-    'dialogo-canal-da-publicacao',
-    (await dialog.locator('a[href*="wa.me"]').count()) === 0 &&
-      !/Falar diretamente pelo WhatsApp/.test(dialogText) &&
-      (contactsConfigured === 'configurado' ? mailDirect === 1 && /Escrever diretamente por e-mail/.test(dialogText) : /Canais oficiais em definição/.test(dialogText)),
-    contactsConfigured === 'configurado' ? `atalho de e-mail: ${mailDirect}; WhatsApp ausente` : 'sem canal confirmado: aviso de canais em definição presente',
-  );
-  await page.screenshot({ path: path.join(outDir, 'dialogo-solicitacao.png') });
-  results.screenshots.push('dialogo-solicitacao.png');
-  await page.keyboard.press('Escape');
-  await dialog.waitFor({ state: 'detached' });
-  const returned = await page.evaluate(() => !!document.activeElement?.closest('#inicio') && document.activeElement?.getAttribute('aria-haspopup') === 'dialog');
-  check('dialogo-esc-fecha-e-devolve-foco', returned);
-  const others = [];
-  for (const sec of ['precos', 'hosting', 'contato']) {
-    await page.locator(`#${sec} [aria-haspopup="dialog"]`).click();
-    const ok = await dialog.isVisible();
-    await dialog.getByRole('button', { name: 'Cancelar' }).click();
-    await dialog.waitFor({ state: 'detached' });
-    others.push(`${sec}=${ok}`);
-  }
-  check('dialogo-ctas-de-precos-hosting-contato', others.every((o) => o.endsWith('true')), `${others.join('; ')} (fechado por "Cancelar")`);
-  // COM-VITRINE-001 (etapa 5): jornadas reais do Delivery e do Hosting no mesmo diálogo, pelos canais existentes. Só três
-  // tipos (nenhum de Monitor ou AI); a orientação do serviço muda com o tipo e fica fora da mensagem (sem coleta nova).
+  // Os CTAs abrem o WhatsApp em outra aba e nada mais: nenhum diálogo, foco e endereço da página intactos, nenhuma
+  // requisição da página. O wa.me é respondido por uma página local de teste (newPage) — nada sai da máquina.
   {
-    const read = () =>
-      dialog.evaluate((d) => ({
-        options: [...d.querySelectorAll('input[name="tipo-solicitacao"]')].map((i) => `${i.value}:${i.checked ? 1 : 0}:${((i.labels && i.labels[0]) || i.closest('label'))?.textContent.trim() ?? ''}`),
-        hint: d.querySelector('[data-dica-servico]')?.textContent.trim() ?? '',
-        hintFor: d.querySelector('[data-dica-servico]')?.getAttribute('data-dica-servico'),
+    const pageRequests = [];
+    const onRequest = (r) => pageRequests.push(`${r.method()} ${r.url()}`);
+    page.on('request', onRequest);
+    const urlBefore = page.url();
+    const opened = [];
+    for (const [sel, how] of [
+      ['#inicio a[data-whatsapp]', 'teclado'],
+      ['#precos [data-outras-demandas] a[data-whatsapp]', 'clique'],
+      ['#hosting a[data-whatsapp]', 'clique'],
+      ['#contato a[data-whatsapp]', 'clique'],
+    ]) {
+      const cta = page.locator(sel).first();
+      await cta.scrollIntoViewIfNeeded();
+      const popupPromise = page.waitForEvent('popup', { timeout: 8000 }).catch(() => null);
+      if (how === 'teclado') {
+        await cta.focus();
+        await page.keyboard.press('Enter');
+      } else {
+        await cta.click();
+      }
+      const popup = await popupPromise;
+      if (popup) await popup.waitForLoadState('load').catch(() => {});
+      const state = await cta.evaluate((a) => ({
+        dialogs: document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open]').length,
+        hash: location.hash,
+        focusOnCta: document.activeElement === a,
       }));
-    // O tipo pedido pelo CTA é aplicado num efeito logo depois da primeira pintura do diálogo: espera até 1 s por ele
-    // (sem ele, a verificação falha do mesmo jeito)
-    const settle = (want) => page.waitForFunction((w) => document.querySelector('[role="dialog"] [data-dica-servico]')?.getAttribute('data-dica-servico') === w, want, { timeout: 1000 }).catch(() => {});
-    await page.locator('#precos [aria-haspopup="dialog"]').click();
-    await dialog.waitFor();
-    await settle('automacao');
-    const fromOther = await read();
-    await dialog.getByRole('radio', { name: 'Hospedar uma automação existente' }).check();
-    const switched = await read();
-    await dialog.getByRole('button', { name: 'Cancelar' }).click();
-    await dialog.waitFor({ state: 'detached' });
-    await page.locator('#hosting [aria-haspopup="dialog"]').click();
-    await dialog.waitFor();
-    await settle('hospedagem');
-    const fromHosting = await read();
-    await dialog.getByRole('button', { name: 'Cancelar' }).click();
-    await dialog.waitFor({ state: 'detached' });
-    results.requestJourneys = { fromOther, switched, fromHosting };
+      opened.push({ sel, how, popup: popup ? popup.url() : null, ...state });
+      if (popup) await popup.close();
+    }
+    page.off('request', onRequest);
+    results.ctasClicados = opened;
+    const wa = `https://wa.me/${publicacao.canais.whatsapp}?text=`;
     check(
-      'solicitacao-tipos-delivery-e-hosting',
-      fromOther.options.length === 3 &&
-        fromOther.options.map((o) => o.split(':')[0]).join() === 'automacao,hospedagem,infraestrutura' &&
-        fromOther.options.every((o) => o.split(':')[2].length > 0) &&
-        !fromOther.options.some((o) => /monitor|\bAI\b|intelig/i.test(o)),
-      fromOther.options.join(' · '),
+      'ctas-abrem-whatsapp-sem-dialogo',
+      opened.every((o) => o.popup?.startsWith(wa) && o.dialogs === 0 && o.hash === '') && opened[0].focusOnCta && page.url() === urlBefore,
+      opened.map((o) => `${o.sel.split(' ')[0]} (${o.how}): aba=${o.popup ? 'wa.me' : 'NENHUMA'} diálogos=${o.dialogs}`).join(' · ') + `; foco no CTA do topo=${opened[0].focusOnCta}`,
     );
-    check(
-      'solicitacao-orientacao-por-servico',
-      fromOther.hintFor === 'automacao' &&
-        fromOther.options[0].startsWith('automacao:1') &&
-        /Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria/.test(fromOther.hint) &&
-        switched.hintFor === 'hospedagem' &&
-        /Nekkora Hosting: sob avaliação e orçamento/.test(switched.hint) &&
-        fromHosting.hintFor === 'hospedagem' &&
-        fromHosting.options[1].startsWith('hospedagem:1'),
-      `V-04 → ${fromOther.hintFor}; troca → ${switched.hintFor}; Hosting → ${fromHosting.hintFor}`,
-    );
+    check('ctas-sem-envio-pela-pagina', pageRequests.length === 0, pageRequests.join(' | ') || 'nenhuma requisição da página ao clicar nos CTAs');
   }
-
-  // Formulário (no diálogo): erros, foco no primeiro erro e envio desativado sem destino real
-  await page.locator('#contato [aria-haspopup="dialog"]').click();
-  await dialog.waitFor();
-  const form = dialog.locator('form');
-  const submit = dialog.locator('button[type="submit"]');
-  await submit.click();
-  const invalid = await form.locator('[aria-invalid="true"]').count();
-  // O foco vai ao primeiro erro no quadro seguinte (requestAnimationFrame): espera até 1 s em vez de ler na hora.
-  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-invalid') === 'true', null, { timeout: 1000 }).catch(() => {});
-  const focused = await page.evaluate(() => document.activeElement?.getAttribute('aria-invalid'));
-  // Obrigatórios: nome e descrição (e-mail é opcional desde a COM-RELEASE-002 — só o necessário para o contato)
-  check('formulario-erros-obrigatorios', invalid === 2, `${invalid} campos inválidos; foco no primeiro inválido=${focused === 'true'}`);
-  check('formulario-foco-no-primeiro-erro', focused === 'true');
-  await page.screenshot({ path: path.join(outDir, 'formulario-erros.png') });
-  results.screenshots.push('formulario-erros.png');
-  await form.getByLabel(/^Nome/).fill('Pessoa de Teste');
-  await form.getByLabel(/^E-mail/).fill('teste@exemplo.invalid');
-  await form.getByLabel(/Descreva o processo/).fill('Teste automatizado de homologação: processo de conciliação manual.');
-  let popup = false;
-  page.on('popup', () => (popup = true));
-  const urlBefore = page.url();
-  const blockedBefore = results.blocked.length;
-  await submit.click();
-  await page.waitForTimeout(400);
-  const done = dialog.locator('.contact__done');
-  const doneText = (await done.count()) ? await done.innerText() : '';
-  results.formStatus = doneText;
-  const contactStatus = await page.evaluate(() => document.querySelector('[data-contact-status]')?.getAttribute('data-contact-status'));
-  if (contactStatus === 'pendente') {
-    check('formulario-modo-demonstracao', /envio desativado/i.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
-  } else {
-    // Com canal: a etapa seguinte é a confirmação da mensagem — nada é aberto antes do clique do visitante
-    check('formulario-vai-para-confirmacao', /Confirme a sua solicitação/.test(doneText) && doneText.includes('Pessoa de Teste'), doneText.replace(/\s+/g, ' ').slice(0, 220));
+  // O endereço #contato (âncora) também não abre diálogo: o contato é uma seção comum
+  {
+    // carregamento novo (não só troca de âncora no mesmo documento)
+    await page.goto('about:blank');
+    await page.goto(new URL('#contato', baseUrl).href, { waitUntil: 'networkidle' });
+    const dialog = await page.waitForSelector('[role="dialog"], dialog[open]', { state: 'attached', timeout: 1500 }).then(() => true, () => false);
+    check('contato-por-ancora-sem-dialogo', !dialog && (await page.locator('#contato a[data-whatsapp="geral"]').count()) === 1, dialog ? 'um diálogo abriu' : 'seção de contato com o botão do WhatsApp, sem diálogo');
   }
-  check('formulario-sem-envio-real', !popup && page.url() === urlBefore && results.blocked.length === blockedBefore, `popup=${popup}; url inalterada=${page.url() === urlBefore}`);
-  // O resumo precisa ficar visível na janela e receber o foco.
-  const placement = await page.evaluate(() => {
-    const d = document.querySelector('[role="dialog"] .contact__done')?.getBoundingClientRect();
-    return { doneTop: d?.top, viewport: innerHeight, focused: document.activeElement?.classList.contains('contact__done') };
-  });
-  check('formulario-resultado-visivel-e-focado', placement.focused && placement.doneTop >= 0 && placement.doneTop < placement.viewport, JSON.stringify(placement));
-  await page.screenshot({ path: path.join(outDir, 'formulario-resultado-tela.png') });
-  results.screenshots.push('formulario-resultado-tela.png');
-  await page.keyboard.press('Escape');
 
   // Texto renderizado (para revisão do conteúdo)
   writeFileSync(path.join(outDir, 'texto-renderizado.txt'), await page.locator('body').innerText());
   await context.close();
 });
 
-// 4. Menu mobile por teclado
+/**
+ * Caixas do cabeçalho (NEKKORA-COM-CANAIS-001): "Entrar" (data-entrar) e os vizinhos — marca, links, seletor de tema e
+ * botão do menu. Só elementos visíveis; o "Entrar" existe duas vezes no DOM (barra no desktop, menu no celular).
+ */
+const headerLayout = (page) =>
+  page.evaluate(() => {
+    const vis = (e) => {
+      if (!e) return false;
+      const r = e.getBoundingClientRect();
+      return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[hidden]');
+    };
+    const box = (e) => {
+      if (!e) return null;
+      const r = e.getBoundingClientRect();
+      return { x: Math.round(r.left * 10) / 10, y: Math.round(r.top * 10) / 10, r: Math.round(r.right * 10) / 10, b: Math.round(r.bottom * 10) / 10 };
+    };
+    const nav = document.querySelector('.nk-navbar');
+    const entrar = [...document.querySelectorAll('[data-entrar]')];
+    return {
+      vw: document.documentElement.clientWidth,
+      total: entrar.length,
+      entrar: entrar
+        .filter(vis)
+        .map((a) => ({ ...box(a), href: a.getAttribute('href'), target: a.getAttribute('target'), inBar: !!a.closest('.nk-navbar__inner'), inMenu: !!a.closest('.nk-navbar__mobile'), text: a.textContent.trim(), tabIndex: a.tabIndex })),
+      toggle: box([...(nav?.querySelectorAll('.nk-navbar__tools button') ?? [])].find(vis)),
+      menu: box([...(nav?.querySelectorAll('.nk-navbar__toggle') ?? [])].find(vis)),
+      brand: box([...(nav?.querySelectorAll('.nk-navbar__brand') ?? [])].find(vis)),
+      links: [...(nav?.querySelectorAll('.nk-navbar__inner .nk-navbar__link') ?? [])].filter(vis).map(box),
+      menuLinks: [...(nav?.querySelectorAll('.nk-navbar__mobile .nk-navbar__link') ?? [])].filter(vis).map(box),
+    };
+  });
+const overlaps = (a, b) => !!a && !!b && a.x < b.r - 0.5 && b.x < a.r - 0.5 && a.y < b.b - 0.5 && b.y < a.b - 0.5;
+/** Nenhum par da lista se sobrepõe e todos cabem na largura da janela. */
+const layoutClear = (items, vw) => {
+  const list = items.filter(([, b]) => b);
+  const clash = [];
+  for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) if (overlaps(list[i][1], list[j][1])) clash.push(`${list[i][0]}×${list[j][0]}`);
+  const outside = list.filter(([, b]) => b.x < -0.5 || b.r > vw + 0.5).map(([n]) => n);
+  return { ok: clash.length === 0 && outside.length === 0, clash, outside };
+};
+/** WebKit não leva o foco a links com Tab (veja primeiro-tab-pular-conteudo): lá, foco programático + tabIndex ≥ 0. */
+async function tabUntil(page, selector, max) {
+  if (ENGINE === 'webkit') {
+    await page.locator(selector).first().focus();
+    return page.evaluate((s) => !!document.activeElement?.matches(s) && document.activeElement.tabIndex >= 0, selector);
+  }
+  for (let i = 0; i < max; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.evaluate((s) => !!document.activeElement?.matches(s), selector)) return true;
+  }
+  return false;
+}
+
+// 4. Cabeçalho: "Entrar" (NEKKORA-COM-CANAIS-001, titular, 12/11/2026 — substitui entrar-oculto-sem-area-de-clientes)
+// leva à Nekkora Platform na mesma aba; no desktop fica depois do seletor de tema, no celular dentro do menu. O link nunca
+// é seguido (nada sai da máquina: newPage aborta e registra qualquer requisição externa).
+await block('entrar', async () => {
+  const sameTab = (t) => t == null || t === '_self';
+  const centerY = (b) => (b.y + b.b) / 2;
+  for (const vp of [
+    { name: 'desktop-1024', width: 1024, height: 768 },
+    { name: 'desktop-1280', width: 1280, height: 800 },
+    { name: 'desktop-1440', width: 1440, height: 900 },
+  ]) {
+    const { context, page } = await newPage({ width: vp.width, height: vp.height }, null);
+    const h = await headerLayout(page);
+    const e = h.entrar[0];
+    check(`entrar-desktop-unico-visivel:${vp.name}`, h.entrar.length === 1 && e.inBar && e.text === 'Entrar', `${h.entrar.length} visível(is) de ${h.total} no DOM`);
+    check(`entrar-desktop-destino:${vp.name}`, !!e && e.href === PLATFORM_LOGIN_URL && sameTab(e.target), e ? `href=${e.href} target=${e.target ?? '(nenhum)'}` : 'ausente');
+    check(
+      `entrar-desktop-depois-do-tema:${vp.name}`,
+      !!e && !!h.toggle && e.x >= h.toggle.r && Math.abs(centerY(e) - centerY(h.toggle)) <= 8 && !overlaps(e, h.toggle),
+      e && h.toggle ? `tema ${h.toggle.x}–${h.toggle.r}px, Entrar ${e.x}–${e.r}px (folga ${(e.x - h.toggle.r).toFixed(1)}px)` : 'tema ou Entrar ausente',
+    );
+    const lay = layoutClear([['marca', h.brand], ...h.links.map((l, i) => [`link${i + 1}`, l]), ['tema', h.toggle], ['entrar', e]], h.vw);
+    check(`cabecalho-desktop-sem-sobreposicao:${vp.name}`, !!h.brand && lay.ok, `sobreposições: ${lay.clash.join(', ') || 'nenhuma'}; fora da tela: ${lay.outside.join(', ') || 'nenhum'}`);
+    if (vp.name === 'desktop-1280') {
+      // Teclado: do seletor de tema, o próximo Tab chega ao "Entrar"
+      await page.locator('.nk-navbar__tools button').first().focus();
+      const reached = await tabUntil(page, '.nk-navbar__actions [data-entrar]', 1);
+      check('entrar-desktop-focavel-por-teclado', reached, ENGINE === 'webkit' ? 'WebKit: foco programático, tabIndex ≥ 0' : 'um Tab a partir do seletor de tema');
+      const file = 'cabecalho-desktop-entrar.png';
+      await page.locator('.nk-navbar').screenshot({ path: path.join(outDir, file) });
+      results.screenshots.push(file);
+    }
+    await context.close();
+  }
+  for (const vp of [
+    { name: 'celular-320', width: 320, height: 640 },
+    { name: 'celular-390', width: 390, height: 844 },
+    { name: 'tablet-768', width: 768, height: 1024 },
+  ]) {
+    const { context, page } = await newPage({ width: vp.width, height: vp.height }, null);
+    const closed = await headerLayout(page);
+    check(`entrar-celular-fora-da-barra:${vp.name}`, closed.entrar.length === 0 && closed.total >= 1, `${closed.entrar.length} visível(is) com o menu fechado`);
+    const bar = layoutClear([['marca', closed.brand], ['tema', closed.toggle], ['menu', closed.menu]], closed.vw);
+    check(
+      `cabecalho-celular-sem-sobreposicao:${vp.name}`,
+      !!closed.brand && !!closed.toggle && !!closed.menu && bar.ok,
+      `sobreposições: ${bar.clash.join(', ') || 'nenhuma'}; fora da tela: ${bar.outside.join(', ') || 'nenhum'}`,
+    );
+    await page.locator('.nk-navbar__toggle').focus();
+    await page.keyboard.press('Enter');
+    const openedOk = await page
+      .waitForFunction(() => document.querySelector('.nk-navbar__mobile') && !document.querySelector('.nk-navbar__mobile').hidden, null, { timeout: 2000 })
+      .then(() => true, () => false);
+    const open = await headerLayout(page);
+    const e = open.entrar[0];
+    check(
+      `entrar-celular-no-menu:${vp.name}`,
+      openedOk && open.entrar.length === 1 && e.inMenu && e.text === 'Entrar' && e.href === PLATFORM_LOGIN_URL && sameTab(e.target),
+      e ? `menu aberto=${openedOk}; href=${e.href} target=${e.target ?? '(nenhum)'}` : `menu aberto=${openedOk}; Entrar não visível`,
+    );
+    const inMenu = layoutClear([['marca', open.brand], ['tema', open.toggle], ['menu', open.menu], ...open.menuLinks.map((l, i) => [`link${i + 1}`, l]), ['entrar', e]], open.vw);
+    check(`menu-celular-sem-sobreposicao:${vp.name}`, !!e && inMenu.ok, `sobreposições: ${inMenu.clash.join(', ') || 'nenhuma'}; fora da tela: ${inMenu.outside.join(', ') || 'nenhum'}`);
+    // Teclado: do botão do menu, Tab percorre os links e chega ao "Entrar"
+    const reached = await tabUntil(page, '.nk-navbar__mobile [data-entrar]', open.menuLinks.length + 2);
+    check(`entrar-celular-focavel-por-teclado:${vp.name}`, reached, ENGINE === 'webkit' ? 'WebKit: foco programático, tabIndex ≥ 0' : 'Tab a partir do botão do menu');
+    if (vp.name === 'celular-390') {
+      const file = 'menu-celular-entrar.png';
+      await page.screenshot({ path: path.join(outDir, file) });
+      results.screenshots.push(file);
+    }
+    await context.close();
+  }
+});
+
+// 5. Menu mobile por teclado
 await block('menu-mobile', async () => {
   const { context, page } = await newPage({ width: 375, height: 812 }, null);
   const menuBtn = page.getByRole('button', { name: /menu/i }).first();
@@ -861,7 +997,7 @@ await block('menu-mobile', async () => {
   await context.close();
 });
 
-// 5. Hosting em faixa pôster: aviso de disponibilidade e condição de contratação visíveis em todas as larguras
+// 6. Hosting em faixa pôster: aviso de disponibilidade e condição de contratação visíveis em todas as larguras
 await block('hosting-faixa', async () => {
   for (const vp of [WIDTHS[0], WIDTHS[2]]) {
     const { context, page } = await newPage({ width: vp.width, height: vp.height }, null);
@@ -880,26 +1016,25 @@ await block('hosting-faixa', async () => {
   }
 });
 
-// 6. Diálogo aberto: axe e rolagem horizontal nos dois temas, celular e desktop
-await block('dialogo-acessibilidade', async () => {
+// 7. Menu do celular aberto (com o "Entrar"): axe e rolagem horizontal nos dois temas — substitui o axe do diálogo de
+// solicitação, que não existe mais (NEKKORA-COM-CANAIS-001)
+await block('menu-acessibilidade', async () => {
   for (const theme of THEMES) {
-    for (const vp of [WIDTHS[0], WIDTHS[2]]) {
-      const { context, page } = await newPage({ width: vp.width, height: vp.height }, theme);
-      await page.locator('#inicio [aria-haspopup="dialog"]').click();
-      await page.getByRole('dialog').waitFor();
-      await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
-      const r = await page.evaluate(async () => {
-        // eslint-disable-next-line no-undef
-        const res = await axe.run(document.querySelector('[role="dialog"]'), { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
-        return res.violations.map((v) => `${v.id}(${v.nodes.length})`);
-      });
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-      check(`dialogo-axe:${theme}:${vp.name}`, r.length === 0 && overflow <= 0, r.join(', ') || `sem violações; excesso horizontal=${overflow}px`);
-      const file = `dialogo-${theme}-${vp.name}.png`;
-      await page.screenshot({ path: path.join(outDir, file) });
-      results.screenshots.push(file);
-      await context.close();
-    }
+    const { context, page } = await newPage({ width: 390, height: 844 }, theme);
+    await page.locator('.nk-navbar__toggle').click();
+    await page.waitForFunction(() => document.querySelector('.nk-navbar__mobile') && !document.querySelector('.nk-navbar__mobile').hidden, null, { timeout: 2000 });
+    await page.evaluate(axeSource); // evaluate (protocolo do navegador), não <script>: a CSP da página bloqueia script inline
+    const r = await page.evaluate(async () => {
+      // eslint-disable-next-line no-undef
+      const res = await axe.run(document.querySelector('.nk-navbar'), { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
+      return res.violations.map((v) => `${v.id}(${v.nodes.length})`);
+    });
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    check(`menu-celular-axe:${theme}`, r.length === 0 && overflow <= 0, r.join(', ') || `sem violações; excesso horizontal=${overflow}px`);
+    const file = `menu-celular-${theme}.png`;
+    await page.screenshot({ path: path.join(outDir, file) });
+    results.screenshots.push(file);
+    await context.close();
   }
 });
 

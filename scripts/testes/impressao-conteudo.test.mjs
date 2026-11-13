@@ -41,7 +41,7 @@ writeFileSync(
       'tabelaDePrecos.posCampanha': reg(impressaoDaTabela()),
       publicacaoAutorizada: `Titular, 12/11/2026 (fictício): versão ${VERSAO}, commit homologado ${'b'.repeat(40)}.`,
     },
-    canais: { whatsapp: null, email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
+    canais: { whatsapp: '5511987654321', email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
     agendamento: { url: null, obrigatorio: false },
     envioAutomatico: { endpoint: null, chaveDoSiteTurnstile: null },
     campanhaLancamento: { inicio: '2026-11-01', fim: '2026-12-31' },

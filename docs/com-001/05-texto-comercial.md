@@ -1,9 +1,7 @@
 # Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)
 
-> **Textos e condições públicas aprovados internamente** pela titular para este conteúdo (impressões de PUB-17 e
-> PUB-19 e registros em `publicacao.json` $origem), sem parecer jurídico externo. **Não é autorização de
-> publicação** (PUB-13 e PUB-18 têm registros próprios) nem aprova contrato-base, anexos, proposta-modelo,
-> procedimento ou as propostas DP-01 a DP-05: a contratação de pacotes segue bloqueada.
+> **Em revisão (COM-VITRINE-001).** Textos e condições alterados depois da aprovação da v1.0.0; sem aprovação
+> própria (impressões de PUB-17 e PUB-19: `node scripts/comercial/impressao-conteudo.mjs`).
 
 > Gerado por `npm run texto` a partir de [`src/content.ts`](../../src/content.ts). Não edite este arquivo: altere
 > o `content.ts` (e a [matriz de alegações](03-matriz-alegacoes.md), se a mudança afetar uma promessa) e gere de novo.
@@ -16,7 +14,7 @@ Selo: Delivery · Hosting
 
 Automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. Infraestrutura para executá-las, sujeita a avaliação. Cada serviço contratado de forma independente.
 
-CTAs: "Solicitar avaliação" · "Ver como funciona"
+CTAs: "Fale com um analista" · "Ver como funciona"
 
 - Proposta por automação
 - Homologação e aceite
@@ -76,7 +74,7 @@ Delivery e Hosting podem ser contratados separadamente ou em conjunto; Monitor e
 
 Valores por automação ou por pacote de 3 automações da mesma categoria, sem mensalidade. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.
 
-> **Lançamento** — Campanha de lançamento para solicitações de avaliação recebidas de 06/11/2026 a 06/01/2027. A proposta pode ser aceita em até 7 dias corridos da emissão.
+> **Lançamento** — Campanha de lançamento para solicitações de avaliação recebidas de 06/11/2026 a 06/01/2027. Os valores e pacotes desta tabela valem para solicitações recebidas a partir de 12/11/2026 e continuam valendo depois da campanha, até nova revisão. As recebidas antes mantêm as condições da oferta anterior. A proposta pode ser aceita em até 7 dias corridos da emissão.
 
 Sem datas aprovadas (só na versão de homologação): _Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial._
 
@@ -85,8 +83,8 @@ Sem a data de início das novas condições: _Prévia para revisão: a data de i
 **Regras da campanha de lançamento** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):
 
 - Período: solicitações de avaliação recebidas pela Nekkora de 06/11/2026 a 06/01/2027, inclusive, no horário de Brasília.
-- Vale a data de recebimento da solicitação: e-mail recebido em contato@nekkora.com ou mensagem recebida na página da Nekkora no LinkedIn. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.
-- Os valores e pacotes dos cartões acima valem a partir da data de início das novas condições, ainda não definida. Solicitações recebidas antes dela mantêm as condições da oferta anterior.
+- Vale a data de recebimento da solicitação: mensagem recebida no WhatsApp da Nekkora (+55 (11) 91772-4200), e-mail recebido em contato@nekkora.com ou mensagem recebida na página da Nekkora no LinkedIn. Abrir o WhatsApp pelo site não basta: vale a mensagem efetivamente recebida. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.
+- Os valores e pacotes dos cartões acima valem para solicitações recebidas a partir de 12/11/2026, inclusive. Solicitações recebidas antes dessa data mantêm as condições da oferta anterior; quando o escopo e a modalidade forem equivalentes, propomos a condição mais favorável, sem alterar proposta já aceita sem o seu acordo.
 - A categoria, simples ou média, é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Vale o preço da data de recebimento da solicitação, mesmo que a proposta seja emitida depois do fim da campanha.
 - Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.
 - A proposta pode ser aceita em até 7 dias corridos da emissão.
@@ -120,7 +118,7 @@ Barra: "Total selecionado: 3 automações" · botões "Limpar simulação" e "Ca
 
 > Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.
 
-Próximo passo: "Agendar uma conversa" (Microsoft Bookings, nova aba) · "Solicitar avaliação" (abre o formulário; o resumo da simulação é opcional)
+Próximo passo: "Conversar sobre esta simulação" (abre o WhatsApp em outra aba com a mensagem do Delivery, "Fiz esta simulação na página:" e o resumo da simulação; o visitante revisa antes de enviar)
 
 **Não sabe a categoria da sua automação?** A categoria depende de sistemas, integrações, regras, volume e licenças, e é confirmada na avaliação. Na dúvida, solicite uma avaliação ou veja o que define a categoria (link para os critérios).
 
@@ -159,7 +157,7 @@ As horas são uma referência: o enquadramento definitivo depende da avaliação
 - Nekkora Monitor — _Em preparação_ — **R$ 75** por automação/mês, previsto
 - Nekkora AI — _Em preparação_ — **R$ 100** por empresa/mês, previsto
 
-Valores e condições definitivos dependem da disponibilização comercial. Ainda não disponíveis para contratação. Para saber mais, fale com a Nekkora pelos canais de contato.
+Valores e condições definitivos dependem da disponibilização comercial. Ainda não disponíveis para contratação.
 
 Hosting tem avaliação e proposta próprias.
 
@@ -216,83 +214,28 @@ O que é definido em proposta, o que não está incluído sem acordo explícito 
 - Disponibilidade da sua equipe para homologação
 - Fila operacional da Nekkora
 
-## 7. Contato
+## 7. Contato e atendimento (NEKKORA-COM-CANAIS-001 — só WhatsApp)
 
 **Vamos olhar o seu processo de perto?**
 
-A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.
+A conversa inicia uma avaliação — não é uma contratação e não gera compromisso.
 
-Botão: "Solicitar avaliação" (abre o diálogo)
+Botão: "Fale com um analista" (abre o WhatsApp em outra aba) — A conversa abre no WhatsApp com uma mensagem sugerida, que você pode editar. Nada é enviado até você tocar em enviar.
 
-Sem canais confirmados: _Canais oficiais em definição · formulário em modo de demonstração_
+Sem número confirmado: _Canal de atendimento em definição_
 
-Diálogo **Solicitar avaliação** — Conte o que você precisa: uma automação nova, a hospedagem de uma automação existente ou infraestrutura e serviços relacionados. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.
+Redes institucionais: "Acompanhe a Nekkora" — LinkedIn · Instagram.
 
-Canal da solicitação: WhatsApp, se confirmado; senão o e-mail (publicação atual: e-mail). Sem canal: _Canais oficiais em definição · formulário em modo de demonstração_
+Sem formulário, sem envio por e-mail, sem envio automático e sem agendamento (Microsoft Bookings).
 
-Formulário: "O que você precisa?"* (Desenvolver uma nova automação · Hospedar uma automação existente · Infraestrutura e serviços relacionados; o CTA do Hosting abre com a hospedagem), Nome*, Empresa (opcional), E-mail (Opcional — só se preferir retorno por e-mail.), "Descreva o processo ou a necessidade"* — O que acontece hoje, quais sistemas envolve, com que frequência e qual resultado você espera. Até 1.000 caracteres.. Rodapé: "Cancelar" + envio; link "Como tratamos seus dados".
+Botão flutuante (canto inferior direito, ícone do WhatsApp): "Fale com um analista" — some no celular enquanto o contato está na tela; sem pulso nem indicador de disponibilidade.
 
-Segunda linha da mensagem, por tipo: _Quero solicitar uma avaliação de automação (Nekkora Delivery)._ · _Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente (Nekkora Hosting)._ · _Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting)._
-
-Orientação abaixo do tipo (só na tela, fora da mensagem — COM-VITRINE-001, etapa 5): Desenvolver uma nova automação: _Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria. Se tiver interesse no pacote, conte na descrição quantas automações você tem em mente; categoria e composição são confirmadas na avaliação._ · Hospedar uma automação existente: _Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade._ · Infraestrutura e serviços relacionados: _Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade._
-
-Vindo do simulador: caixa "Incluir o resumo da minha simulação na mensagem" (desmarcada) — Opcional. Você confere o texto antes de enviar; a simulação não é guardada. Na mensagem: "Simulação feita no site (estimativa, sujeita à avaliação):" + resumo.
-
-Modo demonstração: botão "Revisar solicitação"; nota "Modo de demonstração: nenhum dado é enviado ou armazenado."; resultado **Solicitação validada — envio desativado nesta versão** — Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.
-
-### Pelo e-mail (publicação atual)
-
-Link direto: "Escrever diretamente por e-mail" + divisor "ou preencha o formulário". Botão: "Revisar mensagem"; nota "Na próxima etapa você confere a mensagem antes de abrir o seu aplicativo de e-mail. Nada é armazenado nesta página."
-
-Etapa de confirmação: **Confirme a sua solicitação** — Esta é a mensagem que será aberta no seu aplicativo de e-mail, endereçada à Nekkora. Confira antes de continuar.
-
-> **Antes de continuar** — Ao continuar, o seu aplicativo de e-mail é aberto com esta mensagem — tipo de solicitação, nome, empresa, e-mail, descrição e, se você o incluiu, o resumo da simulação, como estão acima. Ela só chega à Nekkora se você a enviar pelo aplicativo. Esta página não guarda o que você digitou.
-
-Botões: "Voltar e editar" · "Abrir no e-mail". Alternativas: "Copiar mensagem"; "Se o aplicativo de e-mail não abrir, copie a mensagem e envie para <e-mail>".
-
-- Após abrir: **Pedimos ao navegador para abrir o seu aplicativo de e-mail** — Se nenhum aplicativo abriu, copie a mensagem e envie para o endereço abaixo. A mensagem só é enviada quando você a enviar pelo seu e-mail.
-- Link manual (sempre): "Abrir no e-mail novamente"
-
-### Pelo WhatsApp (quando houver número confirmado)
-
-Link direto: "Falar diretamente pelo WhatsApp" + divisor "ou preencha o formulário". Botão: "Revisar mensagem"; nota "Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página."
-
-Etapa de confirmação: **Confirme a sua solicitação** — Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.
-
-> **Antes de continuar** — Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — tipo de solicitação, nome, empresa, e-mail, descrição e, se você o incluiu, o resumo da simulação, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.
-
-Botões: "Voltar e editar" · "Abrir no WhatsApp". Alternativas: "Copiar mensagem"; "Se o WhatsApp não abrir, copie a mensagem e envie para <número>"; "Prefere e-mail? Escreva para <e-mail>".
-
-- Após abrir: **Pedimos ao navegador para abrir o WhatsApp** — Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.
-- Link manual (sempre): "Abrir conversa no WhatsApp"
-
-Canais diretos (sem formulário): "Prefere falar direto?"
-
-## 7b. Envio automático e agendamento (COM-RELEASE-005 — só com endpoint e URL do Bookings confirmados)
-
-Precedência: envio automático (se houver endpoint) → WhatsApp → e-mail. Um único mecanismo de envio por vez.
-
-Formulário: E-mail obrigatório — "Obrigatório — é por ele que respondemos." (erro: "Informe um e-mail para recebermos e respondermos a sua solicitação, como nome@empresa.com."). Nota: "Na próxima etapa você confere os dados antes de enviar."
-
-Confirmação: **Confirme a sua solicitação** — Confira os dados abaixo. Eles serão enviados à Nekkora quando você tocar em "Enviar solicitação".
-
-> **Antes de enviar** — Ao enviar, tipo de solicitação, nome, empresa, e-mail, descrição e, se incluído, o resumo da simulação vão para a Nekkora por um serviço da AWS, que entrega a solicitação na caixa de e-mail comercial. Só usamos os dados para responder e preparar a avaliação.
-
-Desafio: "Verificação de segurança automática (Cloudflare Turnstile) para evitar envios por robôs." · aguardando: "Aguardando a verificação de segurança…" · indisponível: "A verificação de segurança não carregou. Você pode tentar de novo ou usar o e-mail abaixo."
-
-Botões: "Voltar e editar" · "Enviar solicitação" (durante o envio: "Enviando…"; leitor de tela: "Enviando a solicitação. Aguarde a confirmação.")
-
-- Recebida (só com a confirmação do servidor): **Solicitação recebida** — Protocolo NK-XXXXXXXX. Vamos responder pelo e-mail informado. A solicitação inicia uma avaliação — não é uma contratação.
-- Falha: **A solicitação não foi enviada**
-- _rede_: Não conseguimos falar com o servidor. Confira a sua conexão e tente de novo — os dados continuam aqui.
-- _limite_: Recebemos muitas solicitações em pouco tempo. Tente de novo mais tarde ou use o e-mail abaixo.
-- _desafio_: Não foi possível confirmar a verificação de segurança. Faça a verificação de novo e tente enviar.
-- _indisponivel_: O envio não foi concluído por uma falha temporária. Os dados continuam aqui: tente de novo em instantes ou use o e-mail abaixo.
-- _recusada_: Não foi possível enviar esta solicitação. Revise os dados ou escreva diretamente para o e-mail abaixo.
-
-Ações na falha: "Tentar novamente" (não aparece quando a solicitação é recusada) · "Se preferir, envie a mesma mensagem pelo seu e-mail para <e-mail>" · "Abrir no e-mail" · "Copiar mensagem"
-
-**Agendamento** — botão "Agendar conversa" (nome acessível: "Agendar conversa (abre o Microsoft Bookings em outra aba)") no topo e no contato; no diálogo: "Prefere conversar antes? Agendar conversa". Nota no contato: "Escolha um horário na agenda da Nekkora, no Microsoft Bookings. A conversa só fica marcada quando o Bookings confirmar."
+Mensagens iniciais sugeridas (o visitante pode editar; nada é enviado sem ele):
+- Geral (topo, contato e botão flutuante): _Olá! Gostaria de conversar com um analista da Nekkora._
+- Delivery (outras demandas e simulador): _Olá! Tenho interesse em desenvolver automações com a Nekkora._
+- Hosting: _Olá! Tenho interesse em hospedagem de automações com a Nekkora e gostaria de saber como funciona a avaliação de viabilidade._
+- Monitor ("Quero receber informações sobre o Nekkora Monitor"): _Olá! Gostaria de receber informações sobre o Nekkora Monitor quando ele estiver disponível._
+- AI ("Quero receber informações sobre o Nekkora AI"): _Olá! Gostaria de receber informações sobre o Nekkora AI quando ele estiver disponível._
 
 ## 7a. Privacidade
 
@@ -300,17 +243,17 @@ Ações na falha: "Tentar novamente" (não aparece quando a solicitação é rec
 
 Responsável pelos dados pessoais desta página: NICOLLY OLIVEIRA DE CARVALHO DESENVOLVIMENTO DE SOFTWARE LTDA (CNPJ 68.337.624/0001-32).
 
-- **O formulário não envia nada** — O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.
-- **O que vai para o e-mail** — Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a contato@nekkora.com. Ela só é enviada se você a enviar pelo aplicativo.
-- **Sem cookies nem rastreamento** — Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro); o simulador de investimento não guarda nem envia o que você seleciona. Fontes e imagens vêm do próprio site.
+- **Sem formulário nem envio automático** — Esta página não tem formulário, cadastro nem envio automático de solicitações comerciais. O simulador de investimento funciona só no seu navegador e não guarda nem envia o que você seleciona. Como em qualquer site, o acesso envolve dados técnicos de navegação, tratados pelo provedor de hospedagem e guardados nos registros de acesso descritos abaixo.
+- **Conversa pelo WhatsApp** — Os botões de atendimento abrem o WhatsApp, serviço da Meta, em outra aba, com uma mensagem sugerida — e, se você vier do simulador, o resumo da simulação. Você pode editar ou apagar a mensagem: ela só chega à Nekkora se você tocar em enviar. Depois disso, seu número, seu nome de perfil e o que você escrever na conversa são usados pela Nekkora para responder. O WhatsApp segue os termos e a política de privacidade da Meta.
+- **Sem cookies nem rastreamento** — Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site. O WhatsApp, o LinkedIn e o Instagram seguem regras próprias. O botão "Entrar" leva à Nekkora Platform, uma aplicação separada, que também segue regras próprias.
 - **Registros de acesso** — A Amazon Web Services (AWS), que hospeda este site, processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço. Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. A guarda cumpre uma obrigação legal (LGPD, art. 7º, II). Pela lei, a disponibilização desses registros a terceiros depende de ordem judicial (Marco Civil da Internet, art. 10, §1º, e art. 15, §3º). Autoridades podem pedir que eles sejam guardados por mais tempo (art. 15, §2º), mas o acesso continua dependendo de ordem judicial. Os registros não contêm dados cadastrais, como nome ou endereço, que seguem regras legais próprias (art. 10, §3º).
 - **Por quanto tempo guardamos** — Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante. Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.
-- **Onde os dados são processados** — Os arquivos deste site e os registros de acesso ficam armazenados na Amazon Web Services (AWS), na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países.
-- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à solicitação e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18), pelo e-mail contato@nekkora.com.
+- **Onde os dados são processados** — Os arquivos deste site e os registros de acesso ficam armazenados na Amazon Web Services (AWS), na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países. As conversas pelo WhatsApp passam pelos servidores da Meta, que podem estar fora do Brasil.
+- **Uso e seus direitos** — Usamos os dados que você nos envia só para responder à sua mensagem e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18), pelo WhatsApp +55 (11) 91772-4200 ou pelo e-mail contato@nekkora.com.
 
 ## 8. Barra de navegação
 
-Links: Soluções · Preços · Como funciona · Hosting · Transparência. Sem botão "Entrar": oculto enquanto não houver área de clientes (COM-008-B, AUD-26).
+Links: Soluções · Preços · Como funciona · Hosting · Transparência. Botão "Entrar" → https://platform.nekkora.com/entrar, na mesma aba (NEKKORA-COM-CANAIS-001; no celular, dentro do menu). A Commercial não autentica.
 
 ## 9. Rodapé
 

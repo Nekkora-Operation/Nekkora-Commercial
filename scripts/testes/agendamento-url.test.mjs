@@ -1,12 +1,12 @@
 /**
- * URL do Microsoft Bookings (NEKKORA-COM-007): matriz de casos da regra única em src/agendamento-url.js, usada pela
+ * URL do Microsoft Bookings (NEKKORA-COM-007): matriz de casos da regra em scripts/comercial/agendamento-url.mjs, usada pela
  * página (src/config.ts) e pelo portão (scripts/verificar-publicacao.mjs). Os domínios abaixo são FICTÍCIOS, exceto a
  * URL oficial da Nekkora, conferida em publicacao.json.
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BOOKINGS_HOSTS, isBookingsUrl } from '../../src/agendamento-url.js';
+import { BOOKINGS_HOSTS, isBookingsUrl } from '../comercial/agendamento-url.mjs';
 
 const NEKKORA = { emailDomain: 'nekkora.com' };
 const OFICIAL = 'https://bookings.cloud.microsoft/book/Nekkora@nekkora.com/';
@@ -117,10 +117,15 @@ test('fixtures sintéticas: a da API usa o domínio atual e é aceita; a de outr
   assert.equal(isBookingsUrl(outra.agendamento.url, { emailDomain: outra.canais.email.split('@')[1] }), false);
 });
 
-test('página e portão usam a mesma função (sem cópia da regra)', () => {
-  const config = readFileSync('src/config.ts', 'utf8');
+// NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): o Bookings saiu da página pública. A regra continua aqui para a
+// homologação reconhecer QUALQUER link do Bookings (BOOKINGS_HOSTS) e recusá-lo; a página não a usa e o portão bloqueia
+// qualquer agendamento.url (PUB-20).
+test('sem Bookings na página: nenhum código da página importa a regra nem cita os hosts do Bookings', () => {
   const portao = readFileSync('scripts/verificar-publicacao.mjs', 'utf8');
-  assert.match(config, /import \{ isBookingsUrl \} from '\.\/agendamento-url\.js'/);
-  assert.match(portao, /import \{ isBookingsUrl \} from '\.\.\/src\/agendamento-url\.js'/);
-  for (const fonte of [config, portao]) assert.doesNotMatch(fonte, /'(outlook\.office365\.com|outlook\.office\.com|bookings\.cloud\.microsoft)'/);
+  assert.match(portao, /need\(booking\.url == null && booking\.obrigatorio !== true, 'PUB-20'/);
+  for (const f of readdirSync('src', { recursive: true }).filter((f) => /\.(ts|tsx)$/.test(f))) {
+    const t = readFileSync(`src/${f}`, 'utf8');
+    assert.doesNotMatch(t, /agendamento-url|isBookingsUrl|BOOKINGS_URL/, f);
+    for (const host of BOOKINGS_HOSTS) assert.ok(!t.includes(host), `${f}: ${host}`);
+  }
 });

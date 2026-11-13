@@ -1,8 +1,8 @@
 /**
- * Validação da URL pública do Microsoft Bookings (COM-RELEASE-005 §4.5, NEKKORA-COM-007). Fonte ÚNICA da regra: a
- * página (src/config.ts) e o portão de publicação (scripts/verificar-publicacao.mjs) importam esta função, então os dois
- * aceitam exatamente as mesmas URLs. JavaScript puro, sem dependências, para rodar no navegador e no Node sem build;
- * tipos em agendamento-url.d.ts.
+ * Validação da URL pública do Microsoft Bookings (COM-RELEASE-005 §4.5, NEKKORA-COM-007). NEKKORA-COM-CANAIS-001
+ * (titular, 12/11/2026): o Bookings saiu da página pública — o módulo saiu de src/ e serve só à homologação, que usa
+ * BOOKINGS_HOSTS para recusar qualquer link do Bookings; o portão bloqueia qualquer agendamento.url (PUB-20). Reativar o
+ * agendamento exige nova decisão da titular, código e aviso de privacidade revistos.
  *
  * Aceita só:
  *   https://bookings.cloud.microsoft/book/<caixa>@<domínio>/            (endereço atual gerado pelo Bookings)
