@@ -176,7 +176,9 @@ async function run(engine) {
       const url = req.url();
       if (url.startsWith(origin) || url.startsWith('data:') || url.startsWith('blob:') || url === 'about:blank') return route.continue();
       if (url.startsWith('https://wa.me/')) {
-        waRequests.push({ url, referer: req.headers()['referer'] ?? null });
+        // O WebKit informa o Referer suprimido (noreferrer) como texto vazio; Chromium e Firefox, como ausente. Vazio não
+        // revela nenhum endereço e conta como ausente; qualquer valor não vazio continua reprovando.
+        waRequests.push({ url, referer: req.headers()['referer'] || null });
         return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: '<!doctype html><meta charset="utf-8"><title>wa.me (página de teste local)</title><h1>wa.me — página de teste local</h1>' });
       }
       aborted.push(url);
