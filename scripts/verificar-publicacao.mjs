@@ -95,6 +95,26 @@ need(
   'PUB-13',
   `registro da data de início ausente ou divergente: $origem["novasCondicoes.inicio"] deve começar por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje) e citar a data ${novas ?? 'AAAA-MM-DD'} de novasCondicoes.inicio, não anterior ao registro`,
 );
+// NEKKORA-COM-ECOSYSTEM-001 §11: vigência da nova estratégia comercial, gravada pela titular quando autorizar a
+// publicação — sem sobrescrever o histórico acima. Exige ecossistema.inicio (AAAA-MM-DD, não depois de hoje) e o
+// registro $origem["ecossistema.inicio"] ("Titular, DD/MM/AAAA", de 20/11/2026 até hoje) citando UMA data, exatamente
+// essa, nunca anterior ao próprio registro (sem retroatividade).
+const vigencia = pub.ecossistema?.inicio ?? null;
+const registroDaVigencia = pub.$origem?.['ecossistema.inicio'];
+const dataDoRegistroDaVigencia = dataDoRegistro(registroDaVigencia);
+const datasDaVigencia = typeof registroDaVigencia === 'string' ? [...new Set(registroDaVigencia.match(/\b\d{4}-\d{2}-\d{2}\b/g) ?? [])] : [];
+need(
+  iso(vigencia) &&
+    vigencia <= today &&
+    dataDoRegistroDaVigencia != null &&
+    dataDoRegistroDaVigencia >= '2026-11-20' &&
+    dataDoRegistroDaVigencia <= today &&
+    datasDaVigencia.length === 1 &&
+    datasDaVigencia[0] === vigencia &&
+    vigencia >= dataDoRegistroDaVigencia,
+  'PUB-13',
+  `vigência da nova estratégia comercial: ecossistema.inicio (AAAA-MM-DD, não depois de hoje, ${today}) e registro em $origem["ecossistema.inicio"] ("Titular, DD/MM/AAAA", de 20/11/2026 até hoje) citando essa data, não anterior ao registro`,
+);
 // Privacidade (§5.4)
 need(Boolean(pub.controlador.nome), 'PUB-09', 'controlador dos dados: razão social (ou nome) para o aviso de privacidade');
 need(isTaxId(pub.controlador.documento), 'PUB-09', 'controlador dos dados: CNPJ ou CPF válido (dígitos verificadores)');
@@ -133,28 +153,22 @@ need(
   'PUB-14',
   `registro da aprovação da tabela ausente ou divergente: $origem["tabelaDePrecos.impressao"] deve começar por "Titular, DD/MM/AAAA" (de 11/11/2026 até hoje) e citar a impressão aprovada ${impressao}`,
 );
-// V-01 / L-04 (titular, 12/11/2026): a página anuncia que os valores continuam depois da campanha, até nova revisão. Por
-// isso a continuidade é exigida em qualquer data, e a flag sozinha não é aprovação: posCampanha === true com o registro
-// $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela
-// aprovada (a continuidade vale para ESSA tabela; outra tabela exige nova decisão).
-const posCampanhaAprovada = tabela.posCampanha === true && registroConfere(pub.$origem?.['tabelaDePrecos.posCampanha'], tabela.impressao, impressao, '2026-11-12');
-need(
-  posCampanhaAprovada,
-  'V-01',
-  `tabela depois de 06/01/2027 sem aprovação própria: tabelaDePrecos.posCampanha true e registro em $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela ${impressao}`,
-);
-// COM-VITRINE-001 §3.2: campanha encerrada só com a V-01 aprovada (a página já não mostra comunicação promocional)
-need(!iso(fim) || fim >= today || posCampanhaAprovada, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today}) e tabela pós-campanha não aprovada (tabelaDePrecos.posCampanha, V-01)`);
-// COM-VITRINE-001 §7 (V-06): Monitor e AI só "em-preparacao" ou, com aprovação própria, "disponivel"
-for (const servico of ['monitor', 'ai']) {
+// V-01 / L-04 e a campanha encerrada (COM-VITRINE-001 §3.2) saíram do portão na NEKKORA-COM-ECOSYSTEM-001: a página não
+// exibe mais a tabela do Delivery, a campanha de lançamento nem a continuidade daquela tabela (a homologação confere a
+// ausência). Os registros $origem["tabelaDePrecos.posCampanha"] e campanhaLancamento ficam como histórico dos
+// compromissos já assumidos.
+// PUB-23 (NEKKORA-COM-ECOSYSTEM-001 §10): o estado de cada produto reflete a operação efetivamente existente. AI em
+// piloto; Monitor e Hosting sob avaliação ou em preparação; "disponivel" só com aprovação própria.
+const ESTADOS = { ai: ['piloto'], monitor: ['sob-avaliacao', 'em-preparacao'], hosting: ['sob-avaliacao', 'em-preparacao'] };
+for (const [servico, permitidos] of Object.entries(ESTADOS)) {
   const estado = pub.servicos?.[servico] ?? null;
   need(
-    estado === 'em-preparacao' || (estado === 'disponivel' && pub.aprovacoes.disponibilidade?.[servico] === true),
+    permitidos.includes(estado) || (estado === 'disponivel' && pub.aprovacoes.disponibilidade?.[servico] === true),
     'PUB-23',
-    `servicos.${servico}: "em-preparacao", ou "disponivel" só com aprovacoes.disponibilidade.${servico} (homologado, sem contratação fictícia)`,
+    `servicos.${servico}: ${permitidos.map((e) => `"${e}"`).join(' ou ')}, ou "disponivel" só com aprovacoes.disponibilidade.${servico} (operação efetivamente existente, sem contratação fictícia)`,
   );
 }
-need(pub.aprovacoes.condicoesComerciais === true, 'PUB-19', 'aprovação das condições comerciais (50/50, fila, reuniões, licenças, garantia e aceite)');
+need(pub.aprovacoes.condicoesComerciais === true, 'PUB-19', 'aprovação das condições comerciais');
 need(pub.aprovacoes.textosComerciais === true, 'PUB-17', 'aprovação dos textos comerciais');
 // COM-VITRINE-001 §12 (titular, 12/11/2026, forma b): a flag herdada da v1.0.0 não basta. Cada aprovação vale para UM
 // conteúdo: a impressão calculada dos arquivos (scripts/comercial/impressao-conteudo.mjs) tem de ser a aprovada em

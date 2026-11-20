@@ -1,6 +1,6 @@
 import { Icon, Logo } from 'nekkora-lib';
 import { HOSTING } from '../content';
-import { WhatsappButton } from '../whatsapp';
+import { RequestButton } from '../atendimento';
 
 /** Faixa pôster em acento sólido (modelo C). Texto branco sobre --nk-solid-accent; no Sakura Dark, tom mais fechado. */
 export function Hosting() {
@@ -20,10 +20,10 @@ export function Hosting() {
             </span>
           </p>
           <div>
-            {/* NEKKORA-COM-CANAIS-001: conversa no WhatsApp com a mensagem de hospedagem (o visitante pode editá-la) */}
-            <WhatsappButton context="hosting" size="lg" pill className="hosting-band__cta">
+            {/* NEKKORA-COM-ECOSYSTEM-001 §7: formulário de atendimento já com o Hosting marcado */}
+            <RequestButton options={{ services: ['hosting'] }} size="lg" pill className="hosting-band__cta" data-atendimento-origem="hosting-faixa">
               {HOSTING.cta}
-            </WhatsappButton>
+            </RequestButton>
           </div>
         </div>
         <div className="split__visual hosting-band__visual" aria-hidden="true">

@@ -6,6 +6,15 @@
 > **não aprova** o contrato-base, os anexos, a proposta-modelo nem o procedimento operacional, e **não libera a
 > contratação de pacotes**, que depende de aprovação contratual específica (§7.6).
 >
+> **[NEKKORA-COM-ECOSYSTEM-001](../release/NEKKORA-COM-ECOSYSTEM-001.md) — PROPOSTA pendente de aprovação da titular
+> (PUB-19), 20/11/2026.** O Nekkora Delivery deixa de existir como produto comercial independente: a criação de
+> automações passa ao **Nekkora AI — Piloto**. Este regulamento, a campanha e as tabelas dos §2 a §7 passam a valer
+> **só como histórico e como compromisso**: solicitações recebidas até a véspera da vigência da nova estratégia
+> (`ecossistema.inicio` em `publicacao.json`, definida pela titular quando autorizar a publicação) seguem as condições
+> deste regulamento, pela data de recebimento; propostas já emitidas e aceitas não mudam. As recebidas a partir da
+> vigência seguem as condições do ecossistema exibidas na página — **sem** as regras de pacotes, pagamento 50/50, fila,
+> categorias ou licenças daqui, que não se aplicam automaticamente ao AI Piloto. Nenhum texto abaixo foi apagado.
+>
 > **Histórico.** NEKKORA-COM-CONTRACT-001 (06/11/2026), diretriz **C-10**: os preços da tabela anterior (§2) foram
 > aprovados na v1.0.0; a tabela nova (§7) tem aprovação própria (PUB-14). **Datas (09/11/2026):** a titular decidiu **manter 06/11/2026 a
 > 06/01/2027**, o período já gravado em `publicacao.json` (§1; [registro](../release/evidencias/golive-001/decisoes-titular-2026-11-09.md)).
@@ -74,7 +83,8 @@ O fim da campanha encerra só a comunicação promocional; a tabela do §7 conti
 
 | Canal | Evidência | Observação |
 |---|---|---|
-| WhatsApp `+55 (11) 91772-4200` (único canal promovido na vitrine, NEKKORA-COM-CANAIS-001) | Data e hora da mensagem recebida na conversa, no horário de Brasília | Vale o recebimento, não o clique no site, a abertura do aplicativo nem a data de escrita. Captura ou exportação da conversa, com data e hora visíveis, ao emitir a proposta; não apagar a conversa antes do fim do prazo de aceite |
+| WhatsApp oficial `+55 (11) 93059-7466` (único canal promovido na vitrine; NEKKORA-COM-ECOSYSTEM-001 §5, PROPOSTA pendente de aprovação, PUB-19) | Data e hora da mensagem recebida na conversa, no horário de Brasília | Mesma regra da linha abaixo: vale a mensagem efetivamente recebida, não a abertura do WhatsApp pelo formulário |
+| WhatsApp `+55 (11) 91772-4200` (aprovado em 13/11/2026, NEKKORA-COM-CANAIS-001; substituído pelo número oficial acima antes de ser publicado — vale para o que tiver sido recebido nele) | Data e hora da mensagem recebida na conversa, no horário de Brasília | Vale o recebimento, não o clique no site, a abertura do aplicativo nem a data de escrita. Captura ou exportação da conversa, com data e hora visíveis, ao emitir a proposta; não apagar a conversa antes do fim do prazo de aceite |
 | E-mail `contato@nekkora.com` (sem botão na vitrine; vale o que chegar por ele) | Data e hora de recebimento no servidor do Microsoft 365 (cabeçalho `Received`), no horário de Brasília | Vale o recebimento, não o clique no site nem a data de escrita. Não apagar a mensagem antes do fim do prazo de aceite |
 | Microsoft Bookings (indisponível na vitrine desde a NEKKORA-COM-CANAIS-001; vale para o histórico) | Data de **criação** da reserva (notificação e histórico) | Não a data da reunião |
 | LinkedIn (rede institucional; vale o que chegar por ele) | Data e hora da mensagem recebida | Captura ou exportação ao emitir a proposta |

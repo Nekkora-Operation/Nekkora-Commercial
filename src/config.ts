@@ -5,14 +5,14 @@
  * `publicacao.json`, na raiz — fonte única lida também por scripts/verificar-publicacao.mjs, que bloqueia o deploy de
  * produção enquanto algum item obrigatório estiver pendente. Enquanto um valor for `null` — ou não passar na validação
  * abaixo — a página não faz a afirmação correspondente: o canal não aparece como link e o botão flutuante e os CTAs de
- * WhatsApp não são exibidos. NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): o WhatsApp é o único canal público de
- * atendimento comercial; a página não tem formulário, envio por e-mail nem agendamento pelo Microsoft Bookings.
+ * WhatsApp não são exibidos. NEKKORA-COM-CANAIS-001 (titular, 12/11/2026) e NEKKORA-COM-ECOSYSTEM-001 (20/11/2026): o
+ * WhatsApp é o único canal público de atendimento comercial; o formulário só prepara a mensagem no navegador (sem envio
+ * automático, envio por e-mail nem agendamento pelo Microsoft Bookings).
  *
  * Builds de homologação trocam o arquivo por scripts/fixtures/publicacao-homologacao.json (dados sintéticos) com
  * NEKKORA_PUBLICACAO — veja vite.config.ts.
  */
 import publicacao from '@publicacao';
-import { campaignState, todayInBrazil, type CampaignState } from './precos';
 
 /** WhatsApp com DDI + DDD, só dígitos. E-mail. URLs de perfil (não a página inicial da rede). */
 export const CONTACT: { whatsappNumber: string | null; email: string | null; instagram: string | null; linkedin: string | null } = {
@@ -23,17 +23,10 @@ export const CONTACT: { whatsappNumber: string | null; email: string | null; ins
 };
 
 /**
- * Mensagens iniciais sugeridas para o WhatsApp (NEKKORA-COM-CANAIS-001): o visitante pode editá-las na conversa, e nada
- * é enviado sem que ele toque em enviar. Monitor e AI estão em preparação: a mensagem pede informação, nunca contratação.
+ * Primeira linha de toda mensagem preparada pelo formulário de atendimento (NEKKORA-COM-ECOSYSTEM-001 §7): o visitante
+ * revisa e edita a mensagem no WhatsApp, e nada é enviado sem que ele toque em enviar.
  */
-export const WHATSAPP_MESSAGES = {
-  geral: 'Olá! Gostaria de conversar com um analista da Nekkora.',
-  delivery: 'Olá! Tenho interesse em desenvolver automações com a Nekkora.',
-  hosting: 'Olá! Tenho interesse em hospedagem de automações com a Nekkora e gostaria de saber como funciona a avaliação de viabilidade.',
-  monitor: 'Olá! Gostaria de receber informações sobre o Nekkora Monitor quando ele estiver disponível.',
-  ai: 'Olá! Gostaria de receber informações sobre o Nekkora AI quando ele estiver disponível.',
-} as const;
-export type WhatsappContext = keyof typeof WHATSAPP_MESSAGES;
+export const WHATSAPP_GREETING = 'Olá! Gostaria de conversar com um analista da Nekkora.';
 
 /** Acesso de clientes (NEKKORA-COM-CANAIS-001): a Commercial só leva à Nekkora Platform; não autentica ninguém. */
 export const PLATFORM_LOGIN_URL = 'https://platform.nekkora.com/entrar';
@@ -64,10 +57,10 @@ export const CHANNELS = {
 
 export const hasAnyChannel = Object.values(CHANNELS).some((c) => c != null);
 
-export const whatsappUrl = (message: string = WHATSAPP_MESSAGES.geral) =>
+export const whatsappUrl = (message: string = WHATSAPP_GREETING) =>
   CHANNELS.whatsapp ? `https://wa.me/${CHANNELS.whatsapp}?text=${encodeURIComponent(message)}` : null;
 
-/** Número do WhatsApp por extenso (aviso de privacidade): +55 (11) 91772-4200. */
+/** Número do WhatsApp por extenso (aviso de privacidade): +55 (11) 93059-7466. */
 export const whatsappDisplay = (n: string | null = CHANNELS.whatsapp) => {
   if (!n) return null;
   const m = /^(\d{2})(\d{2})(\d{4,5})(\d{4})$/.exec(n);
@@ -78,47 +71,30 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const toBr = (iso: string) => iso.split('-').reverse().join('/');
 
 /**
- * Datas da campanha de lançamento (PUB-13) — só quando as duas existem, são AAAA-MM-DD e estão em ordem. Decisão da
- * titular de 09/11/2026: manter 06/11/2026 a 06/01/2027, no lugar da regra de dois meses da COM-008-B. As datas são
- * gravadas pela titular em publicacao.json; o código nunca as calcula nem preenche.
+ * Data de vigência da nova estratégia comercial (NEKKORA-COM-ECOSYSTEM-001 §11): a partir dela valem o catálogo e a
+ * tabela de AI Piloto, Monitor e Hosting; solicitações e propostas anteriores mantêm as condições em que foram feitas. Só
+ * a titular grava em publicacao.json (ecossistema.inicio), quando autorizar a publicação; sem ela, a página diz que a
+ * data não foi definida e o portão bloqueia (PUB-13). Não substitui o histórico da PUB-13 anterior
+ * (campanhaLancamento e novasCondicoes, que a página deixa de exibir).
  */
-export const LAUNCH_DATES = (() => {
-  const { inicio, fim } = publicacao.campanhaLancamento;
-  if (inicio == null || fim == null || !ISO_DATE.test(inicio) || !ISO_DATE.test(fim) || inicio > fim) return null;
-  return { inicio, fim };
-})();
-
-/**
- * Vigência da campanha de lançamento (PUB-13). Com as duas datas definidas e válidas, a página informa o período
- * ("de 01/11/2026 a 31/12/2026") e só mostra a faixa e as regras da campanha dentro dele (isLaunchActive). Desde a
- * COM-VITRINE-001 os valores não dependem da campanha (V-01).
- */
-export const LAUNCH_PERIOD = LAUNCH_DATES && { start: toBr(LAUNCH_DATES.inicio), end: toBr(LAUNCH_DATES.fim) };
-
-/**
- * Data de início das novas condições (COM-VITRINE-001 §3.1, V-02): a partir dela valem a tabela e os pacotes da
- * vitrine; solicitações recebidas antes mantêm a oferta anterior. Só a titular grava em publicacao.json; sem ela, a
- * página diz que a data não foi definida (nunca apresenta os valores novos como válidos desde o início da campanha) e
- * o portão bloqueia a publicação (PUB-13).
- */
-export const NEW_CONDITIONS_START: string | null = (() => {
-  const inicio = publicacao.novasCondicoes?.inicio ?? null;
+export const ECOSYSTEM_START: string | null = (() => {
+  const inicio = publicacao.ecossistema?.inicio ?? null;
   return inicio != null && ISO_DATE.test(inicio) ? toBr(inicio) : null;
 })();
 
-/** Situação da campanha hoje, no fuso de Brasília: pendente, futura, vigente ou encerrada (NEKKORA-COM-008-C §3.6). */
-export const launchState = (now: Date = new Date()): CampaignState => campaignState(LAUNCH_DATES ?? { inicio: null, fim: null }, todayInBrazil(now));
+/** Produtos do ecossistema (NEKKORA-COM-ECOSYSTEM-001 §2): independentes entre si (§3). */
+export type ServiceId = 'ai' | 'monitor' | 'hosting';
+export const SERVICE_IDS: ServiceId[] = ['ai', 'monitor', 'hosting'];
 
 /**
- * Comunicação da campanha (faixa e regras) exibida hoje? Dentro do período aprovado, sim. Sem datas, só como PRÉVIA numa versão
- * de homologação (avisoHomologacao): a página diz que as datas não foram definidas e que nenhuma solicitação é elegível
- * ainda, e o portão bloqueia a publicação (PUB-13). Sem o aviso de homologação e sem datas, e antes do início ou depois
- * do fim, nenhuma comunicação promocional: os cartões mostram a mesma tabela (COM-VITRINE-001, V-01).
+ * Estado real de cada produto, gravado pela titular em publicacao.json (servicos; PUB-23). Sem o dado, o mais
+ * conservador: AI em piloto, Monitor e Hosting sob avaliação. "disponivel" só com aprovação própria (o portão confere).
  */
-export const isLaunchActive = (now: Date = new Date()) => {
-  const state = launchState(now);
-  return state === 'vigente' || (state === 'pendente' && publicacao.avisoHomologacao === true);
-};
+export const SERVICE_STATES = {
+  ai: publicacao.servicos?.ai ?? 'piloto',
+  monitor: publicacao.servicos?.monitor ?? 'sob-avaliacao',
+  hosting: publicacao.servicos?.hosting ?? 'sob-avaliacao',
+} as const;
 
 /** Quem responde pelos dados pessoais (aviso de privacidade). Sem o dado confirmado, o aviso usa "a Nekkora". */
 export const DATA_CONTROLLER = {

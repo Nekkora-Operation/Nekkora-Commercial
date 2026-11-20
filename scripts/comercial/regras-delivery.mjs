@@ -7,13 +7,13 @@
  * revisão jurídica: onde a exigibilidade depende de avaliação jurídica, a função devolve essa condição em vez de
  * presumir o resultado.
  *
- * Sem dependências além de src/precos.ts (tabela oficial, lida sem alteração). Valores em CENTAVOS (inteiros).
+ * Sem dependências além de scripts/comercial/tabelas-anteriores.mjs (tabelas históricas do Delivery, lidas sem alteração). Valores em CENTAVOS (inteiros).
  * Datas como 'AAAA-MM-DD' no calendário de Brasília. Contagem de prazos: exclui o dia do começo e inclui o do
  * vencimento (CC art. 132), salvo regra própria indicada.
  */
 // COM-VITRINE-001 (V-02): a tabela ANTERIOR rege as solicitações recebidas antes do início das novas condições
 // (compromissos preservados); a tabela da vitrine (individual e pacote de 3), as recebidas a partir dessa data.
-import { PACKAGE_SIZE, PREVIOUS_PRICE_TABLE as PRICE_TABLE, PRICE_TABLE as TABELA_VITRINE, campaignState } from '../../src/precos.ts';
+import { CAMPANHA_DE_LANCAMENTO as PRICE_TABLE, PACKAGE_SIZE, VITRINE_DELIVERY as TABELA_VITRINE, campaignState } from './tabelas-anteriores.mjs';
 
 /* ------------------------------------------------------------------ */
 /* Calendário                                                         */

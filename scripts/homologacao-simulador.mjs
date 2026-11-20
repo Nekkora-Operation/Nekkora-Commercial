@@ -1,36 +1,29 @@
 #!/usr/bin/env node
 /**
- * Homologação do Simulador de Investimento (NEKKORA-CALC-001) e da conversa pelo WhatsApp que ele abre
- * (NEKKORA-COM-CANAIS-001, titular, 12/11/2026 — substitui o formulário de avaliação da NEKKORA-COM-008-C §8) em
- * navegador real (Playwright: Chromium, Firefox, WebKit).
+ * Homologação do Simulador de investimento (NEKKORA-COM-ECOSYSTEM-001 §4) e da sua passagem para o formulário de
+ * atendimento (§7) em navegador real (Playwright: Chromium, Firefox, WebKit).
  *
  * Uso (builds servidos como no CloudFront — veja .github/workflows/ci.yml):
- *   node scripts/homologacao-simulador.mjs <url de produção> <url da fixture com datas> <pasta> [chromium,firefox,webkit]
- *     [<url da fixture pendente> <url da fixture pendente sem aviso>]
+ *   node scripts/homologacao-simulador.mjs <url de produção> <url da fixture> <pasta> [chromium,firefox,webkit]
+ *     [<url da fixture sem datas de campanha> <url da fixture sem datas e sem aviso>]
  *
- *   - produção (publicacao.json real): campanha aprovada de 06/11/2026 a 06/01/2027 (NEKKORA-COM-RELEASE-FIX-001) →
- *     relógio do navegador fixado na véspera, no primeiro dia, durante, no último dia e no dia seguinte; WhatsApp oficial,
- *     sem Bookings;
- *   - fixture (scripts/fixtures/publicacao-homologacao.json): datas sintéticas 01/11 a 31/12/2026 → relógio do navegador
- *     fixado antes, durante e depois da campanha;
- *   - fixtures pendentes (publicacao-homologacao-pendente*.json): campanha SEM datas → faixa de prévia só com o aviso
- *     de homologação.
+ * O simulador tem quatro campos (automações no AI Piloto e no Monitor, horas-máquina Windows e Linux), todos começando
+ * em zero, só inteiros de 0 ao limite de cada campo; a estimativa acompanha as quantidades na hora (sem botão de
+ * calcular). Cada natureza de cobrança aparece separada — inicial (AI, "a partir de"), mensal (Monitor) e por hora
+ * (Hosting) — e o combinado (AI + PRIMEIRO mês do Monitor + horas de Hosting) nunca é chamado de mensalidade.
  *
- * COM-VITRINE-001: a tabela (individual e pacote de 3) é a mesma em qualquer data (V-01); a campanha controla só a faixa
- * promocional. Sem categoria complexa (V-04).
+ * Valores esperados digitados aqui de propósito (independentes do código) e conferidos contra src/precos.ts antes de
+ * qualquer navegador abrir. A campanha de lançamento ficou só como histórico: o relógio de cada contexto é fixado nas
+ * bordas da antiga campanha (produção) e as fixtures com e sem datas de campanha são exercitadas para provar que nada
+ * muda com a data nem com a publicação.
  *
- * O relógio de cada contexto é sempre fixado (nada depende do dia em que o runner executa). A situação esperada de cada
- * data é derivada de campaignState/todayInBrazil (src/precos.ts) sobre o publicacao.json e conferida contra a tabela
- * explícita da missão.
- *
- * Nada sai do localhost: qualquer outra requisição é abortada e reprova. A aba do WhatsApp aberta pelo CTA do resultado
- * ("Conversar sobre esta simulação") é respondida por uma página local de teste — o wa.me real nunca é acessado. A página
- * não tem formulário nem diálogo: a simulação só segue, como texto editável, na mensagem inicial do WhatsApp.
+ * Nada sai do localhost: qualquer outra requisição é abortada e reprova. window.open é substituído por um registro
+ * (nenhuma aba do WhatsApp é aberta aqui — a aba, o isolamento e o botão flutuante estão em homologacao-canais.mjs).
  */
 import { createRequire } from 'node:module';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { campaignState, todayInBrazil } from '../src/precos.ts';
+import { PRICE_TABLE, SIM_LIMITS } from '../src/precos.ts';
 
 const [
   ,
@@ -47,77 +40,53 @@ const playwright = require('playwright');
 const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 mkdirSync(outDir, { recursive: true });
 
-const PUBLICACAO = JSON.parse(readFileSync('publicacao.json', 'utf8'));
-/**
- * Mensagens do WhatsApp (NEKKORA-COM-CANAIS-001), digitadas de propósito — iguais a WHATSAPP_MESSAGES (src/config.ts) e
- * SIMULATOR.whatsappIntro (src/content.ts), conferidas contra o código-fonte antes de qualquer navegador abrir.
- */
-const MSG_DELIVERY = 'Olá! Tenho interesse em desenvolver automações com a Nekkora.';
-const MSG_HOSTING = 'Olá! Tenho interesse em hospedagem de automações com a Nekkora e gostaria de saber como funciona a avaliação de viabilidade.';
-const SIM_INTRO = 'Fiz esta simulação na página:';
-if (!readFileSync('src/config.ts', 'utf8').includes(`delivery: '${MSG_DELIVERY}'`) || !readFileSync('src/config.ts', 'utf8').includes(`hosting: '${MSG_HOSTING}'`)) {
-  throw new Error('src/config.ts: mensagens do WhatsApp divergem da homologação');
+/** Tabela e limites digitados de propósito — iguais a PRICE_TABLE e SIM_LIMITS de src/precos.ts. */
+const PRICES = { ai: 100, monitor: 75, windows: 25, linux: 12 };
+const LIMITS = { ai: 50, monitor: 50, windows: 744, linux: 744 };
+{
+  const src = { ai: PRICE_TABLE.ai.porAutomacao, monitor: PRICE_TABLE.monitor.porAutomacaoMes, windows: PRICE_TABLE.hosting.windowsPorHora, linux: PRICE_TABLE.hosting.linuxPorHora };
+  if (JSON.stringify(src) !== JSON.stringify(PRICES)) throw new Error(`src/precos.ts: tabela diverge da homologação: ${JSON.stringify(src)}`);
+  if (JSON.stringify(SIM_LIMITS) !== JSON.stringify(LIMITS)) throw new Error(`src/precos.ts: limites divergem da homologação: ${JSON.stringify(SIM_LIMITS)}`);
 }
-if (!readFileSync('src/content.ts', 'utf8').includes(`whatsappIntro: '${SIM_INTRO}'`)) throw new Error('src/content.ts: whatsappIntro diverge da homologação');
-/** Resumo do exemplo (4 simples + 1 média) como vai para o WhatsApp — digitado de propósito. */
-const SUMMARY_LINES = [
-  '- 4 automações simples: 1 pacote de 3 (R$ 1.500 cada) + 1 individual (R$ 650 cada) = R$ 2.150',
-  '- 1 automação média: 1 individual (R$ 1.400 cada) = R$ 1.400',
-  'Investimento estimado: R$ 3.550',
-  'Sem pacotes, no preço individual: R$ 4.000 · Economia com pacotes: R$ 450',
-];
-/** Texto (parâmetro text) de um link wa.me para o número da publicação; null se for outro destino. */
-const waText = (href, number) => {
-  try {
-    const u = new URL(href);
-    return u.origin === 'https://wa.me' && u.pathname === `/${number}` ? u.searchParams.get('text').replace(/ /g, ' ') : null;
-  } catch {
-    return null;
-  }
+const FIELDS = ['ai', 'monitor', 'windows', 'linux'];
+/** Unidades sob cada campo — iguais às linhas dos cartões de preço. */
+const UNITS = ['A partir de R$ 100 por automação', 'R$ 75 por automação, por mês', 'R$ 25 por hora-máquina', 'R$ 12 por hora-máquina'];
+/** Rótulos dos resultados (§4): cada natureza de cobrança separada; o combinado nunca é mensalidade. */
+const LABELS = {
+  ai: 'Investimento inicial estimado no AI Piloto',
+  monitor: 'Valor mensal estimado do Monitor',
+  hosting: 'Hosting para as horas selecionadas',
+  combinado: 'Investimento combinado estimado',
 };
+const COMBINED_NOTE = 'Soma do AI Piloto, do primeiro mês do Monitor e das horas de Hosting selecionadas. Não é uma mensalidade.';
+const DISCLAIMER = 'Esta simulação é só uma estimativa. Não é proposta nem contratação: escopo, condições e valores definitivos são confirmados na avaliação e registrados em proposta comercial.';
+const EMPTY_TEXT = 'Informe ao menos uma quantidade para ver a estimativa.';
+/** Mensagem do formulário (src/config.ts e src/mensagem.ts), digitada de propósito. */
+const GREETING = 'Olá! Gostaria de conversar com um analista da Nekkora.';
+if (!readFileSync('src/config.ts', 'utf8').includes(`WHATSAPP_GREETING = '${GREETING}'`)) throw new Error('src/config.ts: WHATSAPP_GREETING diverge da homologação');
+
+/** Exemplo principal: 2 automações no AI, 3 no Monitor, 10 h Windows e 20 h Linux. */
+const EXAMPLE_Q = { ai: 2, monitor: 3, windows: 10, linux: 20 };
+const EXAMPLE = { ai: 'a partir de R$ 200', monitor: 'R$ 225 por mês', hosting: 'R$ 490', combinado: 'R$ 915' };
+const EXAMPLE_SUMMARY = [
+  '- Nekkora AI (piloto): 2 automações × R$ 100 = a partir de R$ 200',
+  '- Nekkora Monitor: 3 automações × R$ 75 = R$ 225 por mês',
+  '- Nekkora Hosting Windows: 10 horas × R$ 25 = R$ 250',
+  '- Nekkora Hosting Linux: 20 horas × R$ 12 = R$ 240',
+  `Investimento combinado estimado: R$ 915 (${COMBINED_NOTE})`,
+].join('\n');
+/** Valores da tabela anterior (Delivery e campanha) e restos do modelo anterior: nunca no simulador. */
+const PREVIOUS = /R\$ 650|R\$ 1\.500|R\$ 1\.400|R\$ 3\.500|R\$ 1\.000|R\$ 2\.800|pacote|Economia|simples|média|lançamento|Delivery|NaN|undefined|Infinity/;
+
 const THEME_KEY = 'nekkora-commercial-tema';
-const DISCLAIMER =
-  'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.';
-// Exemplo da COM-VITRINE-001, digitado aqui de propósito (independente do código): 4 simples + 1 média →
-// 1 pacote de 3 simples + 1 simples + 1 média
-const EXAMPLE = { estimativa: 'R$ 3.550', individual: 'R$ 4.000', economia: 'R$ 450' };
-// 2 simples + 1 média: nenhum pacote (categorias não se misturam), sem economia
-const EXAMPLE_NO_PACKAGE = { estimativa: 'R$ 2.700' };
-// Cartões: a mesma tabela em qualquer data
-const TABLE = {
-  simples: { individual: 'R$ 650', pacote: 'R$ 1.500', economia: 'Economia de R$ 450' },
-  media: { individual: 'R$ 1.400', pacote: 'R$ 3.500', economia: 'Economia de R$ 700' },
-};
-const UNITS = 'R$ 650 cada · R$ 1.500 o pacote de 3,R$ 1.400 cada · R$ 3.500 o pacote de 3';
-const SUMMARY_EXAMPLE = /4 automações simples: 1 pacote de 3 \(R\$ 1\.500 cada\) \+ 1 individual \(R\$ 650 cada\) = R\$ 2\.150/;
-/** Valores da tabela anterior e do antigo exemplo: nunca podem aparecer no simulador. */
-const PREVIOUS = /R\$ 1\.000|R\$ 2\.800|R\$ 4\.800|R\$ 6\.500|26,15%|lançamento|Desconto/;
-/** Fixture sintética (01/11 a 31/12/2026): antes, durante e depois. */
-const AT = {
-  vigente: new Date('2026-11-15T12:00:00-03:00'),
-  futura: new Date('2026-10-31T23:30:00-03:00'),
-  encerrada: new Date('2027-01-01T00:30:00-03:00'),
-  // fixtures sem datas: qualquer dia
-  pendente: new Date('2026-11-15T12:00:00-03:00'),
-};
-/**
- * Campanha real (publicacao.json), nas bordas do fuso de Brasília: 23h30 de 05/11 já é 06/11 em UTC, e 00h30 de 07/01
- * ainda é 06/01 em UTC — a página precisa seguir o calendário brasileiro.
- */
-const PROD_DATES = [
-  { id: '2026-11-05-campanha-futura', at: new Date('2026-11-05T23:30:00-03:00'), state: 'futura' },
-  { id: '2026-11-06-primeiro-dia', at: new Date('2026-11-06T00:30:00-03:00'), state: 'vigente' },
-  { id: '2026-11-15-campanha-vigente', at: new Date('2026-11-15T12:00:00-03:00'), state: 'vigente' },
-  { id: '2027-01-06-ultimo-dia', at: new Date('2027-01-06T23:30:00-03:00'), state: 'vigente' },
-  { id: '2027-01-07-campanha-encerrada', at: new Date('2027-01-07T00:30:00-03:00'), state: 'encerrada' },
+/** Bordas da antiga campanha de lançamento (06/11/2026 a 06/01/2027) no fuso de Brasília: a estimativa não muda. */
+const DATES = [
+  { id: '2026-11-05-vespera', at: new Date('2026-11-05T23:30:00-03:00') },
+  { id: '2026-11-06-primeiro-dia', at: new Date('2026-11-06T00:30:00-03:00') },
+  { id: '2027-01-06-ultimo-dia', at: new Date('2027-01-06T23:30:00-03:00') },
+  { id: '2027-01-07-dia-seguinte', at: new Date('2027-01-07T00:30:00-03:00') },
 ];
-// A tabela explícita acima tem de coincidir com as regras de src/precos.ts aplicadas às datas aprovadas
-for (const d of PROD_DATES) {
-  const derived = campaignState(PUBLICACAO.campanhaLancamento, todayInBrazil(d.at));
-  if (derived !== d.state) throw new Error(`${d.id}: publicacao.json + src/precos.ts dão "${derived}", esperado "${d.state}" (datas ${JSON.stringify(PUBLICACAO.campanhaLancamento)})`);
-}
-const toBr = (iso) => iso.split('-').reverse().join('/');
-const PROD_PERIOD = `de ${toBr(PUBLICACAO.campanhaLancamento.inicio)} a ${toBr(PUBLICACAO.campanhaLancamento.fim)}`;
+const AT = new Date('2026-11-20T12:00:00-03:00');
 
 const checks = [];
 const check = (engine, id, ok, detail) => {
@@ -129,22 +98,27 @@ const shots = [];
 async function run(engine) {
   const browser = await playwright[engine].launch();
   const external = [];
-  const waTabs = [];
   const errors = [];
   /** Contexto isolado com relógio fixo; tema opcional; toda requisição fora do localhost é abortada e registrada. */
-  async function open(url, { at = AT.vigente, viewport = { width: 1280, height: 900 }, theme = null } = {}) {
+  async function open(url, { at = AT, viewport = { width: 1280, height: 900 }, theme = null } = {}) {
     const ctx = await browser.newContext({ viewport, reducedMotion: 'reduce' });
     await ctx.clock.setFixedTime(at);
-    if (theme) await ctx.addInitScript(([k, t]) => localStorage.setItem(k, t), [THEME_KEY, theme]);
+    await ctx.addInitScript(
+      ([k, t]) => {
+        // Registro de window.open: o envio do formulário prepara o link do WhatsApp; nenhuma aba é aberta aqui
+        window.__nkOpen = [];
+        window.open = (...a) => {
+          window.__nkOpen.push(a);
+          return null;
+        };
+        if (t) localStorage.setItem(k, t);
+      },
+      [THEME_KEY, theme],
+    );
     const origin = new URL(url).origin;
     await ctx.route('**/*', (route) => {
       const u = route.request().url();
       if (u.startsWith(origin) || u.startsWith('data:') || u.startsWith('blob:')) return route.continue();
-      // Aba do WhatsApp aberta por um CTA: página LOCAL de teste (nada sai da máquina), registrada à parte
-      if (u.startsWith('https://wa.me/')) {
-        waTabs.push({ url: u, referer: route.request().headers()['referer'] ?? null });
-        return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: '<!doctype html><meta charset="utf-8"><title>wa.me (página de teste local)</title>' });
-      }
       external.push(u);
       return route.abort();
     });
@@ -153,46 +127,58 @@ async function run(engine) {
     page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
     await page.goto(url, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
-    return { ctx, page, sim: page.locator('[data-simulator]') };
+    const sim = page.locator('[data-simulator]');
+    await sim.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    return { ctx, page, sim };
   }
   const shot = async (locator, name) => {
     const file = `${engine}-${name}.png`;
     await locator.screenshot({ path: path.join(outDir, file), style: 'header, nav, .nk-fab { visibility: hidden !important; }' });
     shots.push(file);
   };
-  const plus = (sim, tier, times = 1) => Array.from({ length: times }).reduce((p) => p.then(() => sim.locator(`[data-sim-tier="${tier}"] [data-sim-action="aumentar"]`).click()), Promise.resolve());
-  const calc = (sim) => sim.getByRole('button', { name: 'Calcular meu investimento' }).click();
-  const figures = (sim) => sim.evaluate((el) => Object.fromEntries([...el.querySelectorAll('[data-calc]')].map((e) => [e.dataset.calc, e.textContent.trim()])));
-  /** CTA do resultado ("Conversar sobre esta simulação"): destino, isolamento e o texto que vai para o WhatsApp. */
-  const simCta = (sim) =>
-    sim.locator('[data-sim-result]').evaluate((r) => {
-      const a = r.querySelector('a[data-whatsapp]');
-      return {
-        count: r.querySelectorAll('a[data-whatsapp]').length,
-        dialogTriggers: r.querySelectorAll('[aria-haspopup]').length,
-        ctx: a?.getAttribute('data-whatsapp') ?? null,
-        href: a?.getAttribute('href') ?? '',
-        target: a?.getAttribute('target'),
-        rel: a?.getAttribute('rel') ?? '',
-        label: a?.textContent.replace(/\s+/g, ' ').trim() ?? '',
-      };
-    });
-  /** Clica num link do WhatsApp e espera a aba nova (local): nenhum diálogo, nenhuma requisição da página. */
-  async function clickWa(page, locator) {
-    const before = waTabs.length;
-    const requests = [];
-    const onRequest = (r) => requests.push(r.url());
-    page.on('request', onRequest);
-    const popupPromise = page.waitForEvent('popup', { timeout: 8000 }).catch(() => null);
-    await locator.click();
-    const popup = await popupPromise;
-    if (popup) await popup.waitForLoadState('load').catch(() => {});
-    page.off('request', onRequest);
-    const dialogs = await page.evaluate(() => document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open], form').length);
-    if (popup) await popup.close();
-    const tab = waTabs.slice(before).at(-1) ?? null;
-    return { popup: !!popup, tab, dialogs, requests };
-  }
+  const input = (sim, f) => sim.locator(`[data-sim-input="${f}"]`);
+  const btn = (sim, f, action) => sim.locator(`[data-sim-campo="${f}"] [data-sim-action="${action}"]`);
+  const plus = async (sim, f, times = 1) => {
+    for (let i = 0; i < times; i++) await btn(sim, f, 'aumentar').click();
+  };
+  /** Quantidades pelo campo numérico (digitação), como o visitante faria; Tab confirma o campo. */
+  const setQ = async (sim, q) => {
+    for (const f of FIELDS) {
+      if (q[f] == null) continue;
+      await input(sim, f).fill(String(q[f]));
+      await input(sim, f).press('Tab');
+    }
+  };
+  const clear = (sim) => sim.locator('[data-sim-action="limpar"]').click();
+  const read = (sim) =>
+    sim.evaluate((el) => ({
+      values: [...el.querySelectorAll('[data-sim-input]')].map((i) => i.value),
+      state: el.querySelector('[data-sim-result]')?.getAttribute('data-sim-result') ?? null,
+      figures: Object.fromEntries([...el.querySelectorAll('[data-calc]')].map((e) => [e.getAttribute('data-calc'), e.textContent.replace(/\s+/g, ' ').trim()])),
+      labels: Object.fromEntries([...el.querySelectorAll('[data-calc]')].map((e) => [e.getAttribute('data-calc'), e.previousElementSibling?.textContent.trim() ?? null])),
+      text: el.querySelector('[data-sim-result]')?.innerText ?? '',
+      cta: el.querySelectorAll('[data-atendimento-origem="simulador"]').length,
+    }));
+  /** Espera (até 2 s) a estimativa chegar ao esperado — a atualização é imediata; a espera só evita corrida de leitura. */
+  const waitFigures = async (sim, expected) => {
+    await sim
+      .evaluate(
+        (el, exp) =>
+          new Promise((resolve) => {
+            const t0 = Date.now();
+            const tick = () => {
+              const f = Object.fromEntries([...el.querySelectorAll('[data-calc]')].map((e) => [e.getAttribute('data-calc'), e.textContent.replace(/\s+/g, ' ').trim()]));
+              if (JSON.stringify(f) === exp || Date.now() - t0 > 2000) resolve();
+              else requestAnimationFrame(tick);
+            };
+            tick();
+          }),
+        JSON.stringify(expected),
+      )
+      .catch(() => {});
+    return read(sim);
+  };
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
   // 1. Integração, estado inicial e consistência com os cartões (produção) -------------------------------------------
   {
@@ -204,237 +190,266 @@ async function run(engine) {
         inPricing: !!s?.closest('[data-pricing]') && !!s?.closest('#precos'),
         afterCards: !!cards && !!s && (cards.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_FOLLOWING) > 0,
         title: s?.querySelector('h3')?.textContent,
-        noForm: !s?.querySelector('form, input[type="email"], input[type="password"]'),
+        noForm: !s?.querySelector('form, input[type="email"], input[type="password"], textarea'),
+        calcButton: [...(s?.querySelectorAll('button') ?? [])].filter((b) => /calcular/i.test(b.textContent ?? '')).length,
       };
     });
-    check(engine, 'integrado-na-secao-de-precos', place.inPricing && place.afterCards && place.title === 'Simulador de Investimento — Nekkora Delivery' && place.noForm, JSON.stringify(place));
+    check(engine, 'integrado-na-secao-de-precos', place.inPricing && place.afterCards && place.title === 'Simulador de investimento' && place.noForm, JSON.stringify(place));
     const initial = await sim.evaluate((el) => ({
+      fields: [...el.querySelectorAll('[data-sim-campo]')].map((t) => t.getAttribute('data-sim-campo')),
       values: [...el.querySelectorAll('[data-sim-input]')].map((i) => i.value),
-      tiers: [...el.querySelectorAll('[data-sim-tier]')].map((t) => t.dataset.simTier),
-      total: el.querySelector('[data-sim-total]')?.getAttribute('data-sim-total'),
-      result: !!el.querySelector('[data-sim-result]'),
-      minusDisabled: [...el.querySelectorAll('[data-sim-action="diminuir"]')].every((b) => b.getAttribute('aria-disabled') === 'true'),
+      state: el.querySelector('[data-sim-result]')?.getAttribute('data-sim-result'),
+      calc: el.querySelectorAll('[data-calc]').length,
+      cta: el.querySelectorAll('[data-atendimento-origem="simulador"]').length,
+      empty: el.querySelector('.sim__warning')?.textContent.trim() ?? null,
+      minusDisabled: [...el.querySelectorAll('[data-sim-action="diminuir"]')].map((b) => b.getAttribute('aria-disabled')),
+      plusDisabled: [...el.querySelectorAll('[data-sim-action="aumentar"]')].map((b) => b.getAttribute('aria-disabled')),
+      max: [...el.querySelectorAll('[data-sim-input]')].map((i) => i.getAttribute('aria-valuemax')),
     }));
-    check(engine, 'inicia-com-zero-so-simples-e-media', JSON.stringify(initial.values) === '["0","0"]' && initial.tiers.join() === 'simples,media' && initial.total === '0' && !initial.result && initial.minusDisabled, JSON.stringify(initial));
+    check(
+      engine,
+      'inicia-com-zero-nos-quatro-campos',
+      initial.fields.join() === FIELDS.join() &&
+        initial.values.join() === '0,0,0,0' &&
+        initial.state === 'vazio' &&
+        initial.calc === 0 &&
+        initial.cta === 0 &&
+        initial.empty === EMPTY_TEXT &&
+        initial.minusDisabled.every((d) => d === 'true') &&
+        initial.plusDisabled.every((d) => d == null) &&
+        initial.max.join() === FIELDS.map((f) => LIMITS[f]).join(),
+      JSON.stringify(initial),
+    );
+    // Consistência com os cartões: a unidade de cada campo é a linha do cartão de preço correspondente
+    const cards = await page.evaluate(() => ({
+      lines: [...document.querySelectorAll('[data-pricing] .price__line')].map((l) => [...l.children].map((c) => c.textContent.trim()).join(' ')),
+      units: [...document.querySelectorAll('[data-sim-campo] .sim__tier-unit')].map((u) => u.textContent.trim()),
+    }));
+    const cardUnits = cards.lines.map((l) => l.replace(/^(Windows|Linux) /, ''));
+    check(engine, 'consistente-com-os-cartoes', same(cards.units, UNITS) && same(cardUnits, UNITS), `${cards.units.join(' · ')} | cartões: ${cards.lines.join(' · ')}`);
     await shot(sim, 'simulador-inicial-producao');
-    await plus(sim, 'simples', 4);
-    await plus(sim, 'media');
-    await calc(sim);
-    const f = await figures(sim);
-    const res = await sim.locator('[data-sim-result]').evaluate((e) => ({ packages: e.dataset.simPacotes, text: e.innerText }));
-    check(engine, 'calculo-exemplo-com-pacote', JSON.stringify(f) === JSON.stringify(EXAMPLE) && res.packages === '1' && !PREVIOUS.test(res.text), `${JSON.stringify(f)} · pacotes=${res.packages}`);
-    check(engine, 'aviso-de-transparencia', res.text.includes(DISCLAIMER) && /não é uma economia operacional comprovada/.test(res.text) && /Categorias diferentes não se misturam em um pacote/.test(res.text), 'texto obrigatório, economia comercial ≠ operacional e regra dos pacotes');
-    // 19. Consistência com os cartões: os valores de cada categoria são os do cartão
-    const cards = await page.evaluate(() => ({
-      table: Object.fromEntries([...document.querySelectorAll('[data-price-tier]')].map((el) => [el.dataset.priceTier, Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.dataset.price, v.textContent.trim()]))])),
-      lines: [...document.querySelectorAll('[data-sim-line]')].map((l) => `${l.dataset.simLine}:${l.innerText.replace(/\s+/g, ' ')}`),
-      units: [...document.querySelectorAll('[data-sim-tier] .sim__tier-unit')].map((u) => u.textContent.trim()),
-    }));
-    const t = cards.table;
+    // Ao vivo: sem botão de calcular; um clique em + já mostra a estimativa
+    await plus(sim, 'ai');
+    const live = await waitFigures(sim, { ai: 'a partir de R$ 100', combinado: 'R$ 100' });
+    check(engine, 'estimativa-ao-vivo-sem-botao-calcular', place.calcButton === 0 && live.state === 'calculado' && same(live.figures, { ai: 'a partir de R$ 100', combinado: 'R$ 100' }), `botões "calcular"=${place.calcButton}; depois de um +: ${JSON.stringify(live.figures)}`);
+    // Digitação também atualiza na hora, sem sair do campo
+    await input(sim, 'monitor').fill('4');
+    const typed = await waitFigures(sim, { ai: 'a partir de R$ 100', monitor: 'R$ 300 por mês', combinado: 'R$ 400' });
+    check(engine, 'digitacao-atualiza-sem-sair-do-campo', same(typed.figures, { ai: 'a partir de R$ 100', monitor: 'R$ 300 por mês', combinado: 'R$ 400' }), JSON.stringify(typed.figures));
+    await ctx.close();
+  }
+
+  // 2. Cada produto sozinho, combinações, todos em zero e a soma correta -------------------------------------------------
+  {
+    const { ctx, page, sim } = await open(prodUrl);
+    const cases = [
+      ['so-ai', { ai: 3 }, { ai: 'a partir de R$ 300', combinado: 'R$ 300' }],
+      ['so-monitor', { monitor: 4 }, { monitor: 'R$ 300 por mês', combinado: 'R$ 300' }],
+      ['so-hosting-windows', { windows: 10 }, { hosting: 'R$ 250', combinado: 'R$ 250' }],
+      ['so-hosting-linux', { linux: 7 }, { hosting: 'R$ 84', combinado: 'R$ 84' }],
+      ['ai-e-monitor', { ai: 1, monitor: 1 }, { ai: 'a partir de R$ 100', monitor: 'R$ 75 por mês', combinado: 'R$ 175' }],
+      ['windows-e-linux', { windows: 1, linux: 1 }, { hosting: 'R$ 37', combinado: 'R$ 37' }],
+      ['monitor-e-hosting', { monitor: 2, linux: 5 }, { monitor: 'R$ 150 por mês', hosting: 'R$ 60', combinado: 'R$ 210' }],
+      ['os-quatro', EXAMPLE_Q, EXAMPLE],
+      ['separador-de-milhar', { ai: 12, windows: 100 }, { ai: 'a partir de R$ 1.200', hosting: 'R$ 2.500', combinado: 'R$ 3.700' }],
+    ];
+    const out = [];
+    for (const [id, q, expected] of cases) {
+      await clear(sim);
+      await setQ(sim, q);
+      const r = await waitFigures(sim, expected);
+      const ok = r.state === 'calculado' && same(r.figures, expected) && !PREVIOUS.test(r.text);
+      out.push(ok);
+      check(engine, `calculo:${id}`, ok, `${JSON.stringify(q)} → ${JSON.stringify(r.figures)}`);
+      if (id === 'os-quatro') await shot(sim, 'simulador-quatro-servicos');
+    }
+    // Separação das naturezas de cobrança (§4): rótulos, "a partir de" só no AI, "por mês" só no Monitor, combinado nunca
+    // chamado de mensalidade, com a nota e o aviso de estimativa
+    await clear(sim);
+    await setQ(sim, EXAMPLE_Q);
+    const r = await waitFigures(sim, EXAMPLE);
+    const notes = await sim.evaluate((el) => ({ note: [...el.querySelectorAll('.sim__result .sim__note')].map((n) => n.textContent.trim()), disclaimer: el.querySelector('[data-sim-aviso]')?.textContent.trim() ?? '' }));
     check(
       engine,
-      'consistente-com-os-cartoes',
-      cards.units[0] === `${t.simples?.individual} cada · ${t.simples?.pacote} o pacote de 3` &&
-        cards.units[1] === `${t.media?.individual} cada · ${t.media?.pacote} o pacote de 3` &&
-        cards.lines[0].includes(`(${t.simples?.pacote} cada)`) &&
-        cards.lines[0].includes(`(${t.simples?.individual} cada)`) &&
-        cards.lines[1].includes(`(${t.media?.individual} cada)`),
-      `${cards.units.join(' · ')} | ${cards.lines.join(' · ')}`,
+      'cobrancas-separadas-combinado-nao-e-mensalidade',
+      same(r.labels, LABELS) &&
+        /^a partir de /.test(r.figures.ai) &&
+        / por mês$/.test(r.figures.monitor) &&
+        !/mês|mensal|a partir/.test(r.figures.hosting + r.figures.combinado) &&
+        !/mensal/i.test(r.labels.combinado) &&
+        notes.note.includes(COMBINED_NOTE) &&
+        notes.disclaimer === DISCLAIMER,
+      `${Object.entries(r.labels).map(([k, v]) => `${v}: ${r.figures[k]}`).join(' · ')} · nota="${notes.note.join(' ')}"`,
     );
-    // Caminho após a simulação: só a conversa pelo WhatsApp (NEKKORA-COM-CANAIS-001). Sem agendamento (Bookings saiu da
-    // página pública) nem formulário: nenhum link de agendamento, nenhum botão que abra diálogo.
-    const semAgenda = await sim.locator('[data-sim-result]').evaluate((e) => ({
-      links: e.querySelectorAll('a[data-agendar], a[href*="bookings"], a[href*="/book/"], a[href^="mailto:"]').length,
-      text: /Agendar|Bookings|Teams/.test(e.innerText),
-      dialogTriggers: e.querySelectorAll('[aria-haspopup]').length,
-    }));
-    check(engine, 'sem-bookings-nenhum-link-de-agendamento', semAgenda.links === 0 && !semAgenda.text && semAgenda.dialogTriggers === 0, JSON.stringify(semAgenda));
-    const status = await page.locator('[data-testid="status-simulador"]').innerText();
-    check(engine, 'resultado-anunciado-em-regiao-viva', /Resultado da simulação atualizado\./.test(status) && (await page.locator('[data-testid="status-simulador"]').getAttribute('role')) === 'status', status.slice(0, 120));
-    await shot(sim, 'simulador-com-pacote-producao');
+    // Todos em zero: de volta ao estado vazio (nenhum valor, nenhum CTA)
+    await clear(sim);
+    await plus(sim, 'linux');
+    await btn(sim, 'linux', 'diminuir').click();
+    const zero = await read(sim);
+    check(engine, 'todos-em-zero-sem-estimativa', zero.values.join() === '0,0,0,0' && zero.state === 'vazio' && same(zero.figures, {}) && zero.cta === 0 && (await sim.locator('.sim__warning').innerText()) === EMPTY_TEXT, JSON.stringify(zero.figures));
+    // Limpar: zera os quatro campos e anuncia
+    await setQ(sim, EXAMPLE_Q);
+    await clear(sim);
+    const cleared = await read(sim);
+    const status = page.locator('[data-testid="status-simulador"]');
+    const statusText = await status.innerText();
+    check(engine, 'limpar-zera-tudo', cleared.values.join() === '0,0,0,0' && cleared.state === 'vazio' && cleared.cta === 0 && /Simulação limpa\./.test(statusText), `${cleared.values.join(',')} · região viva: ${statusText}`);
     await ctx.close();
   }
 
-  // Campanha real (publicacao.json): véspera, primeiro dia, vigente, último dia e dia seguinte ------------------------
-  // A tabela não muda com a data (V-01): só a faixa promocional aparece ou não.
-  for (const d of PROD_DATES) {
-    const promo = d.state === 'vigente';
-    const { ctx, page, sim } = await open(prodUrl, { at: d.at });
-    const cards = await page.evaluate(() => {
-      const block = document.querySelector('[data-pricing]');
-      return {
-        table: Object.fromEntries(
-          [...block.querySelectorAll('[data-price-tier]')].map((el) => [el.dataset.priceTier, Object.fromEntries([...el.querySelectorAll('[data-price]')].map((v) => [v.dataset.price, v.textContent.trim()]))]),
-        ),
-        struck: [...block.querySelectorAll('[data-price-tier] s, [data-price-tier] del')].map((s) => s.textContent.trim()),
-        strip: block.querySelector('.launch-strip')?.innerText.replace(/\s+/g, ' ').trim() ?? null,
-        preview: !!block.querySelector('[data-campanha="pendente"]'),
-      };
-    });
-    const cardsOk = JSON.stringify(cards.table) === JSON.stringify(TABLE) && cards.struck.length === 0 && !cards.preview && (promo ? !!cards.strip?.includes(PROD_PERIOD) : cards.strip === null);
-    check(engine, `producao-${d.id}:cartoes`, cardsOk, `${JSON.stringify(cards.table)} · riscados=${cards.struck.join(',') || 'nenhum'} · faixa=${cards.strip ?? 'ausente'}`);
-    await plus(sim, 'simples', 4);
-    await plus(sim, 'media');
-    await calc(sim);
-    const f = await figures(sim);
-    const text = await sim.locator('[data-sim-result]').innerText();
-    const units = await sim.locator('.sim__tier-unit').allInnerTexts();
-    const label = await sim.locator('.sim__figure--main dt').innerText();
-    const simOk = JSON.stringify(f) === JSON.stringify(EXAMPLE) && label === 'Investimento estimado' && units.join() === UNITS && !PREVIOUS.test(text);
-    check(engine, `producao-${d.id}:simulador`, simOk, `${label}: ${JSON.stringify(f)} · ${units.join(' · ')}`);
-    // Resumo levado à mensagem do WhatsApp (NEKKORA-COM-CANAIS-001; antes, ao formulário): os mesmos valores em qualquer
-    // data, depois da mensagem do Delivery
-    const cta = await simCta(sim);
-    const message = waText(cta.href, PUBLICACAO.canais.whatsapp) ?? '';
-    const summaryOk =
-      cta.count === 1 && cta.ctx === 'delivery' && message === `${MSG_DELIVERY}\n\n${SIM_INTRO}\n${SUMMARY_LINES.join('\n')}` && SUMMARY_EXAMPLE.test(message) && !PREVIOUS.test(message);
-    check(engine, `producao-${d.id}:resumo-no-whatsapp`, summaryOk, message.replace(/\n/g, ' / ').slice(0, 220) || `CTA: ${JSON.stringify(cta)}`);
-    await shot(sim, `simulador-producao-${d.id}`);
-    await ctx.close();
-  }
-
-  // 12. Datas pendentes (fixtures sem datas): faixa de prévia só com o aviso de homologação; preços sempre os mesmos ---
-  for (const [id, url, withNotice] of [
-    ['datas-pendentes-previa-com-aviso', pendingUrl, true],
-    ['datas-pendentes-sem-aviso-sem-faixa', pendingNoNoticeUrl, false],
-  ]) {
-    const { ctx, page, sim } = await open(url, { at: AT.pendente });
-    await plus(sim, 'simples', 4);
-    await plus(sim, 'media');
-    await calc(sim);
-    const f = await figures(sim);
-    const text = await sim.locator('[data-sim-result]').innerText();
-    const cards = await page.evaluate(() => ({
-      struck: document.querySelectorAll('[data-pricing] [data-price-tier] s').length,
-      preview: document.querySelectorAll('[data-pricing] [data-campanha="pendente"]').length,
-      strip: !!document.querySelector('[data-pricing] .launch-strip'),
+  // 3. Limites e entradas inválidas -----------------------------------------------------------------------------------
+  {
+    const { ctx, sim } = await open(fixtureUrl);
+    // Digitação: só dígitos, sem sinal, vírgula, ponto ou expoente; acima do limite, o limite
+    const typed = [];
+    for (const [f, value, expected] of [
+      ['ai', '-5', '5'],
+      ['ai', 'abc', ''],
+      ['ai', '2,5', '25'],
+      ['ai', '2.5', '25'],
+      ['ai', '1e3', '13'],
+      ['ai', '007', '7'],
+      ['ai', ' 12 ', '12'],
+      ['ai', '999', '50'],
+      ['monitor', '51', '50'],
+      ['windows', '745', '744'],
+      ['windows', '999', '744'],
+      ['linux', '744', '744'],
+    ]) {
+      await input(sim, f).fill(value);
+      const got = await input(sim, f).inputValue();
+      typed.push(`${f}:${JSON.stringify(value)}→${JSON.stringify(got)}${got === expected ? '' : ` (esperado ${JSON.stringify(expected)})`}`);
+    }
+    // Números enormes: nunca acima do limite nem fracionários (o campo aceita no máximo 3 dígitos)
+    const huge = [];
+    for (const [f, value] of [
+      ['ai', '100000'],
+      ['windows', '99999999'],
+      ['linux', '1e308'],
+    ]) {
+      await input(sim, f).fill(value);
+      const got = await input(sim, f).inputValue();
+      huge.push(`${f}:${value}→${got}`);
+      if (!/^\d+$/.test(got) || Number(got) > LIMITS[f]) huge.push('(FORA DO LIMITE)');
+    }
+    // Campo vazio vira 0 ao sair dele
+    await input(sim, 'ai').fill('');
+    await input(sim, 'ai').press('Tab');
+    const afterBlur = await input(sim, 'ai').inputValue();
+    const text = (await read(sim)).text;
+    check(
+      engine,
+      'protecao-contra-valores-invalidos',
+      typed.every((t) => !t.includes('esperado')) && !huge.includes('(FORA DO LIMITE)') && afterBlur === '0' && !/NaN|undefined|Infinity|-R\$/.test(text),
+      `${typed.join(' · ')} · enormes: ${huge.join(' ')} · vazio+saída→${afterBlur}`,
+    );
+    // Todos no limite: + com aria-disabled e sem efeito (clique e seta ↑), − disponível; valores no limite
+    await setQ(sim, { ai: '999', monitor: '999', windows: '999', linux: '999' });
+    const atMax = await waitFigures(sim, { ai: 'a partir de R$ 5.000', monitor: 'R$ 3.750 por mês', hosting: 'R$ 27.528', combinado: 'R$ 36.278' });
+    for (const f of FIELDS) await btn(sim, f, 'aumentar').click({ force: true });
+    await input(sim, 'windows').focus();
+    await input(sim, 'windows').press('ArrowUp');
+    const after = await read(sim);
+    const flags = await sim.evaluate((el) => ({
+      plus: [...el.querySelectorAll('[data-sim-action="aumentar"]')].map((b) => b.getAttribute('aria-disabled')),
+      minus: [...el.querySelectorAll('[data-sim-action="diminuir"]')].map((b) => b.getAttribute('aria-disabled')),
+      now: [...el.querySelectorAll('[data-sim-input]')].map((i) => i.getAttribute('aria-valuenow')),
     }));
     check(
       engine,
-      id,
-      JSON.stringify(f) === JSON.stringify(EXAMPLE) && !PREVIOUS.test(text) && cards.struck === 0 && (withNotice ? cards.preview === 1 && cards.strip : cards.preview === 0 && !cards.strip),
-      `${JSON.stringify(f)} · ${JSON.stringify(cards)}`,
+      'limites-por-campo',
+      atMax.values.join() === '50,50,744,744' &&
+        after.values.join() === '50,50,744,744' &&
+        same(after.figures, { ai: 'a partir de R$ 5.000', monitor: 'R$ 3.750 por mês', hosting: 'R$ 27.528', combinado: 'R$ 36.278' }) &&
+        flags.plus.every((d) => d === 'true') &&
+        flags.minus.every((d) => d == null) &&
+        flags.now.join() === '50,50,744,744',
+      `${after.values.join(',')} · ${JSON.stringify(after.figures)} · + aria-disabled=${flags.plus.join(',')}`,
     );
-    if (withNotice) await shot(sim, 'simulador-pendente-previa');
+    await shot(sim, 'simulador-no-limite');
+    // − no zero: aria-disabled e sem efeito (clique e seta ↓)
+    await clear(sim);
+    for (const f of FIELDS) await btn(sim, f, 'diminuir').click({ force: true });
+    await input(sim, 'ai').focus();
+    await input(sim, 'ai').press('ArrowDown');
+    const atZero = await read(sim);
+    check(engine, 'zero-e-o-minimo', atZero.values.join() === '0,0,0,0' && atZero.state === 'vazio', atZero.values.join(','));
     await ctx.close();
   }
 
-  // 9–11. Estados da campanha com datas (fixture): a mesma tabela antes, durante e depois ------------------------------
-  for (const state of ['vigente', 'futura', 'encerrada']) {
-    const { ctx, sim } = await open(fixtureUrl, { at: AT[state] });
-    await plus(sim, 'simples', 4);
-    await plus(sim, 'media');
-    await calc(sim);
-    const f = await figures(sim);
-    const text = await sim.locator('[data-sim-result]').innerText();
-    const units = await sim.locator('.sim__tier-unit').allInnerTexts();
-    check(engine, `campanha-${state}-mesma-tabela`, JSON.stringify(f) === JSON.stringify(EXAMPLE) && units.join() === UNITS && !PREVIOUS.test(text), JSON.stringify(f));
-    await shot(sim, `simulador-${state}`);
-    await ctx.close();
-  }
-
-  // 8, 13, 14. Sem complexa, sem pacote misto, seis médias, proteção de entradas, teclado, recalcular, limpar -----------
+  // 4. Teclado: botões por Enter/Espaço, setas no campo, foco visível, nome acessível e ordem de Tab -------------------
   {
     const { ctx, page, sim } = await open(fixtureUrl);
-    const noComplex = await sim.evaluate((el) => ({ tier: el.querySelectorAll('[data-sim-tier="complexa"], [data-sim-input="complexa"]').length, text: /complexa|sob orçamento/i.test(el.innerText) }));
-    check(engine, 'sem-campo-complexa', noComplex.tier === 0 && !noComplex.text, JSON.stringify(noComplex));
-    // 2 simples + 1 média: categorias diferentes não formam pacote
-    await plus(sim, 'simples', 2);
-    await plus(sim, 'media');
-    await calc(sim);
-    let f = await figures(sim);
-    let res = await sim.locator('[data-sim-result]').evaluate((e) => ({ packages: e.dataset.simPacotes, text: e.innerText }));
-    check(engine, 'sem-pacote-misto', JSON.stringify(f) === JSON.stringify(EXAMPLE_NO_PACKAGE) && res.packages === '0' && !/Economia com pacotes/.test(res.text), `${JSON.stringify(f)} · pacotes=${res.packages}`);
-    await shot(sim, 'simulador-sem-pacote');
-    // recalcular: mudar a quantidade esconde o resultado até novo cálculo (nunca um valor desatualizado)
-    await plus(sim, 'simples', 2);
-    const staleShown = await sim.locator('[data-sim-result]').count();
-    const staleNote = await sim.locator('.sim__warning', { hasText: 'As quantidades mudaram.' }).count();
-    await calc(sim);
-    f = await figures(sim);
-    check(engine, 'alterar-e-recalcular', staleShown === 0 && staleNote === 1 && JSON.stringify(f) === JSON.stringify(EXAMPLE), `resultado oculto após mudança=${staleShown === 0}; aviso=${staleNote}`);
-    // seis médias: dois pacotes (V-03)
-    await sim.getByRole('button', { name: 'Limpar simulação' }).click();
-    await plus(sim, 'media', 6);
-    await calc(sim);
-    f = await figures(sim);
-    res = await sim.locator('[data-sim-result]').evaluate((e) => ({ packages: e.dataset.simPacotes, text: e.innerText }));
-    check(
-      engine,
-      'pacotes-seis-medias-dois-pacotes',
-      JSON.stringify(f) === JSON.stringify({ estimativa: 'R$ 7.000', individual: 'R$ 8.400', economia: 'R$ 1.400' }) && res.packages === '2' && /6 automações médias: 2 pacotes de 3 \(R\$ 3\.500 cada\)/.test(res.text),
-      `${JSON.stringify(f)} · pacotes=${res.packages}`,
-    );
-    await shot(sim, 'simulador-seis-medias');
-    // entradas inválidas: digitação e colagem
-    const input = sim.locator('[data-sim-input="simples"]');
-    const typed = [];
-    for (const [value, expected] of [
-      ['-5', '5'],
-      ['abc', ''],
-      ['2,5', '20'],
-      ['1e3', '13'],
-      ['999', '20'],
-      ['007', '7'],
-    ]) {
-      await input.fill(value);
-      typed.push(`${value}→${await input.inputValue()}${(await input.inputValue()) === expected ? '' : ` (esperado ${expected})`}`);
-    }
-    await input.fill('');
-    await input.blur();
-    const afterBlur = await input.inputValue();
-    await input.fill('25');
-    const plusAtMax = await sim.locator('[data-sim-tier="simples"] [data-sim-action="aumentar"]').getAttribute('aria-disabled');
-    await sim.locator('[data-sim-tier="simples"] [data-sim-action="aumentar"]').click({ force: true });
-    const atMax = await input.inputValue();
-    check(engine, 'protecao-contra-valores-invalidos', typed.every((t) => !t.includes('esperado')) && afterBlur === '0' && atMax === '20' && plusAtMax === 'true', `${typed.join(' · ')} · vazio+saída→${afterBlur} · máximo=${atMax}`);
-    // limpar
-    await sim.getByRole('button', { name: 'Limpar simulação' }).click();
-    const cleared = await sim.evaluate((el) => ({ values: [...el.querySelectorAll('[data-sim-input]')].map((i) => i.value), result: !!el.querySelector('[data-sim-result]') }));
-    await calc(sim);
-    // visível no simulador (a região viva, oculta, também anuncia o mesmo texto)
-    const empty = await sim.locator('.sim__warning', { hasText: 'Selecione ao menos uma automação para calcular.' }).count();
-    check(engine, 'limpar-e-calcular-vazio', JSON.stringify(cleared.values) === '["0","0"]' && !cleared.result && empty === 1, JSON.stringify(cleared));
-    // teclado: botões por Enter/Espaço, setas no campo, Enter calcula — sem mouse
-    await sim.locator('[data-sim-tier="simples"] [data-sim-action="aumentar"]').focus();
+    await btn(sim, 'ai', 'aumentar').focus();
     await page.keyboard.press('Enter');
     await page.keyboard.press('Space');
-    await sim.locator('[data-sim-input="media"]').focus();
+    await input(sim, 'monitor').focus();
     await page.keyboard.press('ArrowUp');
     await page.keyboard.press('ArrowUp');
     await page.keyboard.press('ArrowDown');
-    await page.keyboard.press('Enter');
-    f = await figures(sim);
-    const ring = await sim.locator('[data-sim-input="media"]').evaluate((el) => {
+    const r = await waitFigures(sim, { ai: 'a partir de R$ 200', monitor: 'R$ 75 por mês', combinado: 'R$ 275' });
+    const ring = await input(sim, 'monitor').evaluate((el) => {
       for (let n = el, i = 0; n && i < 3; n = n.parentElement, i++) {
         const cs = getComputedStyle(n);
         if ((cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0) || (cs.boxShadow && cs.boxShadow !== 'none')) return true;
       }
       return false;
     });
-    const spin = await sim.locator('[data-sim-input="media"]').evaluate((el) => ({ role: el.getAttribute('role'), now: el.getAttribute('aria-valuenow'), max: el.getAttribute('aria-valuemax'), name: el.getAttribute('aria-labelledby') && document.getElementById(el.getAttribute('aria-labelledby'))?.textContent }));
-    check(engine, 'teclado-completo', JSON.stringify(f) === JSON.stringify(EXAMPLE_NO_PACKAGE) && ring && spin.role === 'spinbutton' && spin.now === '1' && spin.max === '20' && spin.name === 'Automações médias', `${JSON.stringify(f)} · foco visível=${ring} · ${JSON.stringify(spin)}`);
-    // Tab percorre os controles do simulador em ordem e com foco visível
-    await sim.locator('[data-sim-tier="simples"] [data-sim-action="diminuir"]').focus();
+    const spin = await input(sim, 'monitor').evaluate((el) => ({
+      role: el.getAttribute('role'),
+      now: el.getAttribute('aria-valuenow'),
+      min: el.getAttribute('aria-valuemin'),
+      max: el.getAttribute('aria-valuemax'),
+      inputMode: el.getAttribute('inputmode'),
+      name: (el.getAttribute('aria-labelledby') ?? '').split(/\s+/).map((id) => document.getElementById(id)?.textContent.trim()).join(' '),
+      description: document.getElementById(el.getAttribute('aria-describedby') ?? '')?.textContent.trim() ?? '',
+    }));
+    check(
+      engine,
+      'teclado-completo',
+      same(r.figures, { ai: 'a partir de R$ 200', monitor: 'R$ 75 por mês', combinado: 'R$ 275' }) &&
+        ring &&
+        spin.role === 'spinbutton' &&
+        spin.now === '1' &&
+        spin.min === '0' &&
+        spin.max === '50' &&
+        spin.inputMode === 'numeric' &&
+        spin.name === 'Nekkora Monitor Automações monitoradas' &&
+        /^Limites provisórios, só desta simulação: até 50 automações por serviço e até 744 horas-máquina por sistema/.test(spin.description),
+      `${JSON.stringify(r.figures)} · foco visível=${ring} · ${JSON.stringify(spin)}`,
+    );
+    // Região viva: anuncia a estimativa atualizada sem mover o foco
+    const status = page.locator('[data-testid="status-simulador"]');
+    const statusText = await status.innerText();
+    check(
+      engine,
+      'estimativa-anunciada-em-regiao-viva',
+      /^Estimativa atualizada\./.test(statusText) && statusText.includes('Investimento combinado estimado: R$ 275') && (await status.getAttribute('role')) === 'status',
+      statusText.slice(0, 200),
+    );
+    // Tab percorre os controles do simulador em ordem (− campo + de cada um, depois "Limpar simulação")
+    await btn(sim, 'ai', 'diminuir').focus();
     const order = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 13; i++) {
       order.push(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') || document.activeElement?.getAttribute('data-sim-input') || document.activeElement?.textContent?.trim()));
       await page.keyboard.press('Tab');
     }
-    check(
-      engine,
-      'ordem-de-tab',
-      JSON.stringify(order) ===
-        JSON.stringify(['Diminuir automações simples', 'simples', 'Aumentar automações simples', 'Diminuir automações médias', 'media', 'Aumentar automações médias', 'Limpar simulação', 'Calcular meu investimento']),
-      order.join(' → '),
-    );
+    const expectedOrder = [
+      'Diminuir automações solicitadas', 'ai', 'Aumentar automações solicitadas',
+      'Diminuir automações monitoradas', 'monitor', 'Aumentar automações monitoradas',
+      'Diminuir horas-máquina windows', 'windows', 'Aumentar horas-máquina windows',
+      'Diminuir horas-máquina linux', 'linux', 'Aumentar horas-máquina linux',
+      'Limpar simulação',
+    ];
+    check(engine, 'ordem-de-tab', same(order, expectedOrder), order.join(' → '));
     await ctx.close();
   }
 
-  // 15, 16, 17. Celular, tema escuro, armazenamento e rede -------------------------------------------------------------
+  // 5. Celular, tema escuro, armazenamento, rede e acessibilidade ----------------------------------------------------
   for (const [name, viewport, theme] of [
     ['celular-claro', { width: 375, height: 812 }, 'sage-light'],
     ['celular-escuro', { width: 375, height: 812 }, 'sakura-dark'],
+    ['celular-320', { width: 320, height: 640 }, 'sage-light'],
     ['tablet-claro', { width: 768, height: 1024 }, 'sage-light'],
     ['desktop-escuro', { width: 1280, height: 900 }, 'sakura-dark'],
   ]) {
@@ -442,10 +457,13 @@ async function run(engine) {
     const before = await page.evaluate(() => ({ local: Object.keys(localStorage), session: Object.keys(sessionStorage), cookie: document.cookie }));
     const requests = [];
     page.on('request', (r) => requests.push(r.url()));
-    await plus(sim, 'simples', 4);
-    await plus(sim, 'media');
-    await calc(sim);
-    await sim.locator('[data-sim-result]').waitFor();
+    await plus(sim, 'ai', 2);
+    await plus(sim, 'monitor', 3);
+    await setQ(sim, { windows: 10, linux: 20 });
+    await waitFigures(sim, EXAMPLE);
+    await clear(sim);
+    await setQ(sim, EXAMPLE_Q);
+    const r = await waitFigures(sim, EXAMPLE);
     const after = await page.evaluate(async () => ({
       local: Object.keys(localStorage),
       session: Object.keys(sessionStorage),
@@ -453,95 +471,158 @@ async function run(engine) {
       idb: typeof indexedDB.databases === 'function' ? (await indexedDB.databases()).map((d) => d.name) : [],
     }));
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
-    const offscreen = await sim.evaluate((el) => [...el.querySelectorAll('button, a, input')].filter((b) => { const r = b.getBoundingClientRect(); return r.right > innerWidth + 1 || r.left < -1; }).length);
-    check(engine, `responsivo-sem-rolagem-horizontal:${name}`, overflow <= 0 && offscreen === 0, `excesso=${overflow}px; controles fora da tela=${offscreen}`);
+    const offscreen = await sim.evaluate((el) =>
+      [...el.querySelectorAll('button, a, input')].filter((b) => {
+        const rr = b.getBoundingClientRect();
+        return rr.right > innerWidth + 1 || rr.left < -1;
+      }).length,
+    );
+    check(engine, `responsivo-sem-rolagem-horizontal:${name}`, overflow <= 0 && offscreen === 0 && same(r.figures, EXAMPLE), `excesso=${overflow}px; controles fora da tela=${offscreen}`);
     check(
       engine,
       `sem-armazenamento:${name}`,
-      JSON.stringify(after.local) === JSON.stringify(before.local) && after.local.every((k) => k === 'nekkora-commercial-tema') && after.session.every((k) => k === '__nk_seeded' || before.session.includes(k)) && after.cookie === '' && after.idb.length === 0,
+      same(after.local, before.local) && after.local.every((k) => k === THEME_KEY) && same(after.session, before.session) && after.cookie === '' && after.idb.length === 0,
       `localStorage=${after.local.join(',') || '—'}; sessionStorage=${after.session.join(',') || '—'}; cookie=${after.cookie || '—'}; IndexedDB=${after.idb.join(',') || '—'}`,
     );
     check(engine, `sem-envio-externo:${name}`, requests.length === 0, requests.join(' | ') || 'nenhuma requisição durante a simulação');
-    // Acessibilidade (axe, WCAG 2.1 AA) do simulador com o resultado aberto
+    // Acessibilidade (axe, WCAG 2.1 AA) do simulador com a estimativa aberta
     await page.evaluate(axeSource);
     const axe = await page.evaluate(async () => {
       // eslint-disable-next-line no-undef
-      const r = await axe.run(document.querySelector('[data-simulator]'), { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
-      return { violations: r.violations.map((v) => `${v.id}(${v.nodes.length}): ${v.nodes[0]?.target.join(' ')}`), contrast: r.incomplete.filter((i) => i.id === 'color-contrast').length };
+      const res = await axe.run(document.querySelector('[data-simulator]'), { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
+      return { violations: res.violations.map((v) => `${v.id}(${v.nodes.length}): ${v.nodes[0]?.target.join(' ')}`), contrast: res.incomplete.filter((i) => i.id === 'color-contrast').length };
     });
     check(engine, `axe-simulador:${name}`, axe.violations.length === 0, axe.violations.join(' | ') || `sem violações (${axe.contrast} nó(s) de contraste indeterminado)`);
     await shot(sim, `simulador-${name}`);
     await ctx.close();
   }
 
-  // 18. Conversa pelo WhatsApp a partir da simulação (NEKKORA-COM-CANAIS-001; substitui a integração com o formulário):
-  // a mensagem do Delivery leva o resumo do resultado MOSTRADO; o visitante a revisa e edita no WhatsApp — a página não
-  // envia nada, e um resultado desatualizado nunca vira mensagem
+  // 6. Da simulação ao formulário de atendimento (§7): "Solicitar atendimento com esta simulação" abre o formulário com os
+  // serviços que têm quantidade já marcados e a opção de incluir o resumo MOSTRADO, DESMARCADA por padrão (titular,
+  // 20/11/2026): só entra na mensagem se o visitante marcar.
+  // Nada é enviado pela página: o envio só prepara o link do WhatsApp (window.open registrado, nenhuma aba aqui).
   {
     const { ctx, page, sim } = await open(prodUrl);
-    await plus(sim, 'simples', 4);
-    await plus(sim, 'media');
-    await calc(sim);
-    const f = await figures(sim);
-    const cta = await simCta(sim);
-    const message = waText(cta.href, PUBLICACAO.canais.whatsapp) ?? '';
-    const summary = message.startsWith(`${MSG_DELIVERY}\n\n${SIM_INTRO}\n`) ? message.slice(`${MSG_DELIVERY}\n\n${SIM_INTRO}\n`.length) : '';
+    const requests = [];
+    page.on('request', (r) => requests.push(r.url()));
+    const openFromSim = async () => {
+      const cta = sim.locator('[data-atendimento-origem="simulador"]');
+      await cta.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      const attrs = await cta.evaluate((a) => ({ tag: a.tagName.toLowerCase(), href: a.getAttribute('href'), haspopup: a.getAttribute('aria-haspopup'), text: a.querySelector('.nk-button__label')?.textContent.trim() ?? a.textContent.trim() }));
+      await cta.click();
+      await page.waitForSelector('[data-atendimento]', { state: 'visible', timeout: 3000 });
+      const d = await page.evaluate(() => {
+        const dlg = document.querySelector('[data-atendimento]');
+        return {
+          services: [...dlg.querySelectorAll('[data-servico-interesse]')].filter((c) => c.checked).map((c) => c.getAttribute('data-servico-interesse')),
+          include: dlg.querySelector('[data-incluir-simulacao]')?.checked ?? null,
+          summary: dlg.querySelector('.request__message')?.textContent ?? null,
+        };
+      });
+      return { attrs, ...d };
+    };
+    const submit = async (fields) => {
+      await page.locator('[data-atendimento] [data-campo="name"]').fill(fields.name);
+      await page.locator('[data-atendimento] [data-campo="description"]').fill(fields.description);
+      const n = await page.evaluate(() => window.__nkOpen.length);
+      await page.locator('[data-atendimento] button[type="submit"]').click();
+      await page.waitForSelector('[data-atendimento-aberto]', { timeout: 3000 }).catch(() => {});
+      const calls = await page.evaluate(() => window.__nkOpen);
+      const call = calls.slice(n).at(-1) ?? null;
+      const text = call ? new URL(call[0]).searchParams.get('text') : null;
+      return { calls: calls.length - n, call, text };
+    };
+    const closeDialog = async () => {
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('[data-atendimento]', { state: 'detached', timeout: 3000 });
+    };
+    const fields = { name: 'Ana Teste', description: 'Quero automatizar a conciliação.' };
+    const base = `${GREETING}\n\nNome: Ana Teste\n\nDescrição do processo:\nQuero automatizar a conciliação.`;
+
+    await setQ(sim, EXAMPLE_Q);
+    await waitFigures(sim, EXAMPLE);
+    const o1 = await openFromSim();
     check(
       engine,
-      'whatsapp-recebe-resumo-da-simulacao',
-      cta.count === 1 &&
-        cta.ctx === 'delivery' &&
-        cta.dialogTriggers === 0 &&
-        cta.label.startsWith('Conversar sobre esta simulação') &&
-        cta.target === '_blank' &&
-        /\bnoopener\b/.test(cta.rel) &&
-        /\bnoreferrer\b/.test(cta.rel) &&
-        summary === SUMMARY_LINES.join('\n') &&
-        // coerente com o resultado na tela
-        summary.includes(`Investimento estimado: ${f.estimativa}`) &&
-        summary.includes(`Sem pacotes, no preço individual: ${f.individual}`) &&
-        summary.includes(`Economia com pacotes: ${f.economia}`),
-      `"${cta.label}" → ${message.replace(/\n/g, ' / ').slice(0, 200)} · tela=${JSON.stringify(f)}`,
+      'formulario-recebe-servicos-e-resumo',
+      o1.attrs.tag === 'a' &&
+        o1.attrs.href === '#contato' &&
+        o1.attrs.haspopup === 'dialog' &&
+        o1.attrs.text.startsWith('Solicitar atendimento com esta simulação') &&
+        same(o1.services, ['ai', 'monitor', 'hosting']) &&
+        o1.include === false &&
+        o1.summary === EXAMPLE_SUMMARY,
+      `${o1.attrs.text}: serviços=[${o1.services.join(',')}]; incluir=${o1.include}; resumo=${JSON.stringify(o1.summary).slice(0, 160)}`,
     );
-    const r = await clickWa(page, sim.locator('[data-sim-result] a[data-whatsapp]'));
+    await page.locator('[data-atendimento] [data-incluir-simulacao]').check();
+    const s1 = await submit(fields);
+    const expectedWith = `${base}\n\nServiços de interesse:\n- Nekkora AI (piloto)\n- Nekkora Monitor\n- Nekkora Hosting\n\nSimulação de investimento:\n${EXAMPLE_SUMMARY}`;
+    check(engine, 'mensagem-com-a-simulacao', s1.calls === 1 && s1.text === expectedWith, `${s1.calls} chamada(s); ${JSON.stringify(s1.text).slice(0, 240)}`);
+    await closeDialog();
+    // Sem marcar (padrão): a simulação não entra na mensagem
+    await page.locator('[data-atendimento-origem="simulador"]').click();
+    await page.waitForSelector('[data-atendimento]', { state: 'visible' });
+    const s2 = await submit(fields);
+    const expectedWithout = `${base}\n\nServiços de interesse:\n- Nekkora AI (piloto)\n- Nekkora Monitor\n- Nekkora Hosting`;
+    check(engine, 'mensagem-sem-a-simulacao-por-padrao', s2.calls === 1 && s2.text === expectedWithout && !/Simulação de investimento/.test(s2.text ?? ''), JSON.stringify(s2.text).slice(0, 240));
+    await closeDialog();
+    // Quantidades mudadas: o resumo e os serviços acompanham a estimativa da tela (nunca um resumo desatualizado)
+    await clear(sim);
+    await setQ(sim, { linux: 5 });
+    const shown = await waitFigures(sim, { hosting: 'R$ 60', combinado: 'R$ 60' });
+    const o3 = await openFromSim();
+    const linuxSummary = `- Nekkora Hosting Linux: 5 horas × R$ 12 = R$ 60\nInvestimento combinado estimado: R$ 60 (${COMBINED_NOTE})`;
     check(
       engine,
-      'resumo-vai-so-na-mensagem-sem-envio',
-      r.popup && r.tab != null && waText(r.tab.url, PUBLICACAO.canais.whatsapp) === message && r.tab.referer == null && r.dialogs === 0 && r.requests.length === 0,
-      `aba wa.me (local)=${r.popup}; mesma mensagem=${r.tab != null && waText(r.tab.url, PUBLICACAO.canais.whatsapp) === message}; Referer=${r.tab?.referer ?? 'ausente'}; diálogos/formulários=${r.dialogs}; requisições da página=${r.requests.length}`,
+      'resumo-acompanha-a-estimativa',
+      same(shown.figures, { hosting: 'R$ 60', combinado: 'R$ 60' }) && same(o3.services, ['hosting']) && o3.include === false && o3.summary === linuxSummary,
+      `serviços=[${o3.services.join(',')}]; resumo=${JSON.stringify(o3.summary)}`,
     );
-    await shot(sim.locator('[data-sim-result]'), 'simulador-resultado-whatsapp');
-    // quantidade alterada: o resultado (e o CTA com o resumo) some até novo cálculo
-    await plus(sim, 'simples');
-    const stale = await sim.locator('a[data-whatsapp]').count();
-    check(engine, 'sem-resumo-desatualizado-no-whatsapp', stale === 0, `CTA com resumo depois de mudar a quantidade: ${stale}`);
+    await shot(page.locator('[data-atendimento]'), 'formulario-com-simulacao');
+    await closeDialog();
+    // Só o AI: só o AI marcado
+    await clear(sim);
+    await plus(sim, 'ai');
+    const o4 = await openFromSim();
+    check(engine, 'servicos-marcados-pela-simulacao:so-ai', same(o4.services, ['ai']) && o4.summary?.startsWith('- Nekkora AI (piloto): 1 automação × R$ 100 = a partir de R$ 100\n'), `serviços=[${o4.services.join(',')}]`);
+    await closeDialog();
+    // Sem quantidade, sem CTA da simulação
+    await clear(sim);
+    check(engine, 'sem-simulacao-sem-cta', (await sim.locator('[data-atendimento-origem="simulador"]').count()) === 0, 'estimativa vazia: nenhum CTA com simulação');
+    check(engine, 'formulario-sem-envio-pela-pagina', requests.length === 0, requests.join(' | ') || 'nenhuma requisição da página (o link do WhatsApp só é preparado)');
+    // Sem agendamento nem e-mail no resultado
+    await plus(sim, 'monitor');
+    const semAgenda = await sim.locator('[data-sim-result]').evaluate((e) => ({
+      links: e.querySelectorAll('a[data-agendar], a[href*="bookings"], a[href*="/book/"], a[href^="mailto:"], a[href*="wa.me"]').length,
+      text: /Agendar|Bookings|Teams/.test(e.innerText),
+    }));
+    check(engine, 'resultado-sem-agendamento-nem-link-direto', semAgenda.links === 0 && !semAgenda.text, JSON.stringify(semAgenda));
     await ctx.close();
   }
 
-  // AUD-25. Hosting: o CTA abre a conversa com a mensagem de hospedagem (NEKKORA-COM-CANAIS-001; substitui o diálogo com
-  // o tipo "hospedagem" marcado) — nenhum diálogo nem formulário na página
+  // 7. A mesma estimativa em qualquer data e em qualquer publicação (a campanha de lançamento é só histórico) -----------
   {
-    const { ctx, page } = await open(prodUrl);
-    const hosting = await page.locator('#hosting a[data-whatsapp]').evaluate((a) => ({ ctx: a.dataset.whatsapp, href: a.getAttribute('href'), haspopup: a.getAttribute('aria-haspopup'), target: a.getAttribute('target'), rel: a.getAttribute('rel') ?? '' }));
-    const page0 = await page.evaluate(() => ({ forms: document.querySelectorAll('form').length, triggers: document.querySelectorAll('[aria-haspopup="dialog"]').length }));
-    const r = await clickWa(page, page.locator('#hosting a[data-whatsapp]'));
-    check(
-      engine,
-      'hosting-whatsapp-adequado',
-      hosting.ctx === 'hosting' &&
-        hosting.haspopup == null &&
-        waText(hosting.href, PUBLICACAO.canais.whatsapp) === MSG_HOSTING &&
-        hosting.target === '_blank' &&
-        /\bnoreferrer\b/.test(hosting.rel) &&
-        r.popup &&
-        waText(r.tab?.url ?? '', PUBLICACAO.canais.whatsapp) === MSG_HOSTING &&
-        r.dialogs === 0 &&
-        r.requests.length === 0 &&
-        page0.forms === 0 &&
-        page0.triggers === 0,
-      `mensagem="${waText(hosting.href, PUBLICACAO.canais.whatsapp)}"; aba=${r.popup}; diálogos/formulários=${r.dialogs}; formulários na página=${page0.forms}; botões de diálogo=${page0.triggers}`,
-    );
-    await ctx.close();
+    const runs = [
+      ...DATES.map((d) => [`producao-${d.id}`, prodUrl, d.at]),
+      ['fixture-sintetica', fixtureUrl, AT],
+      ['fixture-sem-datas-de-campanha', pendingUrl, AT],
+      ['fixture-sem-datas-sem-aviso', pendingNoNoticeUrl, AT],
+    ];
+    for (const [id, url, at] of runs) {
+      if (!url) continue;
+      const { ctx, page, sim } = await open(url, { at });
+      const cards = await page.evaluate(() => [...document.querySelectorAll('[data-pricing] [data-price]')].map((e) => `${e.getAttribute('data-price')}=${e.textContent.trim()}`).join(','));
+      await setQ(sim, EXAMPLE_Q);
+      const r = await waitFigures(sim, EXAMPLE);
+      const campaign = await page.evaluate(() => document.querySelectorAll('.launch-strip, [data-campanha], [data-campanha-regras]').length);
+      check(
+        engine,
+        `mesma-estimativa:${id}`,
+        cards === 'ai=R$ 100,monitor=R$ 75,windows=R$ 25,linux=R$ 12' && same(r.figures, EXAMPLE) && campaign === 0 && !PREVIOUS.test(r.text),
+        `${cards} · ${JSON.stringify(r.figures)} · marcadores de campanha=${campaign}`,
+      );
+      await ctx.close();
+    }
   }
 
   check(engine, 'sem-requisicoes-externas', external.length === 0, external.join(' | ') || 'nenhuma');
@@ -549,13 +630,19 @@ async function run(engine) {
   await browser.close();
 }
 
-for (const engine of engineList.split(',')) await run(engine);
+for (const engine of engineList.split(',')) {
+  try {
+    await run(engine);
+  } catch (e) {
+    check(engine, 'execucao', false, String(e.message).split('\n')[0]);
+  }
+}
 const failed = checks.filter((c) => !c.ok);
-writeFileSync(path.join(outDir, 'resultados.json'), JSON.stringify({ prodUrl, fixtureUrl, checks, shots }, null, 2));
+writeFileSync(path.join(outDir, 'resultados.json'), JSON.stringify({ prodUrl, fixtureUrl, pendingUrl, pendingNoNoticeUrl, checks, shots }, null, 2));
 writeFileSync(
   path.join(outDir, 'resumo.md'),
   [
-    `# Homologação do simulador e da conversa pelo WhatsApp — ${new Date().toISOString()}`,
+    `# Homologação do simulador de investimento e da passagem ao formulário — ${new Date().toISOString()}`,
     '',
     `${checks.length} verificações · ${failed.length} falha(s) · ${engineList}`,
     '',

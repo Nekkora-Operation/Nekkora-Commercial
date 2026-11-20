@@ -1,31 +1,33 @@
 #!/usr/bin/env node
 /**
- * Jornada de atendimento pelo WhatsApp (NEKKORA-COM-CANAIS-001, titular, 12/11/2026) — em Chromium, Firefox e WebKit.
+ * Jornada de atendimento: formulário → WhatsApp (NEKKORA-COM-ECOSYSTEM-001 §7 e §8; WhatsApp como único canal público,
+ * NEKKORA-COM-CANAIS-001) — em Chromium, Firefox e WebKit.
  *
- * O WhatsApp é o único canal público de atendimento comercial: a página não tem formulário, diálogo de solicitação,
- * jornada por e-mail (mailto), agendamento (Microsoft Bookings) nem envio automático (API). Esta homologação substitui a
- * antiga jornada de conversão (formulário → confirmação → WhatsApp/e-mail) e a de scripts/homologacao-leads.mjs
- * (Bookings e envio automático), comprovando a AUSÊNCIA de cada um desses caminhos:
+ * Todo CTA comercial (topo, cartões do AI, Monitor e Hosting, faixa do Hosting, contato, simulador e o botão flutuante)
+ * abre o formulário de atendimento (diálogo da nekkora-lib). O formulário só prepara a mensagem no navegador e abre o
+ * WhatsApp em outra aba (window.open, sem opener e sem Referer); nada é enviado pela página. Esta homologação comprova:
  *
- *   - cada CTA (data-whatsapp = geral, delivery, hosting, monitor, ai) abre wa.me/<número da publicação> com a mensagem
- *     EXATA do contexto, em outra aba, sem opener e sem Referer; o clique não abre diálogo nem envia nada;
- *   - o CTA do simulador leva a mensagem do Delivery + o resumo da simulação mostrada na tela;
- *   - botão flutuante "Fale com um analista": texto, ícone, destino, sem pulso, contraste ≥ 4,5:1 nos dois temas, área
- *     de toque, posição, não cobre o rodapé, recolhido no celular com o contato na tela, foco pelo teclado;
- *   - Monitor e AI "Em preparação", com pedido de informação (nunca contratação);
+ *   - CTAs: âncora #contato com aria-haspopup="dialog", serviços já marcados conforme a origem; nenhum link direto ao wa.me;
+ *   - campos, aviso de não informar senhas, validação (nome e descrição obrigatórios; e-mail validado só se informado);
+ *   - mensagem estruturada EXATA (saudação, só os campos preenchidos, descrição, serviços de interesse), com acentos,
+ *     quebras de linha e caracteres especiais codificados no link e recuperados intactos;
+ *   - a aba do WhatsApp sem opener e sem Referer; o link de reserva; nenhuma afirmação de recebimento;
+ *   - foco preso no diálogo, Esc devolvendo o foco; nada no armazenamento além do tema; nenhuma requisição da página;
+ *   - botão flutuante "Fale com um analista": abre o formulário; texto, ícone, sem pulso, contraste ≥ 4,5:1 nos dois
+ *     temas, área de toque, posição, não cobre o rodapé, recolhido no celular com o topo ou o contato na tela, teclado;
  *   - LinkedIn e Instagram (redes institucionais) com as URLs exatas da publicação, em outra aba;
- *   - nenhum form, diálogo, mailto, link do Bookings, "Agendar", instrução de envio por e-mail nem requisição a API.
+ *   - nenhum mailto, link do Bookings, "Agendar", instrução de envio por e-mail, Turnstile ou requisição a API.
  *
  * Uso (builds servidos como no CloudFront — veja .github/workflows/ci.yml):
  *   node scripts/homologacao-canais.mjs <url> <pasta-de-saida> [chromium,firefox,webkit]
  *
  * Os valores esperados vêm do publicacao.json com que o build servido foi feito (release.json → "publicacao"):
- *   - produção (dist, publicacao.json real);
+ *   - produção (dist, publicacao.json real: WhatsApp oficial 5511930597466);
  *   - fixture sintética (scripts/fixtures/publicacao-homologacao.json): número fictício; Instagram apontando para a
  *     página inicial, que precisa ser REJEITADO (não vira link);
  *   - fixture NEGATIVA (scripts/fixtures/publicacao-homologacao-api.json): URL do Bookings e endpoint de envio automático
  *     configurados, servida com a política do próprio build (--politica-do-build, CSP liberando o endpoint) — mesmo
- *     assim, nenhum formulário, agendamento ou requisição ao endpoint.
+ *     assim, nenhum agendamento, Turnstile ou requisição ao endpoint, nem ao enviar o formulário.
  *
  * Nenhuma requisição sai da máquina: o wa.me é respondido por uma página local de teste (registrando URL e Referer) e
  * todo o resto fora da origem servida é abortado e reprova.
@@ -47,32 +49,34 @@ if (!release?.publicacao) throw new Error(`release.json ausente ou sem "publicac
 const publicacao = JSON.parse(readFileSync(release.publicacao, 'utf8'));
 const NUMBER = publicacao.canais.whatsapp;
 if (!/^\d{12,13}$/.test(NUMBER ?? '')) throw new Error(`${release.publicacao}: WhatsApp ausente ou inválido (${NUMBER}) — a página não teria atendimento`);
+/** WhatsApp oficial (NEKKORA-COM-ECOSYSTEM-001 §5), digitado de propósito; o anterior não pode aparecer em lugar nenhum. */
+const OFFICIAL_WHATSAPP = '5511930597466';
+const PREVIOUS_WHATSAPP = ['5511917724200', '91772-4200', '917724200'];
+const PRODUCTION = release.publicacao === 'publicacao.json';
+if (PRODUCTION && NUMBER !== OFFICIAL_WHATSAPP) throw new Error(`publicacao.json: WhatsApp ${NUMBER} diverge do oficial ${OFFICIAL_WHATSAPP}`);
 
 /**
- * Mensagens iniciais por contexto — digitadas aqui de propósito (independentes do código), iguais a WHATSAPP_MESSAGES de
- * src/config.ts; conferidas contra o código-fonte antes de qualquer navegador abrir: se o texto mudar, a homologação
- * falha em vez de aceitar a mensagem nova sem revisão.
+ * Textos do formulário — digitados aqui de propósito (independentes do código) e conferidos contra o código-fonte antes de
+ * qualquer navegador abrir: se o texto mudar, a homologação falha em vez de aceitar a mensagem nova sem revisão.
  */
-const MESSAGES = {
-  geral: 'Olá! Gostaria de conversar com um analista da Nekkora.',
-  delivery: 'Olá! Tenho interesse em desenvolver automações com a Nekkora.',
-  hosting: 'Olá! Tenho interesse em hospedagem de automações com a Nekkora e gostaria de saber como funciona a avaliação de viabilidade.',
-  monitor: 'Olá! Gostaria de receber informações sobre o Nekkora Monitor quando ele estiver disponível.',
-  ai: 'Olá! Gostaria de receber informações sobre o Nekkora AI quando ele estiver disponível.',
-};
-/** Frase que antecede o resumo da simulação (SIMULATOR.whatsappIntro, src/content.ts). */
-const SIM_INTRO = 'Fiz esta simulação na página:';
+const GREETING = 'Olá! Gostaria de conversar com um analista da Nekkora.';
+const SERVICE_NAMES = { ai: 'Nekkora AI (piloto)', monitor: 'Nekkora Monitor', hosting: 'Nekkora Hosting' };
+const NO_SECRETS = 'Não informe senhas, credenciais nem dados confidenciais.';
+const OPENED_TEXT = 'Abrimos o WhatsApp em outra aba com a sua mensagem. Ela só chega à Nekkora quando você tocar em enviar — abrir o WhatsApp não é o envio.';
 const SR_SUFFIX = '(abre o WhatsApp em outra aba)';
 const FAB_TEXT = 'Fale com um analista';
 {
   const config = readFileSync('src/config.ts', 'utf8');
-  for (const [ctx, msg] of Object.entries(MESSAGES)) if (!config.includes(`${ctx}: '${msg}'`)) throw new Error(`src/config.ts: mensagem "${ctx}" diverge da homologação`);
-  if (!readFileSync('src/content.ts', 'utf8').includes(`whatsappIntro: '${SIM_INTRO}'`)) throw new Error('src/content.ts: whatsappIntro diverge da homologação');
+  const content = readFileSync('src/content.ts', 'utf8');
+  if (!config.includes(`WHATSAPP_GREETING = '${GREETING}'`)) throw new Error('src/config.ts: WHATSAPP_GREETING diverge da homologação');
+  if (!content.includes(`SERVICE_NAMES: Record<ServiceId, string> = { ai: '${SERVICE_NAMES.ai}', monitor: '${SERVICE_NAMES.monitor}', hosting: '${SERVICE_NAMES.hosting}' }`)) throw new Error('src/content.ts: SERVICE_NAMES diverge da homologação');
+  for (const t of [NO_SECRETS, OPENED_TEXT]) if (!content.includes(t)) throw new Error(`src/content.ts: texto do formulário diverge da homologação: ${t}`);
 }
-/** Onde cada CTA fica (seção:contexto), na ordem do documento — o botão flutuante por último. */
-const EXPECTED_CTAS = ['inicio:geral', 'precos:delivery', 'precos:monitor', 'precos:ai', 'hosting:hosting', 'contato:geral', 'flutuante:geral'];
+/** Origens dos CTAs na ordem do documento (o do simulador só aparece com estimativa) e os serviços que cada uma marca. */
+const EXPECTED_ORIGINS = ['topo', 'ai', 'monitor', 'hosting', 'hosting-faixa', 'contato', 'flutuante'];
+const PRESELECTED = { topo: [], ai: ['ai'], monitor: ['monitor'], hosting: ['hosting'], 'hosting-faixa': ['hosting'], contato: [], flutuante: [] };
 const waHref = (text) => `https://wa.me/${NUMBER}?text=${encodeURIComponent(text)}`;
-/** Texto (parâmetro text) de um link do wa.me, decodificado. */
+/** Texto (parâmetro text) de um link do wa.me, decodificado; null se for outro destino. */
 const waText = (href) => {
   try {
     const u = new URL(href);
@@ -105,12 +109,11 @@ const ENDPOINT_ORIGIN = ENDPOINT ? new URL(ENDPOINT).origin : null;
 const NEGATIVE = BOOKINGS_URL != null || ENDPOINT != null;
 
 const EMAIL_INSTRUCTION = /(?:envie|mande|escreva|solicite|peça|abra)[^.]{0,60}\b(?:por|pelo|no) e-mail|aplicativo de e-mail|Escrever diretamente por e-mail|Abrir no e-mail/i;
+/** Abrir o WhatsApp não é o recebimento: nenhuma frase pode dizer que a solicitação foi recebida ou enviada. */
+const RECEIPT_CLAIM = /recebid[ao]s? com sucesso|recebemos (?:a |sua )|solicitação (?:foi )?(?:recebida|enviada|registrada)|mensagem (?:foi )?enviada|enviad[ao] com sucesso|entraremos em contato/i;
 const THEME_KEY = 'nekkora-commercial-tema';
 const THEMES = ['sage-light', 'sakura-dark'];
-const toBr = (iso) => iso.split('-').reverse().join('/');
-const { inicio: CAMP_START, fim: CAMP_END } = publicacao.campanhaLancamento;
-/** Durante a campanha da publicação servida (meio-dia do primeiro dia, Brasília). */
-const IN_CAMPAIGN = CAMP_START ? new Date(`${CAMP_START}T12:00:00-03:00`) : new Date('2026-11-15T12:00:00-03:00');
+const AT = new Date('2026-11-20T12:00:00-03:00');
 
 const checks = [];
 const check = (engine, id, ok, detail) => {
@@ -137,18 +140,27 @@ async function run(engine) {
   /** Toda requisição feita por qualquer página (inclusive as abas do wa.me), para provar que nada vai a uma API. */
   const requests = [];
   const errors = [];
-  async function newContext({ viewport = { width: 1280, height: 800 }, at = IN_CAMPAIGN, theme = null, reducedMotion = 'reduce' } = {}) {
+  async function newContext({ viewport = { width: 1280, height: 800 }, at = AT, theme = null, reducedMotion = 'reduce' } = {}) {
     const ctx = await browser.newContext({ viewport, reducedMotion });
     await ctx.clock.setFixedTime(at);
     await ctx.addInitScript(
       ([key, t]) => {
-        // A página não pode usar window.open (link comum não é barrado por bloqueador de pop-up): conta qualquer chamada.
-        window.__openCalls = 0;
+        // Registra cada window.open (só o envio do formulário pode chamá-lo) e segue com a chamada original: a aba do
+        // wa.me é respondida por uma página local de teste. sendBeacon também é contado (não pode ser usado).
+        window.__nkOpen = [];
         const original = window.open;
         window.open = (...a) => {
-          window.__openCalls++;
+          window.__nkOpen.push(a);
           return original.apply(window, a);
         };
+        window.__nkBeacon = 0;
+        if (navigator.sendBeacon) {
+          const beacon = navigator.sendBeacon.bind(navigator);
+          navigator.sendBeacon = (...a) => {
+            window.__nkBeacon++;
+            return beacon(...a);
+          };
+        }
         try {
           if (t && !sessionStorage.getItem('__nk_seeded')) {
             localStorage.setItem(key, t);
@@ -158,7 +170,7 @@ async function run(engine) {
       },
       [THEME_KEY, theme],
     );
-    ctx.on('request', (r) => requests.push({ url: r.url(), method: r.method() }));
+    ctx.on('request', (r) => requests.push({ url: r.url(), method: r.method(), type: r.resourceType() }));
     await ctx.route('**/*', (route) => {
       const req = route.request();
       const url = req.url();
@@ -184,128 +196,387 @@ async function run(engine) {
     await page.evaluate(() => document.fonts.ready);
     return { ctx, page };
   }
-  /** Lê os CTAs do WhatsApp na ordem do documento. */
-  const readCtas = (page) =>
-    page.$$eval('[data-whatsapp]', (els) =>
-      els.map((a) => ({
-        ctx: a.getAttribute('data-whatsapp'),
-        where: a.closest('section')?.id ?? (a.classList.contains('nk-fab') ? 'flutuante' : '?'),
-        tag: a.tagName.toLowerCase(),
-        href: a.getAttribute('href') ?? '',
-        target: a.getAttribute('target'),
-        rel: a.getAttribute('rel') ?? '',
-        name: (a.getAttribute('aria-label') || a.textContent || '').replace(/\s+/g, ' ').trim(),
-        visibleText: (a.querySelector('.fab__text, .nk-link__label, .nk-button__label')?.firstChild?.textContent ?? a.innerText ?? '').replace(/\s+/g, ' ').trim(),
-      })),
-    );
   const isolated = (c) => c.target === '_blank' && /\bnoopener\b/.test(c.rel) && /\bnoreferrer\b/.test(c.rel);
-  /** Clica num CTA e espera a aba nova; devolve o que a página e a aba mostram. Nada é enviado: a aba é local. */
-  async function clickCta(page, locator) {
-    const before = { url: page.url(), wa: waRequests.length };
-    const popupPromise = page.waitForEvent('popup', { timeout: 8000 }).catch(() => null);
-    await locator.click();
-    const popup = await popupPromise;
-    if (popup) await popup.waitForLoadState('load').catch(() => {});
-    const isolation = popup ? await popup.evaluate(() => ({ opener: window.opener === null, referrer: document.referrer })).catch((e) => ({ error: e.message })) : null;
-    const state = await page.evaluate(() => ({
-      dialogs: document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open]').length,
-      forms: document.querySelectorAll('form').length,
-      openCalls: window.__openCalls,
-    }));
-    const req = waRequests.slice(before.wa).at(-1) ?? null;
-    if (popup) await popup.close();
-    return { popup: !!popup, popupText: req ? waText(req.url) : null, referer: req?.referer ?? null, isolation, sameUrl: page.url() === before.url, ...state };
+  const dialog = (page) => page.locator('[data-atendimento]');
+  const field = (page, name) => page.locator(`[data-atendimento] [data-campo="${name}"]`);
+  /** Abre o formulário por um CTA (clique ou Enter) e espera o diálogo. */
+  async function openForm(page, origem, how = 'clique') {
+    const cta = page.locator(`[data-atendimento-origem="${origem}"]`);
+    await cta.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    if (how === 'teclado') {
+      await cta.focus();
+      await page.keyboard.press('Enter');
+    } else {
+      await cta.click();
+    }
+    return page.waitForSelector('[data-atendimento]', { state: 'visible', timeout: 3000 }).then(() => true, () => false);
   }
-  const clickOk = (r, expectedText) =>
-    r.popup && r.popupText === expectedText && r.referer == null && r.isolation?.opener === true && r.isolation?.referrer === '' && r.dialogs === 0 && r.forms === 0 && r.openCalls === 0 && r.sameUrl;
-  const clickDetail = (r) =>
-    `aba=${r.popup ? 'wa.me (local)' : 'NENHUMA'}; mensagem exata=${r.popupText != null}; sem opener=${r.isolation?.opener}; Referer=${r.referer ?? 'ausente'}; diálogos=${r.dialogs}; window.open=${r.openCalls}`;
+  async function closeForm(page) {
+    await page.keyboard.press('Escape');
+    return page.waitForSelector('[data-atendimento]', { state: 'detached', timeout: 3000 }).then(() => true, () => false);
+  }
+  const checkedServices = (page) => page.$$eval('[data-atendimento] [data-servico-interesse]', (els) => els.filter((c) => c.checked).map((c) => c.getAttribute('data-servico-interesse')));
+  /**
+   * Preenche e envia o formulário; devolve a chamada a window.open, a aba aberta (página local), o isolamento da aba e o
+   * estado do diálogo depois do envio. Nada sai da máquina: a aba do wa.me é local.
+   */
+  async function submitForm(page, fields = {}) {
+    for (const [k, v] of Object.entries(fields)) await field(page, k).fill(v);
+    const before = { open: await page.evaluate(() => window.__nkOpen.length), wa: waRequests.length };
+    const popupPromise = page.waitForEvent('popup', { timeout: 5000 }).catch(() => null);
+    await page.locator('[data-atendimento] button[type="submit"]').click();
+    const opened = await page.waitForSelector('[data-atendimento-aberto]', { timeout: 3000 }).then(() => true, () => false);
+    const calls = (await page.evaluate(() => window.__nkOpen)).slice(before.open);
+    let popup = null;
+    let isolation = null;
+    if (calls.length) {
+      popup = await popupPromise;
+      if (popup) {
+        await popup.waitForLoadState('load').catch(() => {});
+        isolation = await popup.evaluate(() => ({ opener: window.opener === null, referrer: document.referrer })).catch((e) => ({ error: e.message }));
+        await popup.close();
+      }
+    }
+    const state = await page.evaluate(() => {
+      const d = document.querySelector('[data-atendimento]');
+      const link = d?.querySelector('[data-whatsapp="formulario"]');
+      return {
+        text: d?.innerText ?? '',
+        errors: [...(d?.querySelectorAll('[aria-invalid="true"]') ?? [])].map((e) => e.getAttribute('data-campo')),
+        focus: document.activeElement?.getAttribute('data-campo') ?? document.activeElement?.tagName.toLowerCase() ?? null,
+        focusInside: !!d?.contains(document.activeElement),
+        link: link ? { href: link.getAttribute('href'), target: link.getAttribute('target'), rel: link.getAttribute('rel') ?? '' } : null,
+      };
+    });
+    const req = waRequests.slice(before.wa).at(-1) ?? null;
+    return { opened, calls, popup: !!popup, isolation, referer: req?.referer ?? null, tabUrl: req?.url ?? null, ...state };
+  }
+  /** O envio abriu o WhatsApp com a mensagem exata, codificada no link, numa aba isolada. */
+  const sentOk = (s, expected) =>
+    s.opened &&
+    s.calls.length === 1 &&
+    s.calls[0][0] === waHref(expected) &&
+    waText(s.calls[0][0]) === expected &&
+    s.calls[0][1] === '_blank' &&
+    /\bnoopener\b/.test(s.calls[0][2] ?? '') &&
+    /\bnoreferrer\b/.test(s.calls[0][2] ?? '') &&
+    s.popup &&
+    s.tabUrl === waHref(expected) &&
+    s.referer == null &&
+    s.isolation?.opener === true &&
+    s.isolation?.referrer === '' &&
+    s.link?.href === waHref(expected) &&
+    isolated(s.link);
+  const sentDetail = (s) =>
+    `window.open=${s.calls.length} ${s.calls[0] ? `(${s.calls[0][1]}, "${s.calls[0][2]}")` : ''}; mensagem=${JSON.stringify(s.calls[0] ? waText(s.calls[0][0]) : null)?.slice(0, 200)}; aba=${s.popup ? 'wa.me (local)' : 'NENHUMA'}; sem opener=${s.isolation?.opener}; Referer=${s.referer ?? 'ausente'}; link de reserva=${s.link ? 'sim' : 'não'}`;
 
-  // 1. CTAs do WhatsApp: contexto, mensagem exata, isolamento, nome acessível --------------------------------------------
+  // 1. CTAs: todos abrem o formulário; nenhum link direto ao WhatsApp --------------------------------------------------
   {
     const { ctx, page } = await openPage();
     check(engine, 'status-configurado', (await page.getAttribute('[data-contact-status]', 'data-contact-status')) === 'configurado');
-    const ctas = await readCtas(page);
-    const where = ctas.map((c) => `${c.where}:${c.ctx}`);
-    check(engine, 'ctas-por-contexto', JSON.stringify(where) === JSON.stringify(EXPECTED_CTAS), where.join(', '));
-    for (const context of Object.keys(MESSAGES)) {
-      const list = ctas.filter((c) => c.ctx === context);
-      check(
-        engine,
-        `mensagem-exata:${context}`,
-        list.length > 0 && list.every((c) => c.tag === 'a' && c.href === waHref(MESSAGES[context]) && waText(c.href) === MESSAGES[context] && isolated(c)),
-        `${list.length} link(s) → wa.me/${NUMBER} "${list.length ? waText(list[0].href) : '—'}"; outra aba sem opener e sem Referer: ${list.every(isolated)}`,
-      );
-    }
-    check(engine, 'nome-acessivel-avisa-outra-aba', ctas.every((c) => c.name.endsWith(SR_SUFFIX)), ctas.filter((c) => !c.name.endsWith(SR_SUFFIX)).map((c) => c.name).join(' | ') || `todos terminam com "${SR_SUFFIX}"`);
-    // Monitor e AI: "Em preparação", pedido de informação — nunca contratação
-    const prep = await page.evaluate(() => ({
-      cards: [...document.querySelectorAll('#solucoes .offer-card')].filter((c) => /Monitor|AI/.test(c.querySelector('h3')?.textContent ?? '')).map((c) => `${c.querySelector('h3')?.textContent.trim()}:${c.querySelector('.nk-badge')?.textContent.trim()}`),
-      planned: [...document.querySelectorAll('[data-servicos-previstos] [data-servico]')].map((s) => `${s.dataset.servico}:${s.querySelector('.nk-badge')?.textContent.trim()}`),
-    }));
-    const asks = ctas.filter((c) => c.ctx === 'monitor' || c.ctx === 'ai');
+    const ctas = await page.$$eval('[data-atendimento-origem]', (els) =>
+      els.map((a) => ({
+        origem: a.getAttribute('data-atendimento-origem'),
+        tag: a.tagName.toLowerCase(),
+        href: a.getAttribute('href'),
+        haspopup: a.getAttribute('aria-haspopup'),
+        target: a.getAttribute('target'),
+        name: (a.getAttribute('aria-label') || a.textContent || '').replace(/\s+/g, ' ').trim(),
+      })),
+    );
     check(
       engine,
-      'monitor-ai-em-preparacao-so-informacao',
-      JSON.stringify(prep.cards) === JSON.stringify(['Nekkora Monitor:Em preparação', 'Nekkora AI:Em preparação']) &&
-        JSON.stringify(prep.planned) === JSON.stringify(['monitor:Em preparação', 'ai:Em preparação']) &&
-        JSON.stringify(asks.map((a) => a.visibleText)) === JSON.stringify(['Quero receber informações sobre o Nekkora Monitor', 'Quero receber informações sobre o Nekkora AI']) &&
-        asks.every((a) => !/contrat|assin|compr/i.test(`${a.visibleText} ${waText(a.href)}`)),
-      `${prep.cards.join(', ')} · ${asks.map((a) => a.visibleText).join(' · ')}`,
+      'ctas-abrem-o-formulario',
+      JSON.stringify(ctas.map((c) => c.origem)) === JSON.stringify(EXPECTED_ORIGINS) && ctas.every((c) => c.tag === 'a' && c.href === '#contato' && c.haspopup === 'dialog' && c.target == null),
+      ctas.map((c) => `${c.origem}: "${c.name}"`).join(' · '),
     );
-    // Clique em cada CTA da página (o flutuante e o simulador têm verificações próprias abaixo)
-    const all = page.locator('[data-whatsapp]');
-    const n = await all.count();
-    for (let i = 0; i < n; i++) {
-      const c = ctas[i];
-      if (c.where === 'flutuante') continue;
-      const r = await clickCta(page, all.nth(i));
-      check(engine, `clique-abre-whatsapp:${c.where}-${c.ctx}`, clickOk(r, MESSAGES[c.ctx]), clickDetail(r));
+    // O CTA abre um diálogo, não outra aba: o nome acessível não promete o WhatsApp em outra aba
+    check(engine, 'ctas-nome-acessivel-sem-outra-aba', ctas.every((c) => c.name.length > 0 && !c.name.includes('outra aba')), ctas.filter((c) => c.name.includes('outra aba')).map((c) => c.name).join(' | ') || 'nenhum CTA anuncia outra aba');
+    const direct = await page.evaluate(() => ({
+      links: [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).filter((h) => /wa\.me|whatsapp\.com|api\.whatsapp/i.test(h)),
+      markers: document.querySelectorAll('[data-whatsapp]').length,
+    }));
+    check(engine, 'sem-link-direto-ao-whatsapp', direct.links.length === 0 && direct.markers === 0, direct.links.join(' | ') || 'o WhatsApp só abre a partir do formulário');
+    // Cada CTA: diálogo, serviços pré-marcados conforme a origem, sem a opção da simulação; Esc fecha e devolve o foco
+    const results = [];
+    for (const origem of EXPECTED_ORIGINS) {
+      const how = origem === 'topo' || origem === 'flutuante' ? 'teclado' : 'clique';
+      const ok = await openForm(page, origem, how);
+      const services = ok ? await checkedServices(page) : null;
+      const sim = await page.locator('[data-atendimento] [data-incluir-simulacao]').count();
+      const closed = await closeForm(page);
+      const focusBack = await page.locator(`[data-atendimento-origem="${origem}"]`).evaluate((a) => document.activeElement === a);
+      results.push({ origem, how, ok, services, sim, closed, focusBack });
     }
-    await page.screenshot({ path: shot('pagina-topo.png') });
+    check(
+      engine,
+      'cada-cta-abre-com-os-servicos-da-origem',
+      results.every((r) => r.ok && JSON.stringify(r.services) === JSON.stringify(PRESELECTED[r.origem]) && r.sim === 0),
+      results.map((r) => `${r.origem} (${r.how}): ${r.ok ? `[${r.services.join(',')}]` : 'NÃO ABRIU'}`).join(' · '),
+    );
+    check(engine, 'esc-fecha-e-devolve-o-foco', results.every((r) => r.closed && r.focusBack), results.map((r) => `${r.origem}: fechou=${r.closed} foco=${r.focusBack}`).join(' · '));
+    check(engine, 'ctas-nao-abrem-o-whatsapp', (await page.evaluate(() => window.__nkOpen.length)) === 0 && page.url() === baseUrl, `window.open=${await page.evaluate(() => window.__nkOpen.length)}; endereço=${page.url()}`);
     await ctx.close();
   }
 
-  // 2. Ausência: formulário, diálogo, mailto, Bookings, "Agendar", instrução de envio por e-mail ------------------------
+  // 2. Campos, aviso, validação e foco -------------------------------------------------------------------------------
   {
     const { ctx, page } = await openPage();
-    const a = await page.evaluate(
-      ({ hosts, instr }) => {
-        const host = (h) => {
-          try {
-            return new URL(h, location.href).hostname;
-          } catch {
-            return '';
-          }
-        };
-        const hrefs = [...document.querySelectorAll('a[href]')].map((x) => x.getAttribute('href'));
-        const text = (document.body.textContent ?? '').replace(/\s+/g, ' ');
-        return {
-          forms: document.querySelectorAll('form').length,
-          fields: [...document.querySelectorAll('input, textarea, select')].filter((e) => !e.matches('[data-sim-input]')).length,
-          dialogs: document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog').length,
-          triggers: document.querySelectorAll('[aria-haspopup="dialog"], [aria-haspopup="true"]').length,
-          mailto: hrefs.filter((h) => /^mailto:/i.test(h)),
-          bookings: hrefs.filter((h) => hosts.includes(host(h)) || /bookings|\/book\//i.test(h)),
-          agendar: /\bagendar\b|agende/i.test(text) || document.querySelectorAll('[data-agendamento], [data-agendar]').length > 0,
-          emailInstruction: text.match(new RegExp(instr.source, instr.flags))?.[0] ?? null,
-          scripts: [...document.scripts].map((s) => s.src).filter((s) => s && !s.startsWith(location.origin)),
-          iframes: document.querySelectorAll('iframe').length,
-        };
-      },
-      { hosts: BOOKINGS_HOSTS, instr: { source: EMAIL_INSTRUCTION.source, flags: EMAIL_INSTRUCTION.flags } },
+    const pageRequests = [];
+    page.on('request', (r) => pageRequests.push(`${r.method()} ${r.resourceType()} ${r.url()}`));
+    await openForm(page, 'topo');
+    const form = await page.evaluate(() => {
+      const d = document.querySelector('[data-atendimento]');
+      const lab = (el) => (el ? document.querySelector(`label[for="${el.id}"]`)?.textContent.replace(/\*$/, '').trim() : null);
+      const desc = (el) => (el?.getAttribute('aria-describedby') ?? '').split(/\s+/).map((id) => document.getElementById(id)?.textContent.trim()).filter(Boolean).join(' ');
+      const f = (k) => d.querySelector(`[data-campo="${k}"]`);
+      return {
+        title: document.getElementById(d.getAttribute('aria-labelledby'))?.textContent.trim(),
+        description: document.getElementById(d.getAttribute('aria-describedby') ?? '')?.textContent.trim() ?? null,
+        fields: ['name', 'company', 'email', 'description'].map((k) => ({ k, tag: f(k)?.tagName.toLowerCase(), type: f(k)?.getAttribute('type'), label: lab(f(k)), required: f(k)?.required ?? null, hint: desc(f(k)), autocomplete: f(k)?.getAttribute('autocomplete'), max: f(k)?.maxLength })),
+        services: [...d.querySelectorAll('[data-servico-interesse]')].map((c) => `${c.getAttribute('data-servico-interesse')}:${document.querySelector(`label[for="${c.id}"]`)?.textContent.trim()}`),
+        legend: d.querySelector('fieldset legend')?.textContent.trim(),
+        submit: d.querySelector('button[type="submit"]')?.textContent.replace(/\s+/g, ' ').trim(),
+        forbidden: d.querySelectorAll('input[type="password"], input[type="file"], input[type="hidden"], iframe, .cf-turnstile').length,
+        forms: document.querySelectorAll('form').length,
+        focus: document.activeElement?.getAttribute('data-campo'),
+      };
+    });
+    const byKey = Object.fromEntries(form.fields.map((x) => [x.k, x]));
+    check(
+      engine,
+      'formulario-campos',
+      form.title === 'Fale com um analista' &&
+        form.description === 'Preencha os campos e revise a mensagem no WhatsApp antes de enviar. Nada é enviado pela página.' &&
+        byKey.name.label === 'Nome' && byKey.name.required === true && byKey.name.autocomplete === 'name' &&
+        byKey.company.label === 'Empresa' && byKey.company.required === false && byKey.company.hint === 'Opcional' &&
+        byKey.email.label === 'E-mail' && byKey.email.type === 'email' && byKey.email.required === false && byKey.email.hint === 'Opcional' &&
+        byKey.description.tag === 'textarea' && byKey.description.label === 'Descrição do processo ou necessidade' && byKey.description.required === true &&
+        JSON.stringify(form.services) === JSON.stringify(Object.entries(SERVICE_NAMES).map(([k, v]) => `${k}:${v}`)) &&
+        form.legend === 'Serviços de interesse' &&
+        form.submit === `Abrir o WhatsApp ${SR_SUFFIX}` &&
+        form.forbidden === 0 &&
+        form.forms === 1 &&
+        form.focus === 'name',
+      `${form.fields.map((x) => `${x.label}${x.required ? '*' : ''}${x.hint ? ` (${x.hint})` : ''}`).join(' · ')} · ${form.services.join(', ')} · "${form.submit}" · foco inicial=${form.focus}`,
     );
-    check(engine, 'sem-formulario', a.forms === 0 && a.fields === 0, `form=${a.forms}; campos fora do simulador=${a.fields}`);
-    check(engine, 'sem-dialogo', a.dialogs === 0 && a.triggers === 0, `diálogos=${a.dialogs}; botões que abrem diálogo=${a.triggers}`);
-    check(engine, 'sem-mailto', a.mailto.length === 0, a.mailto.join(' | ') || 'nenhum link mailto');
-    check(engine, 'sem-link-do-bookings', a.bookings.length === 0, a.bookings.join(' | ') || `nenhum link para ${BOOKINGS_HOSTS.join(', ')}`);
-    check(engine, 'sem-agendar', !a.agendar, a.agendar ? '"Agendar" na página' : 'nenhum "Agendar"');
-    check(engine, 'sem-instrucao-de-envio-por-email', a.emailInstruction === null, a.emailInstruction ?? 'nenhuma');
-    check(engine, 'sem-script-ou-iframe-externo', a.scripts.length === 0 && a.iframes === 0, a.scripts.join(' | ') || 'nenhum (sem Turnstile, sem widget)');
+    check(engine, 'formulario-aviso-sem-senhas', byKey.description.hint === NO_SECRETS, byKey.description.hint);
+    // Nome e descrição obrigatórios: envio vazio mostra os dois erros, foco no primeiro, nada abre
+    let s = await submitForm(page);
+    check(
+      engine,
+      'validacao-campos-obrigatorios',
+      !s.opened && s.calls.length === 0 && JSON.stringify(s.errors) === '["name","description"]' && s.focus === 'name' && /Informe o seu nome\./.test(s.text) && /Descreva o processo ou a necessidade\./.test(s.text),
+      `erros=${s.errors.join(',')}; foco=${s.focus}; window.open=${s.calls.length}`,
+    );
+    // Só espaços não contam como preenchido
+    s = await submitForm(page, { name: '   ', description: '  \n  ' });
+    check(engine, 'validacao-espacos-nao-contam', !s.opened && s.calls.length === 0 && JSON.stringify(s.errors) === '["name","description"]', `erros=${s.errors.join(',')}`);
+    // E-mail opcional, mas validado se informado
+    const badEmails = [];
+    for (const email of ['abc', 'nome@empresa', 'nome empresa@x.com', '@empresa.com']) {
+      s = await submitForm(page, { name: 'Ana', description: 'Teste', email });
+      badEmails.push(`${email}: erros=${s.errors.join(',')} foco=${s.focus} aberto=${s.calls.length}`);
+      if (s.opened || s.calls.length || JSON.stringify(s.errors) !== '["email"]' || s.focus !== 'email' || !/Informe um e-mail válido ou deixe o campo em branco\./.test(s.text)) badEmails.push('(FALHOU)');
+    }
+    check(engine, 'validacao-email-se-informado', !badEmails.includes('(FALHOU)'), badEmails.join(' · '));
+    // Corrigido: abre o WhatsApp
+    s = await submitForm(page, { email: 'ana@empresa.com.br' });
+    const expected = `${GREETING}\n\nNome: Ana\nE-mail: ana@empresa.com.br\n\nDescrição do processo:\nTeste`;
+    check(engine, 'validacao-corrigida-abre-o-whatsapp', sentOk(s, expected), sentDetail(s));
+    check(engine, 'formulario-sem-requisicao', pageRequests.length === 0 && (await page.evaluate(() => window.__nkBeacon)) === 0, pageRequests.join(' | ') || 'nenhuma requisição da página (fetch, XHR, beacon ou envio de formulário)');
+    await ctx.close();
+  }
+
+  // 3. Mensagens: exatas, só os campos preenchidos, codificadas no link e recuperadas intactas --------------------------
+  {
+    const { ctx, page } = await openPage();
+    const pageRequests = [];
+    page.on('request', (r) => pageRequests.push(`${r.method()} ${r.resourceType()} ${r.url()}`));
+    const storageBefore = await page.evaluate(() => ({ local: Object.keys(localStorage).sort(), session: Object.keys(sessionStorage).sort() }));
+    const cases = [
+      {
+        id: 'minima',
+        origem: 'topo',
+        fields: { name: 'Ana', description: 'Conciliação diária' },
+        expected: `${GREETING}\n\nNome: Ana\n\nDescrição do processo:\nConciliação diária`,
+      },
+      {
+        id: 'completa-com-acentos-e-quebras',
+        origem: 'monitor',
+        extra: ['hosting'],
+        fields: {
+          name: '  José Ção  ',
+          company: 'Açaí & Cia — Ltda.',
+          email: 'jose@empresa.com.br',
+          description: 'Linha 1: 50% dos pedidos\nLinha 2 com #hash, ?a=1&b=2 + "aspas" / barra\n\nLinha 4 🚀 ñ ü',
+        },
+        expected:
+          `${GREETING}\n\nNome: José Ção\nEmpresa: Açaí & Cia — Ltda.\nE-mail: jose@empresa.com.br\n\n` +
+          'Descrição do processo:\nLinha 1: 50% dos pedidos\nLinha 2 com #hash, ?a=1&b=2 + "aspas" / barra\n\nLinha 4 🚀 ñ ü' +
+          `\n\nServiços de interesse:\n- ${SERVICE_NAMES.monitor}\n- ${SERVICE_NAMES.hosting}`,
+      },
+      {
+        id: 'campos-vazios-nao-aparecem',
+        origem: 'ai',
+        fields: { name: 'Bia', company: '   ', email: '', description: 'Relatório semanal' },
+        expected: `${GREETING}\n\nNome: Bia\n\nDescrição do processo:\nRelatório semanal\n\nServiços de interesse:\n- ${SERVICE_NAMES.ai}`,
+      },
+      {
+        id: 'servico-desmarcado',
+        origem: 'hosting-faixa',
+        uncheck: ['hosting'],
+        fields: { name: 'Caio', company: 'Empresa X', description: 'Executar robôs à noite' },
+        expected: `${GREETING}\n\nNome: Caio\nEmpresa: Empresa X\n\nDescrição do processo:\nExecutar robôs à noite`,
+      },
+    ];
+    for (const c of cases) {
+      await openForm(page, c.origem);
+      for (const id of c.extra ?? []) await page.locator(`[data-atendimento] [data-servico-interesse="${id}"]`).check();
+      for (const id of c.uncheck ?? []) await page.locator(`[data-atendimento] [data-servico-interesse="${id}"]`).uncheck();
+      const s = await submitForm(page, c.fields);
+      const raw = s.calls[0]?.[0] ?? '';
+      check(engine, `mensagem-exata:${c.id}`, sentOk(s, c.expected), sentDetail(s));
+      // Codificação: o link é exatamente text=encodeURIComponent(mensagem) — sem espaço, quebra ou acento cru — e decodifica
+      // de volta à mensagem (acentos, emoji, &, #, ?, +, % e quebras de linha preservados)
+      const query = raw.slice(raw.indexOf('?') + 1);
+      check(
+        engine,
+        `mensagem-codificada:${c.id}`,
+        query === `text=${encodeURIComponent(c.expected)}` && !/[\s\n"<>À-ÿ]/.test(raw) && decodeURIComponent(query.slice(5)) === c.expected,
+        `${raw.length} caracteres no link; ${query.slice(0, 90)}…`,
+      );
+      // Depois de abrir: o diálogo diz que a mensagem só chega quando o visitante a envia — nunca que foi recebida
+      check(
+        engine,
+        `sem-afirmacao-de-recebimento:${c.id}`,
+        s.text.includes('Mensagem preparada no WhatsApp') && s.text.includes(OPENED_TEXT) && !RECEIPT_CLAIM.test(s.text) && s.focusInside,
+        `${s.text.replace(/\s+/g, ' ').slice(0, 200)}; foco no diálogo=${s.focusInside}`,
+      );
+      if (c.id === 'completa-com-acentos-e-quebras') {
+        await dialog(page).screenshot({ path: shot('formulario-whatsapp-aberto.png') });
+        // Link de reserva ("Abrir o WhatsApp novamente"): mesma mensagem, outra aba, sem opener e sem Referer
+        const before = waRequests.length;
+        const popupPromise = page.waitForEvent('popup', { timeout: 5000 }).catch(() => null);
+        await page.locator('[data-whatsapp="formulario"]').click();
+        const popup = await popupPromise;
+        if (popup) await popup.waitForLoadState('load').catch(() => {});
+        const iso = popup ? await popup.evaluate(() => ({ opener: window.opener === null, referrer: document.referrer })).catch(() => null) : null;
+        if (popup) await popup.close();
+        const req = waRequests.slice(before).at(-1);
+        check(
+          engine,
+          'link-de-reserva-isolado',
+          !!popup && req?.url === waHref(c.expected) && req.referer == null && iso?.opener === true && iso?.referrer === '',
+          `aba=${!!popup}; mesma mensagem=${req?.url === waHref(c.expected)}; Referer=${req?.referer ?? 'ausente'}; sem opener=${iso?.opener}`,
+        );
+        // "Voltar ao formulário" mantém o que foi digitado
+        await page.getByRole('button', { name: 'Voltar ao formulário' }).click();
+        const kept = await field(page, 'company').inputValue().catch(() => null);
+        const again = await submitForm(page);
+        check(engine, 'voltar-ao-formulario-mantem-os-campos', kept === c.fields.company && sentOk(again, c.expected), `empresa="${kept}"; reenvio com a mesma mensagem=${sentOk(again, c.expected)}`);
+      }
+      // Fechar depois de abrir o WhatsApp: nada fica na memória da página — reabrir mostra o formulário vazio
+      await page.getByRole('button', { name: 'Fechar', exact: true }).last().click();
+      await page.waitForSelector('[data-atendimento]', { state: 'detached', timeout: 3000 }).catch(() => {});
+      await openForm(page, 'contato');
+      const reopened = await page.evaluate(() => ['name', 'company', 'email', 'description'].map((k) => document.querySelector(`[data-atendimento] [data-campo="${k}"]`)?.value ?? null));
+      check(engine, `fechar-descarta-os-dados:${c.id}`, reopened.every((v) => v === ''), JSON.stringify(reopened));
+      await closeForm(page);
+    }
+    // Armazenamento e rede durante todas as mensagens: só o tema no localStorage, nenhuma requisição da página
+    const storageAfter = await page.evaluate(async () => ({
+      local: Object.keys(localStorage).sort(),
+      session: Object.keys(sessionStorage).sort(),
+      cookie: document.cookie,
+      idb: typeof indexedDB.databases === 'function' ? (await indexedDB.databases()).map((d) => d.name) : [],
+    }));
+    check(
+      engine,
+      'formulario-sem-armazenamento',
+      storageAfter.local.every((k) => k === THEME_KEY) &&
+        JSON.stringify(storageAfter.local) === JSON.stringify(storageBefore.local) &&
+        JSON.stringify(storageAfter.session) === JSON.stringify(storageBefore.session) &&
+        storageAfter.session.every((k) => k === '__nk_seeded') &&
+        storageAfter.cookie === '' &&
+        storageAfter.idb.length === 0,
+      `localStorage=${storageAfter.local.join(',') || '—'}; sessionStorage=${storageAfter.session.join(',') || '—'} (só a semente do teste); cookie=${storageAfter.cookie || '—'}; IndexedDB=${storageAfter.idb.join(',') || '—'}`,
+    );
+    check(engine, 'mensagens-sem-requisicao-da-pagina', pageRequests.length === 0 && (await page.evaluate(() => window.__nkBeacon)) === 0, pageRequests.join(' | ') || 'nenhuma requisição da página em 4 envios');
+    // Número oficial no link e nenhum vestígio do número anterior
+    const html = await page.evaluate(() => document.documentElement.outerHTML);
+    const urls = (await page.evaluate(() => window.__nkOpen.map((c) => c[0]))).join(' ');
+    const old = PREVIOUS_WHATSAPP.filter((n) => html.includes(n) || urls.includes(n));
+    check(engine, 'whatsapp-numero-da-publicacao', old.length === 0 && (await page.evaluate(() => window.__nkOpen.every((c) => c[0].startsWith('https://wa.me/')))) && urls.split(' ').every((u) => u.startsWith(`https://wa.me/${NUMBER}?text=`)), `${PRODUCTION ? 'oficial' : 'sintético'} ${NUMBER}; número anterior: ${old.join(', ') || 'ausente'}`);
+    await ctx.close();
+  }
+
+  // 4. Diálogo pelo teclado: foco preso no diálogo (Tab e Shift+Tab) e Esc devolvendo o foco ---------------------------
+  {
+    const { ctx, page } = await openPage();
+    await openForm(page, 'contato', 'teclado');
+    const outside = [];
+    for (const key of [...Array(16).fill('Tab'), ...Array(16).fill('Shift+Tab')]) {
+      await page.keyboard.press(key);
+      const inside = await page.evaluate(() => !!document.querySelector('[data-atendimento]')?.contains(document.activeElement));
+      if (!inside) outside.push(key);
+    }
+    const inert = await page.evaluate(() => {
+      const main = document.querySelector('main');
+      return !!main?.closest('[inert]') || main?.inert === true || [...document.body.children].some((c) => c.inert && c.contains(main));
+    });
+    const closed = await closeForm(page);
+    const back = await page.locator('[data-atendimento-origem="contato"]').evaluate((a) => document.activeElement === a);
+    check(engine, 'dialogo-prende-o-foco', outside.length === 0 && inert && closed && back, `fora do diálogo em ${outside.length} de 32 teclas; página inerte=${inert}; Esc fechou=${closed}; foco de volta no CTA=${back}`);
+    await ctx.close();
+  }
+
+  // 5. Ausência: mailto, Bookings, "Agendar", instrução de envio por e-mail, Turnstile, iframe, script externo ----------
+  {
+    const { ctx, page } = await openPage();
+    const read = () =>
+      page.evaluate(
+        ({ hosts, instr }) => {
+          const host = (h) => {
+            try {
+              return new URL(h, location.href).hostname;
+            } catch {
+              return '';
+            }
+          };
+          const hrefs = [...document.querySelectorAll('a[href]')].map((x) => x.getAttribute('href'));
+          const text = (document.body.textContent ?? '').replace(/\s+/g, ' ');
+          return {
+            forms: document.querySelectorAll('form').length,
+            fields: [...document.querySelectorAll('input, textarea, select')].filter((e) => !e.matches('[data-sim-input]') && !e.closest('[data-atendimento]')).length,
+            mailto: hrefs.filter((h) => /^mailto:/i.test(h)),
+            bookings: hrefs.filter((h) => hosts.includes(host(h)) || /bookings|\/book\//i.test(h)),
+            agendar: /\bagendar\b|agende/i.test(text) || document.querySelectorAll('[data-agendamento], [data-agendar]').length > 0,
+            emailInstruction: text.match(new RegExp(instr.source, instr.flags))?.[0] ?? null,
+            scripts: [...document.scripts].map((s) => s.src).filter((s) => s && !s.startsWith(location.origin)),
+            iframes: document.querySelectorAll('iframe, .cf-turnstile, [data-sitekey]').length,
+          };
+        },
+        { hosts: BOOKINGS_HOSTS, instr: { source: EMAIL_INSTRUCTION.source, flags: EMAIL_INSTRUCTION.flags } },
+      );
+    const closed = await read();
+    await openForm(page, 'topo');
+    const open = await read();
+    check(engine, 'formulario-so-no-dialogo', closed.forms === 0 && closed.fields === 0 && open.forms === 1 && open.fields === 0, `fechado: form=${closed.forms}; aberto: form=${open.forms}; campos fora do simulador e do diálogo=${open.fields}`);
+    for (const [id, a] of [
+      ['fechado', closed],
+      ['aberto', open],
+    ]) {
+      check(engine, `sem-mailto:${id}`, a.mailto.length === 0, a.mailto.join(' | ') || 'nenhum link mailto');
+      check(engine, `sem-link-do-bookings:${id}`, a.bookings.length === 0 && !a.agendar, a.bookings.join(' | ') || `nenhum link para ${BOOKINGS_HOSTS.join(', ')}; nenhum "Agendar"`);
+      check(engine, `sem-instrucao-de-envio-por-email:${id}`, a.emailInstruction === null, a.emailInstruction ?? 'nenhuma');
+      check(engine, `sem-turnstile-script-ou-iframe-externo:${id}`, a.scripts.length === 0 && a.iframes === 0, a.scripts.join(' | ') || 'nenhum (sem Turnstile, sem widget)');
+    }
+    await closeForm(page);
     // E-mail só como texto: identificação do fornecedor (rodapé) e canal dos direitos (privacidade)
     const email = publicacao.canais.email;
     const emailText = await page.evaluate((e) => ({ footer: (document.querySelector('footer [data-supplier]')?.textContent ?? '').includes(e), privacy: (document.querySelector('#privacidade')?.textContent ?? '').includes(e) }), email);
-    check(engine, 'email-so-como-texto', emailText.footer && emailText.privacy && a.mailto.length === 0, `${email}: rodapé=${emailText.footer}; privacidade=${emailText.privacy}; sem link`);
+    check(engine, 'email-so-como-texto', emailText.footer && emailText.privacy && closed.mailto.length === 0, `${email}: rodapé=${emailText.footer}; privacidade=${emailText.privacy}; sem link`);
     // Redes institucionais (LinkedIn e Instagram): URLs exatas da publicação, outra aba; URL sem perfil não vira link
     const social = await page.evaluate(() => ({
       caption: document.querySelector('[data-redes-institucionais] .contact__caption')?.textContent.trim() ?? null,
@@ -321,67 +592,16 @@ async function run(engine) {
         JSON.stringify(social.anywhere) === JSON.stringify(EXPECTED_SOCIAL.map(([, u]) => u)),
       `${social.links.map((l) => `${l.text}=${l.href} (${l.target}, ${l.rel})`).join(' · ') || 'nenhuma'}${REJECTED_SOCIAL.length ? `; rejeitada(s): ${REJECTED_SOCIAL.map(([n, u]) => `${n} ${u}`).join(', ')}` : ''}`,
     );
-    // #contato por âncora: carregamento novo, nenhum diálogo aparece (espera limitada que falha se aparecer)
+    // #contato por âncora: carregamento novo, nenhum diálogo aparece sozinho (espera limitada que falha se aparecer)
     await page.goto('about:blank');
     await page.goto(new URL('#contato', baseUrl).href, { waitUntil: 'networkidle' });
-    const dialog = await page.waitForSelector('[role="dialog"], dialog[open]', { state: 'attached', timeout: 1500 }).then(() => true, () => false);
-    check(engine, 'contato-por-ancora-sem-dialogo', !dialog, dialog ? 'um diálogo abriu' : 'nenhum diálogo');
+    const dlg = await page.waitForSelector('[role="dialog"], dialog[open]', { state: 'attached', timeout: 1500 }).then(() => true, () => false);
+    check(engine, 'contato-por-ancora-sem-dialogo', !dlg, dlg ? 'um diálogo abriu' : 'nenhum diálogo');
     await page.locator('#contato').screenshot({ path: shot('contato.png'), style: '.nk-fab { visibility: hidden !important; }' });
     await ctx.close();
   }
 
-  // 3. Simulador: "Conversar sobre esta simulação" leva a mensagem do Delivery + o resumo mostrado ------------------------
-  {
-    const { ctx, page } = await openPage();
-    const sim = page.locator('[data-simulator]');
-    for (let i = 0; i < 4; i++) await sim.locator('[data-sim-tier="simples"] [data-sim-action="aumentar"]').click();
-    await sim.locator('[data-sim-tier="media"] [data-sim-action="aumentar"]').click();
-    await sim.getByRole('button', { name: 'Calcular meu investimento' }).click();
-    await sim.locator('[data-sim-result]').waitFor({ timeout: 5000 });
-    const cta = sim.locator('[data-sim-result] a[data-whatsapp="delivery"]');
-    const shown = await page.evaluate(() => ({
-      figures: Object.fromEntries([...document.querySelectorAll('[data-simulator] [data-calc]')].map((e) => [e.dataset.calc, e.textContent.trim()])),
-      status: document.querySelector('[data-testid="status-simulador"]')?.textContent ?? '',
-      ctas: document.querySelectorAll('[data-sim-result] a[data-whatsapp], [data-sim-result] button[aria-haspopup]').length,
-    }));
-    const href = await cta.getAttribute('href');
-    const text = (waText(href) ?? '').replace(/ /g, ' ');
-    const label = ((await cta.locator('.nk-button__label').count()) ? await cta.locator('.nk-button__label').evaluate((e) => e.firstChild?.textContent ?? '') : await cta.innerText()).trim();
-    const prefix = `${MESSAGES.delivery}\n\n${SIM_INTRO}\n`;
-    const summary = text.startsWith(prefix) ? text.slice(prefix.length) : null;
-    const nb = (s) => s.replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
-    // Exemplo digitado de propósito: 4 simples + 1 média → 1 pacote de 3 simples + 1 simples + 1 média
-    const EXPECTED_SUMMARY = [
-      '- 4 automações simples: 1 pacote de 3 (R$ 1.500 cada) + 1 individual (R$ 650 cada) = R$ 2.150',
-      '- 1 automação média: 1 individual (R$ 1.400 cada) = R$ 1.400',
-      'Investimento estimado: R$ 3.550',
-      'Sem pacotes, no preço individual: R$ 4.000 · Economia com pacotes: R$ 450',
-    ].join('\n');
-    const f = Object.fromEntries(Object.entries(shown.figures).map(([k, v]) => [k, nb(v)]));
-    check(
-      engine,
-      'simulador-mensagem-com-resumo',
-      label.startsWith('Conversar sobre esta simulação') &&
-        shown.ctas === 1 &&
-        summary === EXPECTED_SUMMARY &&
-        // coerente com o resultado na tela: os mesmos valores e o mesmo resumo anunciado ao leitor de tela
-        summary.includes(`Investimento estimado: ${f.estimativa}`) &&
-        summary.includes(`Sem pacotes, no preço individual: ${f.individual}`) &&
-        summary.includes(`Economia com pacotes: ${f.economia}`) &&
-        // a região viva anuncia as mesmas linhas, em frases ("- " removido, separadas por ". ")
-        nb(shown.status) === nb(`Resultado da simulação atualizado. ${summary.split('\n').map((l) => l.replace(/^- /, '')).join('. ')}`) &&
-        (await cta.getAttribute('target')) === '_blank' &&
-        /noopener/.test((await cta.getAttribute('rel')) ?? '') &&
-        /noreferrer/.test((await cta.getAttribute('rel')) ?? ''),
-      `${label}: ${JSON.stringify(text).slice(0, 220)} · tela=${JSON.stringify(f)}`,
-    );
-    const r = await clickCta(page, cta);
-    check(engine, 'clique-abre-whatsapp:simulador-delivery', clickOk(r, waText(href)), clickDetail(r));
-    await sim.locator('[data-sim-result]').screenshot({ path: shot('simulador-resultado-whatsapp.png'), style: 'header, nav, .nk-fab { visibility: hidden !important; }' });
-    await ctx.close();
-  }
-
-  // 4. Botão flutuante "Fale com um analista": temas × desktop/celular ----------------------------------------------------
+  // 6. Botão flutuante "Fale com um analista": temas × desktop/celular ------------------------------------------------
   for (const theme of THEMES) {
     for (const vp of [
       { name: 'desktop', width: 1280, height: 800 },
@@ -391,18 +611,18 @@ async function run(engine) {
       // reducedMotion 'no-preference': o pulso da lib só seria visível assim — prova que não há animação
       const { ctx, page } = await openPage({ viewport: { width: vp.width, height: vp.height }, theme, reducedMotion: 'no-preference' });
       const fab = page.locator('.nk-fab');
-      // No celular o botão fica recolhido no topo (os botões do hero já levam ao WhatsApp): as medições começam em
-      // Preços, onde ele aparece. Se continuar recolhido, as verificações abaixo falham (sem espera fixa).
-      if (vp.name === 'celular') {
-        await page.evaluate(() => document.getElementById('precos')?.scrollIntoView({ block: 'start' }));
-        // espera o fim da transição de volta (posição e opacidade finais), não um tempo fixo
-        await page
-          .waitForFunction(() => {
+      /** Espera o fim de qualquer transição do botão (posição e opacidade finais): o Firefox mede no meio da transição. */
+      const settle = (tucked) =>
+        page
+          .waitForFunction((t) => {
             const el = document.querySelector('.nk-fab');
-            return el && !el.classList.contains('fab--tucked') && el.getAnimations({ subtree: true }).length === 0;
-          }, null, { timeout: 3000 })
-          .catch(() => {});
-      }
+            return !!el && el.classList.contains('fab--tucked') === t && el.getAnimations({ subtree: true }).length === 0;
+          }, tucked, { timeout: 3000 })
+          .then(() => true, () => false);
+      // No celular o botão fica recolhido no topo (o CTA do topo faz a mesma coisa): as medições começam em Preços, onde
+      // ele aparece. Se continuar recolhido, as verificações abaixo falham (sem espera fixa).
+      await page.evaluate(() => document.getElementById('precos')?.scrollIntoView({ block: 'start' }));
+      await settle(false);
       const info = async () =>
         fab.evaluate((el) => {
           const r = el.getBoundingClientRect();
@@ -425,10 +645,11 @@ async function run(engine) {
             aria: el.getAttribute('aria-label'),
             href: el.getAttribute('href'),
             target: el.getAttribute('target'),
-            rel: el.getAttribute('rel') ?? '',
-            ctx: el.getAttribute('data-whatsapp'),
+            haspopup: el.getAttribute('aria-haspopup'),
+            origem: el.getAttribute('data-atendimento-origem'),
             classes: el.className,
             tooltip: el.querySelectorAll('.nk-fab__tooltip').length,
+            online: el.querySelectorAll('.nk-fab__badge, [class*="online"], [class*="status"], [class*="dot"]').length,
             animations: [cs.animationName, getComputedStyle(el, '::before').animationName, getComputedStyle(el, '::after').animationName],
             running: el.getAnimations({ subtree: true }).length,
             tucked: el.classList.contains('fab--tucked'),
@@ -443,14 +664,14 @@ async function run(engine) {
       check(
         engine,
         `flutuante-texto-e-icone:${tag}`,
-        i0.count === 1 && i0.text === FAB_TEXT && i0.textVisible && i0.icon && i0.aria === `${FAB_TEXT} ${SR_SUFFIX}` && i0.tooltip === 0,
-        `texto="${i0.text}" visível=${i0.textVisible}; ícone=${i0.icon}; aria-label="${i0.aria}"; tooltip=${i0.tooltip}`,
+        i0.count === 1 && i0.text === FAB_TEXT && i0.textVisible && i0.icon && i0.aria === FAB_TEXT && i0.tooltip === 0 && i0.online === 0 && /nk-fab--whatsapp/.test(i0.classes),
+        `texto="${i0.text}" visível=${i0.textVisible}; ícone do WhatsApp=${i0.icon}; aria-label="${i0.aria}"; tooltip=${i0.tooltip}; indicador "online"=${i0.online}`,
       );
       check(
         engine,
-        `flutuante-destino:${tag}`,
-        i0.href === waHref(MESSAGES.geral) && waText(i0.href) === MESSAGES.geral && i0.ctx === 'geral' && isolated(i0),
-        `wa.me/${NUMBER} "${waText(i0.href)}"; target=${i0.target}; rel=${i0.rel}`,
+        `flutuante-abre-o-formulario:${tag}`,
+        i0.href === '#contato' && i0.haspopup === 'dialog' && i0.origem === 'flutuante' && i0.target == null,
+        `href=${i0.href}; aria-haspopup=${i0.haspopup}; origem=${i0.origem}; target=${i0.target ?? '(nenhum)'}`,
       );
       check(
         engine,
@@ -461,17 +682,17 @@ async function run(engine) {
       const ratio = i0.textColor && /rgba?\(/.test(i0.bg) && !/rgba\([^)]*,\s*0(\.0+)?\)/.test(i0.bg) ? contrast(i0.textColor, i0.bg) : 0;
       check(engine, `flutuante-contraste:${tag}`, ratio >= 4.5, `texto ${i0.textColor} sobre ${i0.bg}: ${ratio.toFixed(2)}:1 (mín. 4,5)`);
       check(engine, `flutuante-area-de-toque:${tag}`, i0.box.w >= 44 && i0.box.h >= 44, `${i0.box.w.toFixed(0)}×${i0.box.h.toFixed(0)}px (mín. 44×44)`);
-      // Posição: dentro da janela, respeitando o afastamento da lib (24 px; 16 px até 640 px de largura)
+      // Posição: canto inferior direito, dentro da janela, respeitando o afastamento da lib (24 px; 16 px até 640 px)
       const offset = vp.width <= 640 ? 16 : 24;
       const gapR = i0.vw - i0.box.r;
       const gapB = i0.vh - i0.box.b;
       check(
         engine,
         `flutuante-dentro-da-tela:${tag}`,
-        i0.box.x >= 0 && i0.box.y >= 0 && Math.abs(gapR - offset) <= 1 && Math.abs(gapB - offset) <= 1,
+        i0.box.x >= 0 && i0.box.y >= 0 && Math.abs(gapR - offset) <= 1 && Math.abs(gapB - offset) <= 1 && (i0.box.x + i0.box.r) / 2 > i0.vw / 2,
         `direita ${gapR.toFixed(1)}px, base ${gapB.toFixed(1)}px (esperado ${offset}px); x=${i0.box.x.toFixed(0)}`,
       );
-      // Teclado: visível, recebe foco com Tab a partir do último link do rodapé (WebKit: foco programático)
+      // Teclado: recebe foco com Tab a partir do último link do rodapé (WebKit: foco programático) e abre com Enter
       let focused;
       if (engine === 'webkit') {
         await fab.focus();
@@ -487,11 +708,12 @@ async function run(engine) {
       });
       check(engine, `flutuante-focavel-por-teclado:${tag}`, focused && ring, `foco=${focused}; indicador=${ring}${engine === 'webkit' ? ' (WebKit: foco programático)' : ''}`);
       await page.evaluate(() => document.activeElement?.blur());
-      // Fim da página: o botão não cobre nenhum texto nem link do rodapé
+      // Fim da página: o botão não cobre nenhum texto nem link do rodapé (inclusive a linha legal do fornecedor)
       await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
       const atBottom = await page
         .waitForFunction(() => Math.ceil(scrollY + innerHeight) >= document.documentElement.scrollHeight - 1, null, { timeout: 3000 })
         .then(() => true, () => false);
+      await settle(false);
       const cover = await fab.evaluate((el) => {
         const f = el.getBoundingClientRect();
         const hit = [];
@@ -534,15 +756,14 @@ async function run(engine) {
           tuckedOk && t.ariaHidden === 'true' && t.tabIndex === -1 && t.pointer === 'none',
           `recolhido=${t.tucked}; aria-hidden=${t.ariaHidden}; tabIndex=${t.tabIndex}; opacity=${t.opacity}; pointer-events=${t.pointer}`,
         );
-        // de volta ao topo, reaparece
-        // NEKKORA-COM-CANAIS-001: no topo os botões do hero já levam ao WhatsApp — o flutuante também fica recolhido ali
+        // No topo o CTA do hero já abre o formulário: o flutuante também fica recolhido ali
         await page.evaluate(() => window.scrollTo(0, 0));
-        const topo = await page.waitForFunction(() => document.querySelector('.nk-fab')?.classList.contains('fab--tucked'), null, { timeout: 3000 }).then(() => true, () => false);
+        const topo = await settle(true);
         const tp = await info();
         check(engine, `flutuante-recolhido-com-o-cta-do-topo:${tag}`, topo && tp.ariaHidden === 'true' && tp.tabIndex === -1, `aria-hidden=${tp.ariaHidden}; tabIndex=${tp.tabIndex}`);
         // fora do topo e do contato (preços), ele volta
         await page.evaluate(() => document.getElementById('precos')?.scrollIntoView({ block: 'start' }));
-        const back = await page.waitForFunction(() => !document.querySelector('.nk-fab')?.classList.contains('fab--tucked'), null, { timeout: 3000 }).then(() => true, () => false);
+        const back = await settle(false);
         const b = await info();
         check(engine, `flutuante-volta-fora-do-contato:${tag}`, back && b.ariaHidden == null && b.tabIndex === 0 && b.opacity === '1', `aria-hidden=${b.ariaHidden}; tabIndex=${b.tabIndex}; opacity=${b.opacity}`);
       } else {
@@ -550,18 +771,29 @@ async function run(engine) {
         const tucked = await page.waitForSelector('.nk-fab.fab--tucked', { state: 'attached', timeout: 1500 }).then(() => true, () => false);
         check(engine, `flutuante-visivel-com-o-contato:${tag}`, !tucked, tucked ? 'recolhido no desktop' : 'continua visível');
       }
-      // Clique no flutuante (desktop e celular, fora do topo e do contato — em Preços): abre o WhatsApp, nenhum diálogo
+      // Clique no flutuante (em Preços, fora do topo e do contato): abre o formulário, sem serviço marcado, sem abrir o
+      // WhatsApp; Esc devolve o foco ao botão
       if (theme === 'sage-light') {
         await page.evaluate(() => document.getElementById('precos')?.scrollIntoView({ block: 'start' }));
-        await page.waitForFunction(() => !document.querySelector('.nk-fab')?.classList.contains('fab--tucked'), null, { timeout: 3000 }).catch(() => {});
-        const r = await clickCta(page, fab);
-        check(engine, `clique-abre-whatsapp:flutuante-${vp.name}`, clickOk(r, MESSAGES.geral), clickDetail(r));
+        await settle(false);
+        await fab.click();
+        const opened = await page.waitForSelector('[data-atendimento]', { state: 'visible', timeout: 3000 }).then(() => true, () => false);
+        const services = opened ? await checkedServices(page) : null;
+        const calls = await page.evaluate(() => window.__nkOpen.length);
+        if (vp.name === 'celular') {
+          // contexto sem redução de movimento: a captura espera o fim da animação de entrada do diálogo
+          await page
+            .waitForFunction(() => document.querySelector('.nk-dialog-root')?.getAnimations({ subtree: true }).length === 0, null, { timeout: 3000 })
+            .catch(() => {});
+          await page.screenshot({ path: shot('formulario-celular.png') });
+        }
+        const closed = await closeForm(page);
+        const back = await fab.evaluate((el) => document.activeElement === el);
+        check(engine, `flutuante-clique-abre-o-formulario:${vp.name}`, opened && JSON.stringify(services) === '[]' && calls === 0 && closed && back, `diálogo=${opened}; serviços=[${(services ?? []).join(',')}]; window.open=${calls}; foco de volta=${back}`);
       }
       await ctx.close();
     }
   }
-
-  await campaign(engine, newContext);
 
   // Fixture negativa: a CSP do build libera o endpoint (uma chamada passaria) — e mesmo assim nenhuma é feita
   if (ENDPOINT_ORIGIN) {
@@ -569,76 +801,18 @@ async function run(engine) {
     check(engine, 'negativa-csp-libera-o-endpoint', csp.includes(ENDPOINT_ORIGIN), `connect-src com ${ENDPOINT_ORIGIN}: ${csp.includes(ENDPOINT_ORIGIN)}`);
   }
   const foreign = requests.filter((r) => !r.url.startsWith(origin) && !r.url.startsWith('https://wa.me/') && !/^(data|blob|about):/.test(r.url));
-  const writes = requests.filter((r) => r.method !== 'GET');
+  const writes = requests.filter((r) => r.method !== 'GET' || ['fetch', 'xhr', 'ping', 'beacon', 'eventsource', 'websocket'].includes(r.type) && !/\/release\.json/.test(r.url));
   check(
     engine,
     'sem-requisicao-a-api',
     foreign.length === 0 && writes.length === 0 && (!ENDPOINT_ORIGIN || !requests.some((r) => r.url.startsWith(ENDPOINT_ORIGIN))),
-    `${requests.length} requisições: só ${origin} e as abas locais do wa.me; fora disso: ${foreign.map((r) => r.url).join(' | ') || 'nenhuma'}; não-GET: ${writes.map((r) => `${r.method} ${r.url}`).join(' | ') || 'nenhuma'}`,
+    `${requests.length} requisições: só ${origin} e as abas locais do wa.me; fora disso: ${foreign.map((r) => r.url).join(' | ') || 'nenhuma'}; não-GET, fetch, XHR ou beacon: ${writes.map((r) => `${r.method} ${r.type} ${r.url}`).join(' | ') || 'nenhuma'}`,
   );
   check(engine, 'sem-requisicao-externa-real', aborted.length === 0, aborted.join(' | ') || 'wa.me respondido localmente; nenhuma outra requisição externa');
   check(engine, 'console-sem-erros', errors.length === 0, errors.join(' | ') || 'limpo');
   const version = browser.version();
   await browser.close();
   return { engine, version, waRequests: waRequests.map((r) => ({ ...r, url: `${r.url.slice(0, 60)}…` })), aborted };
-}
-
-/**
- * Vigência (COM-VITRINE-001, V-01): a campanha controla só a comunicação promocional. Antes, durante, no último dia e
- * depois do período da publicação servida os cartões mostram a MESMA tabela (individual, pacote de 3 e economia), sem
- * valor riscado; a faixa com o período por extenso só aparece durante a campanha.
- */
-async function campaign(engine, newContext) {
-  if (!CAMP_START || !CAMP_END) return;
-  const read = async (at) => {
-    const ctx = await newContext({ at });
-    const p = await ctx.newPage();
-    await p.goto(baseUrl, { waitUntil: 'networkidle' });
-    const r = await p.evaluate(() => ({
-      text: document.querySelector('[data-pricing]').innerText,
-      strip: document.querySelector('[data-pricing] .launch-strip')?.innerText ?? null,
-      struck: document.querySelectorAll('[data-pricing] s, [data-pricing] del').length,
-      values: [...document.querySelectorAll('[data-price-tier] [data-price]')].map((e) => `${e.closest('[data-price-tier]').dataset.priceTier}:${e.dataset.price}=${e.textContent.trim()}`),
-    }));
-    await ctx.close();
-    return r;
-  };
-  // Tabela da COM-VITRINE-001, digitada de propósito (independente do código)
-  const table = [
-    'simples:individual=R$ 650',
-    'simples:pacote=R$ 1.500',
-    'simples:economia=Economia de R$ 450',
-    'media:individual=R$ 1.400',
-    'media:pacote=R$ 3.500',
-    'media:economia=Economia de R$ 700',
-  ];
-  const sameTable = (r) => JSON.stringify(r.values) === JSON.stringify(table) && r.struck === 0 && !/R\$ 1\.000|R\$ 2\.800/.test(r.text);
-  const period = `de ${toBr(CAMP_START)} a ${toBr(CAMP_END)}`;
-  const novas = publicacao.novasCondicoes?.inicio ? toBr(publicacao.novasCondicoes.inicio) : null;
-  const during = await read(IN_CAMPAIGN);
-  check(
-    engine,
-    'vigencia-durante-campanha',
-    sameTable(during) &&
-      (during.strip ?? '').includes(`Campanha de lançamento para solicitações de avaliação recebidas ${period}.`) &&
-      // V-01 (titular, 12/11/2026): a faixa diz que os valores continuam depois da campanha, até nova revisão
-      (!novas || (during.strip ?? '').includes(`valem para solicitações recebidas a partir de ${novas} e continuam valendo depois da campanha, até nova revisão.`)) &&
-      !/Preços especiais|preço de lançamento/i.test(during.text),
-    during.values.join(' · '),
-  );
-  const dayBefore = new Date(new Date(`${CAMP_START}T12:00:00-03:00`).getTime() - 864e5).toISOString().slice(0, 10);
-  const dayAfter = new Date(new Date(`${CAMP_END}T12:00:00-03:00`).getTime() + 864e5).toISOString().slice(0, 10);
-  for (const [id, at] of [
-    ['vigencia-antes-do-inicio', new Date(`${dayBefore}T23:30:00-03:00`)],
-    // 00h30 do dia seguinte ao fim, em Brasília: a campanha já acabou — mesma tabela, sem retorno à tabela anterior (V-01)
-    ['vigencia-depois-do-fim', new Date(`${dayAfter}T00:30:00-03:00`)],
-  ]) {
-    const r = await read(at);
-    check(engine, id, sameTable(r) && r.strip === null && !/[Ll]ançamento/.test(r.text), r.values.join(' · '));
-  }
-  // último dia ainda vale: 23h30 em Brasília já é o dia seguinte em UTC
-  const last = await read(new Date(`${CAMP_END}T23:30:00-03:00`));
-  check(engine, 'vigencia-ultimo-dia-no-fuso-de-brasilia', sameTable(last) && last.strip != null, `${last.values.join(' · ')} · faixa=${last.strip ? 'presente' : 'ausente'}`);
 }
 
 const runs = [];
@@ -652,7 +826,7 @@ for (const engine of enginesArg.split(',')) {
 const failed = checks.filter((c) => !c.ok).length;
 writeFileSync(path.join(outDir, 'resultados.json'), JSON.stringify({ baseUrl, publicacao: release.publicacao, negativa: NEGATIVE, at: new Date().toISOString(), runs, checks, summary: { total: checks.length, failed } }, null, 2));
 const md = [
-  `# Atendimento pelo WhatsApp (NEKKORA-COM-CANAIS-001) — ${new Date().toISOString()}`,
+  `# Atendimento: formulário → WhatsApp (NEKKORA-COM-ECOSYSTEM-001) — ${new Date().toISOString()}`,
   '',
   `URL: ${baseUrl} (${release.publicacao}${NEGATIVE ? ', fixture NEGATIVA: Bookings e endpoint configurados' : ''}) · ${runs.map((r) => `${r.engine} ${r.version}`).join(' · ')} · ${checks.length} verificações · ${failed} falha(s)`,
   '',

@@ -1,16 +1,21 @@
 # nekkora-commercial
 
-Página comercial da Nekkora (**COM-001 — posicionamento comercial**). Apresenta duas ofertas complementares:
+Página comercial da Nekkora. Desde a **NEKKORA-COM-ECOSYSTEM-001** (v1.2.0, em homologação) apresenta o ecossistema
+**Crie. Monitore. Execute.**, com três produtos independentes, contratados sozinhos ou em qualquer combinação:
 
-- **Nekkora Delivery** — desenvolvimento de automações por demanda, com escopo, preço e aceite definidos em proposta.
-- **Nekkora Hosting** — infraestrutura e serviços para executar automações, em avaliação de viabilidade.
+- **Nekkora AI — Piloto** — criação de automações com inteligência artificial (a partir de R$ 100 por automação).
+- **Nekkora Monitor** — acompanhamento das execuções (R$ 75 por automação, por mês).
+- **Nekkora Hosting** — execução em máquina Windows ou Linux (por hora-máquina).
+
+O Nekkora Delivery deixou de ser produto comercial; seus documentos ficam em [`docs/comercial/`](docs/comercial/) como
+histórico dos compromissos assumidos.
 
 Feita com **Vite + React + TypeScript** e a **[nekkora-lib](../Nekkora-lib)** (design system da Nekkora).
 Tema padrão **Sakura Dark**, com alternância para **Sage Light**.
 
-> **Versão para homologação.** Canais confirmados: e-mail `contato@nekkora.com` e LinkedIn (sem WhatsApp por
-> enquanto). A solicitação de avaliação abre a mensagem confirmada no aplicativo de e-mail do visitante. A publicação
-> continua bloqueada até as aprovações da titular: veja
+> **Versão para homologação.** Atendimento comercial só pelo WhatsApp oficial: o formulário de atendimento prepara a
+> mensagem no navegador e abre o WhatsApp, sem envio automático. A publicação continua bloqueada até as aprovações da
+> titular: veja [docs/release/NEKKORA-COM-ECOSYSTEM-001.md](docs/release/NEKKORA-COM-ECOSYSTEM-001.md) e
 > [docs/release/COM-RELEASE-PENDENCIAS.md](docs/release/COM-RELEASE-PENDENCIAS.md).
 
 ## Rodando localmente
@@ -58,11 +63,13 @@ Antes de mudar uma promessa comercial, atualize o [contrato](docs/com-001/02-con
 src/
 ├── content.ts           texto comercial (fonte única)
 ├── config.ts            canais de contato validados, menu, aviso de homologação, chave do tema
-├── App.tsx              Navbar, seções, footer e WhatsApp flutuante (só com número confirmado)
+├── precos.ts            tabela de preços e simulador (fonte única dos valores)
+├── mensagem.ts          validação e montagem da mensagem do formulário de atendimento
+├── atendimento.tsx      formulário de atendimento (diálogo) e botões que o abrem
+├── App.tsx              Navbar, seções, footer e botão flutuante (só com número confirmado)
 ├── styles.css           layout e composição (cores e componentes vêm da lib)
-├── sections/            Hero, Solutions, Delivery, HowItWorks, Hosting, Combined, Differentials,
-│                        Transparency, Contact, Footer
-└── illustrations/       mascote (Neko) e cenas em SVG
+└── sections/            Hero, Solutions, Pricing, Simulator, HowItWorks, Hosting, Transparency, Contact,
+                         Privacy, Footer
 scripts/                 homologacao.mjs, homologacao-canais.mjs, exportar-texto.mjs
 docs/ARQUITETURA.md      visão geral da página
 docs/com-001/            auditoria, contrato, matriz, arquitetura, texto, roteiro, checklist, pendências,
@@ -74,19 +81,21 @@ public/                  favicons da marca (idênticos aos da nekkora-lib)
 
 - Dados que só a titular confirma (canais, campanha, controlador, aprovações): [`publicacao.json`](publicacao.json).
   `npm run verificar:publicacao` lista o que falta e **bloqueia o deploy de produção**.
-- Preços: [`src/precos.ts`](src/precos.ts) é a fonte única. Economia e percentual são calculados, e a campanha só
-  vale dentro das datas aprovadas.
+- Preços: [`src/precos.ts`](src/precos.ts) é a fonte única (PUB-14 por impressão:
+  `node scripts/comercial/impressao-precos.mjs`). As tabelas do Delivery ficam só em
+  [`scripts/comercial/tabelas-anteriores.mjs`](scripts/comercial/tabelas-anteriores.mjs), fora da página.
 - nekkora-lib: tarball do CI em [`vendor/`](vendor/). `npm run verificar:lib -- --reconstruir` refaz e confere o hash.
 - Hospedagem: **AWS S3 + CloudFront** (DNS na Cloudflare). Cabeçalhos, cache, função e políticas IAM estão em
   [`deploy/aws/`](deploy/aws/), e os scripts de publicação, rollback, verificação e auditoria em
   [`scripts/aws/`](scripts/aws/).
 - `npm test`: preços, portão, publicação/rollback simulados, auditoria, CloudFront local e backend de solicitações.
 - `npm run cloudfront:local`: serve o `dist/` como o CloudFront (CSP, erros, cache, função).
-- `npm run homologacao` (página) e `npm run homologacao:canais` (atendimento pelo WhatsApp, botão flutuante e ausência de formulário, e-mail e Bookings).
+- `npm run homologacao` (página) e `npm run homologacao:canais` (formulário de atendimento, WhatsApp, botão flutuante e ausência de envio automático, e-mail e Bookings).
 - `npm run aws:auditar -- --bucket <nome>`: auditoria somente leitura da conta AWS.
 - `npm run verificar:precos`: confere que o bundle tem a tabela de `src/precos.ts` e nenhum percentual digitado.
-- **Contato (NEKKORA-COM-CANAIS-001, 12/11/2026)**: o WhatsApp é o único canal público de atendimento (CTAs e botão
-  flutuante "Fale com um analista"); a página não tem formulário, envio por e-mail, envio automático nem agendamento, e o
+- **Contato (NEKKORA-COM-CANAIS-001 e NEKKORA-COM-ECOSYSTEM-001)**: o WhatsApp oficial é o único canal público de
+  atendimento. Os CTAs e o botão flutuante "Fale com um analista" abrem o formulário de atendimento, que só prepara a
+  mensagem no navegador e abre o WhatsApp; a página não tem envio por e-mail, envio automático nem agendamento, e o
   portão bloqueia `agendamento.url` e `envioAutomatico.endpoint`. "Entrar" leva à Nekkora Platform. O backend de
   solicitações em [`api/solicitacoes/`](api/solicitacoes/) continua no repositório (testes de unidade e
   `npm run api:local`), sem uso pela página; histórico em [`COM-RELEASE-005-leads.md`](docs/release/COM-RELEASE-005-leads.md).

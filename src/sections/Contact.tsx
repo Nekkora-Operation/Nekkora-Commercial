@@ -1,12 +1,12 @@
 import { Link, Logo } from 'nekkora-lib';
 import { CHANNELS } from '../config';
 import { CONTACT_COPY } from '../content';
-import { WhatsappButton } from '../whatsapp';
+import { RequestButton } from '../atendimento';
 
 /**
- * Contato (NEKKORA-COM-CANAIS-001, titular, 12/11/2026): o WhatsApp é o único canal público de atendimento comercial.
- * Sem formulário, sem envio por e-mail e sem agendamento: a página só abre a conversa, com uma mensagem inicial que o
- * visitante pode editar — nada é enviado sem que ele toque em enviar no WhatsApp. LinkedIn e Instagram aparecem como
+ * Contato (NEKKORA-COM-CANAIS-001 e NEKKORA-COM-ECOSYSTEM-001): o WhatsApp é o único canal público de atendimento
+ * comercial. O formulário de atendimento só prepara a mensagem e abre o WhatsApp — nada é enviado sem que o visitante
+ * toque em enviar; sem envio por e-mail, envio automático nem agendamento. LinkedIn e Instagram aparecem como
  * redes institucionais, não como canais de atendimento. O e-mail continua só onde a lei pede (identificação do
  * fornecedor no rodapé e canal dos direitos no aviso de privacidade).
  */
@@ -27,9 +27,9 @@ export function Contact() {
           {CHANNELS.whatsapp ? (
             <>
               <div className="contact__ctas">
-                <WhatsappButton context="geral" size="lg" pill>
+                <RequestButton size="lg" pill data-atendimento-origem="contato">
                   {CONTACT_COPY.cta}
-                </WhatsappButton>
+                </RequestButton>
               </div>
               <p className="contact__note">{CONTACT_COPY.note}</p>
             </>

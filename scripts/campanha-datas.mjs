@@ -9,6 +9,11 @@
  * Regra aprovada: dois meses a partir da publicação oficial. inicio = D; fim = o mesmo dia, dois meses depois,
  * inclusivo (se o dia não existir no mês, o último dia do mês). Fuso de Brasília.
  *
+ * NEKKORA-COM-ECOSYSTEM-001 (titular, 20/11/2026): a campanha de lançamento (06/11/2026 a 06/01/2027) virou HISTÓRICO
+ * dos compromissos do Delivery — a página não a exibe mais, e a nova estratégia tem vigência própria
+ * (publicacao.json → ecossistema.inicio). Por isso o plano RECUSA qualquer troca das datas da campanha: o histórico da
+ * PUB-13 anterior não pode ser sobrescrito. As funções de cálculo continuam para conferência.
+ *
  * Proteções:
  * - sem --aplicar, nada é gravado;
  * - --aplicar exige --autorizacao (texto que vai para $origem.campanhaLancamento);
@@ -56,32 +61,6 @@ export const hojeEmBrasilia = (agora = new Date()) =>
 const REGRAS = [
   { arquivo: 'publicacao.json', n: 1, de: (a) => `"inicio": "${a.inicio}"`, para: (n) => `"inicio": "${n.inicio}"` },
   { arquivo: 'publicacao.json', n: 1, de: (a) => `"fim": "${a.fim}"`, para: (n) => `"fim": "${n.fim}"` },
-  { arquivo: 'scripts/testes/condicoes-delivery.test.mjs', n: 2, de: (a) => `{ inicio: '${a.inicio}', fim: '${a.fim}' }`, para: (n) => `{ inicio: '${n.inicio}', fim: '${n.fim}' }` },
-  ...['simulador.test.mjs'].flatMap(() => {
-    const escopo = ['9–11. campanha aprovada', "assert.equal(campaignState(campanhaLancamento"];
-    return [
-      { arquivo: 'scripts/testes/simulador.test.mjs', escopo, n: 1, de: (a) => `${a.vespera}T23:30`, para: (n) => `${n.vespera}T23:30` },
-      { arquivo: 'scripts/testes/simulador.test.mjs', escopo, n: 1, de: (a) => `${a.inicio}T00:30`, para: (n) => `${n.inicio}T00:30` },
-      { arquivo: 'scripts/testes/simulador.test.mjs', escopo, n: 1, de: (a) => `${a.meio}T12:00`, para: (n) => `${n.meio}T12:00` },
-      { arquivo: 'scripts/testes/simulador.test.mjs', escopo, n: 1, de: (a) => `${a.fim}T23:30`, para: (n) => `${n.fim}T23:30` },
-      { arquivo: 'scripts/testes/simulador.test.mjs', escopo, n: 1, de: (a) => `${a.seguinte}T00:30`, para: (n) => `${n.seguinte}T00:30` },
-      { arquivo: 'scripts/testes/simulador.test.mjs', escopo, n: 1, de: (a) => `(${br(a.inicio)} a ${br(a.fim)})`, para: (n) => `(${br(n.inicio)} a ${br(n.fim)})` },
-    ];
-  }),
-  { arquivo: 'scripts/testes/simulador.test.mjs', n: 1, de: (a) => `inicio: '${a.inicio}',\n    fim: '${a.fim}'`, para: (n) => `inicio: '${n.inicio}',\n    fim: '${n.fim}'` },
-  ...[['vespera', 'T23:30'], ['inicio', 'T00:30'], ['meio', 'T12:00'], ['fim', 'T23:30'], ['seguinte', 'T00:30']].map(([k, h]) => ({
-    arquivo: 'scripts/homologacao-simulador.mjs',
-    escopo: ['const PROD_DATES = [', '];'],
-    n: 2, // id e horário
-    de: (a) => a[k],
-    para: (n) => n[k],
-    so: h,
-  })),
-  { arquivo: 'scripts/homologacao-simulador.mjs', n: 1, de: (a) => `de ${br(a.inicio)} a ${br(a.fim)}`, para: (n) => `de ${br(n.inicio)} a ${br(n.fim)}` },
-  // NEKKORA-COM-CANAIS-001: scripts/homologacao-canais.mjs deriva as datas da campanha do publicacao.json do build servido
-  // (release.json) — nada a trocar; scripts/homologacao-leads.mjs saiu (sem formulário, Bookings nem envio automático).
-  { arquivo: '.github/workflows/ci.yml', n: 1, de: (a) => `for d in ${a.vespera} ${a.meio} ${a.seguinte}; do`, para: (n) => `for d in ${n.vespera} ${n.meio} ${n.seguinte}; do` },
-  { arquivo: '.github/workflows/ci.yml', n: 1, de: (a) => `(${br(a.inicio)} a ${br(a.fim)})`, para: (n) => `(${br(n.inicio)} a ${br(n.fim)})` },
 ];
 
 const contar = (texto, trecho) => texto.split(trecho).length - 1;
@@ -89,6 +68,10 @@ const contar = (texto, trecho) => texto.split(trecho).length - 1;
 /** Monta o plano sobre os conteúdos atuais. Não grava nada. Lança erro se alguma contagem divergir. */
 export function planejar(ler, novoInicio, autorizacao) {
   const pub = JSON.parse(ler('publicacao.json'));
+  // NEKKORA-COM-ECOSYSTEM-001: campanha encerrada como histórico — nenhuma troca de datas
+  if (pub.ecossistema !== undefined) {
+    throw new Error('campanha de lançamento é histórico (NEKKORA-COM-ECOSYSTEM-001): as datas não podem ser trocadas; a nova estratégia usa ecossistema.inicio');
+  }
   const atual = calcularDatas(pub.campanhaLancamento.inicio);
   if (atual.fim !== pub.campanhaLancamento.fim) throw new Error(`publicacao.json: fim ${pub.campanhaLancamento.fim} não é inicio + 2 meses (${atual.fim})`);
   const nova = calcularDatas(novoInicio);

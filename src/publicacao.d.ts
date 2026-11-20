@@ -18,14 +18,24 @@ declare module '@publicacao' {
       agendamento: boolean;
       envioAutomatico: boolean;
       publicacao: boolean;
+      disponibilidade?: Partial<Record<'ai' | 'monitor' | 'hosting', boolean>>;
     };
     avisoHomologacao: boolean;
     /** COM-VITRINE-001 §9.3: impressão digital da tabela aprovada (PUB-14) e aprovação da tabela pós-campanha (V-01). */
     tabelaDePrecos?: { impressao: string | null; posCampanha: boolean };
     /** COM-VITRINE-001 §3.1: data de início das novas condições (AAAA-MM-DD), definida pela titular. */
     novasCondicoes?: { inicio: string | null };
-    /** COM-VITRINE-001 §7: disponibilidade real de Monitor e AI (PUB-23). */
-    servicos?: { monitor: 'em-preparacao' | 'disponivel'; ai: 'em-preparacao' | 'disponivel' };
+    /** NEKKORA-COM-ECOSYSTEM-001 §11: vigência da nova estratégia comercial (AAAA-MM-DD), definida pela titular (PUB-13). */
+    ecossistema?: { inicio: string | null };
+    /**
+     * Estado real de cada produto (PUB-23; NEKKORA-COM-ECOSYSTEM-001 §10): o AI em piloto; Monitor e Hosting sob avaliação
+     * ou em preparação; "disponivel" só com aprovação própria (aprovacoes.disponibilidade).
+     */
+    servicos?: {
+      ai: 'piloto' | 'disponivel';
+      monitor: 'sob-avaliacao' | 'em-preparacao' | 'disponivel';
+      hosting: 'sob-avaliacao' | 'em-preparacao' | 'disponivel';
+    };
   };
   export default publicacao;
 }

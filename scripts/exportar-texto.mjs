@@ -16,7 +16,8 @@ const rel = (alvo) => path.relative(path.dirname(out), path.join(root, alvo)).sp
 const { createServer } = await import('vite');
 const vite = await createServer({ root, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' });
 const c = await vite.ssrLoadModule('/src/content.ts');
-const { WHATSAPP_MESSAGES } = await vite.ssrLoadModule('/src/config.ts');
+const { WHATSAPP_GREETING } = await vite.ssrLoadModule('/src/config.ts');
+const { buildMessage } = await vite.ssrLoadModule('/src/mensagem.ts');
 await vite.close();
 const { CONTACT_COPY: K, PRICING: P } = c;
 // Cabeçalho conforme as aprovações reais da configuração usada (publicacao.json ou NEKKORA_PUBLICACAO)
@@ -35,7 +36,7 @@ const list = (items) => items.forEach((i) => L.push(`- ${i}`));
 const header = (s) => L.push(`**${s.eyebrow}** — ${s.title}`, '', s.description ?? '');
 
 L.push(
-  '# Texto comercial consolidado (modelo C — Poster · COM-RELEASE-001/002/003 · NEKKORA-COM-008-C)',
+  '# Texto comercial consolidado (modelo C — Poster · NEKKORA-COM-ECOSYSTEM-001)',
   '',
   ...(APROVADO
     ? ['> **Textos e condições públicas aprovados internamente** pela titular para este conteúdo (impressões de PUB-17 e',
@@ -43,8 +44,8 @@ L.push(
        '> publicação** (PUB-13 e PUB-18 têm registros próprios) nem aprova contrato-base, anexos, proposta-modelo,',
        '> procedimento ou as propostas DP-01 a DP-05: a contratação de pacotes segue bloqueada.']
     : FLAGS && !process.env.NEKKORA_PUBLICACAO
-      ? ['> **Em revisão (COM-VITRINE-001).** Textos e condições alterados depois da aprovação da v1.0.0; sem aprovação',
-         '> própria (impressões de PUB-17 e PUB-19: `node scripts/comercial/impressao-conteudo.mjs`).']
+      ? ['> **Em revisão (NEKKORA-COM-ECOSYSTEM-001).** Textos, preços e condições novos, sem aprovação própria (impressões',
+         '> de PUB-14, PUB-17 e PUB-19: `node scripts/comercial/impressao-precos.mjs` e `impressao-conteudo.mjs`).']
       : ['> **Em revisão.** Textos ajustados às decisões da COM-008-B; não aprovados (aprovacoes.textosComerciais,',
          '> condicoesComerciais e avisoDePrivacidade = false) e sujeitos a revisão jurídica.']),
   '',
@@ -57,6 +58,7 @@ L.push(
 
 h('1. Hero');
 L.push(`Selo: ${c.HERO.badge}`, '', `**${c.HERO.titleLead} ${c.HERO.titleAccent}**`, '', c.HERO.lead, '', `CTAs: "${c.HERO.primaryCta}" · "${c.HERO.secondaryCta}"`, '');
+L.push(`Pilares (${c.HERO.pillarsLabel}):`, '');
 list(c.HERO.points.map((p) => p.label));
 
 h('2. Soluções');
@@ -64,40 +66,27 @@ header(c.SOLUTIONS);
 for (const s of c.SOLUTIONS.cards) {
   L.push('', `### ${s.number} · ${s.name} · _${s.stage}_`, '', s.summary, '');
   list(s.items);
-  if (s.technologies) L.push('', `${s.technologies.label}: ${s.technologies.items.join(' · ')}. _${s.technologies.note}_`);
-  L.push('', `Link: "${s.cta}" (${s.href})`);
+  L.push('', `Botão: "${s.cta}" (abre o formulário de atendimento com o ${s.name} marcado)`);
 }
 L.push('', c.SOLUTIONS.note);
 
 h('3. Preços (bloco data-pricing)');
 header(P);
-L.push('', `> **${P.launch.badge}** — ${P.launch.text} ${P.launch.condition}`, '', `Sem datas aprovadas (só na versão de homologação): _${P.launch.pendingDates}_`, '', `Sem a data de início das novas condições: _${P.launch.pendingStart}_`, '', ...(P.launch.rules ? [`**${P.launch.rules.title}** (CONTRACT-001, C-10 — recolhível, só com a campanha em vigor):`, '', ...P.launch.rules.items.map((i) => `- ${i}`), ''] : []), '| Faixa | Para | Individual | Pacote de 3 |', '|---|---|---|---|');
-for (const t of P.tiers) {
-  const individual = `**${t.price.individualLabel}** — ${P.unit}`;
-  const pack = `**${t.price.packageLabel}** — ${P.packageUnit} · ${P.savings(t.price.savingsLabel)} ${P.savingsBasis}`;
-  L.push(`| ${t.title} | ${t.fit} | ${individual} | ${pack} |`);
+L.push('', `Vigência: _${P.validity}_`, '', '| Produto | Valor | Observação |', '|---|---|---|');
+for (const card of P.cards) {
+  const valores = card.rows.map((r) => `${r.prefix ? `${r.prefix} ` : ''}**${r.value}** ${r.unit}`).join(' · ');
+  L.push(`| ${card.overline} — ${card.title} | ${valores} | ${card.note} |`);
 }
-L.push('', `${P.other.text} — link "${P.other.cta}" (abre a solicitação de avaliação).`);
-L.push('', 'Os valores são os mesmos em qualquer data (COM-VITRINE-001, V-01); a campanha controla só a faixa e as regras. Valores de src/precos.ts.');
+L.push('', 'Valores de src/precos.ts. Sem pacote nem desconto; nenhum produto depende dos outros.');
 const Sm = c.SIMULATOR;
-L.push('', `### ${Sm.title} (NEKKORA-CALC-001 — logo abaixo dos cartões)`, '', Sm.description, '');
-L.push(`Controles: ${Sm.tiers.map((t) => t.label).join(' · ')} — botões "${Sm.decrease('…')}" / "${Sm.increase('…')}", campo numérico (0 a 20), rótulo "${Sm.unit('<individual>', '<pacote>')}", "${Sm.max(20)}"`);
-L.push('', `Barra: "${Sm.total(3)}" · botões "${Sm.clear}" e "${Sm.calculate}". Sem seleção: _${Sm.empty}_ Mudou depois de calcular: _${Sm.changed}_`);
-L.push('', `**${Sm.resultTitle}** — linhas "4 automações simples: ${Sm.composition(1, 1, '<pacote>', '<individual>')}", depois:`);
-list([`"${Sm.estimateLabel}"`, `Com pacote: "${Sm.individualLabel}" e "${Sm.savingsLabel}" — ${Sm.savingsNote}`, Sm.packagesRule]);
-L.push('', `> ${Sm.disclaimer}`, '', `${Sm.next}: "${Sm.request}" (abre o WhatsApp em outra aba com a mensagem do Delivery, "${Sm.whatsappIntro}" e o resumo da simulação; o visitante revisa antes de enviar)`);
-L.push('', `**${Sm.help.title}** ${Sm.help.text} ${Sm.help.link} (link para os critérios).`, '', 'Exemplo de homologação: 4 simples + 1 média → 1 pacote de 3 simples (R$ 1.500) + 1 simples (R$ 650) + 1 média (R$ 1.400) = R$ 3.550; sem pacotes R$ 4.000; economia R$ 450.');
-L.push('');
-list(P.notes.map((n) => `**${n.title}** — ${n.text}`));
-L.push('', `**${P.criteria.title}**`, '');
-list(P.criteria.items);
-L.push('', P.criteria.note, '', `**${P.conditions.title}**`, '');
+L.push('', `### ${Sm.title} (§4 — logo abaixo dos cartões)`, '', Sm.description, '');
+list(Sm.fields.map((f) => `${f.group} — ${f.label} (${f.unit}); começa em 0`));
+L.push('', Sm.limits, '', `Estimativa ao vivo (sem botão de calcular); "${Sm.clear}" zera tudo. Sem quantidade: _${Sm.empty}_`, '');
+list([`${Sm.ai}: "${Sm.aiValue('<valor>')}"`, `${Sm.monitor}: "${Sm.monitorValue('<valor>')}"`, `${Sm.hosting}`, `${Sm.combined} — ${Sm.combinedNote}`]);
+L.push('', `> ${Sm.disclaimer}`, '', `Botão: "${Sm.request}" (abre o formulário de atendimento com os serviços da simulação marcados e a opção de incluir o resumo).`);
+L.push('', 'Exemplo de homologação: 3 automações no AI Piloto + 2 no Monitor + 10 h Windows + 5 h Linux → a partir de R$ 300 · R$ 150 por mês · Hosting R$ 310 · combinado R$ 760 (inclui o primeiro mês do Monitor; não é mensalidade).');
+L.push('', `**${P.conditions.title}**`, '');
 list(P.conditions.items);
-const Ps = c.PLANNED_SERVICES;
-L.push('', `**${Ps.title}** (COM-VITRINE-001, V-06 — dentro do bloco de preços, sem contratação):`, '');
-list(Ps.items.map((s) => `${s.name} — _${Ps.status}_ — **${s.price}** ${s.unit}`));
-L.push('', `${Ps.notice} ${Ps.note}`);
-L.push('', P.hostingNote);
 
 h('4. Como funciona');
 header(c.HOW_IT_WORKS);
@@ -115,20 +104,23 @@ for (const key of ['defined', 'excluded', 'dependencies']) {
   list(c.TRANSPARENCY[key].items);
 }
 
-h('7. Contato e atendimento (NEKKORA-COM-CANAIS-001 — só WhatsApp)');
-const W = WHATSAPP_MESSAGES;
-L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (abre o WhatsApp em outra aba) — ${K.note}`, '', `Sem número confirmado: _${K.pendingCaption}_`);
-L.push('', `Redes institucionais: "${K.socialTitle}" — LinkedIn · Instagram.`);
-L.push('', 'Sem formulário, sem envio por e-mail, sem envio automático e sem agendamento (Microsoft Bookings).');
-L.push('', 'Botão flutuante (canto inferior direito, ícone do WhatsApp): "Fale com um analista" — some no celular enquanto o contato está na tela; sem pulso nem indicador de disponibilidade.');
-L.push('', 'Mensagens iniciais sugeridas (o visitante pode editar; nada é enviado sem ele):');
+h('7. Contato e formulário de atendimento (NEKKORA-COM-ECOSYSTEM-001 §7 — WhatsApp)');
+const F = c.REQUEST_FORM;
+L.push(`**${K.title}**`, '', K.description, '', `Botão: "${K.cta}" (abre o formulário) — ${K.note}`, '', `Sem número confirmado: _${K.pendingCaption}_`);
+L.push('', `Redes institucionais: "${K.socialTitle}" — LinkedIn · Instagram (@nekkora.br).`);
+L.push('', 'Botão flutuante (canto inferior direito, ícone do WhatsApp): "Fale com um analista" — abre o formulário; some no celular enquanto o topo ou o contato estão na tela; sem pulso nem indicador de disponibilidade.');
+L.push('', `### ${F.title}`, '', F.description, '');
 list([
-  `Geral (topo, contato e botão flutuante): _${W.geral}_`,
-  `Delivery (outras demandas e simulador): _${W.delivery}_`,
-  `Hosting: _${W.hosting}_`,
-  `Monitor ("${c.PLANNED_SERVICES.ask('Nekkora Monitor')}"): _${W.monitor}_`,
-  `AI ("${c.PLANNED_SERVICES.ask('Nekkora AI')}"): _${W.ai}_`,
+  `${F.name.label} (obrigatório) — erro: _${F.name.error}_`,
+  `${F.company.label} (${F.company.hint.toLowerCase()})`,
+  `${F.email.label} (${F.email.hint.toLowerCase()}) — erro: _${F.email.error}_`,
+  `${F.description_.label} (obrigatório) — ${F.description_.hint} — erro: _${F.description_.error}_`,
+  `${F.services.legend}: ${Object.values(c.SERVICE_NAMES).join(' · ')} — ${F.services.description}`,
+  `Vindo do simulador: "${F.simulation.include}" (marcado; ${F.simulation.hint.toLowerCase()})`,
 ]);
+L.push('', `Botões: "${F.cancel}" · "${F.submit}" (abre o WhatsApp em outra aba). Depois: **${F.opened.title}** — ${F.opened.text} · "${F.again}" · "${F.back}" · "${F.close}".`);
+L.push('', 'Sem envio automático, banco de dados, e-mail, API do WhatsApp, Microsoft Bookings ou armazenamento persistente.');
+L.push('', 'Exemplo de mensagem preparada:', '', '```', buildMessage(WHATSAPP_GREETING, F.message, { name: '[nome]', company: '[empresa, se informada]', email: '[e-mail, se informado]', description: '[descrição]' }, ['[serviços selecionados, quando aplicável]'], '[resumo, quando autorizado pelo visitante]'), '```');
 L.push('');
 
 h('7a. Privacidade');
@@ -137,7 +129,7 @@ L.push('');
 list(c.PRIVACY.items.map((i) => `**${i.title}** — ${i.text}`));
 
 h('8. Barra de navegação');
-L.push('Links: Soluções · Preços · Como funciona · Hosting · Transparência. Botão "Entrar" → https://platform.nekkora.com/entrar, na mesma aba (NEKKORA-COM-CANAIS-001; no celular, dentro do menu). A Commercial não autentica.');
+L.push('Links: Soluções · Preços · Como funciona · Hosting · Transparência. Botão "Entrar" → https://platform.nekkora.com/entrar, na mesma aba (PUB-16, NEKKORA-COM-CANAIS-001; no celular, dentro do menu). A Commercial não autentica.');
 
 h('9. Rodapé');
 list(['© Nekkora. Todos os direitos reservados.', `Link "${c.FOOTER.privacy}"`, `${c.FOOTER.preview} (enquanto publicacao.json mantiver avisoHomologacao)`, c.FOOTER.signature]);

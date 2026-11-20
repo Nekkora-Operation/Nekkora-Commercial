@@ -38,7 +38,7 @@ writeFileSync(
       'impressoesDeConteudo.textosComerciais': reg(APROVADA.textosComerciais),
       'impressoesDeConteudo.condicoesComerciais': reg(APROVADA.condicoesComerciais),
       'novasCondicoes.inicio': 'Titular, 12/11/2026 (fictício): data de início 2026-11-12.',
-      'tabelaDePrecos.posCampanha': reg(impressaoDaTabela()),
+      'ecossistema.inicio': 'Titular, 20/11/2026 (fictício): vigência 2026-11-20.',
       publicacaoAutorizada: `Titular, 12/11/2026 (fictício): versão ${VERSAO}, commit homologado ${'b'.repeat(40)}.`,
     },
     canais: { whatsapp: '5511987654321', email: 'comercial@empresa-ficticia.com.br', linkedin: 'https://www.linkedin.com/company/empresa-ficticia/', instagram: null },
@@ -52,7 +52,8 @@ writeFileSync(
     avisoHomologacao: false,
     tabelaDePrecos: { impressao: impressaoDaTabela(), posCampanha: true },
     novasCondicoes: { inicio: '2026-11-12' },
-    servicos: { monitor: 'em-preparacao', ai: 'em-preparacao' },
+    ecossistema: { inicio: '2026-11-20' },
+    servicos: { ai: 'piloto', monitor: 'sob-avaliacao', hosting: 'sob-avaliacao' },
     impressoesDeConteudo: APROVADA,
     publicacaoAutorizada: { versao: VERSAO, commit: 'b'.repeat(40) },
   }),
@@ -60,7 +61,7 @@ writeFileSync(
 
 const gate = () =>
   new Promise((done) =>
-    execFile(process.execPath, [join(dir, 'scripts/verificar-publicacao.mjs'), '--hoje', '2026-11-15'], { cwd: dir, encoding: 'utf8' }, (err, stdout) =>
+    execFile(process.execPath, [join(dir, 'scripts/verificar-publicacao.mjs'), '--hoje', '2026-11-25'], { cwd: dir, encoding: 'utf8' }, (err, stdout) =>
       done({ code: err ? err.code : 0, ids: [...new Set([...stdout.matchAll(/- ([A-Z]+(?:-\d+)?) —/g)].map((m) => m[1]))].sort(), stdout }),
     ),
   );
@@ -92,9 +93,9 @@ test('conteúdo aprovado: libera (impressões e registros conferem)', async () =
 
 const casos = [
   // textos e condições exibidos (src/): bloqueiam PUB-17 e PUB-19
-  ['texto da página alterado (content.ts)', 'src/content.ts', troca('A automação é sua', 'A automação é nossa'), ['PUB-17', 'PUB-19']],
-  ['condição da campanha alterada (content.ts)', 'src/content.ts', troca('Campanha de lançamento para solicitações de avaliação recebidas', 'Campanha de lançamento para todas as solicitações recebidas'), ['PUB-17', 'PUB-19']],
-  ['componente deixa de mostrar um texto (Pricing.tsx)', 'src/sections/Pricing.tsx', troca('{PRICING.notes.map((n) => (', '{PRICING.notes.slice(1).map((n) => ('), ['PUB-17', 'PUB-19']],
+  ['texto da página alterado (content.ts)', 'src/content.ts', troca('Criação de automações com inteligência artificial, em fase piloto.', 'Criação de automações com inteligência artificial.'), ['PUB-17', 'PUB-19']],
+  ['condição comercial alterada (content.ts)', 'src/content.ts', troca('Sem pacotes nem descontos por combinação de serviços', 'Desconto de 10% na combinação de serviços'), ['PUB-17', 'PUB-19']],
+  ['componente deixa de mostrar um texto (Pricing.tsx)', 'src/sections/Pricing.tsx', troca('{PRICING.conditions.items.map((item) => (', '{PRICING.conditions.items.slice(1).map((item) => ('), ['PUB-17', 'PUB-19']],
   ['estilo que esconde conteúdo (styles.css)', 'src/styles.css', (t) => `${t}\n.price-notes { display: none; }\n`, ['PUB-17', 'PUB-19']],
   ['arquivo novo com texto em src/', 'src/sections/Novo.tsx', () => "export const Novo = () => <p>Desconto de 90% para todos.</p>;\n", ['PUB-17', 'PUB-19']],
   // montagem da página, fora de src/: só PUB-17

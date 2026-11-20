@@ -11,7 +11,7 @@ import { Pricing } from './sections/Pricing';
 import { Privacy } from './sections/Privacy';
 import { Solutions } from './sections/Solutions';
 import { Transparency } from './sections/Transparency';
-import { WHATSAPP_SR, whatsappHref } from './whatsapp';
+import { REQUEST_AVAILABLE, RequestProvider, useRequestTrigger } from './atendimento';
 
 /** Retorna o href (#id) da seção do menu que está visível. */
 function useActiveSection(hrefs: string[]) {
@@ -42,8 +42,8 @@ function useThemeColorMeta() {
 }
 
 /**
- * true enquanto algum bloco que já tem o próprio botão de WhatsApp está visível: os botões do topo e a seção de contato
- * (NEKKORA-COM-CANAIS-001 — no celular, o botão flutuante cobriria o CTA do topo, que faz a mesma coisa).
+ * true enquanto algum bloco que já tem o próprio botão de atendimento está visível: os botões do topo e a seção de
+ * contato (NEKKORA-COM-CANAIS-001 — no celular, o botão flutuante cobriria o CTA do topo, que faz a mesma coisa).
  */
 function useOwnWhatsappVisible() {
   const [visible, setVisible] = useState(false);
@@ -65,13 +65,43 @@ function useOwnWhatsappVisible() {
   return visible;
 }
 
-/** WhatsApp só com número confirmado em config.ts (sem destino provisório). */
-const WHATSAPP = whatsappHref('geral');
-
 /** Texto do botão flutuante (NEKKORA-COM-CANAIS-001): sem promessa de disponibilidade ou de resposta imediata. */
 const FAB_TEXT = 'Fale com um analista';
 
+/**
+ * Botão flutuante (NEKKORA-COM-ECOSYSTEM-001 §8): abre o formulário de atendimento, que leva ao WhatsApp. Ícone oficial do
+ * WhatsApp da nekkora-lib e texto lado a lado, sem pulso nem indicador de "online".
+ */
+function RequestFab({ tucked }: { tucked: boolean }) {
+  const trigger = useRequestTrigger();
+  return (
+    <FloatingButton
+      {...trigger}
+      icon="whatsapp"
+      label={FAB_TEXT}
+      tooltip={false}
+      tone="whatsapp"
+      data-atendimento-origem="flutuante"
+      className={tucked ? 'fab--label fab--tucked' : 'fab--label'}
+      aria-hidden={tucked || undefined}
+      tabIndex={tucked ? -1 : undefined}
+    >
+      <span className="fab__text" aria-hidden="true">
+        {FAB_TEXT}
+      </span>
+    </FloatingButton>
+  );
+}
+
 export function App() {
+  return (
+    <RequestProvider>
+      <Page />
+    </RequestProvider>
+  );
+}
+
+function Page() {
   const active = useActiveSection(HREFS);
   useThemeColorMeta();
   // No celular, o botão flutuante sai de cena enquanto os botões do topo ou o contato estão visíveis.
@@ -79,7 +109,7 @@ export function App() {
   const isMobile = useMediaQuery('(max-width: 900px)');
   const tucked = ownWhatsappVisible && isMobile;
   return (
-    <div className={WHATSAPP ? 'page page--fab' : 'page'}>
+    <div className={REQUEST_AVAILABLE ? 'page page--fab' : 'page'}>
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
@@ -109,27 +139,7 @@ export function App() {
         <Privacy />
       </main>
       <Footer />
-      {/* Atendimento comercial (NEKKORA-COM-CANAIS-001): ícone e texto lado a lado, sem pulso nem indicador de
-          "online" — nada sugere disponibilidade ou resposta imediata. Outra aba, sem opener e sem Referer. */}
-      {WHATSAPP && (
-        <FloatingButton
-          href={WHATSAPP}
-          icon="whatsapp"
-          label={`${FAB_TEXT} ${WHATSAPP_SR}`}
-          tooltip={false}
-          tone="whatsapp"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-whatsapp="geral"
-          className={tucked ? 'fab--label fab--tucked' : 'fab--label'}
-          aria-hidden={tucked || undefined}
-          tabIndex={tucked ? -1 : undefined}
-        >
-          <span className="fab__text" aria-hidden="true">
-            {FAB_TEXT}
-          </span>
-        </FloatingButton>
-      )}
+      {REQUEST_AVAILABLE && <RequestFab tucked={tucked} />}
     </div>
   );
 }

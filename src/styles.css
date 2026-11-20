@@ -54,11 +54,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: max(40px, 5%); align-items: center; }
 .split__visual { position: relative; display: flex; justify-content: center; }
 
-/* COM-VITRINE-001 (V-06): serviços em preparação, no bloco de preços */
-.planned__list { gap: 12px; }
-.planned__item { display: flex; flex-direction: column; gap: 6px; }
-.planned__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.planned__price strong { font-size: var(--nk-font-size-xl); }
+
 .center-note { margin: 0; text-align: center; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
 
 /* ---------- Hero (centralizado) ---------- */
@@ -132,52 +128,28 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .checklist--sm li { font-size: var(--nk-font-size-sm); }
 
 /* ---------- Preços ---------- */
-.launch-strip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 12px 16px;
-  margin: 0;
-  padding: 14px 20px;
-  border-radius: var(--nk-radius-lg);
-  background: var(--nk-color-accent-soft);
-  border: 1px solid var(--nk-color-accent-border-soft);
-  text-align: center;
-  color: var(--nk-color-text);
-}
-.launch-strip strong { font-weight: 600; }
-.launch-strip__condition { font-size: var(--nk-font-size-sm); color: var(--nk-color-text-secondary); }
 .price-overline { font-size: var(--nk-font-size-xs); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--nk-color-accent); }
 .price { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 1px solid var(--nk-color-border); }
 .price__from { font-size: var(--nk-font-size-sm); color: var(--nk-color-text-secondary); }
-.price__row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.price__line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
 .price__value { font-size: clamp(1.8rem, 1.2rem + 1.4vw, 2.4rem); font-weight: 700; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; color: var(--nk-color-text); }
-.price__savings { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
-.price__package { font-size: var(--nk-font-size-sm); color: var(--nk-color-text-secondary); }
-.price__package strong { font-size: var(--nk-font-size-xl); font-weight: 700; color: var(--nk-color-text); white-space: nowrap; }
 .price__unit { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
 
-/* NEKKORA-COM-CONTRACT-001 (C-10): regras completas da campanha, recolhíveis, com foco visível */
-.campaign-rules { padding: 12px 20px; border-radius: var(--nk-radius-lg); border: 1px solid var(--nk-color-border); background: var(--nk-color-surface); color: var(--nk-color-text); }
-.campaign-rules > summary { cursor: pointer; font-size: var(--nk-font-size-sm); font-weight: 600; }
-.campaign-rules > summary:focus-visible { outline: none; box-shadow: var(--nk-focus-ring); border-radius: var(--nk-radius-sm); }
-.campaign-rules[open] > summary { margin-bottom: 12px; }
-.launch-strip__preview { flex-basis: 100%; font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
-[data-criteria]:focus { outline: none; }
-[data-criteria]:focus-visible { box-shadow: var(--nk-focus-ring); }
+/* NEKKORA-COM-ECOSYSTEM-001 §11: vigência dos valores (ou prévia sem data) */
+.validity-note { font-weight: 500; color: var(--nk-color-text); }
 
-/* ---------- Simulador de investimento (NEKKORA-CALC-001) ---------- */
+/* ---------- Simulador de investimento (NEKKORA-COM-ECOSYSTEM-001 §4) ---------- */
 .sim { gap: 20px; }
 .sim__head { display: flex; gap: 14px; align-items: flex-start; }
 .sim__head .nk-icon { flex-shrink: 0; margin-top: 4px; }
 .sim__title { margin: 0; font-size: var(--nk-font-size-xl); font-weight: 600; line-height: 1.3; color: var(--nk-color-text); }
 .sim__description { margin: 6px 0 0; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
-.sim__tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.sim__tiers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .sim__tier {
   display: flex; flex-direction: column; gap: 6px; padding: 16px;
   border-radius: var(--nk-radius-lg); background: var(--nk-color-surface); border: 1px solid var(--nk-color-border);
 }
+.sim__tier-group { font-size: var(--nk-font-size-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--nk-color-accent); }
 .sim__tier-label { font-size: var(--nk-font-size-md); font-weight: 600; color: var(--nk-color-text); }
 .sim__tier-unit { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
 .sim__stepper { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
@@ -187,34 +159,31 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .sim__qty-wrap { flex: 1; min-width: 0; }
 .sim__qty { text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; }
 .sim__note { margin: 0; font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
-.sim__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding-top: 16px; border-top: 1px solid var(--nk-color-border); }
-.sim__total { font-size: var(--nk-font-size-md); color: var(--nk-color-text); }
-.sim__actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .sim__warning { margin: 0; font-size: var(--nk-font-size-sm); font-weight: 500; color: var(--nk-color-text); }
 .sim__result {
   display: flex; flex-direction: column; gap: 14px; padding: 20px;
   border-radius: var(--nk-radius-lg); background: var(--nk-color-accent-soft); border: 1px solid var(--nk-color-accent-border-soft);
 }
+.sim__result-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
 .sim__result-title { margin: 0; font-size: var(--nk-font-size-lg); font-weight: 600; color: var(--nk-color-text); }
-.sim__campaign { margin: 0; font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
-.sim__lines { display: grid; gap: 6px; }
-.sim__lines li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; font-size: var(--nk-font-size-sm); color: var(--nk-color-text); }
-.sim__line-total { font-variant-numeric: tabular-nums; font-weight: 600; }
 .sim__figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 0; }
 .sim__figure { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: var(--nk-radius-md); background: var(--nk-color-surface); border: 1px solid var(--nk-color-border); }
 .sim__figure dt { font-size: var(--nk-font-size-xs); line-height: 1.4; color: var(--nk-color-text-secondary); }
 .sim__figure dd { margin: 0; font-size: var(--nk-font-size-lg); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--nk-color-text); }
 .sim__figure--main { grid-column: 1 / -1; }
 .sim__figure--main dd { font-size: clamp(1.8rem, 1.2rem + 1.4vw, 2.4rem); line-height: 1.1; letter-spacing: -0.03em; }
-.sim__partial { margin: 0; font-size: var(--nk-font-size-sm); font-weight: 500; line-height: 1.55; color: var(--nk-color-text); }
 .sim__disclaimer { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.55; color: var(--nk-color-text); }
 .sim__disclaimer .nk-icon { flex-shrink: 0; margin-top: 3px; }
 .sim__next { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-top: 14px; border-top: 1px solid var(--nk-color-accent-border-soft); }
-.sim__next-label { font-size: var(--nk-font-size-sm); font-weight: 600; color: var(--nk-color-text); }
-.sim__help { margin: 0; font-size: var(--nk-font-size-sm); line-height: 1.6; color: var(--nk-color-text-secondary); }
-.sim__help strong { color: var(--nk-color-text); }
-/* Cor do texto, sublinhado: o acento sobre o cartão elevado ficava abaixo de 4,5:1 (contraste-por-pixels) */
-.sim__help a { color: var(--nk-color-text); text-decoration: underline; text-underline-offset: 2px; }
+/* ---------- Formulário de atendimento (NEKKORA-COM-ECOSYSTEM-001 §7) ---------- */
+.request__form, .request__done { display: flex; flex-direction: column; gap: 16px; }
+.request__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.request__simulation { display: flex; flex-direction: column; gap: 8px; }
+.request__message {
+  margin: 0; padding: 12px 14px; max-height: 180px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+  font: inherit; font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text);
+  border-radius: var(--nk-radius-md); background: var(--nk-color-surface); border: 1px solid var(--nk-color-border);
+}
 
 /* ---------- Hosting: faixa pôster ---------- */
 .hosting-band { padding-block: clamp(56px, 8vw, 96px); background: var(--poster-band); color: #fff; scroll-margin-top: 72px; }
@@ -252,12 +221,7 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 .contact__note { font-size: var(--nk-font-size-xs); line-height: 1.5; color: var(--nk-color-text-secondary); }
 
 .contact__direct { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-/* Tecnologias do Delivery */
-.tech { display: flex; flex-direction: column; gap: 8px; }
-.tech__label { font-size: var(--nk-font-size-xs); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--nk-color-text-secondary); }
-.tech__list { display: flex; flex-wrap: wrap; gap: 6px; }
-.tech__note { font-size: var(--nk-font-size-xs); color: var(--nk-color-text-secondary); }
-/* Contato (NEKKORA-COM-CANAIS-001): o WhatsApp como único CTA de atendimento */
+/* Contato: o botão de atendimento abre o formulário, que leva ao WhatsApp */
 .contact__ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 
 /* ---------- Botão flutuante ---------- */
@@ -281,12 +245,15 @@ a:not([class]):hover { color: var(--nk-color-accent-hover); }
 @media (max-width: 900px) {
   .split, .cards--2, .cards--3 { grid-template-columns: minmax(0, 1fr); }
   .split__visual { order: -1; }
-  .sim__tiers { grid-template-columns: minmax(0, 1fr); }
+  .sim__tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .wrap { padding-inline: 16px; }
   .hero__ctas > *, .contact__ctas > * { flex: 1 1 100%; }
-  .sim__actions, .sim__actions > * { flex: 1 1 100%; }
+  .sim__tiers, .request__grid { grid-template-columns: minmax(0, 1fr); }
+  .sim__next > * { flex: 1 1 100%; }
+  /* rótulo longo do botão quebra em telas estreitas (320 px), sem sair do cartão */
+  .sim__next .nk-button { max-width: 100%; height: auto; min-height: 44px; white-space: normal; text-align: center; }
   .sim__result { padding: 16px; }
   .hosting-band__visual { display: none; }
 }

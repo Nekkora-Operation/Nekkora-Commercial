@@ -1,91 +1,75 @@
 import { useId, useState, type KeyboardEvent } from 'react';
 import { Button, Card, Icon, Input, StatusRegion } from 'nekkora-lib';
+import type { ServiceId } from '../config';
 import { SIMULATOR as S } from '../content';
-import { EMPTY_QUANTITIES, MAX_QUANTITY, PRICE_TABLE, brl, sanitizeQuantity, simulate, type QuantityTier, type Simulation } from '../precos';
-import { WhatsappButton } from '../whatsapp';
-
-type Result = { sim: Simulation };
+import { PRICE_TABLE, SIM_FIELDS, SIM_LIMITS, brl, sanitizeQuantity, simulate, type SimField, type Simulation } from '../precos';
+import { RequestButton } from '../atendimento';
 
 /**
- * Resumo em texto da simulação: anunciado ao leitor de tela e levado à mensagem inicial do WhatsApp
- * (NEKKORA-COM-CANAIS-001), onde o visitante a revisa e edita antes de enviar. Valores de src/precos.ts.
+ * Resumo em texto da simulação: anunciado ao leitor de tela e oferecido ao formulário de atendimento, onde o visitante
+ * escolhe se ele entra na mensagem do WhatsApp. Só as linhas com quantidade; valores de src/precos.ts.
  */
-export function simulationSummary({ sim }: Result): string {
-  const lines = sim.lines
-    .filter((l) => l.quantity > 0)
-    .map((l) => `- ${S.count(l.tier, l.quantity)}: ${S.composition(l.packages, l.singles, l.packageLabel, l.individualLabel)} = ${l.totalLabel}`);
-  lines.push(`${S.estimateLabel}: ${sim.estimateLabel}`);
-  if (sim.savings > 0) lines.push(`${S.individualLabel}: ${sim.individualTotalLabel} · ${S.savingsLabel}: ${sim.savingsLabel}`);
+export function simulationSummary(sim: Simulation): string {
+  const q = sim.quantities;
+  const lines: string[] = [];
+  if (q.ai > 0) lines.push(`- Nekkora AI (piloto): ${S.count('ai', q.ai)} × ${brl(PRICE_TABLE.ai.porAutomacao)} = ${S.aiValue(sim.labels.ai)}`);
+  if (q.monitor > 0) lines.push(`- Nekkora Monitor: ${S.count('monitor', q.monitor)} × ${brl(PRICE_TABLE.monitor.porAutomacaoMes)} = ${S.monitorValue(sim.labels.monitor)}`);
+  if (q.windows > 0) lines.push(`- Nekkora Hosting Windows: ${S.count('windows', q.windows)} × ${brl(PRICE_TABLE.hosting.windowsPorHora)} = ${sim.labels.windows}`);
+  if (q.linux > 0) lines.push(`- Nekkora Hosting Linux: ${S.count('linux', q.linux)} × ${brl(PRICE_TABLE.hosting.linuxPorHora)} = ${sim.labels.linux}`);
+  lines.push(`${S.combined}: ${sim.labels.combined} (${S.combinedNote})`);
   return lines.join('\n');
 }
 
+/** Serviços com quantidade na simulação — já marcados no formulário de atendimento. */
+const servicesOf = (sim: Simulation): ServiceId[] =>
+  [sim.quantities.ai > 0 && 'ai', sim.quantities.monitor > 0 && 'monitor', (sim.quantities.windows > 0 || sim.quantities.linux > 0) && 'hosting'].filter(Boolean) as ServiceId[];
+
+const ZERO: Record<SimField, string> = { ai: '0', monitor: '0', windows: '0', linux: '0' };
+
 /**
- * Simulador de Investimento — Nekkora Delivery (NEKKORA-CALC-001), dentro do bloco de preços (data-pricing).
+ * Simulador de investimento (NEKKORA-COM-ECOSYSTEM-001 §4), dentro do bloco de preços (data-pricing).
  *
- * - Quantidades de 0 a MAX_QUANTITY por categoria (botões − e +, campo numérico e setas ↑/↓); nada fora disso é aceito.
- * - O resultado só aparece com "Calcular meu investimento" e some se as quantidades mudarem, até um novo cálculo:
- *   nunca há um valor desatualizado na tela.
- * - Tabela única (COM-VITRINE-001): o preço não depende da data; por categoria, pacotes de 3 enquanto houver 3 e o
- *   restante no individual. Só simples e média (V-04).
+ * - Quatro campos, todos começando em zero; nenhum produto obrigatório. Só inteiros de 0 ao limite de cada campo
+ *   (botões − e +, campo numérico e setas ↑/↓); nada fora disso é aceito.
+ * - A estimativa acompanha as quantidades na hora: nunca há valor desatualizado na tela.
+ * - Cobranças separadas: inicial (AI Piloto), mensal (Monitor), por hora (Hosting) e o combinado, que inclui só o
+ *   primeiro mês do Monitor e nunca é chamado de mensalidade.
  * - Nada é enviado nem guardado: o estado vive só na memória da página (sem storage, sem requisição).
  */
 export function Simulator() {
   const uid = useId();
-  const [raw, setRaw] = useState<Record<QuantityTier, string>>({ simples: '0', media: '0' });
-  const [result, setResult] = useState<Result | null>(null);
-  const [notice, setNotice] = useState<'empty' | 'cleared' | null>(null);
+  const [raw, setRaw] = useState<Record<SimField, string>>(ZERO);
   const [announcement, setAnnouncement] = useState<{ text: string; key: number }>({ text: '', key: 0 });
 
-  const quantities = { ...EMPTY_QUANTITIES, ...Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, sanitizeQuantity(v)])) } as Record<QuantityTier, number>;
-  const total = quantities.simples + quantities.media;
-  const stale = result != null && (Object.keys(quantities) as QuantityTier[]).some((t) => quantities[t] !== result.sim.quantities[t]);
-  const shown = result && !stale ? result : null;
-  const summary = shown ? simulationSummary(shown) : null;
+  const sim = simulate(Object.fromEntries(SIM_FIELDS.map((f) => [f, sanitizeQuantity(raw[f], SIM_LIMITS[f])])));
+  const summary = sim.empty ? null : simulationSummary(sim);
 
   const announce = (text: string) => setAnnouncement((a) => ({ text, key: a.key + 1 }));
+  const after = (next: Record<SimField, string>) => {
+    const s = simulate(next);
+    announce(s.empty ? S.empty : S.announce(simulationSummary(s).split('\n').map((l) => l.replace(/^- /, '')).join('. ')));
+  };
 
-  const set = (tier: QuantityTier, value: number) => {
-    setRaw((r) => ({ ...r, [tier]: String(sanitizeQuantity(value)) }));
-    setNotice(null);
+  const set = (field: SimField, value: number) => {
+    const next = { ...raw, [field]: String(sanitizeQuantity(value, SIM_LIMITS[field])) };
+    setRaw(next);
+    after(next);
   };
   // Só dígitos (sem sinal, vírgula, ponto ou expoente) e nunca acima do limite.
-  const type = (tier: QuantityTier, text: string) => {
-    const digits = text.replace(/\D/g, '').slice(0, 3);
-    setRaw((r) => ({ ...r, [tier]: digits === '' ? '' : String(sanitizeQuantity(digits)) }));
-    setNotice(null);
+  const type = (field: SimField, text: string) => {
+    const digits = text.replace(/\D/g, '').slice(0, String(SIM_LIMITS[field]).length + 1);
+    setRaw((r) => ({ ...r, [field]: digits === '' ? '' : String(sanitizeQuantity(digits, SIM_LIMITS[field])) }));
   };
-  const keys = (tier: QuantityTier) => (e: KeyboardEvent<HTMLInputElement>) => {
+  const keys = (field: SimField, q: number) => (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault();
-      set(tier, quantities[tier] + (e.key === 'ArrowUp' ? 1 : -1));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      calculate();
+      set(field, q + (e.key === 'ArrowUp' ? 1 : -1));
     }
   };
-
-  const calculate = () => {
-    if (total === 0) {
-      setResult(null);
-      setNotice('empty');
-      announce(S.empty);
-      return;
-    }
-    const next = { sim: simulate(quantities) };
-    setRaw({ simples: String(quantities.simples), media: String(quantities.media) });
-    setResult(next);
-    setNotice(null);
-    announce(S.announce(simulationSummary(next).split('\n').map((l) => l.replace(/^- /, '')).join('. ')));
-  };
-
   const clear = () => {
-    setRaw({ simples: '0', media: '0' });
-    setResult(null);
-    setNotice('cleared');
+    setRaw(ZERO);
     announce(S.cleared);
   };
-
-  const unit = (tier: QuantityTier) => S.unit(brl(PRICE_TABLE[tier].individual), brl(PRICE_TABLE[tier].pacote));
 
   return (
     <Card variant="raised" padding="lg" className="sim" data-simulator="">
@@ -100,134 +84,105 @@ export function Simulator() {
       </div>
 
       <div className="sim__tiers" role="group" aria-labelledby={`${uid}-title`}>
-        {S.tiers.map(({ tier, label }) => {
-          const q = quantities[tier];
-          const labelId = `${uid}-${tier}`;
+        {S.fields.map(({ field, group, label, unit }) => {
+          const q = sim.quantities[field];
+          const max = SIM_LIMITS[field];
+          const labelId = `${uid}-${field}`;
           return (
-            <div key={tier} className="sim__tier" data-sim-tier={tier}>
+            <div key={field} className="sim__tier" data-sim-campo={field}>
+              <span className="sim__tier-group">{group}</span>
               <span id={labelId} className="sim__tier-label">
                 {label}
               </span>
-              <span className="sim__tier-unit">{unit(tier)}</span>
+              <span className="sim__tier-unit">{unit}</span>
               <div className="sim__stepper">
-                <Button
-                  variant="secondary"
-                  icon="minus"
-                  aria-label={S.decrease(label)}
-                  aria-disabled={q === 0 || undefined}
-                  onClick={() => q > 0 && set(tier, q - 1)}
-                  data-sim-action="diminuir"
-                />
+                <Button variant="secondary" icon="minus" aria-label={S.decrease(label)} aria-disabled={q === 0 || undefined} onClick={() => q > 0 && set(field, q - 1)} data-sim-action="diminuir" />
                 <Input
                   className="sim__qty"
                   wrapperClassName="sim__qty-wrap"
                   role="spinbutton"
-                  aria-labelledby={labelId}
+                  aria-labelledby={`${uid}-${field}-group ${labelId}`}
                   aria-describedby={`${uid}-max`}
                   aria-valuemin={0}
-                  aria-valuemax={MAX_QUANTITY}
+                  aria-valuemax={max}
                   aria-valuenow={q}
                   inputMode="numeric"
                   autoComplete="off"
-                  maxLength={3}
-                  value={raw[tier]}
-                  onChange={(e) => type(tier, e.target.value)}
-                  onBlur={() => setRaw((r) => ({ ...r, [tier]: String(sanitizeQuantity(r[tier])) }))}
-                  onKeyDown={keys(tier)}
-                  data-sim-input={tier}
+                  maxLength={String(max).length + 1}
+                  value={raw[field]}
+                  onChange={(e) => type(field, e.target.value)}
+                  onBlur={() => {
+                    const next = { ...raw, [field]: String(sanitizeQuantity(raw[field], max)) };
+                    setRaw(next);
+                    after(next);
+                  }}
+                  onKeyDown={keys(field, q)}
+                  data-sim-input={field}
                 />
-                <Button
-                  variant="secondary"
-                  icon="plus"
-                  aria-label={S.increase(label)}
-                  aria-disabled={q >= MAX_QUANTITY || undefined}
-                  onClick={() => q < MAX_QUANTITY && set(tier, q + 1)}
-                  data-sim-action="aumentar"
-                />
+                <Button variant="secondary" icon="plus" aria-label={S.increase(label)} aria-disabled={q >= max || undefined} onClick={() => q < max && set(field, q + 1)} data-sim-action="aumentar" />
               </div>
+              <span id={`${uid}-${field}-group`} className="nk-visually-hidden">
+                {group}
+              </span>
             </div>
           );
         })}
       </div>
 
       <p id={`${uid}-max`} className="sim__note">
-        {S.max(MAX_QUANTITY)}
+        {S.limits}
       </p>
 
-      <div className="sim__bar">
-        <strong className="sim__total" data-sim-total={total}>
-          {S.total(total)}
-        </strong>
-        <div className="sim__actions">
-          <Button variant="ghost" leftIcon="refresh" onClick={clear}>
-            {S.clear}
-          </Button>
-          <Button rightIcon="arrow-right" onClick={calculate}>
-            {S.calculate}
-          </Button>
-        </div>
-      </div>
-
-      {notice === 'empty' && <p className="sim__warning">{S.empty}</p>}
-      {stale && <p className="sim__warning">{S.changed}</p>}
-
-      {shown && (
-        <section className="sim__result" aria-labelledby={`${uid}-result`} data-sim-result="" data-sim-pacotes={shown.sim.packages}>
+      <section className="sim__result" aria-labelledby={`${uid}-result`} data-sim-result={sim.empty ? 'vazio' : 'calculado'}>
+        <div className="sim__result-head">
           <h4 id={`${uid}-result`} className="sim__result-title">
             {S.resultTitle}
           </h4>
-          <ul className="sim__lines plain-list">
-            {shown.sim.lines
-              .filter((l) => l.quantity > 0)
-              .map((l) => (
-                <li key={l.tier} data-sim-line={l.tier}>
-                  <span>
-                    {S.count(l.tier, l.quantity)}: {S.composition(l.packages, l.singles, l.packageLabel, l.individualLabel)}
-                  </span>
-                  <span className="sim__line-total">{l.totalLabel}</span>
-                </li>
-              ))}
-          </ul>
-          <dl className="sim__figures">
-            <div className="sim__figure sim__figure--main">
-              <dt>{S.estimateLabel}</dt>
-              <dd data-calc="estimativa">{shown.sim.estimateLabel}</dd>
-            </div>
-            {shown.sim.savings > 0 && (
-              <>
+          <Button variant="ghost" size="sm" leftIcon="refresh" onClick={clear} data-sim-action="limpar">
+            {S.clear}
+          </Button>
+        </div>
+        {sim.empty ? (
+          <p className="sim__warning">{S.empty}</p>
+        ) : (
+          <>
+            <dl className="sim__figures">
+              {sim.quantities.ai > 0 && (
                 <div className="sim__figure">
-                  <dt>{S.individualLabel}</dt>
-                  <dd data-calc="individual">{shown.sim.individualTotalLabel}</dd>
+                  <dt>{S.ai}</dt>
+                  <dd data-calc="ai">{S.aiValue(sim.labels.ai)}</dd>
                 </div>
+              )}
+              {sim.quantities.monitor > 0 && (
                 <div className="sim__figure">
-                  <dt>{S.savingsLabel}</dt>
-                  <dd data-calc="economia">{shown.sim.savingsLabel}</dd>
+                  <dt>{S.monitor}</dt>
+                  <dd data-calc="monitor">{S.monitorValue(sim.labels.monitor)}</dd>
                 </div>
-              </>
-            )}
-          </dl>
-          <p className="sim__note">{S.packagesRule}</p>
-          {shown.sim.savings > 0 && <p className="sim__note">{S.savingsNote}</p>}
-          <p className="sim__disclaimer" data-sim-aviso="">
-            <Icon name="info" size="sm" />
-            <span>{S.disclaimer}</span>
-          </p>
-          <div className="sim__next">
-            <span className="sim__next-label">{S.next}</span>
-            <div className="sim__actions">
-              {/* NEKKORA-COM-CANAIS-001: a simulação vai junto da mensagem do Delivery; nada é enviado sem o visitante */}
-              <WhatsappButton context="delivery" extra={summary && `${S.whatsappIntro}\n${summary}`}>
+              )}
+              {sim.hosting > 0 && (
+                <div className="sim__figure">
+                  <dt>{S.hosting}</dt>
+                  <dd data-calc="hosting">{sim.labels.hosting}</dd>
+                </div>
+              )}
+              <div className="sim__figure sim__figure--main">
+                <dt>{S.combined}</dt>
+                <dd data-calc="combinado">{sim.labels.combined}</dd>
+              </div>
+            </dl>
+            <p className="sim__note">{S.combinedNote}</p>
+            <p className="sim__disclaimer" data-sim-aviso="">
+              <Icon name="info" size="sm" />
+              <span>{S.disclaimer}</span>
+            </p>
+            <div className="sim__next">
+              <RequestButton options={{ services: servicesOf(sim), simulation: summary }} data-atendimento-origem="simulador">
                 {S.request}
-              </WhatsappButton>
+              </RequestButton>
             </div>
-          </div>
-        </section>
-      )}
-
-      <p className="sim__help">
-        <strong>{S.help.title}</strong> {S.help.text}{' '}
-        <a href="#criterios-categoria">{S.help.link}</a>.
-      </p>
+          </>
+        )}
+      </section>
       <StatusRegion visuallyHidden message={announcement.text || null} announceKey={announcement.key} data-testid="status-simulador" />
     </Card>
   );
