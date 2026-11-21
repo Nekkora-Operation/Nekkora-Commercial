@@ -8,7 +8,17 @@ import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PACKAGE_SIZE, PREVIOUS_PRICE_TABLE, brl, priceFacts } from '../../src/precos.ts';
+// NEKKORA-COM-ECOSYSTEM-001: as tabelas do Delivery saíram de src/; os documentos do Delivery ficam como histórico dos
+// compromissos assumidos e continuam conferidos contra as tabelas históricas
+import { brl } from '../../src/precos.ts';
+import { CAMPANHA_DE_LANCAMENTO as PREVIOUS_PRICE_TABLE, PACKAGE_SIZE, VITRINE_DELIVERY } from '../comercial/tabelas-anteriores.mjs';
+
+/** Valores de um cartão do Delivery (COM-VITRINE-001), como a página da v1.1.0 os mostrava. */
+function priceFacts(tier) {
+  const { individual, pacote } = VITRINE_DELIVERY[tier];
+  const savings = individual * PACKAGE_SIZE - pacote;
+  return { individual, package: pacote, individualLabel: brl(individual), packageLabel: brl(pacote), savingsLabel: brl(savings) };
+}
 
 const root = resolve('.');
 const doc = (f) => readFileSync(join(root, 'docs/comercial', f), 'utf8');
@@ -20,7 +30,7 @@ const PROC = doc('procedimento-operacional-delivery.md');
 const HIST = doc('condicoes-comerciais-minuta.md');
 const secao7 = REG.slice(REG.indexOf('## 7. Novas condições'));
 
-test('etapa 6. regulamento §7: a tabela nova é a de src/precos.ts', () => {
+test('etapa 6. regulamento §7: a tabela do Delivery (histórico) é a de scripts/comercial/tabelas-anteriores.mjs', () => {
   for (const [tier, nome] of [['simples', 'Simples'], ['media', 'Média']]) {
     const f = priceFacts(tier);
     assert.match(secao7, new RegExp(`\\| ${nome} \\| ${f.individualLabel.replace('$', '\\$')} \\| ${f.packageLabel.replace('$', '\\$')} \\| ${f.savingsLabel.replace('$', '\\$')} \\|`), nome);

@@ -9,7 +9,8 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { PREVIOUS_PRICE_TABLE, PRICE_TABLE } from '../src/precos.ts';
+import { PRICE_TABLE } from '../src/precos.ts';
+import { CAMPANHA_DE_LANCAMENTO, VITRINE_DELIVERY } from './comercial/tabelas-anteriores.mjs';
 
 const argv = process.argv.slice(2);
 const dist = resolve(argv.includes('--dist') ? argv[argv.indexOf('--dist') + 1] : 'dist');
@@ -34,15 +35,22 @@ const check = (id, ok, detail) => {
   console.log(`${ok ? 'OK  ' : 'FALHA'} ${id} — ${detail}`);
 };
 
-// COM-VITRINE-001: individual e pacote de 3, iguais aos de src/precos.ts
-for (const [tier, { individual, pacote }] of Object.entries(PRICE_TABLE)) {
-  const found = minified(individual).some((i) => minified(pacote).some((p) => bundle.includes(`individual:${i},pacote:${p}}`)));
-  check(`tabela-no-bundle:${tier}`, found, `individual ${individual}, pacote ${pacote}`);
-}
-// A tabela anterior só rege compromissos já assumidos (scripts/comercial/regras-delivery.mjs): nunca vai para a página
-for (const [tier, { standard, launch }] of Object.entries(PREVIOUS_PRICE_TABLE)) {
+// NEKKORA-COM-ECOSYSTEM-001: AI Piloto, Monitor e Hosting, iguais aos de src/precos.ts
+const ESPERADOS = {
+  ai: `porAutomacao:${PRICE_TABLE.ai.porAutomacao}}`,
+  monitor: `porAutomacaoMes:${PRICE_TABLE.monitor.porAutomacaoMes}}`,
+  hosting: `windowsPorHora:${PRICE_TABLE.hosting.windowsPorHora},linuxPorHora:${PRICE_TABLE.hosting.linuxPorHora}}`,
+};
+for (const [servico, trecho] of Object.entries(ESPERADOS)) check(`tabela-no-bundle:${servico}`, bundle.includes(trecho), trecho.replace(/}$/, ''));
+// As tabelas do Delivery (campanha de lançamento e vitrine de 12/11/2026) só regem compromissos já assumidos
+// (scripts/comercial/tabelas-anteriores.mjs): nunca vão para a página
+for (const [tier, { standard, launch }] of Object.entries(CAMPANHA_DE_LANCAMENTO)) {
   const found = minified(standard).some((s) => minified(launch).some((l) => bundle.includes(`standard:${s},launch:${l}}`)));
-  check(`tabela-anterior-fora-do-bundle:${tier}`, !found, found ? `standard ${standard}, launch ${launch} no bundle` : 'ausente');
+  check(`tabela-da-campanha-fora-do-bundle:${tier}`, !found, found ? `standard ${standard}, launch ${launch} no bundle` : 'ausente');
+}
+for (const [tier, { individual, pacote }] of Object.entries(VITRINE_DELIVERY)) {
+  const found = minified(individual).some((i) => minified(pacote).some((p) => bundle.includes(`individual:${i},pacote:${p}}`)));
+  check(`tabela-do-delivery-fora-do-bundle:${tier}`, !found, found ? `individual ${individual}, pacote ${pacote} no bundle` : 'ausente');
 }
 // O sinal de menos tipográfico (U+2212) é o dos selos de desconto; o hífen aparece em CSS/JS (rootMargin '-35%').
 const literals = [...bundle.matchAll(/−\s?\d+(?:[.,]\d+)?\s?%/g)].map((m) => m[0]);

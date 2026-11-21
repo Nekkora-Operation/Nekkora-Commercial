@@ -10,7 +10,8 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { PREVIOUS_PRICE_TABLE } from '../../src/precos.ts';
+// NEKKORA-COM-ECOSYSTEM-001: as tabelas do Delivery saíram de src/ e ficam como histórico dos compromissos assumidos
+import { CAMPANHA_DE_LANCAMENTO as PREVIOUS_PRICE_TABLE } from '../comercial/tabelas-anteriores.mjs';
 import {
   atendimentoDaGarantia,
   classificarAutomacao,
@@ -211,7 +212,7 @@ test('10. solicitação durante a campanha e proposta emitida depois do fim: man
   assert.ok(emissao > PERIODO.fim);
   assert.equal(precoDaAutomacao({ categoria: 'simples', recebidaEm, periodo: PERIODO }).centavos, 100_000);
   assert.match(REGULAMENTO, /Proposta emitida depois do fim da campanha\*\* mantém o preço de lançamento/);
-  assert.match(CONTENT, /mesmo que a proposta seja emitida depois do fim da campanha/);
+  // NEKKORA-COM-ECOSYSTEM-001: a regra saiu da página com o Delivery; continua no regulamento (compromissos preservados)
 });
 
 /* 11 ----------------------------------------------------------------- */
@@ -219,7 +220,7 @@ test('11. validade de 7 dias corridos a partir da emissão', () => {
   assert.equal(ultimoDiaDeAceite('2027-02-05'), '2027-02-12');
   assert.equal(propostaAceitavel('2027-02-05', '2027-02-13T02:59:00Z'), true, '12/02 23:59 em Brasília');
   assert.equal(propostaAceitavel('2027-02-05', '2027-02-13T03:00:00Z'), false, '13/02 00:00 em Brasília');
-  assert.match(CONTENT, /aceita em até 7 dias corridos da emissão/);
+  assert.match(REGULAMENTO, /aceita em até \*\*7 dias corridos da emissão\*\*/);
 });
 
 /* 12 ----------------------------------------------------------------- */
@@ -280,24 +281,22 @@ test('14. bloqueios de produção preservados: nenhuma aprovação presumida', (
 });
 
 /* Coerência dos textos públicos com as decisões ------------------------ */
-test('textos públicos coerentes com C-02, C-03, C-06, C-07 e C-12', () => {
-  // Titular, 09/11/2026 (PUB-19): os 7 dias da assinatura não aparecem como espera obrigatória; o início vem da fila e da
-  // proposta. O prazo de 7 dias para aceitar a proposta é outra regra e continua.
-  assert.doesNotMatch(CONTENT, /começa depois de 7 dias|dias corridos da assinatura/);
-  assert.match(CONTENT, /Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação/);
-  assert.match(CONTENT, /aceita em até 7 dias corridos da emissão/);
-  assert.match(CONTENT, /devolvemos integralmente o valor pago pelo desenvolvimento/);
-  // GOLIVE-001 (10/11/2026, publicação sem parecer externo): a regra dos 50% na homologação (C-04) não aparece no site
-  // enquanto a retenção não estiver fundamentada (JUR-03). O site remete à proposta e ao contrato, com os direitos legais.
-  assert.doesNotMatch(CONTENT, /devolvemos 50%|50% do valor já pago/, 'cláusula pública da C-04 fora do site');
+test('textos públicos (NEKKORA-COM-ECOSYSTEM-001): as regras do Delivery não se aplicam automaticamente ao AI Piloto', () => {
+  // O Delivery saiu da página (titular, 20/11/2026): 50/50, fila, pacotes, devolução integral, homologação e garantia
+  // do Delivery continuam só nos documentos e nas regras deste arquivo, para os compromissos já assumidos.
+  for (const antigo of [/Pagamento de 50%/, /Demandas organizadas em fila/, /pacote de 3/i, /devolvemos integralmente/, /o silêncio não vale como aceite/, /Garantia contratual de correção de defeitos/, /Nekkora Delivery/]) {
+    assert.doesNotMatch(CONTENT.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ''), antigo, `fora da página (fora dos comentários): ${antigo}`);
+  }
+  // As condições novas remetem à proposta e preservam os direitos legais e os compromissos anteriores
   assert.match(CONTENT, /'Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei'/);
-  assert.match(CONTENT, /A desistência não inclui a entrega definitiva da automação/);
+  assert.match(CONTENT, /'Solicitações recebidas e propostas emitidas antes desta tabela mantêm as condições em que foram feitas'/);
+  assert.match(CONTENT, /'Sem pacotes nem descontos por combinação de serviços'/);
+  // Nada de promessa de validade jurídica, retenção, multa ou aceite tácito
   assert.doesNotMatch(CONTENT, /juridicamente válid|validade jurídica (confirmada|garantida)/i, 'sem promessa de validade jurídica');
-  assert.doesNotMatch(CONTENT, /50% do (valor|preço) (total|do contrato)/);
-  assert.match(CONTENT, /o silêncio não vale como aceite/);
-  assert.match(CONTENT, /Garantia contratual de correção de defeitos, em termo escrito, além das garantias legais/);
-  assert.doesNotMatch(CONTENT, /garantia adicional após a entrega, salvo se previstos/, 'a garantia contratual deixou de ser "não incluída"');
   assert.doesNotMatch(CONTENT, /retenção|multa por desistência|aceite tácito(?! )/i);
+  assert.doesNotMatch(CONTENT, /começa depois de 7 dias|dias corridos da assinatura/);
+  // Os documentos do Delivery continuam preservados
+  assert.match(CONTRATO, /sem cumulação indevida/);
   assert.match(B2B, /Ter CNPJ \*\*não basta\*\*/);
   assert.equal(diaEmBrasilia('2026-11-06T02:00:00Z'), '2026-11-05');
 });
@@ -520,7 +519,7 @@ test('R1-25. contagem de APIs ou sistemas, sozinha, não eleva a categoria', () 
   assert.equal(r.categoria, 'simples');
   assert.deepEqual(r.fatosRegistrados, { sistemas: 3, apis: 2 });
   assert.match(REGULAMENTO, /contagem isolada/);
-  assert.match(CONTENT, /Esforço técnico estimado/);
+  assert.match(REGULAMENTO, /Esforço técnico estimado/);
 });
 
 test('R1-26. preços promocionais e padrão da oferta anterior preservados (V-02); complexa sem desconto', () => {
@@ -562,21 +561,29 @@ test('R1-29. atualização monetária aplicada uma vez, sem duplicidade', () => 
   assert.match(CONTRATO, /sem cumulação indevida/);
 });
 
-test('R1-30. portão de produção (execução real): tabela, textos e condições da COM-VITRINE-001 aprovadas pela titular; PUB-13 registrada no Dia D (12/11/2026); sem a PUB-18 bloqueia só por ela, com a PUB-18 válida não acusa nada', () => {
+test('R1-30. portão de produção (execução real): históricos preservados; na NEKKORA-COM-ECOSYSTEM-001, só vigência, tabela, textos, condições e a PUB-18 desta versão podem ficar pendentes', () => {
   const r = spawnSync(process.execPath, [new URL('../verificar-publicacao.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8' });
-  // As aprovações da V1.0.0 (PUB-17/19/09 e PUB-10/18 em 11/11/2026) continuam gravadas; PUB-09/10 não são
-  // acusadas. Titular, 12/11/2026: PUB-14, V-01, PUB-17 e PUB-19 aprovadas por impressão + registro próprio (commit
-  // cf0e733). PUB-13 registrada pela titular no Dia D (12/11/2026).
+  // As aprovações da V1.0.0 (PUB-09 e PUB-10 em 11/11/2026) continuam gravadas e não são acusadas. A PUB-13 anterior
+  // (campanha e novas condições de 12/11/2026) continua conferida e sem pendência; a vigência nova é outra mensagem.
   const saida = r.stdout + r.stderr;
   for (const id of ['PUB-09', 'PUB-10']) assert.doesNotMatch(saida, new RegExp(`${id} —`), `${id} não pendente`);
-  assert.doesNotMatch(saida, /PUB-13 —/, 'data de início e registro conferem');
+  assert.doesNotMatch(saida, /PUB-13 — (datas de início e fim|data de início das novas condições|registro da data de início)/, 'PUB-13 anterior preservada');
   const ids = [...new Set([...saida.matchAll(/- ((?:PUB|V)-\d+) —/g)].map((m) => m[1]))].sort();
   // pendências de BUILD dependem do dist/ local (no CI os testes rodam antes do build); o artefato real é conferido
   // pelo portão no job de deploy. Nenhuma outra pendência é tolerada.
   const outras = [...saida.matchAll(/^ {2}- ([A-Z]+(?:-\d+)?) —/gm)].map((m) => m[1]).filter((id) => !/^(PUB|V)-\d+$/.test(id) && id !== 'BUILD');
   assert.deepEqual(outras, [], saida);
   const pub = JSON.parse(readFileSync(new URL('../../publicacao.json', import.meta.url), 'utf8'));
-  if (pub.publicacaoAutorizada === undefined) {
+  const versao = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version;
+  // Só o que depende de aprovação desta release pode faltar: vigência (PUB-13), tabela (PUB-14), textos (PUB-17),
+  // condições (PUB-19) e a autorização desta versão (PUB-18)
+  const aprovar = ids.filter((id) => id !== 'PUB-18');
+  for (const id of aprovar) assert.ok(['PUB-13', 'PUB-14', 'PUB-17', 'PUB-19'].includes(id), `pendência inesperada: ${id}`);
+  if (aprovar.length) {
+    assert.notEqual(r.status, 0, 'publicação bloqueada');
+    assert.ok(ids.includes('PUB-18'), 'sem aprovações, sem autorização desta versão');
+    assert.ok(pub.publicacaoAutorizada?.versao !== versao, 'autorização desta versão só depois das aprovações');
+  } else if (pub.publicacaoAutorizada === undefined || pub.publicacaoAutorizada.versao !== versao) {
     // Estado H: a flag aprovacoes.publicacao herdada da v1.0.0 não autoriza esta versão — o portão BLOQUEIA, só pela PUB-18
     assert.notEqual(r.status, 0, 'publicação bloqueada');
     assert.match(saida, /- PUB-18 — autorização desta versão/);

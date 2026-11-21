@@ -1,379 +1,211 @@
 /**
  * Texto comercial da página — fonte única para revisão.
  *
- * Layout "modelo C — Poster" (mockup da responsável, 2026-10-15). Toda frase segue o contrato comercial
- * (docs/com-001/02-contrato-comercial.md). Os comentários [A-01], [H-03], [PR-01]… apontam a linha da matriz de
- * alegações (docs/com-001/03-matriz-alegacoes.md) que autoriza o trecho. Antes de mudar uma promessa, atualize a matriz.
+ * Layout "modelo C — Poster" (mockup da responsável, 2026-10-15). NEKKORA-COM-ECOSYSTEM-001 (titular, 20/11/2026):
+ * a narrativa do Nekkora Delivery dá lugar ao ecossistema "Crie. Monitore. Execute." — três produtos independentes
+ * (Nekkora AI em piloto, Nekkora Monitor e Nekkora Hosting), sem pacote nem desconto. Os textos anteriores (Delivery,
+ * categorias simples e média, pacotes de 3, campanha de lançamento) ficam no histórico do git e dos documentos.
  *
- * NEKKORA-COM-008-C: textos ajustados às decisões da titular na COM-008-B (campanha, condições, várias automações,
- * licenças, homologação, Hosting, botão "Entrar" e privacidade). A aprovação de 11/11/2026 (PUB-17, PUB-19 e PUB-09,
- * commit e4bc72c) vale só para o texto da v1.0.0. COM-VITRINE-001: a aprovação deste texto não fica registrada aqui —
- * vale a impressão de PUB-17/PUB-19 aprovada em publicacao.json, com o registro da titular em $origem
- * (scripts/comercial/impressao-conteudo.mjs). Qualquer mudança neste arquivo muda a impressão e exige nova aprovação.
+ * A aprovação deste texto não fica registrada aqui: vale a impressão de PUB-17/PUB-19 aprovada em publicacao.json, com o
+ * registro da titular em $origem (scripts/comercial/impressao-conteudo.mjs). Qualquer mudança neste arquivo muda a
+ * impressão e exige nova aprovação. Textos NOVOS desta missão, pendentes de aprovação (PUB-17, PUB-19 e PUB-09).
  */
 import type { IconName } from 'nekkora-lib';
-import { BOOKINGS_URL, CHANNELS, DATA_CONTROLLER, HOSTING_PROVIDER, LAUNCH_PERIOD, LEAD_API, NEW_CONDITIONS_START, REQUEST_CHANNEL, SUPPLIER_ADDRESS } from './config';
-import { PLANNED_RECURRING_PRICES, brl, priceFacts } from './precos';
+import { CHANNELS, DATA_CONTROLLER, ECOSYSTEM_START, HOSTING_PROVIDER, SERVICE_STATES, SUPPLIER_ADDRESS, whatsappDisplay, type ServiceId } from './config';
+import { PRICE_TABLE, SIM_LIMITS, brl, type SimField } from './precos';
+
+/* ------------------------------------------------------------------ */
+/* Estados dos produtos (PUB-23)                                      */
+/* ------------------------------------------------------------------ */
+/** Rótulo do estado real de cada produto, gravado pela titular em publicacao.json (servicos). */
+export const STATE_LABELS = {
+  piloto: 'Piloto',
+  'sob-avaliacao': 'Disponibilidade sob avaliação',
+  'em-preparacao': 'Em preparação',
+  disponivel: 'Disponível',
+} as const;
+const stage = (id: ServiceId) => STATE_LABELS[SERVICE_STATES[id]];
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
 /* ------------------------------------------------------------------ */
 export const HERO = {
-  badge: 'Delivery · Hosting',
-  titleLead: 'Automação sob medida,',
-  titleAccent: 'da necessidade à execução.',
-  // [A-01] [A-02] [H-01] [H-02 → avaliação] [C-01]
-  lead:
-    'Automações por demanda, com escopo, preço e aceite definidos em proposta para cada uma. ' +
-    'Infraestrutura para executá-las, sujeita a avaliação. Cada serviço contratado de forma independente.',
-  primaryCta: 'Solicitar avaliação',
+  badge: 'AI · Monitor · Hosting',
+  titleLead: 'Sua operação automatizada,',
+  titleAccent: 'do início à execução.',
+  lead: 'Crie automações com inteligência artificial, monitore suas execuções e utilize infraestrutura preparada para sua operação. Escolha os serviços que fazem sentido para sua empresa.',
+  // abre o formulário de atendimento, que prepara a mensagem e leva ao WhatsApp
+  primaryCta: 'Fale com um analista',
   secondaryCta: 'Ver como funciona',
-  // [D-01] [D-02] [D-04]
+  pillarsLabel: 'Crie. Monitore. Execute.',
   points: [
-    { icon: 'file', label: 'Proposta por automação' },
-    { icon: 'check-circle', label: 'Homologação e aceite' },
-    { icon: 'layers', label: 'Sem pacote obrigatório' },
+    { icon: 'robot', label: 'Crie' },
+    { icon: 'monitor', label: 'Monitore' },
+    { icon: 'server', label: 'Execute' },
   ] as { icon: IconName; label: string }[],
 };
 
 /* ------------------------------------------------------------------ */
 /* Soluções                                                           */
 /* ------------------------------------------------------------------ */
-// COM-VITRINE-001 (etapa 4, V-06): catálogo dos quatro serviços, com o estado de cada um. Delivery com contratação
-// assistida; Hosting sob avaliação e orçamento; Monitor e AI em preparação, sem contratação, checkout ou assinatura.
-// Valores previstos de Monitor e AI só no bloco de preços (data-pricing, X-01). Textos NOVOS (PUB-17).
+/**
+ * Catálogo dos três produtos (§2), com o estado real de cada um (§10). Nenhum depende dos outros (§3). Valores só no
+ * bloco de preços (data-pricing). O AI está em piloto: nada de maturidade definitiva, conclusão instantânea ou
+ * compatibilidade universal.
+ */
 export const SOLUTIONS = {
   eyebrow: 'Soluções',
-  title: 'Quatro serviços. Cada um contratado de forma independente.',
+  title: 'Crie. Monitore. Execute.',
+  description: 'Três soluções independentes. Escolha uma, duas ou as três, conforme sua necessidade. Nossa equipe avalia a disponibilidade e as condições antes da contratação.',
   cards: [
     {
-      id: 'delivery',
+      id: 'ai' as const,
       number: '01',
-      name: 'Nekkora Delivery',
-      stage: 'Contratação assistida',
-      stageTone: 'accent' as const,
-      variant: 'raised' as const,
-      summary: 'Desenvolvimento de automações por demanda.', // [A-01]
+      name: 'Nekkora AI',
+      stage: stage('ai'),
+      icon: 'robot' as IconName,
+      summary: 'Criação de automações com inteligência artificial, em fase piloto.',
       items: [
-        'Escopo, prazo e preço definidos em proposta para cada automação', // [A-02]
-        // [A-03] [A-14] — AUD-19: aprovação nos pontos de decisão, não em todas as etapas
-        'A entrega só é concluída depois de documentação, desenvolvimento, testes, da sua homologação e do aceite formal',
-        // [A-13] — AUD-20: entrega definitiva com documentação e dependências identificadas; direitos conforme o contrato
-        'Entrega definitiva com documentação e dependências identificadas, nos termos do contrato',
+        'Você solicita cada automação individualmente',
+        'A necessidade é avaliada antes de qualquer proposta',
+        'Sem mensalidade obrigatória',
+        'Sem promessa de conclusão instantânea nem de compatibilidade com qualquer processo',
       ],
-      // [A-15] [A-16] — tecnologias com que a Nekkora trabalha; nenhuma promessa de compatibilidade universal
-      technologies: {
-        label: 'Tecnologias, conforme o caso',
-        items: ['Python', 'UiPath', 'Power Automate', 'Integrações via API', 'Sistemas web', 'Dados e planilhas'],
-        note: 'A viabilidade com cada sistema é confirmada na avaliação.',
-      },
-      href: '#precos',
-      cta: 'Conhecer o Delivery',
+      cta: 'Solicitar uma automação',
     },
-    // [MO-01..MO-04] Monitor: em preparação; sem contratação nem promessa de disponibilidade (V-06)
     {
-      id: 'monitor',
+      id: 'monitor' as const,
       number: '02',
       name: 'Nekkora Monitor',
-      stage: 'Em preparação',
-      stageTone: 'info' as const,
-      // fundo liso: o selo suave sobre o gradiente do "raised" ficava no limite do contraste (4,27–4,54:1)
-      variant: 'surface' as const,
-      summary: 'Acompanhamento das execuções de automações.',
+      stage: stage('monitor'),
+      icon: 'monitor' as IconName,
+      summary: 'Acompanhamento das execuções das suas automações.',
       items: [
-        'Contratação independente do Delivery, sem número mínimo de automações',
-        'Para automações da Nekkora ou de terceiros, conforme as integrações suportadas',
-        'Ainda não disponível para contratação',
+        'Contratação independente do AI e do Hosting',
+        'Também para automações que não foram criadas pela Nekkora',
+        'Compatibilidade técnica verificada antes da contratação',
+        'Cobrança mensal por automação monitorada',
       ],
-      href: '#servicos-em-preparacao',
-      cta: 'Ver valores previstos',
+      cta: 'Falar sobre o Monitor',
     },
-    // [AI-01..AI-04] AI: em preparação; limites de uso e tratamento de dados definidos antes da disponibilização (V-06)
     {
-      id: 'ai',
+      id: 'hosting' as const,
       number: '03',
-      name: 'Nekkora AI',
-      stage: 'Em preparação',
-      stageTone: 'info' as const,
-      // fundo liso: o selo suave sobre o gradiente do "raised" ficava no limite do contraste (4,27–4,54:1)
-      variant: 'surface' as const,
-      summary: 'Recursos de inteligência artificial para a sua empresa.',
-      items: [
-        'Contratação independente dos demais serviços',
-        'Limites de uso e tratamento de dados definidos antes da disponibilização',
-        'Ainda não disponível para contratação',
-      ],
-      href: '#servicos-em-preparacao',
-      cta: 'Ver valores previstos',
-    },
-    {
-      id: 'hosting',
-      number: '04',
       name: 'Nekkora Hosting',
-      // COM-VITRINE-001 (etapa 4): sob avaliação e orçamento, como hoje (H-02 continua pendente)
-      stage: 'Sob avaliação e orçamento',
-      stageTone: 'info' as const,
-      variant: 'raised' as const,
-      summary: 'Infraestrutura e serviços associados à execução de automações.', // [H-01]
+      stage: stage('hosting'),
+      icon: 'server' as IconName,
+      summary: 'Infraestrutura para executar as suas automações.',
       items: [
-        'Componentes escolhidos conforme a necessidade, nenhum obrigatório', // [H-03]
-        'Responsabilidades de cada parte delimitadas por escrito', // [D-03]
-        'Disponibilidade confirmada em avaliação de viabilidade', // [H-02]
+        'Contratação independente do AI e do Monitor',
+        'Você escolhe o sistema operacional: Windows ou Linux',
+        'Cobrança por hora-máquina',
+        'Disponibilidade e condições confirmadas antes da contratação',
       ],
-      href: '#hosting',
-      cta: 'Entender o Hosting',
+      cta: 'Falar sobre o Hosting',
     },
   ],
-  // [C-01] [C-02]
-  // COM-VITRINE-001 (etapa 4): Monitor e AI ainda não podem ser contratados — texto ALTERADO (PUB-17)
-  note: 'Delivery e Hosting podem ser contratados separadamente ou em conjunto; Monitor e AI estão em preparação e ainda não podem ser contratados. Nenhum deles exige o uso de produtos próprios da Nekkora.',
-};
-
-/**
- * Serviços em preparação (COM-VITRINE-001 §7, V-06): valores PREVISTOS de Monitor e AI, dentro do bloco data-pricing,
- * com o aviso aprovado. Sem botão de contratação, checkout, assinatura ou lista de espera (nova coleta mudaria o aviso de
- * privacidade, PUB-09): o interesse segue pelos canais gerais. Valores de src/precos.ts (PLANNED_RECURRING_PRICES).
- */
-export const PLANNED_SERVICES = {
-  title: 'Serviços em preparação',
-  status: 'Em preparação',
-  notice: 'Valores e condições definitivos dependem da disponibilização comercial.',
-  note: 'Ainda não disponíveis para contratação. Para saber mais, fale com a Nekkora pelos canais de contato.',
-  items: [
-    { id: 'monitor' as const, name: 'Nekkora Monitor', price: brl(PLANNED_RECURRING_PRICES.monitor.mensal), unit: 'por automação/mês, previsto' },
-    { id: 'ai' as const, name: 'Nekkora AI', price: brl(PLANNED_RECURRING_PRICES.ai.mensal), unit: 'por empresa/mês, previsto' },
-  ],
+  note: 'Nenhum serviço exige os outros e não há pacote obrigatório nem desconto por combinação.',
 };
 
 /* ------------------------------------------------------------------ */
-/* Preços do Delivery — bloco data-pricing                            */
+/* Preços — bloco data-pricing                                        */
 /* ------------------------------------------------------------------ */
 /**
- * Tabela oficial de 22/10/2026 (COM-RELEASE-003-R1) no layout do mockup "modelo C" [PR-01..PR-06]. Valores e
- * percentuais só podem aparecer dentro do bloco `data-pricing` (verificado por scripts/homologacao.mjs). Datas da
- * campanha antes da publicação: pendência PUB-13.
+ * Tabela do §2 (valores de src/precos.ts, nunca digitados aqui). Valores só podem aparecer dentro do bloco data-pricing
+ * (verificado por scripts/homologacao.mjs). A vigência (§11) é gravada pela titular em publicacao.json quando autorizar
+ * a publicação; os compromissos anteriores (Delivery e campanha de lançamento) são preservados.
  */
 export const PRICING = {
-  eyebrow: 'Preços · Nekkora Delivery',
-  title: 'Quanto custa uma automação',
-  // [PR-01] [PR-06]
-  // COM-VITRINE-001 (etapa 3): por automação ou pacote de 3 da mesma categoria, sem mensalidade — texto ALTERADO (PUB-17)
-  description: 'Valores por automação ou por pacote de 3 automações da mesma categoria, sem mensalidade. A categoria é definida na avaliação e fica registrada na proposta, junto com escopo e condições.',
-  // [PR-02] Preços especiais de lançamento (COM-RELEASE-003-R1): nunca um percentual único para todas as categorias —
-  // cada preço mostra a própria economia. Com as datas da campanha em publicacao.json (PUB-13), o período aparece por
-  // extenso e a página só mostra os preços de lançamento dentro dele (config.ts, isLaunchActive); sem as datas, só como
-  // prévia de homologação, e o deploy de produção fica bloqueado (scripts/verificar-publicacao.mjs).
-  // [PR-07] Regras aprovadas na COM-008-B (AUD-04, AUD-06); período mantido pela titular em 09/11/2026 (06/11/2026 a
-  // 06/01/2027, no lugar dos dois meses a partir da publicação oficial); vale a data da
-  // SOLICITAÇÃO; proposta com prazo de aceite de 7 dias corridos; preço individual por automação.
-  // COM-VITRINE-001 (etapa 3, §2 e §3.1): o período da campanha é mantido (06/11/2026 a 06/01/2027), sem "preços
-  // especiais" nem comparação com a tabela anterior. A tabela nova vale a partir da data de início das novas condições
-  // (V-02) — nunca retroativamente desde o início da campanha. Sem a data, a faixa diz que ela não foi definida.
-  // Textos ALTERADOS, pendentes de nova aprovação (PUB-17, reabertura na etapa 7).
-  launch: {
-    badge: 'Lançamento',
-    text: LAUNCH_PERIOD
-      ? `Campanha de lançamento para solicitações de avaliação recebidas de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}.`
-      : 'Campanha de lançamento.',
-    condition: NEW_CONDITIONS_START
-      ? `Os valores e pacotes desta tabela valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START} e continuam valendo depois da campanha, até nova revisão. As recebidas antes mantêm as condições da oferta anterior. A proposta pode ser aceita em até 7 dias corridos da emissão.`
-      : 'A proposta pode ser aceita em até 7 dias corridos da emissão.',
-    /** Só na prévia de homologação, sem datas aprovadas: nenhuma elegibilidade antes do início oficial. */
-    pendingDates: 'Prévia para revisão: as datas da campanha ainda não foram definidas. Nenhuma solicitação é elegível antes do início oficial.',
-    /** Sem a data de início das novas condições (PUB-13): a tabela não é apresentada como já vigente. */
-    pendingStart: 'Prévia para revisão: a data de início destes valores ainda não foi definida.',
-    // NEKKORA-COM-CONTRACT-001 (C-10): regras completas e acessíveis da campanha (CDC arts. 30 e 31; Decreto 7.962/2013,
-    // art. 2º, V). Texto NOVO, pendente da aprovação da titular (PUB-17). Só aparece com as datas aprovadas e a campanha
-    // em vigor; sem datas, não há regra a anunciar. Regulamento: docs/comercial/regulamento-campanha-lancamento.md.
-    rules: LAUNCH_PERIOD
-      ? {
-          title: 'Regras da campanha de lançamento',
-          items: [
-            `Período: solicitações de avaliação recebidas pela Nekkora de ${LAUNCH_PERIOD.start} a ${LAUNCH_PERIOD.end}, inclusive, no horário de Brasília.`,
-            `Vale a data de recebimento da solicitação: e-mail recebido em ${CHANNELS.email ?? 'nosso e-mail comercial'}${BOOKINGS_URL ? ', reserva criada no Microsoft Bookings' : ''}${CHANNELS.linkedin ? ' ou mensagem recebida na página da Nekkora no LinkedIn' : ''}. Uma mensagem escrita durante a campanha e enviada depois do fim não entra.`,
-            // V-02: a tabela nova vale a partir da data de início; os compromissos anteriores são preservados
-            NEW_CONDITIONS_START
-              ? `Os valores e pacotes dos cartões acima valem para solicitações recebidas a partir de ${NEW_CONDITIONS_START}, inclusive. Solicitações recebidas antes dessa data mantêm as condições da oferta anterior; quando o escopo e a modalidade forem equivalentes, propomos a condição mais favorável, sem alterar proposta já aceita sem o seu acordo.`
-              : 'Os valores e pacotes dos cartões acima valem a partir da data de início das novas condições, ainda não definida. Solicitações recebidas antes dela mantêm as condições da oferta anterior.',
-            'A categoria, simples ou média, é definida na avaliação pelos critérios de "O que define a categoria" e registrada na proposta, com a justificativa. Vale o preço da data de recebimento da solicitação, mesmo que a proposta seja emitida depois do fim da campanha.',
-            // V-03: pacotes de 3 da mesma categoria; o restante no individual; misto só por proposta específica
-            'Pacote: 3 automações da mesma categoria, pelo valor do cartão. Com 4 ou 5, um pacote e as demais no preço individual; com 6, dois pacotes. Pacote com categorias diferentes só por proposta específica.',
-            'A proposta pode ser aceita em até 7 dias corridos da emissão.',
-            // V-01 (titular, 12/11/2026): o fim da campanha encerra só a comunicação promocional, não a tabela
-            `A campanha termina em ${LAUNCH_PERIOD.end}: depois dessa data, a faixa e estas regras deixam de aparecer, mas os valores e pacotes dos cartões continuam valendo, até nova revisão.`,
-            'Várias automações, avulsas ou em pacote: cada uma tem escopo, documentação, homologação e aceite próprios. Pedir várias juntas não muda a categoria de nenhuma.',
-            // V-04: sem terceira categoria
-            'Demandas que não se enquadram como simples ou média têm avaliação individual, pelos canais de contato.',
-            'Mudanças de escopo pedidas depois da proposta são avaliadas em aditivo ou nova proposta, que informa o preço aplicável.',
-            'Licenças e serviços de terceiros não estão incluídos. O simulador mostra só uma estimativa.',
-          ],
-        }
-      : null,
-  },
-  // [PR-06] — nenhum processo é enquadrado de antemão como simples ou médio
-  criteria: {
-    title: 'O que define a categoria',
-    items: [
-      // CONTRACT-001-R1 (C-10): parâmetro principal aprovado pela titular — texto NOVO (PUB-17). Regulamento §5.
-      // COM-VITRINE-001 (V-04, etapa 3): só simples e média na vitrine — texto ALTERADO (PUB-17)
-      'Esforço técnico estimado da automação: simples até 8 horas; média acima de 8 até 16 horas',
-      'Quantidade de sistemas envolvidos',
-      'Complexidade das integrações',
-      'Regras de negócio e exceções',
-      'Volume de processamento',
-      'Exigências de infraestrutura',
-      'Necessidade de licenciamento',
-    ],
-    // CONTRACT-001-R1 (C-10): os perfis dos cartões são exemplos; nenhuma contagem isolada define a categoria — texto ALTERADO (PUB-17)
-    // COM-VITRINE-001 (V-04, etapa 3) — texto ALTERADO (PUB-17)
-    // Titular, 11/11/2026 (autorização da etapa 3, item 4): as horas são referência; nenhuma classificação garantida só por elas
-    note: 'As horas são uma referência: o enquadramento definitivo depende da avaliação técnica e dos demais critérios, e nenhuma categoria é garantida só pela quantidade de horas. A avaliação indica a categoria antes de qualquer proposta, e os perfis dos cartões são exemplos típicos. Se a demanda não se enquadrar como simples ou média, a avaliação é individual.',
-  },
-  // [CO-01..CO-08] — modelo de atendimento (NEKKORA-RELEASE-001 §5.5) com as condições da COM-008-B; nada aqui promete
-  // prazo, resultado ou disponibilidade. Minuta das cláusulas: docs/comercial/condicoes-comerciais-minuta.md (não
-  // aprovada juridicamente).
+  eyebrow: 'Preços',
+  title: 'Quanto custa cada serviço',
+  description: 'Valores por serviço, sem pacote obrigatório. Escopo, condições e valores definitivos ficam na proposta de cada solicitação.',
+  validity: ECOSYSTEM_START
+    ? `Valores para solicitações recebidas a partir de ${ECOSYSTEM_START}. Solicitações e propostas anteriores mantêm as condições em que foram feitas.`
+    : 'Prévia para revisão: a data de vigência destes valores ainda não foi definida. Solicitações e propostas anteriores mantêm as condições em que foram feitas.',
+  cards: [
+    {
+      id: 'ai' as const,
+      overline: 'Nekkora AI · Piloto',
+      title: 'Criação de automações',
+      rows: [{ id: 'ai', prefix: 'A partir de', value: brl(PRICE_TABLE.ai.porAutomacao), unit: 'por automação' }],
+      note: 'Valor inicial de referência. Se o processo exigir investimento maior, o valor é apresentado para sua aprovação antes de qualquer compromisso. Sem mensalidade obrigatória.',
+    },
+    {
+      id: 'monitor' as const,
+      overline: 'Nekkora Monitor',
+      title: 'Monitoramento de execuções',
+      rows: [{ id: 'monitor', prefix: null, value: brl(PRICE_TABLE.monitor.porAutomacaoMes), unit: 'por automação, por mês' }],
+      note: 'Cobrança mensal por automação monitorada, depois de verificada a compatibilidade técnica.',
+    },
+    {
+      id: 'hosting' as const,
+      overline: 'Nekkora Hosting',
+      title: 'Execução em máquina',
+      rows: [
+        { id: 'windows', prefix: 'Windows', value: brl(PRICE_TABLE.hosting.windowsPorHora), unit: 'por hora-máquina' },
+        { id: 'linux', prefix: 'Linux', value: brl(PRICE_TABLE.hosting.linuxPorHora), unit: 'por hora-máquina' },
+      ],
+      note: 'Sem franquia mínima. Critério de cobrança por hora, licenciamento Windows e disponibilidade são formalizados antes da contratação.',
+    },
+  ],
+  // §11: condições do novo modelo — as regras antigas do Delivery (pacotes, 50/50, fila, categorias, licenças) NÃO se
+  // aplicam automaticamente ao AI Piloto. Texto NOVO, pendente de aprovação (PUB-19).
   conditions: {
     title: 'Condições comerciais',
     items: [
-      'Desenvolvimento sob demanda, com escopo formalizado em proposta',
-      // [CO-07] AUD-07/AUD-13 — contratar várias automações juntas não as transforma em uma complexa
-      // COM-VITRINE-001 (V-03, etapa 3): avulsas ou em pacote — texto ALTERADO (PUB-17/PUB-19)
-      'Pode solicitar várias automações, avulsas ou em pacote de 3 da mesma categoria: cada uma tem escopo, documentação, homologação e aceite próprios',
-      'Preço aprovado por você antes do início do desenvolvimento',
-      // [CO-03] AUD-16 — 50/50 é condição de PAGAMENTO, não percentual de desconto
-      // COM-VITRINE-001 (V-03): no pacote, os percentuais incidem sobre o valor do pacote; o vencimento do saldo por
-      // automação (DP-01) continua em decisão contratual e NÃO é anunciado — fica para a proposta e o contrato
-      'Pagamento de 50% após a aprovação da proposta e a formalização da contratação, e 50% após a homologação e o aceite formal. No pacote de 3, os percentuais incidem sobre o valor do pacote, e o vencimento do saldo é definido na proposta e no contrato',
-      // CONTRACT-001 (C-12): a fila não deixa o início a critério exclusivo da Nekkora (CDC art. 39, XII) — texto ALTERADO (PUB-17)
-      'Demandas organizadas em fila: cada proposta informa as datas previstas de início e de disponibilização para homologação',
-      'Reuniões e acompanhamento conforme as condições acordadas',
-      'Licenças e custos externos tratados à parte, quando aplicáveis',
-      // CONTRACT-001 (C-03): política mais favorável ao cliente — texto NOVO (PUB-17)
-      // C-03 (titular, 09/11/2026): devolução integral antes da disponibilização para homologação.
-      // GOLIVE-001, publicação sem parecer externo (10/11/2026): a frase pública da C-04 (devolução de 50% durante a
-      // homologação) saiu do site enquanto a validade de reter os outros 50% não estiver fundamentada (JUR-03, J3-c a J3-e). A regra
-      // continua só na minuta do contrato, e a 1ª contratação depende de decisão própria. Nova aprovação: PUB-17/PUB-19.
-      'Se você desistir antes da conclusão e disponibilização da automação para homologação, devolvemos integralmente o valor pago pelo desenvolvimento. A desistência não inclui a entrega definitiva da automação. Seus direitos legais permanecem preservados',
-      // [CO-08] AUD-17/AUD-18 — sem cláusula absoluta: as regras ficam na proposta e no contrato, com os direitos legais
+      'Cada serviço é contratado de forma independente: AI, Monitor e Hosting, em qualquer combinação',
+      'Escopo, valores, periodicidade de cobrança e condições de pagamento definidos em proposta, aprovada por você antes do início',
+      'Nekkora AI em fase piloto: cada automação é avaliada antes da proposta, sem promessa de conclusão instantânea nem de compatibilidade com qualquer processo; se o processo exigir investimento maior que o valor inicial, ele é apresentado para sua aprovação antes de qualquer compromisso',
+      'Propriedade e direitos sobre as automações criadas no Nekkora AI são definidos em proposta contratual específica',
+      'Nekkora Monitor: cobrança mensal por automação monitorada, depois de verificada a compatibilidade técnica',
+      'Nekkora Hosting: cobrança por hora-máquina, sem franquia mínima; o critério de cobrança das horas, o licenciamento Windows e a disponibilidade são formalizados antes da contratação',
+      'Licenças e serviços de terceiros não estão incluídos, salvo se previstos na proposta',
+      'Sem pacotes nem descontos por combinação de serviços',
+      'Solicitações recebidas e propostas emitidas antes desta tabela mantêm as condições em que foram feitas',
       'Cancelamento, reembolso e garantia conforme a proposta e o contrato, preservados os direitos previstos em lei',
     ],
   },
-  // [PR-01] [PR-02] — valores, economia e percentual vêm de src/precos.ts (calculados, nunca digitados)
-  tiers: [
-    {
-      overline: 'Simples',
-      title: 'Automação simples',
-      fit: 'Um sistema ou planilha, regras diretas, poucas exceções.',
-      variant: 'surface' as const,
-      price: { tier: 'simples' as const, ...priceFacts('simples') },
-    },
-    {
-      overline: 'Média',
-      title: 'Automação média',
-      fit: 'Mais de um sistema, validações, tratamento de exceções e relatórios.',
-      variant: 'raised' as const,
-      price: { tier: 'media' as const, ...priceFacts('media') },
-    },
-  ],
-  // COM-VITRINE-001 (V-04, etapa 3): só simples e média; sem terceira categoria. Demandas fora das modalidades seguem
-  // pelos canais gerais, com avaliação individual — texto NOVO aprovado como diretriz pela titular (11/11/2026, PUB-17).
-  other: {
-    text: 'Não encontrou uma modalidade adequada à sua necessidade? Entre em contato com nossa equipe para uma avaliação individual.',
-    cta: 'Falar com a equipe',
-  },
-  // COM-VITRINE-001 (V-07): preço individual, valor total do pacote de 3 e economia total calculada; sem valor
-  // unitário dentro do pacote e sem comparação com a tabela anterior. Valores de src/precos.ts (priceFacts).
-  unit: 'por automação',
-  packageUnit: 'pacote de 3 automações da mesma categoria',
-  /** "Economia de <valor>" — 3 × individual − pacote, calculada em src/precos.ts. */
-  savings: (label: string) => `Economia de ${label}`,
-  savingsBasis: 'em relação a 3 automações individuais',
-  notes: [
-    {
-      icon: 'code' as IconName,
-      tone: 'success' as const,
-      // COM-VITRINE-001 (V-05, etapa 3): titularidade do desenvolvimento específico após a quitação integral, com as
-      // exceções (componentes preexistentes e de terceiros). Coerente com o Modelo A-R do anexo de componentes; sem
-      // titularidade irrestrita de bibliotecas e frameworks (LIC-02 pendente). Texto NOVO (PUB-17).
-      title: 'A automação é sua',
-      text: 'O código-fonte, a documentação e os artefatos desenvolvidos especificamente para você e contratados passam a ser seus conforme o contrato e após a quitação integral. Bibliotecas, frameworks e componentes preexistentes da Nekkora, componentes reutilizáveis e tecnologias de terceiros continuam com seus titulares e são licenciados para que você possa usar, manter e executar a automação, nas condições de cada licença.',
-    },
-    {
-      icon: 'studio' as IconName,
-      tone: 'accent' as const,
-      // [PR-04] — AUD-09, opção A (COM-008-B): processo e ferramentas internas, sem nome de produto, sem exigência para
-      // o cliente (P-02) e sem afirmar redução de horas, de retrabalho ou ROI, que não foram medidos
-      title: 'Como chegamos a esses valores',
-      text: 'Trabalhamos com processos padronizados e ferramentas internas de documentação e desenvolvimento. Isso nos permite oferecer estes valores sem retirar etapas: documentação, desenvolvimento, testes e homologação continuam no escopo.',
-    },
-    {
-      icon: 'key' as IconName,
-      tone: 'warning' as const,
-      // [A-09] [PR-05] — AUD-10: licenças de terceiros × infraestrutura do cliente × Nekkora Hosting
-      title: 'Licenças e infraestrutura',
-      text: 'Indicamos na proposta as licenças e os serviços de terceiros necessários (UiPath, Power Automate, APIs pagas); em regra, a contratação é do cliente, e esses custos não estão incluídos nos valores acima. A automação pode rodar na infraestrutura do próprio cliente ou, se contratado à parte, no Nekkora Hosting.',
-    },
-  ],
-  hostingNote: 'Hosting tem avaliação e proposta próprias.', // [H-02]
 };
 
 /* ------------------------------------------------------------------ */
 /* Simulador de investimento — dentro do bloco data-pricing           */
 /* ------------------------------------------------------------------ */
 /**
- * NEKKORA-CALC-001 e COM-VITRINE-001 §8. Valores sempre de src/precos.ts (simulate): nada aqui tem número de preço ou
- * percentual. Sem ROI, horas economizadas ou classificação automática da automação: a categoria é confirmada na
- * avaliação [PR-06] [X-03]. A economia exibida é a diferença entre o preço individual e o preço do pacote da mesma
- * tabela, nunca economia operacional [PR-08]. Sem categoria complexa (V-04).
+ * §4: quatro entradas, todas começando em zero, nenhuma obrigatória. Cada natureza de cobrança aparece separada
+ * (inicial, mensal, por hora) e o combinado nunca é chamado de mensalidade. Valores sempre de src/precos.ts.
  */
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 export const SIMULATOR = {
-  title: 'Simulador de Investimento — Nekkora Delivery',
-  description: 'Escolha quantas automações de cada categoria você tem em mente e veja uma estimativa do investimento, com pacotes de 3 quando houver. Sem cadastro: nada do que você seleciona é enviado ou guardado.',
-  tiers: [
-    { tier: 'simples' as const, label: 'Automações simples', one: 'automação simples', many: 'automações simples' },
-    { tier: 'media' as const, label: 'Automações médias', one: 'automação média', many: 'automações médias' },
-  ],
+  title: 'Simulador de investimento',
+  description: 'Escolha só o que faz sentido para você: todos os campos começam em zero e nenhum serviço é obrigatório. Nada do que você seleciona é enviado ou guardado.',
+  fields: [
+    { field: 'ai', group: 'Nekkora AI · Piloto', label: 'Automações solicitadas', unit: `A partir de ${brl(PRICE_TABLE.ai.porAutomacao)} por automação`, one: 'automação', many: 'automações' },
+    { field: 'monitor', group: 'Nekkora Monitor', label: 'Automações monitoradas', unit: `${brl(PRICE_TABLE.monitor.porAutomacaoMes)} por automação, por mês`, one: 'automação', many: 'automações' },
+    { field: 'windows', group: 'Nekkora Hosting', label: 'Horas-máquina Windows', unit: `${brl(PRICE_TABLE.hosting.windowsPorHora)} por hora-máquina`, one: 'hora', many: 'horas' },
+    { field: 'linux', group: 'Nekkora Hosting', label: 'Horas-máquina Linux', unit: `${brl(PRICE_TABLE.hosting.linuxPorHora)} por hora-máquina`, one: 'hora', many: 'horas' },
+  ] as { field: SimField; group: string; label: string; unit: string; one: string; many: string }[],
   decrease: (label: string) => `Diminuir ${label.toLowerCase()}`,
   increase: (label: string) => `Aumentar ${label.toLowerCase()}`,
-  max: (n: number) => `Até ${n} por categoria. Para mais, fale com a Nekkora.`,
-  total: (n: number) => `Total selecionado: ${plural(n, 'automação', 'automações')}`,
-  /** "<individual> cada · <pacote> o pacote de 3" — rótulo de cada categoria, com os valores de src/precos.ts. */
-  unit: (individual: string, pack: string) => `${individual} cada · ${pack} o pacote de 3`,
-  calculate: 'Calcular meu investimento',
+  limits: `Limites provisórios, só desta simulação: até ${SIM_LIMITS.ai} automações por serviço e até ${SIM_LIMITS.windows} horas-máquina por sistema, em horas inteiras. Para mais, fale com a Nekkora.`,
   clear: 'Limpar simulação',
-  empty: 'Selecione ao menos uma automação para calcular.',
-  changed: 'As quantidades mudaram. Clique em "Calcular meu investimento" para atualizar a estimativa.',
   cleared: 'Simulação limpa.',
-  help: {
-    title: 'Não sabe a categoria da sua automação?',
-    text: 'A categoria depende de sistemas, integrações, regras, volume e licenças, e é confirmada na avaliação. Na dúvida, solicite uma avaliação ou veja',
-    link: 'o que define a categoria',
+  empty: 'Informe ao menos uma quantidade para ver a estimativa.',
+  resultTitle: 'Estimativa',
+  ai: 'Investimento inicial estimado no AI Piloto',
+  aiValue: (v: string) => `a partir de ${v}`,
+  monitor: 'Valor mensal estimado do Monitor',
+  monitorValue: (v: string) => `${v} por mês`,
+  hosting: 'Hosting para as horas selecionadas',
+  combined: 'Investimento combinado estimado',
+  combinedNote: 'Soma do AI Piloto, do primeiro mês do Monitor e das horas de Hosting selecionadas. Não é uma mensalidade.',
+  disclaimer: 'Esta simulação é só uma estimativa. Não é proposta nem contratação: escopo, condições e valores definitivos são confirmados na avaliação e registrados em proposta comercial.',
+  request: 'Solicitar atendimento com esta simulação',
+  count: (field: SimField, n: number) => {
+    const f = SIMULATOR.fields.find((x) => x.field === field)!;
+    return plural(n, f.one, f.many);
   },
-  resultTitle: 'Resultado da simulação',
-  /** "2 automações simples" — para o resumo. */
-  count: (tier: 'simples' | 'media', n: number) => {
-    const t = SIMULATOR.tiers.find((x) => x.tier === tier)!;
-    return plural(n, t.one, t.many);
-  },
-  /** "1 pacote de 3 (<pacote> cada) + 1 individual (<individual> cada)" — composição de uma categoria (V-03). */
-  composition: (packages: number, singles: number, pack: string, individual: string) =>
-    [packages > 0 ? `${plural(packages, 'pacote de 3', 'pacotes de 3')} (${pack} cada)` : null, singles > 0 ? `${plural(singles, 'individual', 'individuais')} (${individual} cada)` : null]
-      .filter(Boolean)
-      .join(' + '),
-  estimateLabel: 'Investimento estimado',
-  individualLabel: 'Sem pacotes, no preço individual',
-  savingsLabel: 'Economia com pacotes',
-  packagesRule: 'Pacotes de 3 automações da mesma categoria; o que sobra fica no preço individual. Categorias diferentes não se misturam em um pacote.',
-  savingsNote: 'A economia é a diferença entre o preço individual e o preço do pacote das categorias selecionadas — não é uma economia operacional comprovada.',
-  // Texto obrigatório (NEKKORA-CALC-001 §3.7)
-  disclaimer:
-    'Esta simulação é uma estimativa baseada nas categorias selecionadas. A classificação, o escopo e o investimento definitivo serão confirmados na avaliação e registrados em proposta comercial.',
-  next: 'Próximo passo',
-  schedule: 'Agendar uma conversa',
-  request: 'Solicitar avaliação',
   /** Anúncio para leitores de tela (região viva), sem mover o foco. */
-  announce: (summary: string) => `Resultado da simulação atualizado. ${summary}`,
+  announce: (summary: string) => `Estimativa atualizada. ${summary}`,
 };
 
 /* ------------------------------------------------------------------ */
@@ -381,23 +213,13 @@ export const SIMULATOR = {
 /* ------------------------------------------------------------------ */
 export const HOW_IT_WORKS = {
   eyebrow: 'Como funciona',
-  title: 'Seis etapas, com a sua aprovação nos pontos de decisão.', // [D-01] — AUD-19
-  // [A-03] [A-13]
+  title: 'Do pedido à execução, com a sua aprovação nos pontos de decisão.',
   steps: [
-    { title: 'Entendimento da necessidade', description: 'Você descreve o processo, as regras e o resultado esperado.' },
-    { title: 'Viabilidade e dimensionamento', description: 'Analisamos sistemas, acessos e complexidade para dimensionar a automação.' },
-    { title: 'Proposta', description: 'Escopo, preço e condições por escrito. O desenvolvimento começa após a sua aprovação.' },
-    { title: 'Desenvolvimento e testes', description: 'Construímos e testamos a automação conforme o escopo aprovado.' },
-    // COM-008-B §5.4: disponibilização, registro e correção de defeitos, aceite formal — o silêncio não vale como aceite
-    {
-      title: 'Homologação e aceite',
-      // CONTRACT-001 (C-06): explicita que o silêncio não vale como aceite — texto ALTERADO (PUB-17)
-      description: 'Você valida a automação no seu cenário e registra os defeitos encontrados. Depois das correções, a homologação só é concluída com o seu aceite formal: o silêncio não vale como aceite.',
-    },
-    {
-      title: 'Entrega definitiva',
-      description: 'Após o aceite e a confirmação do pagamento, entregamos o que foi previsto na proposta, com documentação e dependências identificadas.',
-    },
+    { title: 'Você descreve a necessidade', description: 'O formulário de atendimento prepara uma mensagem, que você revisa e envia pelo WhatsApp.' },
+    { title: 'Avaliação', description: 'Avaliamos o processo, os sistemas envolvidos e a compatibilidade técnica de cada serviço escolhido.' },
+    { title: 'Proposta', description: 'Escopo, valores, periodicidade de cobrança e condições por escrito. Nada começa antes da sua aprovação.' },
+    { title: 'Criação, monitoramento e execução', description: 'Conforme os serviços contratados: a automação criada no AI Piloto, o Monitor acompanhando as execuções, o Hosting executando as automações.' },
+    { title: 'Validação', description: 'Você confere o resultado no seu cenário, pelos critérios definidos na proposta.' },
   ],
 };
 
@@ -406,16 +228,13 @@ export const HOW_IT_WORKS = {
 /* ------------------------------------------------------------------ */
 export const HOSTING = {
   eyebrow: 'Nekkora Hosting',
-  title: 'Infraestrutura para executar automações, com responsabilidades delimitadas.',
-  // [H-03] [A-10] — nenhum serviço apresentado como incluído
-  description:
-    'Hosting reúne serviços distintos — infraestrutura, configuração, administração, monitoramento, operação assistida, correção de incidentes, sustentação. Cada um é avaliado separadamente e só faz parte do contrato quando consta na proposta.',
-  // [H-02] [H-05]
+  title: 'Infraestrutura para executar suas automações, em Windows ou Linux.',
+  description: 'Você escolhe o sistema operacional e a quantidade de horas-máquina. O Hosting pode ser contratado sozinho, sem o AI ou o Monitor.',
   availability: {
-    title: 'Disponibilidade em avaliação.',
-    text: 'Uma solicitação inicia uma avaliação de viabilidade e compatibilidade — não representa contratação nem reserva de capacidade.',
+    title: 'Condições a confirmar antes da contratação.',
+    text: 'Sem franquia mínima. Disponibilidade de infraestrutura, licenciamento Windows, critério de cobrança por hora (fração e arredondamento) e responsabilidades de cada parte são formalizados na proposta. Uma solicitação não representa contratação nem reserva de capacidade.',
   },
-  cta: 'Solicitar avaliação de viabilidade',
+  cta: 'Falar sobre o Hosting',
 };
 
 /* ------------------------------------------------------------------ */
@@ -427,206 +246,87 @@ export const TRANSPARENCY = {
   description: 'O que é definido em proposta, o que não está incluído sem acordo explícito e do que o andamento depende.',
   defined: {
     title: 'Definido em proposta',
-    // [A-02] [A-08] [A-09] [D-03] [D-02]
-    // AUD-18 (F.5): correção de defeitos definida em proposta, sem afastar as garantias legais
     items: [
-      'Escopo de cada automação',
-      'Preço e condições de pagamento',
+      'Serviços escolhidos e quantidades',
+      'Valores e periodicidade de cobrança',
+      'Condições de pagamento',
       'Prazo estimado',
       'Tecnologias e licenças necessárias',
       'Responsabilidades de cada parte',
-      'Critérios de homologação e aceite',
-      // CONTRACT-001 (C-07): garantia contratual em termo escrito, sem anunciar prazo total — texto ALTERADO (PUB-17)
-      'Garantia contratual de correção de defeitos, em termo escrito, além das garantias legais',
+      'Critérios de validação e aceite',
     ],
   },
   excluded: {
     title: 'Não incluído automaticamente',
-    // [A-10] [X-05] [X-06] [X-07] [X-08] [X-09] [PR-05] — bloco de exclusão (data-exclusion)
+    // bloco de exclusão (data-exclusion)
     items: [
-      'Alterações futuras e novas funcionalidades',
-      'Sustentação e evolução das automações',
-      // CONTRACT-001 (C-07): a garantia contratual passa a ser padrão; suporte continua fora — texto ALTERADO (PUB-17)
-      'Suporte técnico após a entrega, salvo se previsto em proposta',
-      'Infraestrutura e serviços de Hosting',
+      'Serviços que você não escolheu: nenhum é obrigatório',
       'Licenças e serviços de terceiros — em regra, contratados pelo cliente',
-      'Monitoramento, 24 horas, alta disponibilidade ou SLA',
+      'Alterações futuras e novas funcionalidades',
+      'Suporte além do previsto em proposta',
+      'Disponibilidade 24 horas, alta disponibilidade ou SLA, salvo se previstos em proposta',
     ],
   },
   dependencies: {
     title: 'Depende de você e de terceiros',
-    // [A-11] [A-06]
-    items: ['Liberação de acessos e credenciais', 'Estabilidade de sistemas externos', 'Disponibilidade da sua equipe para homologação', 'Fila operacional da Nekkora'],
+    items: ['Liberação de acessos e credenciais', 'Estabilidade de sistemas externos', 'Compatibilidade técnica dos seus sistemas', 'Disponibilidade da sua equipe para validação'],
   },
 };
 
 /* ------------------------------------------------------------------ */
-/* Contato                                                            */
+/* Contato e formulário de atendimento (§7)                           */
 /* ------------------------------------------------------------------ */
 export const CONTACT_COPY = {
-  title: 'Vamos olhar o seu processo de perto?',
-  description: 'A solicitação inicia uma avaliação — não é uma contratação e não gera compromisso.',
-  cta: 'Solicitar avaliação',
-  // Alternativa sem formulário (§5.4): canais diretos, sem preencher nada no site
-  directTitle: 'Prefere falar direto?',
-  // [K-01..K-03] pendentes
-  pendingCaption: 'Canais oficiais em definição · formulário em modo de demonstração',
-  // Diálogo "Solicitar avaliação" (modelo C, etapa 2)
-  dialogTitle: 'Solicitar avaliação',
-  // AUD-25 (F.6): o diálogo serve a quem quer uma automação nova e a quem precisa de hospedagem ou infraestrutura
-  dialogDescription:
-    'Conte o que você precisa: uma automação nova, a hospedagem de uma automação existente ou infraestrutura e serviços relacionados. Antes de qualquer envio, você revisa a mensagem. A solicitação inicia uma avaliação — não é uma contratação.',
-  formTitle: 'Formulário de solicitação',
-  /** Tipo de solicitação (COM-008-C §8). A primeira linha da mensagem diz qual é; o CTA do Hosting já abre com a hospedagem. */
-  demand: {
-    legend: 'O que você precisa?',
-    options: [
-      // COM-VITRINE-001 (etapa 5): a primeira linha identifica o serviço, como já fazem as do Hosting — texto ALTERADO (PUB-17)
-      { value: 'automacao', label: 'Desenvolver uma nova automação', line: 'Quero solicitar uma avaliação de automação (Nekkora Delivery).' },
-      {
-        value: 'hospedagem',
-        label: 'Hospedar uma automação existente',
-        line: 'Quero solicitar uma avaliação de viabilidade para hospedar uma automação existente (Nekkora Hosting).',
-      },
-      {
-        value: 'infraestrutura',
-        label: 'Infraestrutura e serviços relacionados',
-        line: 'Quero solicitar uma avaliação de infraestrutura e serviços relacionados (Nekkora Hosting).',
-      },
-    ],
-  },
-  /**
-   * COM-VITRINE-001 (etapa 5): orientação por serviço, só na tela (não entra na mensagem nem cria campo novo). O interesse
-   * em pacote vai na descrição, com as palavras do visitante, ou no resumo do simulador. Monitor e AI não são tipos de
-   * solicitação (em preparação). Textos NOVOS (PUB-17).
-   */
-  demandHints: {
-    automacao:
-      'Nekkora Delivery: por automação ou em pacote de 3 automações da mesma categoria. Se tiver interesse no pacote, conte na descrição quantas automações você tem em mente; categoria e composição são confirmadas na avaliação.',
-    hospedagem: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
-    infraestrutura: 'Nekkora Hosting: sob avaliação e orçamento. A disponibilidade é confirmada na avaliação de viabilidade.',
-  },
-  messageLabel: 'Descreva o processo ou a necessidade',
-  processHint: 'O que acontece hoje, quais sistemas envolve, com que frequência e qual resultado você espera. Até 1.000 caracteres.',
-  /**
-   * Resumo do simulador (NEKKORA-CALC-001 §3.8): só entra na mensagem se o visitante marcar a opção, e aparece na
-   * etapa de confirmação antes de qualquer envio. Nada é guardado.
-   */
-  simulation: {
-    include: 'Incluir o resumo da minha simulação na mensagem',
-    hint: 'Opcional. Você confere o texto antes de enviar; a simulação não é guardada.',
-    heading: 'Simulação feita no site (estimativa, sujeita à avaliação):',
-  },
-  emailHint: 'Opcional — só se preferir retorno por e-mail.',
-  privacyLink: 'Como tratamos seus dados',
-  orForm: 'ou preencha o formulário',
-  // [K-05]
-  demoNote: 'Modo de demonstração: nenhum dado é enviado ou armazenado.',
-  demoSubmit: 'Revisar solicitação',
-  reviewSubmit: 'Revisar mensagem',
-  // Etapa "Confirmar solicitação" (§5.2/§5.3) — textos comuns aos dois canais
-  review: {
-    title: 'Confirme a sua solicitação',
-    back: 'Voltar e editar',
-    copy: 'Copiar mensagem',
-    copied: 'Mensagem copiada.',
-    copyFailed: 'Não foi possível copiar automaticamente — selecione o texto da mensagem acima.',
-    manual: 'Se o WhatsApp não abrir, copie a mensagem e envie para',
-    email: 'Prefere e-mail? Escreva para',
-  },
-  /** Jornada pelo WhatsApp — só com número confirmado em publicacao.json (PUB-01). */
-  whatsapp: {
-    direct: 'Falar diretamente pelo WhatsApp',
-    note: 'Na próxima etapa você confere a mensagem antes de abrir o WhatsApp. Nada é armazenado nesta página.',
-    intro: 'Esta é a mensagem que será aberta no WhatsApp. Confira antes de continuar.',
-    transfer:
-      'Ao continuar, o WhatsApp (serviço da Meta) é aberto em outra aba com esta mensagem — tipo de solicitação, nome, empresa, e-mail, descrição e, se você o incluiu, o resumo da simulação, como estão acima. Ela só chega à Nekkora se você tocar em enviar na conversa. Esta página não guarda o que você digitou.',
-    open: 'Abrir no WhatsApp',
-    // Nunca afirmar abertura nem envio: com noopener o navegador não informa se a aba foi criada (D-18).
-    requested: {
-      title: 'Pedimos ao navegador para abrir o WhatsApp',
-      text: 'Se a conversa não apareceu em uma nova aba, use o botão abaixo. A mensagem só é enviada quando você a confirmar no WhatsApp.',
-    },
-    again: 'Abrir conversa no WhatsApp',
-  },
-  /** Jornada pelo e-mail — canal da publicação enquanto não houver WhatsApp (decisão da titular, 22/10/2026) [K-02]. */
-  email: {
-    direct: 'Escrever diretamente por e-mail',
-    note: 'Na próxima etapa você confere a mensagem antes de abrir o seu aplicativo de e-mail. Nada é armazenado nesta página.',
-    intro: 'Esta é a mensagem que será aberta no seu aplicativo de e-mail, endereçada à Nekkora. Confira antes de continuar.',
-    transfer:
-      'Ao continuar, o seu aplicativo de e-mail é aberto com esta mensagem — tipo de solicitação, nome, empresa, e-mail, descrição e, se você o incluiu, o resumo da simulação, como estão acima. Ela só chega à Nekkora se você a enviar pelo aplicativo. Esta página não guarda o que você digitou.',
-    open: 'Abrir no e-mail',
-    // A página não sabe se algum aplicativo de e-mail abriu: diz só o que pediu ao navegador (mesma regra da D-18).
-    requested: {
-      title: 'Pedimos ao navegador para abrir o seu aplicativo de e-mail',
-      text: 'Se nenhum aplicativo abriu, copie a mensagem e envie para o endereço abaixo. A mensagem só é enviada quando você a enviar pelo seu e-mail.',
-    },
-    again: 'Abrir no e-mail novamente',
-    manual: 'Se o aplicativo de e-mail não abrir, copie a mensagem e envie para',
-  },
-  /**
-   * Recebimento automático (COM-RELEASE-005 §5.7) — só com o endpoint do backend em publicacao.json. "Recebida" só
-   * com a confirmação do servidor; na falha, os dados ficam no formulário e o e-mail aparece como alternativa.
-   */
-  api: {
-    note: 'Na próxima etapa você confere os dados antes de enviar.',
-    emailHint: 'Obrigatório — é por ele que respondemos.',
-    emailRequired: 'Informe um e-mail para recebermos e respondermos a sua solicitação, como nome@empresa.com.',
-    intro: 'Confira os dados abaixo. Eles serão enviados à Nekkora quando você tocar em "Enviar solicitação".',
-    transfer:
-      'Ao enviar, tipo de solicitação, nome, empresa, e-mail, descrição e, se incluído, o resumo da simulação vão para a Nekkora por um serviço da AWS, que entrega a solicitação na caixa de e-mail comercial. Só usamos os dados para responder e preparar a avaliação.',
-    challenge: 'Verificação de segurança automática (Cloudflare Turnstile) para evitar envios por robôs.',
-    challengeWaiting: 'Aguardando a verificação de segurança…',
-    challengeUnavailable: 'A verificação de segurança não carregou. Você pode tentar de novo ou usar o e-mail abaixo.',
-    send: 'Enviar solicitação',
-    sending: 'Enviando…',
-    sendingStatus: 'Enviando a solicitação. Aguarde a confirmação.',
-    received: {
-      title: 'Solicitação recebida',
-      text: (protocolo: string) => `Protocolo ${protocolo}. Vamos responder pelo e-mail informado. A solicitação inicia uma avaliação — não é uma contratação.`,
-    },
-    failed: {
-      title: 'A solicitação não foi enviada',
-      rede: 'Não conseguimos falar com o servidor. Confira a sua conexão e tente de novo — os dados continuam aqui.',
-      limite: 'Recebemos muitas solicitações em pouco tempo. Tente de novo mais tarde ou use o e-mail abaixo.',
-      desafio: 'Não foi possível confirmar a verificação de segurança. Faça a verificação de novo e tente enviar.',
-      indisponivel: 'O envio não foi concluído por uma falha temporária. Os dados continuam aqui: tente de novo em instantes ou use o e-mail abaixo.',
-      recusada: 'Não foi possível enviar esta solicitação. Revise os dados ou escreva diretamente para o e-mail abaixo.',
-    },
-    retry: 'Tentar novamente',
-    alternative: 'Se preferir, envie a mesma mensagem pelo seu e-mail para',
-    openEmail: 'Abrir no e-mail',
-  },
-  demoResult: {
-    title: 'Solicitação validada — envio desativado nesta versão',
-    text: 'Nenhum dado foi enviado ou armazenado. Quando os canais oficiais forem publicados, este formulário passará a encaminhar a solicitação.',
-  },
+  title: 'Vamos conversar sobre a sua operação?',
+  description: 'A conversa inicia uma avaliação — não é uma contratação e não gera compromisso.',
+  cta: 'Fale com um analista',
+  note: 'O formulário prepara a sua mensagem e abre o WhatsApp. Você revisa a mensagem antes de enviar.',
+  // LinkedIn e Instagram: redes institucionais, não canais de atendimento
+  socialTitle: 'Acompanhe a Nekkora',
+  pendingCaption: 'Canal de atendimento em definição',
 };
 
-/* ------------------------------------------------------------------ */
-/* Agendamento — Microsoft Bookings (COM-RELEASE-005 §4)              */
-/* ------------------------------------------------------------------ */
+/** Serviços que o visitante pode marcar no formulário (todos opcionais). */
+export const SERVICE_NAMES: Record<ServiceId, string> = { ai: 'Nekkora AI (piloto)', monitor: 'Nekkora Monitor', hosting: 'Nekkora Hosting' };
+
 /**
- * Só aparece com a URL oficial do Bookings em publicacao.json. Duração, plataforma e antecedência são configuradas no
- * Bookings e não são prometidas aqui antes de confirmadas. A página nunca diz que a reunião foi marcada: quem confirma
- * é o Bookings.
+ * Formulário de atendimento (§7): só prepara a mensagem no navegador e abre o WhatsApp. Sem envio automático, banco de
+ * dados, e-mail, API do WhatsApp ou armazenamento persistente.
  */
-export const SCHEDULE = {
-  cta: 'Agendar conversa',
-  /** Completa o nome acessível do botão (o destino abre em outra aba). */
-  srExternal: '(abre o Microsoft Bookings em outra aba)',
-  note: 'Escolha um horário na agenda da Nekkora, no Microsoft Bookings. A conversa só fica marcada quando o Bookings confirmar.',
-  dialogPrompt: 'Prefere conversar antes?',
+export const REQUEST_FORM = {
+  title: 'Fale com um analista',
+  description: 'Preencha os campos e revise a mensagem no WhatsApp antes de enviar. Nada é enviado pela página.',
+  name: { label: 'Nome', placeholder: 'Seu nome', error: 'Informe o seu nome.' },
+  company: { label: 'Empresa', placeholder: 'Nome da empresa', hint: 'Opcional' },
+  email: { label: 'E-mail', placeholder: 'nome@empresa.com', hint: 'Opcional', error: 'Informe um e-mail válido ou deixe o campo em branco.' },
+  description_: {
+    label: 'Descrição do processo ou necessidade',
+    placeholder: 'Ex.: conferimos todo dia os pagamentos do banco com o sistema financeiro, manualmente.',
+    hint: 'Não informe senhas, credenciais nem dados confidenciais.',
+    error: 'Descreva o processo ou a necessidade.',
+  },
+  services: { legend: 'Serviços de interesse', description: 'Opcional. Marque os que quiser.' },
+  simulation: { include: 'Incluir o resumo da simulação na mensagem', hint: 'Você pode desmarcar.' },
+  submit: 'Abrir o WhatsApp',
+  cancel: 'Cancelar',
+  opened: {
+    title: 'Mensagem preparada no WhatsApp',
+    text: 'Abrimos o WhatsApp em outra aba com a sua mensagem. Ela só chega à Nekkora quando você tocar em enviar — abrir o WhatsApp não é o envio.',
+  },
+  again: 'Abrir o WhatsApp novamente',
+  back: 'Voltar ao formulário',
+  close: 'Fechar',
+  // Rótulos da mensagem estruturada (exemplo do §7)
+  message: { name: 'Nome', company: 'Empresa', email: 'E-mail', description: 'Descrição do processo', services: 'Serviços de interesse', simulation: 'Simulação de investimento' },
 };
 
 /* ------------------------------------------------------------------ */
 /* Barra de navegação                                                 */
 /* ------------------------------------------------------------------ */
 /*
- * Botão "Entrar" (modelo C, etapa 2): OCULTO por decisão da titular na COM-008-B (AUD-26, PUB-16) enquanto não houver
- * área de clientes. Cadastro, autenticação e área do cliente ficam para a futura Nekkora Platform
- * (docs/roadmap/NEKKORA-PLATFORM-POLITICAS-BACKLOG.md), não para o Commercial.
+ * Botão "Entrar": NEKKORA-COM-CANAIS-001 (PUB-16, confirmado pela titular em 13/11/2026). Ele leva a
+ * https://platform.nekkora.com/entrar (PLATFORM_LOGIN_URL, em config.ts); cadastro, autenticação e área do cliente são
+ * da Nekkora Platform, não do Commercial (App.tsx).
  */
 
 /* ------------------------------------------------------------------ */
@@ -640,77 +340,40 @@ export const SCHEDULE = {
 // AUD-33: razão social e CNPJ vêm de publicacao.json (ambos informados pela titular em 04/11/2026); sem o nome, o
 // aviso usa "a Nekkora" e mostra só o CNPJ
 const controller = `${DATA_CONTROLLER.name ?? 'a Nekkora'}${DATA_CONTROLLER.document ? ` (CNPJ ${DATA_CONTROLLER.document})` : ''}`;
-const viaApi = REQUEST_CHANNEL === 'api';
 /**
- * Minuta revisada na COM-RELEASE-005 §6 (envio automático e Microsoft Bookings). Cada item descreve o que acontece DE
- * FATO na configuração publicada: sem endpoint, o formulário não envia nada; sem a URL do Bookings, o item do
- * agendamento não aparece. Bases legais por finalidade (LGPD, art. 7º) documentadas em
- * docs/release/COM-RELEASE-005-privacidade.md — submetida à titular para aprovação (PUB-09).
+ * NEKKORA-COM-ECOSYSTEM-001 §11 — PROPOSTA pendente de aprovação da titular (PUB-09): o formulário de atendimento só
+ * prepara a mensagem no navegador; a página não recebe nem guarda o formulário, e o visitante decide abrir o WhatsApp e
+ * enviar. O e-mail continua como canal dos direitos do titular, ao lado do WhatsApp, e na identificação do fornecedor
+ * (rodapé, Decreto 7.962/2013). Revisões anteriores (NEKKORA-COM-CANAIS-001, aprovada em 13/11/2026; COM-RELEASE-005 §6;
+ * golive-001) ficam no histórico.
  */
+/** Canais dos direitos do titular (LGPD, art. 18): WhatsApp e e-mail, quando confirmados. */
+const rightsChannels = [CHANNELS.whatsapp && `pelo WhatsApp ${whatsappDisplay()}`, CHANNELS.email && `pelo e-mail ${CHANNELS.email}`].filter(Boolean).join(' ou ');
+
 export const PRIVACY = {
   eyebrow: 'Privacidade',
   title: 'Como tratamos seus dados',
   description: `Responsável pelos dados pessoais desta página: ${controller}.`,
   items: [
-    viaApi
-      ? {
-          icon: 'send' as IconName,
-          title: 'O que o formulário envia',
-          // [PV-05] — envio automático: só depois da confirmação; o que é guardado e por quanto tempo
-          text: `Só quando você toca em "Enviar solicitação": nome, e-mail, empresa (se informada) e a descrição do processo vão para um serviço da Nekkora na ${HOSTING_PROVIDER ?? 'nuvem'}, que entrega a solicitação na caixa comercial ${CHANNELS.email ?? 'da Nekkora'} (Microsoft 365). O serviço não guarda o conteúdo: mantém por 24 horas só um código técnico do pedido, para não receber a mesma solicitação duas vezes.`,
-        }
-      : {
-          icon: 'shield' as IconName,
-          title: 'O formulário não envia nada',
-          text: 'O que você digita fica apenas no seu navegador. Nenhum dado vai para servidores da Nekkora por esta página.',
-        },
-    // [PV-02] — o item descreve o canal que a jornada usa de fato (WhatsApp ou e-mail; REQUEST_CHANNEL em config.ts)
-    ...(viaApi
-      ? []
-      : [
-          REQUEST_CHANNEL === 'email'
-            ? {
-                icon: 'mail' as IconName,
-                title: 'O que vai para o e-mail',
-                text: `Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo vão para uma mensagem aberta no seu aplicativo de e-mail, endereçada a ${CHANNELS.email}. Ela só é enviada se você a enviar pelo aplicativo.`,
-              }
-            : {
-                icon: 'whatsapp' as IconName,
-                title: 'O que vai para o WhatsApp',
-                text: 'Só quando você confirma: nome, empresa e e-mail (se informados) e a descrição do processo seguem no texto da mensagem para o WhatsApp, serviço da Meta, sujeito aos termos e à política de privacidade dele. A mensagem só é enviada se você tocar em enviar na conversa.',
-              },
-        ]),
-    // [PV-06] — agendamento: só com a URL oficial do Bookings; o Bookings armazena a reserva
-    ...(BOOKINGS_URL
-      ? [
-          {
-            icon: 'calendar' as IconName,
-            title: 'Agendamento pelo Microsoft Bookings',
-            // AUD-38 (F.8): a conversa é pelo Microsoft Teams
-            text: 'Ao agendar, você sai desta página para o Microsoft Bookings, serviço da Microsoft usado pela Nekkora. Nome, e-mail, respostas às perguntas do agendamento e o horário escolhido ficam registrados na agenda da Nekkora no Microsoft 365 e são usados para confirmar e lembrar o horário e realizar a conversa pelo Microsoft Teams. Não informe senhas, credenciais nem documentos sigilosos.',
-          },
-          // [PV-11] NEKKORA-COM-LEGAL-BASE-001 (05/11/2026): SEM gravação comercial nesta fase (diretriz da titular na
-          // missão). Substitui o texto da COM-PRIVACY-001 ("pode ser gravada"): o aviso descreve só o tratamento que de
-          // fato ocorre (LGPD, art. 6º, VI, e art. 9º). Gravar no futuro exige base legal definida (JUR-10), novo texto e
-          // nova aprovação da titular.
-          {
-            icon: 'headset' as IconName,
-            title: 'Conversa sem gravação',
-            text: 'Nesta fase, a Nekkora não grava as conversas comerciais pelo Microsoft Teams. Se isso mudar, este aviso será atualizado antes, e a gravação só acontecerá com aviso prévio.',
-          },
-        ]
-      : []),
+    {
+      icon: 'shield' as IconName,
+      title: 'Formulário só no seu navegador',
+      // Ajuste da titular (13/11/2026) mantido: sem afirmação absoluta de que a página não coleta dados — o acesso envolve
+      // dados técnicos de navegação e os registros de acesso descritos no item "Registros de acesso"
+      text: 'O formulário de atendimento só prepara uma mensagem. Nome, empresa, e-mail, descrição e, se você escolher, o resumo da simulação são processados no seu navegador: a página não os envia à Nekkora, não tem envio automático de solicitações e não os guarda depois que você sai. O simulador de investimento também funciona só no seu navegador. Como em qualquer site, o acesso envolve dados técnicos de navegação, tratados pelo provedor de hospedagem e guardados nos registros de acesso descritos abaixo.',
+    },
+    // [PV-02] — o canal de atendimento é o WhatsApp, aberto pelo visitante
+    {
+      icon: 'whatsapp' as IconName,
+      title: 'Conversa pelo WhatsApp',
+      text: 'Ao concluir o formulário, a página abre o WhatsApp, serviço da Meta, em outra aba, com a mensagem preparada. Continuar é escolha sua: você pode revisar, editar ou apagar a mensagem, e ela só chega à Nekkora se você tocar em enviar. Depois disso, seu número, seu nome de perfil e o que você escrever na conversa são usados pela Nekkora para responder. O WhatsApp segue os termos e a política de privacidade da Meta.',
+    },
     {
       icon: 'eye' as IconName,
       title: 'Sem cookies nem rastreamento',
-      // [PV-03] AUD-43: o escopo é esta página; o Bookings segue as regras da Microsoft
-      text:
-        'Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro); o simulador de investimento não guarda nem envia o que você seleciona. Fontes e imagens vêm do próprio site.' +
-        (BOOKINGS_URL ? ' O Microsoft Bookings, para onde leva o botão "Agendar conversa", segue as regras da Microsoft.' : '') +
-        // [PV-07] — o desafio antiautomação é de terceiro e só carrega na confirmação do envio
-        (LEAD_API?.turnstileSiteKey
-          ? ' Na confirmação do envio, uma verificação de segurança da Cloudflare (Turnstile) analisa sinais técnicos do navegador para impedir envios por robôs.'
-          : ''),
+      // [PV-03] AUD-43: o escopo é esta página; WhatsApp, redes sociais e a Platform seguem regras próprias. Ajuste da
+      // titular (13/11/2026): a Platform é citada só como destino do botão "Entrar"
+      text: 'Esta página não usa cookies nem ferramentas de análise ou de publicidade. O navegador guarda apenas a sua escolha de tema (claro ou escuro). Fontes e imagens vêm do próprio site. O WhatsApp, o LinkedIn e o Instagram seguem regras próprias. O botão "Entrar" leva à Nekkora Platform, uma aplicação separada, que também segue regras próprias.',
     },
     {
       icon: 'server' as IconName,
@@ -727,15 +390,14 @@ export const PRIVACY = {
       // própria e não estão nestes registros. A base da guarda (art. 7º, II) ficou numa frase própria.
       text:
         `${HOSTING_PROVIDER ? `A ${HOSTING_PROVIDER}, que hospeda este site,` : 'O provedor de hospedagem'} processa dados técnicos de acesso, como endereço IP e navegador, para entregar as páginas e proteger o serviço.` +
-        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. A guarda cumpre uma obrigação legal (LGPD, art. 7º, II). Pela lei, a disponibilização desses registros a terceiros depende de ordem judicial (Marco Civil da Internet, art. 10, §1º, e art. 15, §3º). Autoridades podem pedir que eles sejam guardados por mais tempo (art. 15, §2º), mas o acesso continua dependendo de ordem judicial. Os registros não contêm dados cadastrais, como nome ou endereço, que seguem regras legais próprias (art. 10, §3º).' +
-        (viaApi ? ' Para limitar abusos, o serviço de solicitações conta envios por endereço IP sem guardar o endereço (só um código derivado dele), por até 2 dias.' : ''),
+        ' Por exigência do Marco Civil da Internet (Lei 12.965/2014, art. 15), a Nekkora guarda registros de acesso a este site com cinco informações: data, horário (UTC), endereço IP e porta de origem da conexão e o domínio acessado. Esses registros não indicam a página visitada nem o navegador usado. Eles ficam guardados por pelo menos 6 meses, sob sigilo e com acesso restrito. A exclusão automática está programada para 190 dias após a gravação de cada registro e pode levar alguns dias a mais para ser concluída pelo provedor. A guarda cumpre uma obrigação legal (LGPD, art. 7º, II). Pela lei, a disponibilização desses registros a terceiros depende de ordem judicial (Marco Civil da Internet, art. 10, §1º, e art. 15, §3º). Autoridades podem pedir que eles sejam guardados por mais tempo (art. 15, §2º), mas o acesso continua dependendo de ordem judicial. Os registros não contêm dados cadastrais, como nome ou endereço, que seguem regras legais próprias (art. 10, §3º).',
     },
     // [PV-09] AUD-39: prazos aprovados na COM-008-B. A eliminação é feita pela Nekkora (não há rotina automática): o texto
     // descreve o prazo, não uma execução automática
     {
       icon: 'clock' as IconName,
       title: 'Por quanto tempo guardamos',
-      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante.${BOOKINGS_URL ? ' Reservas do Microsoft Bookings, por até 90 dias após a reunião ou o cancelamento.' : ''} Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
+      text: `Mensagens e dados de contato de quem não chegou a contratar ficam guardados por até seis meses após o último contato relevante. Dados ligados a uma contratação seguem os prazos do contrato e os exigidos por lei.`,
     },
     // [PV-10] AUD-40: transferência internacional. Revisão interna de 10/11/2026 (sem parecer externo): o texto diz só o
     // que foi verificado e não cita nenhum mecanismo do art. 33 que não esteja comprovado (JUR-07). Fatos: site e logs
@@ -745,7 +407,7 @@ export const PRIVACY = {
     {
       icon: 'link' as IconName,
       title: 'Onde os dados são processados',
-      text: `Os arquivos deste site e os registros de acesso ficam armazenados ${HOSTING_PROVIDER ? `na ${HOSTING_PROVIDER}` : 'no provedor de hospedagem'}, na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países.${BOOKINGS_URL ? ' A localização das reservas do Microsoft Bookings e das reuniões pelo Teams não foi confirmada e pode ser fora do Brasil.' : ''}`,
+      text: `Os arquivos deste site e os registros de acesso ficam armazenados ${HOSTING_PROVIDER ? `na ${HOSTING_PROVIDER}` : 'no provedor de hospedagem'}, na região de São Paulo. O e-mail e os arquivos da Nekkora no Microsoft 365 ficam armazenados no Brasil. Ainda assim, parte do tratamento pode ocorrer fora do Brasil, inclusive nos Estados Unidos: a entrega das páginas pode passar por servidores do provedor em outros países, e os provedores podem processar dados ou acessá-los para suporte a partir de outros países. As conversas pelo WhatsApp passam pelos servidores da Meta, que podem estar fora do Brasil.`,
     },
     // [PV-08] COM-008-B §9: base legal ≠ ciência da política ≠ consentimento. Revisão interna de 10/11/2026 (sem parecer
     // externo): aplica a redação já proposta na privacidade-minuta §2 (LEGAL-BASE-001), em que o representante de empresa
@@ -756,7 +418,7 @@ export const PRIVACY = {
     {
       icon: 'user' as IconName,
       title: 'Uso e seus direitos',
-      text: `Usamos os dados que você nos envia só para responder à solicitação${BOOKINGS_URL ? ', realizar a conversa agendada' : ''} e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18)${CHANNELS.email ? `, pelo e-mail ${CHANNELS.email}` : ', pelos canais de contato desta página'}.`,
+      text: `Usamos os dados que você nos envia só para responder à sua mensagem e preparar avaliação e proposta, a seu pedido (LGPD, art. 7º, V) ou, quando você fala em nome de uma empresa, no interesse legítimo de responder ao contato dessa empresa (LGPD, art. 7º, IX). Para isso não pedimos consentimento. Se algum outro uso depender de consentimento, ele será pedido à parte. Você pode pedir confirmação, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade e informações sobre o compartilhamento dos seus dados, opor-se ao tratamento feito com base no interesse legítimo e, quando houver consentimento, revogá-lo (LGPD, art. 18)${rightsChannels ? `, ${rightsChannels}` : ', pelos canais de contato desta página'}.`,
     },
   ],
 };

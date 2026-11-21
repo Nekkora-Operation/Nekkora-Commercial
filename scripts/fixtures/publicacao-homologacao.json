@@ -1,5 +1,5 @@
 {
-  "$comentario": "SINTÉTICO — só para builds de homologação (NEKKORA_PUBLICACAO). Nenhum valor é real: wa.me é atendido por uma página local nos testes e os domínios .invalid não existem. O build feito com este arquivo é marcado em dist/release.json e recusado por scripts/verificar-publicacao.mjs.",
+  "$comentario": "SINTÉTICO — só para builds de homologação (NEKKORA_PUBLICACAO). Nenhum valor é real: wa.me é atendido por uma página local nos testes e os domínios .invalid não existem. NEKKORA-COM-ECOSYSTEM-001: vigência sintética (ecossistema.inicio) e o Monitor \"em-preparacao\", para a homologação cobrir a vigência definida e um estado diferente do padrão. O build feito com este arquivo é marcado em dist/release.json e recusado por scripts/verificar-publicacao.mjs.",
   "canais": {
     "whatsapp": "5511912345678",
     "email": "contato@exemplo.invalid",
@@ -37,5 +37,13 @@
   "avisoHomologacao": true,
   "novasCondicoes": {
     "inicio": "2026-11-10"
+  },
+  "ecossistema": {
+    "inicio": "2026-11-25"
+  },
+  "servicos": {
+    "ai": "piloto",
+    "monitor": "em-preparacao",
+    "hosting": "sob-avaliacao"
   }
 }

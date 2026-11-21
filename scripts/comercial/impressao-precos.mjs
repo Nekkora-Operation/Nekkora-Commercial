@@ -7,21 +7,22 @@
  * recalcula a impressão a partir do código e bloqueia o deploy se ela divergir da aprovada — mesmo com
  * aprovacoes.precos === true. Assim, nenhum preço novo usa uma aprovação anterior.
  *
- * Entram na impressão todos os valores que a página pode exibir: Delivery (individual e pacote), tamanho do pacote e
- * preços previstos de Monitor e AI. A tabela anterior (PREVIOUS_PRICE_TABLE) não entra: ela não é exibida e só rege
- * compromissos já assumidos.
+ * Entram na impressão todos os valores que a página pode exibir (NEKKORA-COM-ECOSYSTEM-001): Nekkora AI Piloto (por
+ * automação), Nekkora Monitor (por automação/mês) e Nekkora Hosting (hora-máquina Windows e Linux), e os limites do
+ * simulador. As tabelas anteriores (Delivery e campanha de lançamento, scripts/comercial/tabelas-anteriores.mjs) não
+ * entram: não são exibidas e só regem compromissos já assumidos.
  *
  *   node scripts/comercial/impressao-precos.mjs      # imprime a tabela canônica e a impressão, para o registro da titular
  */
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
-import { PACKAGE_SIZE, PLANNED_RECURRING_PRICES, PRICE_TABLE } from '../../src/precos.ts';
+import { PRICE_TABLE, SIM_LIMITS } from '../../src/precos.ts';
 
 /** JSON com chaves em ordem alfabética em todos os níveis: a mesma tabela sempre gera o mesmo texto. */
 const canonical = (v) =>
   Array.isArray(v) ? `[${v.map(canonical).join(',')}]` : v && typeof v === 'object' ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${canonical(v[k])}`).join(',')}}` : JSON.stringify(v);
 
-export const tabelaCanonica = (tabela = { delivery: PRICE_TABLE, tamanhoDoPacote: PACKAGE_SIZE, recorrentesPrevistos: PLANNED_RECURRING_PRICES }) => canonical(tabela);
+export const tabelaCanonica = (tabela = { ecossistema: PRICE_TABLE, limitesDoSimulador: SIM_LIMITS }) => canonical(tabela);
 
 export const impressaoDaTabela = (tabela) => `sha256:${createHash('sha256').update(tabelaCanonica(tabela)).digest('hex')}`;
 

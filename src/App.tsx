@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-import { FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
-import { NAV_LINKS, whatsappUrl } from './config';
-import { RequestDialogContext, type RequestOptions } from './request';
+import { useEffect, useState } from 'react';
+import { Button, FloatingButton, Logo, Navbar, ThemeToggle, themes, useTheme } from 'nekkora-lib';
+import { NAV_LINKS, PLATFORM_LOGIN_URL } from './config';
 import { useMediaQuery } from './hooks';
-import { Contact, RequestDialog } from './sections/Contact';
+import { Contact } from './sections/Contact';
 import { Footer } from './sections/Footer';
 import { Hero } from './sections/Hero';
 import { Hosting } from './sections/Hosting';
@@ -12,6 +11,7 @@ import { Pricing } from './sections/Pricing';
 import { Privacy } from './sections/Privacy';
 import { Solutions } from './sections/Solutions';
 import { Transparency } from './sections/Transparency';
+import { REQUEST_AVAILABLE, RequestProvider, useRequestTrigger } from './atendimento';
 
 /** Retorna o href (#id) da seção do menu que está visível. */
 function useActiveSection(hrefs: string[]) {
@@ -41,76 +41,105 @@ function useThemeColorMeta() {
   }, [resolvedTheme]);
 }
 
-/** true enquanto a seção de contato está visível (ela já tem o próprio botão de WhatsApp). */
-function useContactVisible() {
+/**
+ * true enquanto algum bloco que já tem o próprio botão de atendimento está visível: os botões do topo e a seção de
+ * contato (NEKKORA-COM-CANAIS-001 — no celular, o botão flutuante cobriria o CTA do topo, que faz a mesma coisa).
+ */
+function useOwnWhatsappVisible() {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const el = document.getElementById('contato');
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { threshold: 0.15 });
-    observer.observe(el);
+    const els = [document.querySelector('.hero__ctas'), document.getElementById('contato')].filter((el): el is Element => el != null);
+    if (els.length === 0) return;
+    const seen = new Map<Element, boolean>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => seen.set(e.target, e.isIntersecting));
+        setVisible([...seen.values()].some(Boolean));
+      },
+      // qualquer parte visível já conta: no celular, o CTA do topo aparece só em parte na primeira tela
+      { threshold: 0 },
+    );
+    els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
   return visible;
 }
 
-/** WhatsApp só com número confirmado em config.ts (sem destino provisório). */
-const WHATSAPP = whatsappUrl();
+/** Texto do botão flutuante (NEKKORA-COM-CANAIS-001): sem promessa de disponibilidade ou de resposta imediata. */
+const FAB_TEXT = 'Fale com um analista';
+
+/**
+ * Botão flutuante (NEKKORA-COM-ECOSYSTEM-001 §8): abre o formulário de atendimento, que leva ao WhatsApp. Ícone oficial do
+ * WhatsApp da nekkora-lib e texto lado a lado, sem pulso nem indicador de "online".
+ */
+function RequestFab({ tucked }: { tucked: boolean }) {
+  const trigger = useRequestTrigger();
+  return (
+    <FloatingButton
+      {...trigger}
+      icon="whatsapp"
+      label={FAB_TEXT}
+      tooltip={false}
+      tone="whatsapp"
+      data-atendimento-origem="flutuante"
+      className={tucked ? 'fab--label fab--tucked' : 'fab--label'}
+      aria-hidden={tucked || undefined}
+      tabIndex={tucked ? -1 : undefined}
+    >
+      <span className="fab__text" aria-hidden="true">
+        {FAB_TEXT}
+      </span>
+    </FloatingButton>
+  );
+}
 
 export function App() {
+  return (
+    <RequestProvider>
+      <Page />
+    </RequestProvider>
+  );
+}
+
+function Page() {
   const active = useActiveSection(HREFS);
   useThemeColorMeta();
-  // No celular, o botão flutuante sai de cena enquanto o contato está visível.
-  const contactVisible = useContactVisible();
+  // No celular, o botão flutuante sai de cena enquanto os botões do topo ou o contato estão visíveis.
+  const ownWhatsappVisible = useOwnWhatsappVisible();
   const isMobile = useMediaQuery('(max-width: 900px)');
-  const [requestOpen, setRequestOpen] = useState(false);
-  const [requestOptions, setRequestOptions] = useState<RequestOptions>({});
-  // Também sai de cena com o diálogo aberto: ficaria por cima das ações do diálogo no celular.
-  const tucked = (contactVisible && isMobile) || requestOpen;
-  const openRequest = useCallback((options: RequestOptions = {}) => {
-    setRequestOptions(options);
-    setRequestOpen(true);
-  }, []);
-
+  const tucked = ownWhatsappVisible && isMobile;
   return (
-    <RequestDialogContext.Provider value={openRequest}>
-      <div className={WHATSAPP ? 'page page--fab' : 'page'}>
-        <a className="skip-link" href="#conteudo">
-          Pular para o conteúdo
-        </a>
-        <Navbar
-          brand={<Logo size={26} title="Nekkora — início" />}
-          brandHref="#inicio"
-          links={NAV_LINKS}
-          activeHref={active}
-          tools={<ThemeToggle />}
-          // Sem botão "Entrar": oculto enquanto não houver área de clientes (COM-008-B, AUD-26, PUB-16).
-        />
-        <main id="conteudo" tabIndex={-1}>
-          <Hero />
-          <Solutions />
-          <Pricing />
-          <HowItWorks />
-          <Hosting />
-          <Transparency />
-          <Contact />
-          <Privacy />
-        </main>
-        <Footer />
-        {WHATSAPP && (
-          <FloatingButton
-            href={WHATSAPP}
-            icon="whatsapp"
-            label="Fale conosco"
-            tone="whatsapp"
-            pulse
-            className={tucked ? 'fab--tucked' : undefined}
-            aria-hidden={tucked || undefined}
-            tabIndex={tucked ? -1 : undefined}
-          />
-        )}
-        <RequestDialog open={requestOpen} options={requestOptions} onClose={() => setRequestOpen(false)} />
-      </div>
-    </RequestDialogContext.Provider>
+    <div className={REQUEST_AVAILABLE ? 'page page--fab' : 'page'}>
+      <a className="skip-link" href="#conteudo">
+        Pular para o conteúdo
+      </a>
+      <Navbar
+        brand={<Logo size={26} title="Nekkora — início" />}
+        brandHref="#inicio"
+        links={NAV_LINKS}
+        activeHref={active}
+        tools={<ThemeToggle />}
+        // NEKKORA-COM-CANAIS-001 (titular, 12/11/2026; substitui a decisão de ocultar da COM-008-B, AUD-26, PUB-16):
+        // "Entrar" leva à Nekkora Platform, na mesma aba. A Commercial não autentica nem tem tela de login. No desktop
+        // fica à direita, depois do seletor de tema; no celular, dentro do menu.
+        actions={
+          <Button href={PLATFORM_LOGIN_URL} target="_self" variant="secondary" size="sm" data-entrar="">
+            Entrar
+          </Button>
+        }
+      />
+      <main id="conteudo" tabIndex={-1}>
+        <Hero />
+        <Solutions />
+        <Pricing />
+        <HowItWorks />
+        <Hosting />
+        <Transparency />
+        <Contact />
+        <Privacy />
+      </main>
+      <Footer />
+      {REQUEST_AVAILABLE && <RequestFab tucked={tucked} />}
+    </div>
   );
 }

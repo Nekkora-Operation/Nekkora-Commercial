@@ -14,7 +14,6 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { responseHeadersPolicy } from '../deploy/aws/cabecalhos.mjs';
-import { isBookingsUrl } from '../src/agendamento-url.js';
 import { impressaoDaTabela } from './comercial/impressao-precos.mjs';
 import { ITENS, impressaoDoConteudo } from './comercial/impressao-conteudo.mjs';
 
@@ -58,31 +57,20 @@ function isTaxId(doc) {
   return cnpj([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === n[12] && cnpj([6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === n[13];
 }
 
-// Canais (COM-RELEASE-002 §5.1). Decisão da titular (22/10/2026): e-mail e LinkedIn obrigatórios; WhatsApp opcional.
-need(pub.canais.whatsapp == null || isWhatsapp(pub.canais.whatsapp), 'PUB-01', 'WhatsApp: DDI+DDD+número, só dígitos, ou null (opcional)');
-need(isEmail(pub.canais.email), 'PUB-02', 'e-mail comercial');
+// Canais. NEKKORA-COM-CANAIS-001 (titular, 12/11/2026): o WhatsApp é o ÚNICO canal público de atendimento comercial
+// (obrigatório); LinkedIn (obrigatório) e Instagram (opcional) são redes institucionais. O e-mail continua obrigatório:
+// identificação do fornecedor no rodapé (Decreto 7.962/2013, art. 2º) e canal dos direitos do titular (LGPD, art. 18).
+need(isWhatsapp(pub.canais.whatsapp), 'PUB-01', 'WhatsApp comercial: DDI+DDD+número, só dígitos (único canal público de atendimento)');
+need(isEmail(pub.canais.email), 'PUB-02', 'e-mail da empresa (identificação do fornecedor e direitos do titular)');
 need(isProfile(pub.canais.linkedin) && /linkedin\.com$/i.test(new URL(pub.canais.linkedin ?? 'https://x/').hostname.replace(/^www\./, '')), 'PUB-03', 'página oficial do LinkedIn (URL de perfil)');
-need(pub.canais.instagram == null || isProfile(pub.canais.instagram), 'PUB-03', 'Instagram: URL de perfil ou null (opcional)');
-// Agendamento — Microsoft Bookings (COM-RELEASE-005 §4.5, NEKKORA-COM-007). A MESMA função de src/config.ts
-// (src/agendamento-url.js), em modo de produção: recusa também domínios de exemplo. Obrigatório quando faz parte do
-// lançamento; a titular confirma que testou a página oficial.
-const emailDomain = isEmail(pub.canais.email) ? pub.canais.email.split('@')[1].toLowerCase() : null;
-const isBookings = (u) => isBookingsUrl(u, { emailDomain, tenantDomain: pub.agendamento?.dominioDoTenant ?? null, producao: true });
+need(pub.canais.instagram == null || (isProfile(pub.canais.instagram) && /instagram\.com$/i.test(new URL(pub.canais.instagram).hostname.replace(/^www\./, ''))), 'PUB-03', 'Instagram: URL de perfil do instagram.com ou null (opcional)');
+// Agendamento (Microsoft Bookings) e recebimento automático: a página pública não tem agendamento, formulário nem envio
+// automático (NEKKORA-COM-CANAIS-001). Qualquer URL do Bookings ou endpoint de envio — válido ou não — bloqueia: a página
+// não usaria esses dados, e reativá-los exige nova decisão da titular, código e aviso de privacidade revistos.
 const booking = pub.agendamento ?? { url: null, obrigatorio: false };
-need(booking.url == null ? booking.obrigatorio !== true : isBookings(booking.url), 'PUB-20', 'URL oficial da página do Microsoft Bookings (https://bookings.cloud.microsoft/book/<caixa>@<domínio da Nekkora>/)');
-need(booking.url == null || pub.aprovacoes.agendamento === true, 'PUB-20', 'confirmação da titular: serviço do Bookings configurado e página oficial testada');
-// Recebimento automático (COM-RELEASE-005 §5): opcional; se houver endpoint, só https, com desafio e aprovação.
+need(booking.url == null && booking.obrigatorio !== true, 'PUB-20', 'Microsoft Bookings fora da página pública: agendamento.url null e obrigatorio false (NEKKORA-COM-CANAIS-001)');
 const intake = pub.envioAutomatico ?? { endpoint: null, chaveDoSiteTurnstile: null };
-if (intake.endpoint != null) {
-  let okEndpoint = false;
-  try {
-    const u = new URL(intake.endpoint);
-    okEndpoint = u.protocol === 'https:' && u.pathname === '/v1/commercial/requests' && u.search === '' && u.username === '';
-  } catch {}
-  need(okEndpoint, 'PUB-21', 'endpoint do recebimento automático: https://…/v1/commercial/requests');
-  need(typeof intake.chaveDoSiteTurnstile === 'string' && /^[0-9a-zA-Z_-]{10,64}$/.test(intake.chaveDoSiteTurnstile) && !/^[123]x0{20}[AB]{2}$/.test(intake.chaveDoSiteTurnstile), 'PUB-21', 'chave do site do Turnstile (não a chave de teste da Cloudflare)');
-  need(pub.aprovacoes.envioAutomatico === true, 'PUB-21', 'autorização do recebimento automático (backend publicado e homologado na AWS)');
-}
+need(intake.endpoint == null && intake.chaveDoSiteTurnstile == null, 'PUB-21', 'envio automático fora da página pública (sem formulário): envioAutomatico.endpoint e chaveDoSiteTurnstile null (NEKKORA-COM-CANAIS-001)');
 // Campanha (§4.4, COM-RELEASE-003-R1)
 const { inicio, fim } = pub.campanhaLancamento;
 const tabela = pub.tabelaDePrecos ?? {};
@@ -106,6 +94,26 @@ need(
   dataDoRegistroDoInicio != null && dataDoRegistroDoInicio >= '2026-11-12' && dataDoRegistroDoInicio <= today && datasCitadas.length === 1 && datasCitadas[0] === novas && iso(novas) && novas >= dataDoRegistroDoInicio,
   'PUB-13',
   `registro da data de início ausente ou divergente: $origem["novasCondicoes.inicio"] deve começar por "Titular, DD/MM/AAAA" (de 12/11/2026 até hoje) e citar a data ${novas ?? 'AAAA-MM-DD'} de novasCondicoes.inicio, não anterior ao registro`,
+);
+// NEKKORA-COM-ECOSYSTEM-001 §11: vigência da nova estratégia comercial, gravada pela titular quando autorizar a
+// publicação — sem sobrescrever o histórico acima. Exige ecossistema.inicio (AAAA-MM-DD, não depois de hoje) e o
+// registro $origem["ecossistema.inicio"] ("Titular, DD/MM/AAAA", de 20/11/2026 até hoje) citando UMA data, exatamente
+// essa, nunca anterior ao próprio registro (sem retroatividade).
+const vigencia = pub.ecossistema?.inicio ?? null;
+const registroDaVigencia = pub.$origem?.['ecossistema.inicio'];
+const dataDoRegistroDaVigencia = dataDoRegistro(registroDaVigencia);
+const datasDaVigencia = typeof registroDaVigencia === 'string' ? [...new Set(registroDaVigencia.match(/\b\d{4}-\d{2}-\d{2}\b/g) ?? [])] : [];
+need(
+  iso(vigencia) &&
+    vigencia <= today &&
+    dataDoRegistroDaVigencia != null &&
+    dataDoRegistroDaVigencia >= '2026-11-20' &&
+    dataDoRegistroDaVigencia <= today &&
+    datasDaVigencia.length === 1 &&
+    datasDaVigencia[0] === vigencia &&
+    vigencia >= dataDoRegistroDaVigencia,
+  'PUB-13',
+  `vigência da nova estratégia comercial: ecossistema.inicio (AAAA-MM-DD, não depois de hoje, ${today}) e registro em $origem["ecossistema.inicio"] ("Titular, DD/MM/AAAA", de 20/11/2026 até hoje) citando essa data, não anterior ao registro`,
 );
 // Privacidade (§5.4)
 need(Boolean(pub.controlador.nome), 'PUB-09', 'controlador dos dados: razão social (ou nome) para o aviso de privacidade');
@@ -145,28 +153,22 @@ need(
   'PUB-14',
   `registro da aprovação da tabela ausente ou divergente: $origem["tabelaDePrecos.impressao"] deve começar por "Titular, DD/MM/AAAA" (de 11/11/2026 até hoje) e citar a impressão aprovada ${impressao}`,
 );
-// V-01 / L-04 (titular, 12/11/2026): a página anuncia que os valores continuam depois da campanha, até nova revisão. Por
-// isso a continuidade é exigida em qualquer data, e a flag sozinha não é aprovação: posCampanha === true com o registro
-// $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela
-// aprovada (a continuidade vale para ESSA tabela; outra tabela exige nova decisão).
-const posCampanhaAprovada = tabela.posCampanha === true && registroConfere(pub.$origem?.['tabelaDePrecos.posCampanha'], tabela.impressao, impressao, '2026-11-12');
-need(
-  posCampanhaAprovada,
-  'V-01',
-  `tabela depois de 06/01/2027 sem aprovação própria: tabelaDePrecos.posCampanha true e registro em $origem["tabelaDePrecos.posCampanha"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a impressão da tabela ${impressao}`,
-);
-// COM-VITRINE-001 §3.2: campanha encerrada só com a V-01 aprovada (a página já não mostra comunicação promocional)
-need(!iso(fim) || fim >= today || posCampanhaAprovada, 'PUB-13', `campanha já encerrada (fim ${fim} < hoje ${today}) e tabela pós-campanha não aprovada (tabelaDePrecos.posCampanha, V-01)`);
-// COM-VITRINE-001 §7 (V-06): Monitor e AI só "em-preparacao" ou, com aprovação própria, "disponivel"
-for (const servico of ['monitor', 'ai']) {
+// V-01 / L-04 e a campanha encerrada (COM-VITRINE-001 §3.2) saíram do portão na NEKKORA-COM-ECOSYSTEM-001: a página não
+// exibe mais a tabela do Delivery, a campanha de lançamento nem a continuidade daquela tabela (a homologação confere a
+// ausência). Os registros $origem["tabelaDePrecos.posCampanha"] e campanhaLancamento ficam como histórico dos
+// compromissos já assumidos.
+// PUB-23 (NEKKORA-COM-ECOSYSTEM-001 §10): o estado de cada produto reflete a operação efetivamente existente. AI em
+// piloto; Monitor e Hosting sob avaliação ou em preparação; "disponivel" só com aprovação própria.
+const ESTADOS = { ai: ['piloto'], monitor: ['sob-avaliacao', 'em-preparacao'], hosting: ['sob-avaliacao', 'em-preparacao'] };
+for (const [servico, permitidos] of Object.entries(ESTADOS)) {
   const estado = pub.servicos?.[servico] ?? null;
   need(
-    estado === 'em-preparacao' || (estado === 'disponivel' && pub.aprovacoes.disponibilidade?.[servico] === true),
+    permitidos.includes(estado) || (estado === 'disponivel' && pub.aprovacoes.disponibilidade?.[servico] === true),
     'PUB-23',
-    `servicos.${servico}: "em-preparacao", ou "disponivel" só com aprovacoes.disponibilidade.${servico} (homologado, sem contratação fictícia)`,
+    `servicos.${servico}: ${permitidos.map((e) => `"${e}"`).join(' ou ')}, ou "disponivel" só com aprovacoes.disponibilidade.${servico} (operação efetivamente existente, sem contratação fictícia)`,
   );
 }
-need(pub.aprovacoes.condicoesComerciais === true, 'PUB-19', 'aprovação das condições comerciais (50/50, fila, reuniões, licenças, garantia e aceite)');
+need(pub.aprovacoes.condicoesComerciais === true, 'PUB-19', 'aprovação das condições comerciais');
 need(pub.aprovacoes.textosComerciais === true, 'PUB-17', 'aprovação dos textos comerciais');
 // COM-VITRINE-001 §12 (titular, 12/11/2026, forma b): a flag herdada da v1.0.0 não basta. Cada aprovação vale para UM
 // conteúdo: a impressão calculada dos arquivos (scripts/comercial/impressao-conteudo.mjs) tem de ser a aprovada em
@@ -197,17 +199,21 @@ const autorizada = pub.publicacaoAutorizada ?? {};
 const registroPub = pub.$origem?.publicacaoAutorizada;
 const dataPub = dataDoRegistro(registroPub);
 const commitsCitados = typeof registroPub === 'string' ? [...new Set(registroPub.match(/\b[0-9a-f]{40}\b/g) ?? [])] : [];
+// NEKKORA-COM-CANAIS-001 (titular, 13/11/2026): sem autorização retroativa — a PUB-18 não pode ser anterior às aprovações
+// do conteúdo que ela publica (registros da PUB-17 e da PUB-19)
+const datasDoConteudo = ['textosComerciais', 'condicoesComerciais'].map((item) => dataDoRegistro(pub.$origem?.[`impressoesDeConteudo.${item}`]));
 need(
   autorizada.versao === versao &&
     /^[0-9a-f]{40}$/.test(autorizada.commit ?? '') &&
     dataPub != null &&
     dataPub >= '2026-11-12' &&
     dataPub <= today &&
+    datasDoConteudo.every((d) => d != null && dataPub >= d) &&
     commitsCitados.length === 1 &&
     commitsCitados[0] === autorizada.commit &&
     registroPub.includes(`versão ${versao}`),
   'PUB-18',
-  `autorização desta versão: publicacaoAutorizada { versao: "${versao}", commit: SHA homologado } e registro em $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje) citando a versão ${versao} e UM commit, o homologado (a flag aprovacoes.publicacao sozinha não autoriza)`,
+  `autorização desta versão: publicacaoAutorizada { versao: "${versao}", commit: SHA homologado } e registro em $origem["publicacaoAutorizada"] ("Titular, DD/MM/AAAA", de 12/11/2026 até hoje, não anterior às aprovações da PUB-17 e da PUB-19) citando a versão ${versao} e UM commit, o homologado (a flag aprovacoes.publicacao sozinha não autoriza)`,
 );
 need(pub.avisoHomologacao === false, 'PUB-10', 'desligar o aviso "Versão para homologação"');
 
