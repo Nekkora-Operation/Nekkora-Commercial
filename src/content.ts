@@ -56,7 +56,7 @@ export const HERO = {
 export const SOLUTIONS = {
   eyebrow: 'Soluções',
   title: 'Crie. Monitore. Execute.',
-  description: 'Três serviços independentes. Contrate um, dois ou os três — separadamente ou em conjunto.',
+  description: 'Três soluções independentes. Escolha uma, duas ou as três, conforme sua necessidade. Nossa equipe avalia a disponibilidade e as condições antes da contratação.',
   cards: [
     {
       id: 'ai' as const,

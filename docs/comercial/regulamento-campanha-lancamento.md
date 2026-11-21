@@ -6,8 +6,9 @@
 > **não aprova** o contrato-base, os anexos, a proposta-modelo nem o procedimento operacional, e **não libera a
 > contratação de pacotes**, que depende de aprovação contratual específica (§7.6).
 >
-> **[NEKKORA-COM-ECOSYSTEM-001](../release/NEKKORA-COM-ECOSYSTEM-001.md) — PROPOSTA pendente de aprovação da titular
-> (PUB-19), 20/11/2026.** O Nekkora Delivery deixa de existir como produto comercial independente: a criação de
+> **[NEKKORA-COM-ECOSYSTEM-001](../release/NEKKORA-COM-ECOSYSTEM-001.md) — condições aprovadas editorialmente pela
+> titular em 20/11/2026 (PUB-19); a vigência e a publicação dependem das autorizações específicas da release v1.2.0
+> (`ecossistema.inicio` e PUB-18), sem aplicação retroativa.** O Nekkora Delivery deixa de existir como produto comercial independente: a criação de
 > automações passa ao **Nekkora AI — Piloto**. Este regulamento, a campanha e as tabelas dos §2 a §7 passam a valer
 > **só como histórico e como compromisso**: solicitações recebidas até a véspera da vigência da nova estratégia
 > (`ecossistema.inicio` em `publicacao.json`, definida pela titular quando autorizar a publicação) seguem as condições

@@ -26,7 +26,7 @@ Pilares (Crie. Monitore. Execute.):
 
 **Soluções** — Crie. Monitore. Execute.
 
-Três serviços independentes. Contrate um, dois ou os três — separadamente ou em conjunto.
+Três soluções independentes. Escolha uma, duas ou as três, conforme sua necessidade. Nossa equipe avalia a disponibilidade e as condições antes da contratação.
 
 ### 01 · Nekkora AI · _Piloto_
 
