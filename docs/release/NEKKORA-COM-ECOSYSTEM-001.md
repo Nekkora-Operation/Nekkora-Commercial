@@ -1,7 +1,9 @@
 # NEKKORA-COM-ECOSYSTEM-001 — Reestruturação da estratégia comercial (Commercial v1.2.0)
 
-> **Situação:** implementação local em homologação, **sem aprovação**. Nenhum merge, deploy ou alteração em produção
-> autorizados. A v1.1.0 continua em produção. Tudo o que está marcado como **PROPOSTA** depende de decisão da titular.
+> **Situação (20/11/2026):** conteúdos aprovados pela titular e registrados em `publicacao.json` (PUB-14, PUB-17,
+> PUB-19, PUB-09 e canais; §6a). Continuam pendentes a vigência (`ecossistema.inicio`, Dia D planejado para
+> 24/11/2026, §8) e a PUB-18 da 1.2.0 (H/C). Nenhum merge, deploy ou alteração em produção autorizados. A v1.1.0
+> continua em produção.
 
 ## 1. Decisão da titular (20/11/2026)
 
@@ -84,7 +86,7 @@ Esses commits têm as aprovações de 13/11/2026: canais, "Entrar" e o aviso de 
 As tabelas do Delivery saíram de `src/`. Ficam em `scripts/comercial/tabelas-anteriores.mjs` para os compromissos já
 assumidos (`regras-delivery.mjs`), e `verificar-precos-artefato.mjs` confere que nenhuma delas chega ao bundle.
 
-## 4. Condições comerciais propostas (PUB-19)
+## 4. Condições comerciais (PUB-19, aprovadas em 20/11/2026)
 
 Texto exibido no bloco de preços (`src/content.ts`, `PRICING.conditions`):
 
@@ -104,10 +106,11 @@ Texto exibido no bloco de preços (`src/content.ts`, `PRICING.conditions`):
 10. Cancelamento, reembolso e garantia seguem a proposta e o contrato, preservados os direitos previstos em lei.
 
 As regras do Delivery não se aplicam automaticamente ao AI Piloto: 50/50, fila, categorias, pacotes, devolução
-integral, homologação e garantia. O regulamento da campanha ganhou uma nota de transição (proposta) e uma linha para o
-novo WhatsApp no §4, **sem apagar nada**.
+integral, homologação e garantia. O regulamento da campanha ganhou uma nota de transição (aprovada editorialmente em
+20/11/2026; vigência e publicação dependem das autorizações da release) e uma linha para o novo WhatsApp no §4, **sem
+apagar nada**.
 
-## 5. Privacidade proposta (PUB-09)
+## 5. Privacidade (PUB-09, aprovação editorial de 20/11/2026)
 
 O aviso descreve:
 
@@ -135,6 +138,31 @@ Os direitos dos titulares são exercidos pelo novo WhatsApp oficial ou por `cont
 
 A ferramenta `scripts/campanha-datas.mjs` passa a recusar a troca das datas da campanha, que agora é histórico.
 
+## 6a. Aprovações registradas (titular, 20/11/2026)
+
+Vinculadas ao conteúdo do commit `82d56853edc7bcece159c9562f99abfc629c7bc3`, CI `44847090712`, impressões conferidas
+em Linux:
+
+| Item | Registro em `publicacao.json` | Impressão aprovada |
+|---|---|---|
+| PUB-14 (tabela) | `tabelaDePrecos.impressao` e `$origem["tabelaDePrecos.impressao"]` | `sha256:a6bc73ae097f9a0e4d7d569b579116c6bcce08441284cf9461a1517021ebdb16` |
+| PUB-17 (textos) | `impressoesDeConteudo.textosComerciais` e `$origem` correspondente | `sha256:07e669f44ec6070d615673bf842e0d9e119d2ffc68d1962dc1e1f4fb99a5d90a` |
+| PUB-19 (condições) | `impressoesDeConteudo.condicoesComerciais` e `$origem` correspondente | `sha256:1350a234e4a7d87e04841e0203d5219f615b01a688d70946c814e5a4119c1311` |
+| PUB-09 (privacidade) | registro acrescentado ao fim de `$origem["aprovacoes.avisoDePrivacidade"]`; o de 11/11/2026 continua intacto | — (aprovação editorial) |
+| Canais | `$origem.canais` consolidado, com as decisões anteriores como "Histórico" | — |
+
+- **PUB-19:** não autoriza contratação automática, não define titularidade de código, licenciamento nem entrega de
+  documentação e não substitui instrumentos contratuais.
+- **PUB-09:** a aprovação editorial não substitui validação jurídica nem comprovação operacional.
+- **Uma impressão por registro.** O portão (`registroConfere`) exige que cada registro cite uma única impressão.
+  Por isso os registros de PUB-14, PUB-17 e PUB-19 citam só a impressão da v1.2.0. Os registros substituídos estão
+  no apêndice A e no histórico Git.
+- **Preservados sem mudança:** `campanhaLancamento`, `novasCondicoes.inicio` (2026-11-12),
+  `tabelaDePrecos.posCampanha` e os respectivos `$origem`.
+- **Fontes das impressões:** este documento e `publicacao.json` não fazem parte delas. As fontes são `src/precos.ts`
+  (PUB-14); `src`, `index.html`, `public` e `vite.config.ts` (PUB-17); `src`, o regulamento e a minuta de condições
+  (PUB-19).
+
 ## 7. Pontos de decisão da titular
 
 Resolvidos em 20/11/2026: estados de Monitor e Hosting (`sob-avaliacao`), franquia mínima (não há), "a partir de" no
@@ -146,9 +174,74 @@ Continuam pendentes:
 
 1. **Hosting:** critério definitivo de cobrança (fração e arredondamento das horas) e licenciamento Windows,
    formalizados antes da contratação.
-2. **Vigência:** data de `ecossistema.inicio`, gravada quando a publicação for autorizada.
-3. **Registro de canais:** `$origem.canais` com o novo número (redigido como PROPOSTA, para confirmação).
-4. **Aprovação dos conteúdos:** PUB-14, PUB-17, PUB-19 e revisão da PUB-09, com as impressões calculadas em Linux;
-   depois, PUB-18 da 1.2.0 pelo processo H/C.
-5. **Regulamento:** nota de transição e linha do novo número no §4 (PROPOSTA).
-6. **Variável `DOMINIO_PUBLICO`** do workflow de deploy (pendência anterior, fora desta missão).
+2. **Vigência:** `ecossistema.inicio`. 24/11/2026 aprovado como data **planejada**, não como vigência autorizada.
+   Permanece `null` até a autorização específica no Dia D (§8).
+3. **PUB-18 da 1.2.0:** pelo processo H/C, proposta depois da CI de H.
+4. **Variável `DOMINIO_PUBLICO`** do workflow de deploy (pendência anterior, fora desta missão).
+
+## 8. Roteiro do Dia D (planejado: terça-feira, 24/11/2026)
+
+O portão só aceita `ecossistema.inicio` que não seja futura e exige a data dentro do commit homologado H. Por isso a
+vigência, H, C, merge e deploy acontecem na mesma data. Cada etapa depende de autorização expressa da titular.
+
+**Até 23/11/2026:**
+- `ecossistema.inicio` continua `null`;
+- a CI dos registros fica verde;
+- o preview é homologado com as aprovações gravadas.
+
+**Dia D — conferências antes de criar H:**
+1. A data local em Brasília é 24/11/2026: `TZ=America/Sao_Paulo date +%F`.
+2. As aprovações estão íntegras:
+   - `node scripts/verificar-publicacao.mjs` mostra só PUB-13 e PUB-18 pendentes;
+   - as impressões batem com as do §6a.
+3. A `main` não mudou desde `80c46a4` (`git fetch && git log origin/main -1`), ou as mudanças foram avaliadas.
+4. Há margem para concluir CI de H, autorização, C, CI de C, merge, deploy e verificação no mesmo dia. A CI completa
+   leva cerca de 15 minutos.
+
+**Commit H (com nova autorização):** `publicacao.json` recebe só a vigência; ainda **sem** a PUB-18.
+- `ecossistema.inicio = "2026-11-24"`;
+- `$origem["ecossistema.inicio"]`: "Titular, 24/11/2026 (NEKKORA-COM-ECOSYSTEM-001, PUB-13): vigência da nova
+  estratégia comercial a partir de 2026-11-24, data da publicação efetiva, no horário de Brasília. Solicitações
+  recebidas antes da entrada no ar seguem as condições anteriores; sem retroatividade."
+
+Depois vem a CI de H, com as três impressões conferidas em Linux e o portão mostrando só a PUB-18 pendente.
+
+**PUB-18:** proposta à titular para autorização expressa, vinculada ao SHA completo de H.
+
+**Commit C:** difere de H só em `publicacaoAutorizada` (`verificar-autorizacao-release.mjs`).
+- `{ versao: "1.2.0", commit: <SHA de H> }`;
+- registro "Titular, 24/11/2026 … versão 1.2.0 … <SHA de H>".
+
+Depois: CI de C, merge e deploy, cada um com sua autorização. Por fim, a verificação em produção e as evidências.
+
+**Se algo atrasar:** a vigência passa a ser a data da publicação efetiva, nunca anterior. H e C são refeitos com a
+nova data e uma nova autorização.
+
+## Apêndice A — registros substituídos em 20/11/2026 (texto integral)
+
+Estes são os registros de `publicacao.json` antes das aprovações de 20/11/2026. Ficam preservados aqui e no histórico
+Git (commit `82d5685` e anteriores). As aprovações valem só para o conteúdo da época e não se aplicam à v1.2.0.
+
+### A. `$origem["tabelaDePrecos.impressao"]`
+
+```text
+Titular, 12/11/2026 (COM-VITRINE-001, PUB-14, revisão da PR #21, commit cf0e733, CI aprovada e impressões conferidas em Linux): aprovo expressamente a tabela comercial da COM-VITRINE-001 — Nekkora Delivery: automação simples individual R$ 650, pacote de três simples R$ 1.500, automação média individual R$ 1.400, pacote de três médias R$ 3.500; Nekkora Monitor R$ 75 por automação/mês e Nekkora AI R$ 100 por empresa/mês como valores previstos, produtos em preparação e indisponíveis para contratação — impressão sha256:95a612f7b2528cee48fb4b043b4751d8bca66164e6cade01599832d8cc008f35.
+```
+
+### A. `$origem["impressoesDeConteudo.textosComerciais"]`
+
+```text
+Titular, 12/11/2026 (COM-VITRINE-001, PUB-17): aprovo os textos comerciais da nova vitrine correspondentes ao conteúdo homologado no commit cf0e733 — apresentação dos quatro produtos, preços e pacotes, o diferencial "A automação é sua", critérios comerciais, comunicação da campanha e jornadas de solicitação — impressão sha256:fa69c55dfac65645ef13a5e9387d15b8a94ce4f89d1306aa7504e6a5365d9df5.
+```
+
+### A. `$origem["impressoesDeConteudo.condicoesComerciais"]`
+
+```text
+Titular, 12/11/2026 (COM-VITRINE-001, PUB-19): aprovo as condições comerciais anunciadas na vitrine e no regulamento, conforme a versão homologada (commit cf0e733), impressão sha256:0b94d467bbad9aab0aee9cd3ff6c7612e42d88ae7b209fe59a4e50d3bf7577c1. Esta aprovação NÃO representa aprovação do contrato-base, anexos, proposta-modelo ou procedimento operacional; as decisões DP-01 a DP-05 e as demais condições contratuais continuam pendentes; não está autorizada a formalização de contratos de pacotes até a resolução dessas pendências.
+```
+
+### A. `$origem["canais"]`
+
+```text
+Titular, 12/11/2026 (NEKKORA-COM-CANAIS-001): o WhatsApp 5511917724200 passa a ser o único canal público de atendimento comercial; LinkedIn https://www.linkedin.com/company/nekkora mantido e Instagram https://www.instagram.com/nekkora.br/ adicionado, ambos como redes institucionais; formulário, envio por e-mail e Microsoft Bookings saem da página pública; o e-mail contato@nekkora.com continua só para obrigações administrativas, identificação do fornecedor e privacidade (direitos do titular), sem botão comercial. Registro aprovado pela titular em 13/11/2026. Substitui a decisão de 22/10/2026 (COM-RELEASE-003: por enquanto só LinkedIn e e-mail; WhatsApp e Instagram ficam de fora). Titular, 20/11/2026 (NEKKORA-COM-ECOSYSTEM-001, §5 — PROPOSTA de registro pendente de confirmação da titular): novo WhatsApp oficial 5511930597466, exibido como +55 (11) 93059-7466, no lugar de 5511917724200 nos pontos ativos da página; Instagram @nekkora.br e LinkedIn mantidos como redes institucionais; o WhatsApp continua o único canal público promovido para atendimento comercial. O registro de 12/11/2026 acima fica como histórico.
+```
